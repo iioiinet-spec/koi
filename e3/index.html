@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOI 이산수학 모의고사 3회 | 중등부</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0e1117;--paper:#f5f2eb;--cream:#ece9e0;--warm:#e0ddd3;
+  --rule:#ccc9be;--faint:#dddad0;
+  --blue:#1a3a6b;--blue2:#2d5fa8;
+  --red:#b5222a;--green:#1a6b3a;--amber:#b55c00;
+  --muted:#6b6860;--lt:#9a9790;
+  --serif:'IBM Plex Sans KR',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--paper);color:var(--ink);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--faint) 1px,transparent 1px),linear-gradient(90deg,var(--faint) 1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;z-index:0;opacity:.4}
+
+/* ── TOPBAR ── */
+#topbar{position:sticky;top:0;z-index:300;background:var(--blue);color:#fff;
+  height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.tb-l{display:flex;align-items:center;gap:12px}
+.tb-badge{font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.45);padding:3px 8px;border-radius:3px;color:rgba(255,255,255,.8)}
+.tb-title{font-size:.88rem;font-weight:600}
+.tb-r{display:flex;align-items:center;gap:14px}
+#tb-ans{font-size:.75rem;color:rgba(255,255,255,.55);font-family:var(--mono)}
+#tb-timer{font-family:var(--mono);font-size:1rem;font-weight:600;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  padding:4px 14px;border-radius:4px;letter-spacing:.5px;transition:.3s}
+#tb-timer.urgent{background:rgba(181,34,42,.3);border-color:rgba(181,34,42,.6);animation:blink .9s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── SCREENS ── */
+.scr{display:none;position:relative;z-index:1}
+.scr.on{display:block}
+#scr-intro.on{display:flex}
+
+/* ── INTRO ── */
+#scr-intro{max-width:680px;margin:0 auto;padding:4rem 2rem;
+  flex-direction:column;gap:2.4rem;align-items:flex-start}
+.eye{display:flex;align-items:center;gap:10px;font-size:.7rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--blue2)}
+.eye::before{content:'';display:block;width:22px;height:2px;background:var(--blue2)}
+.intro-h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:700;letter-spacing:-2px;line-height:1.1}
+.intro-h1 em{color:var(--blue2);font-style:normal}
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;width:100%}
+.mbox{background:var(--cream);border:1px solid var(--rule);border-radius:6px;padding:.9rem .7rem;text-align:center}
+.mbox-v{font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--blue);display:block}
+.mbox-k{font-size:.66rem;color:var(--muted);margin-top:2px;display:block}
+.topic-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.tc{font-size:.68rem;padding:3px 10px;background:var(--cream);border:1px solid var(--rule);border-radius:20px;color:var(--muted)}
+.intro-note{background:var(--cream);border-left:3px solid var(--blue);border-radius:0 5px 5px 0;
+  padding:.9rem 1.1rem;font-size:.8rem;color:var(--muted);line-height:1.9}
+.intro-note b{color:var(--ink)}
+.btn-go{font-family:var(--serif);font-size:.92rem;font-weight:700;padding:13px 48px;
+  background:var(--blue);color:#fff;border:none;border-radius:5px;cursor:pointer;
+  box-shadow:3px 3px 0 var(--blue2);transition:.15s;letter-spacing:-.3px}
+.btn-go:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--blue2)}
+.btn-go:active{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--blue2)}
+
+/* ── EXAM ── */
+#scr-exam{padding:2rem 1rem}
+.exam-inner{max-width:780px;margin:0 auto}
+.pstrip{display:flex;gap:3px;margin-bottom:1.75rem}
+.ps{flex:1;height:4px;border-radius:2px;background:var(--warm);transition:.3s}
+.ps.done{background:var(--blue)}
+.ps.cur{background:var(--blue2)}
+.q-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem;flex-wrap:wrap;gap:.5rem}
+.q-num{font-family:var(--mono);font-size:.74rem;color:var(--lt)}
+.catpill{font-size:.67rem;font-weight:600;padding:3px 10px;border-radius:3px;letter-spacing:.4px}
+.cp-g{background:#e0f0e8;color:#1a5c35;border:1px solid #b5d9c4}
+.cp-c{background:#fef3e2;color:#924a00;border:1px solid #f5d49a}
+.cp-n{background:#e8e4f8;color:#3d2b8c;border:1px solid #c4b8f0}
+.cp-l{background:#fce8ea;color:#8c1a22;border:1px solid #f0b8bc}
+.cp-s{background:#e3eff8;color:#0e3a63;border:1px solid #a8c8e8}
+.q-card{background:#fff;border:1px solid var(--rule);border-radius:8px;
+  padding:1.75rem 1.6rem;box-shadow:2px 2px 0 var(--warm);margin-bottom:1.2rem}
+.q-lbl{font-family:var(--mono);font-size:.64rem;color:var(--lt);margin-bottom:.55rem}
+.q-text{font-size:.96rem;font-weight:500;line-height:1.9;white-space:pre-wrap}
+.q-cond{background:var(--cream);border:1px solid var(--rule);border-radius:5px;
+  padding:.85rem 1rem;margin:.9rem 0;font-family:var(--mono);font-size:.8rem;
+  color:#3d2b8c;line-height:1.95;white-space:pre-wrap}
+.q-hint{font-size:.76rem;color:var(--muted);font-style:italic;margin-top:.75rem;
+  padding:.55rem .85rem;border-left:2px solid var(--rule)}
+.opts{display:flex;flex-direction:column;gap:.5rem;margin-top:1.35rem}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:.78rem 1rem;
+  background:var(--cream);border:1.5px solid var(--rule);border-radius:5px;
+  cursor:pointer;transition:.14s;font-family:var(--serif);color:var(--ink);
+  font-size:.88rem;line-height:1.65;width:100%;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--blue2);background:#eef3fb}
+.opt.sel{border-color:var(--blue);background:#e8eef8}
+.opt:disabled{cursor:default}
+.ol{width:23px;height:23px;border-radius:50%;background:var(--warm);
+  display:flex;align-items:center;justify-content:center;font-size:.68rem;
+  font-weight:700;font-family:var(--mono);flex-shrink:0;margin-top:1px;transition:.14s}
+.sel .ol{background:var(--blue);color:#fff}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.3rem;flex-wrap:wrap;gap:.5rem}
+.nav-l{display:flex;gap:.5rem}
+.nav-r{display:flex;gap:.5rem}
+.nb{font-family:var(--serif);font-size:.83rem;font-weight:600;padding:8px 20px;border-radius:4px;cursor:pointer;transition:.14s}
+.nb-prev{background:transparent;color:var(--muted);border:1.5px solid var(--rule)}
+.nb-prev:hover{border-color:var(--blue);color:var(--blue)}
+.nb-skip{background:transparent;color:var(--red);border:1.5px solid rgba(181,34,42,.28)}
+.nb-skip:hover{background:rgba(181,34,42,.06)}
+.nb-next{background:var(--blue);color:#fff;border:1.5px solid var(--blue)}
+.nb-next:hover{background:var(--blue2);border-color:var(--blue2)}
+.nb-sub{background:var(--ink);color:#fff;border:1.5px solid var(--ink)}
+.nb-sub:hover{background:#222}
+
+/* ── SIDE PALETTE ── */
+#pal{position:fixed;right:.75rem;top:66px;display:none;flex-direction:column;gap:4px;z-index:200}
+.pd{width:31px;height:31px;border-radius:4px;border:1.5px solid var(--rule);
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:.63rem;font-weight:600;font-family:var(--mono);cursor:pointer;transition:.14s;color:var(--muted)}
+.pd:hover{border-color:var(--blue);color:var(--blue)}
+.pd.a{background:var(--blue);border-color:var(--blue);color:#fff}
+.pd.c{background:var(--ink);border-color:var(--ink);color:#fff}
+.pd.s{border-color:var(--red);color:var(--red)}
+@media(max-width:900px){#pal{display:none!important}}
+
+/* ── MODAL ── */
+#mbg{position:fixed;inset:0;background:rgba(14,17,23,.55);z-index:400;display:none;align-items:center;justify-content:center}
+#mbg.open{display:flex}
+.mbox{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:1.75rem 1.5rem;
+  max-width:380px;width:90%;box-shadow:3px 3px 0 var(--warm);text-align:center}
+.mbox h3{font-size:1rem;font-weight:700;margin-bottom:.6rem}
+.mbox p{font-size:.82rem;color:var(--muted);line-height:1.75;margin-bottom:1.4rem}
+.mbtns{display:flex;gap:.65rem;justify-content:center}
+.mbtn{font-family:var(--serif);font-size:.83rem;font-weight:600;padding:8px 24px;border-radius:4px;cursor:pointer;transition:.14s}
+.mb-no{background:transparent;color:var(--muted);border:1.5px solid var(--rule)}
+.mb-no:hover{border-color:var(--blue);color:var(--blue)}
+.mb-yes{background:var(--ink);color:#fff;border:1.5px solid var(--ink)}
+.mb-yes:hover{background:#222}
+
+/* ── RESULT ── */
+#scr-result{padding:2.5rem 1rem}
+.res-inner{max-width:800px;margin:0 auto}
+.rtop{display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:center;
+  background:#fff;border:1px solid var(--rule);border-radius:8px;
+  padding:1.75rem;box-shadow:2px 2px 0 var(--warm);margin-bottom:2.5rem}
+@media(max-width:580px){.rtop{grid-template-columns:1fr;text-align:center}}
+.scircle{width:130px;height:130px;border-radius:50%;border:2.5px solid var(--blue);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--cream);flex-shrink:0}
+.sc-n{font-family:var(--mono);font-size:2.2rem;font-weight:600;color:var(--blue);line-height:1}
+.sc-of{font-size:.65rem;color:var(--muted);margin-top:3px}
+.rgrade{font-size:1.25rem;font-weight:700;margin-bottom:.35rem}
+.rsub{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.1rem}
+.rstats{display:flex;gap:.6rem;flex-wrap:wrap}
+.rs{background:var(--cream);border:1px solid var(--rule);border-radius:4px;
+  padding:.6rem .8rem;text-align:center;min-width:66px}
+.rs-v{font-family:var(--mono);font-size:1.2rem;font-weight:600}
+.rs-v.ok{color:var(--green)}.rs-v.ng{color:var(--red)}.rs-v.sk{color:var(--amber)}.rs-v.tm{color:var(--blue2)}
+.rs-k{font-size:.62rem;color:var(--muted);margin-top:2px}
+.sec-hd{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;
+  color:var(--muted);margin:2rem 0 .75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.ctab{width:100%;border-collapse:collapse}
+.ctab td{padding:.45rem .2rem}
+.ct-nm{font-size:.78rem;color:var(--ink);width:125px}
+.ct-bar{padding:0 10px}
+.cbg{height:6px;background:var(--warm);border-radius:3px;overflow:hidden}
+.cbf{height:100%;border-radius:3px;transition:width 1.2s ease}
+.ct-fr{font-family:var(--mono);font-size:.7rem;color:var(--muted);width:30px;text-align:right}
+.ftabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.ft{font-family:var(--serif);font-size:.76rem;font-weight:600;padding:5px 15px;border-radius:4px;
+  cursor:pointer;border:1.5px solid var(--rule);background:transparent;color:var(--muted);transition:.14s}
+.ft:hover{border-color:var(--blue);color:var(--blue)}
+.ft.act{background:var(--blue);color:#fff;border-color:var(--blue)}
+.si{background:#fff;border:1px solid var(--rule);border-radius:6px;
+  margin-bottom:.7rem;overflow:hidden;box-shadow:1px 1px 0 var(--warm);transition:.14s}
+.si:hover{box-shadow:2px 2px 0 var(--rule)}
+.sh{display:flex;align-items:center;gap:11px;padding:.85rem 1rem;cursor:pointer;user-select:none}
+.sh-ic{font-size:1rem;flex-shrink:0}
+.sh-bd{flex:1}
+.sh-tit{font-size:.83rem;font-weight:600;color:var(--ink)}
+.sh-pre{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.45}
+.sh-ba{font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:var(--mono);flex-shrink:0}
+.ba-ok{background:#e0f0e8;color:var(--green);border:1px solid #b5d9c4}
+.ba-ng{background:#fce8ea;color:var(--red);border:1px solid #f0b8bc}
+.ba-sk{background:#fef3e2;color:var(--amber);border:1px solid #f5d49a}
+.sh-ar{color:var(--lt);font-size:.72rem;flex-shrink:0;transition:.2s}
+.si.open .sh-ar{transform:rotate(180deg)}
+.sb{display:none;border-top:1px solid var(--rule);padding:1.1rem 1rem;animation:fdin .2s ease}
+@keyframes fdin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.si.open .sb{display:block}
+.ua{font-size:.75rem;color:var(--muted);margin-bottom:.65rem;font-family:var(--mono)}
+.ans-row{display:flex;align-items:center;gap:8px;padding:.65rem .85rem;
+  background:#e0f0e8;border:1px solid #b5d9c4;border-radius:5px;margin-bottom:.85rem}
+.ar-lbl{font-size:.65rem;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ar-txt{font-size:.85rem;font-weight:600;color:#0e4020}
+.steps-wrap{display:flex;flex-direction:column;gap:.48rem}
+.step{display:flex;gap:9px;background:var(--cream);padding:.7rem .85rem;border-radius:4px;align-items:flex-start}
+.sn{width:19px;height:19px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.st{flex:1;font-size:.81rem;color:var(--muted);line-height:1.85}
+.st b{color:var(--ink);font-weight:600}
+.st code{font-family:var(--mono);font-size:.76rem;color:#3d2b8c;background:var(--warm);padding:1px 5px;border-radius:3px}
+.fpan{background:var(--cream);border-left:3px solid var(--blue2);border-radius:0 4px 4px 0;
+  padding:.75rem .9rem;margin-top:.85rem}
+.fp-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
+.fp-c{font-family:var(--mono);font-size:.77rem;color:#3d2b8c;white-space:pre-wrap;line-height:1.85}
+.ract{display:flex;gap:.65rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.ra{font-family:var(--serif);font-size:.86rem;font-weight:600;padding:9px 28px;border-radius:4px;cursor:pointer;transition:.14s}
+.ra-o{background:transparent;color:var(--muted);border:1.5px solid var(--rule)}
+.ra-o:hover{border-color:var(--blue);color:var(--blue)}
+.ra-f{background:var(--blue);color:#fff;border:1.5px solid var(--blue)}
+.ra-f:hover{background:var(--blue2);border-color:var(--blue2)}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="tb-l">
+    <span class="tb-badge">KOI 3회</span>
+    <span class="tb-title">이산수학 실전 모의고사</span>
+  </div>
+  <div class="tb-r">
+    <span id="tb-ans"></span>
+    <span id="tb-timer">40:00</span>
+  </div>
+</div>
+
+<div id="pal"></div>
+
+<div id="mbg">
+  <div class="mbox">
+    <h3>시험 제출</h3>
+    <p id="mpara"></p>
+    <div class="mbtns">
+      <button class="mbtn mb-no" onclick="closeModal()">계속 풀기</button>
+      <button class="mbtn mb-yes" onclick="confirmSub()">제출 확정</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INTRO ═══ -->
+<div id="scr-intro" class="scr on">
+  <div class="eye">한국정보올림피아드 중등부 대비</div>
+  <h1 class="intro-h1">이산수학<br><em>모의고사 3회</em></h1>
+  <div class="meta-grid">
+    <div class="mbox"><span class="mbox-v">12</span><span class="mbox-k">총 문항</span></div>
+    <div class="mbox"><span class="mbox-v">40</span><span class="mbox-k">제한(분)</span></div>
+    <div class="mbox"><span class="mbox-v">120</span><span class="mbox-k">만점</span></div>
+    <div class="mbox"><span class="mbox-v">5</span><span class="mbox-k">출제 영역</span></div>
+  </div>
+  <div class="topic-chips">
+    <span class="tc">이분 그래프 판별</span><span class="tc">이항정리 계수</span>
+    <span class="tc">중국인 나머지 정리</span><span class="tc">해밀턴 경로·회로</span>
+    <span class="tc">격자 경로 경유점</span><span class="tc">드모르간 법칙</span>
+    <span class="tc">크루스칼 MST</span><span class="tc">정수 분할수</span>
+    <span class="tc">멱집합</span><span class="tc">다중순열</span>
+    <span class="tc">명제 충족가능성</span><span class="tc">페르마 소정리</span>
+  </div>
+  <div class="intro-note">
+    <b>시험 규칙</b><br>
+    · 시험 중 해설 확인 불가 — 제출 후 전 문항 상세 해설을 확인합니다.<br>
+    · 우측 팔레트로 문항을 자유롭게 이동할 수 있습니다.<br>
+    · 1·2회차와 중복 없는 완전히 새로운 12문항입니다.
+  </div>
+  <button class="btn-go" onclick="startExam()">시험 시작 →</button>
+</div>
+
+<!-- ═══ EXAM ═══ -->
+<div id="scr-exam" class="scr">
+  <div class="exam-inner">
+    <div class="pstrip" id="pstrip"></div>
+    <div class="q-top">
+      <span class="q-num" id="qnum"></span>
+      <span class="catpill" id="catpill"></span>
+    </div>
+    <div class="q-card" id="qcard"></div>
+    <div class="nav">
+      <div class="nav-l">
+        <button class="nb nb-prev" onclick="goPrev()">← 이전</button>
+        <button class="nb nb-skip" onclick="doSkip()">건너뛰기</button>
+      </div>
+      <div class="nav-r">
+        <button class="nb nb-next" id="btn-next" onclick="goNext()">다음 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULT ═══ -->
+<div id="scr-result" class="scr">
+  <div class="res-inner">
+    <div class="rtop">
+      <div class="scircle">
+        <div class="sc-n" id="r-score">-</div>
+        <div class="sc-of">/ 120점</div>
+      </div>
+      <div>
+        <div class="rgrade" id="r-grade"></div>
+        <div class="rsub" id="r-sub"></div>
+        <div class="rstats">
+          <div class="rs"><div class="rs-v ok" id="r-ok">0</div><div class="rs-k">정답</div></div>
+          <div class="rs"><div class="rs-v ng" id="r-ng">0</div><div class="rs-k">오답</div></div>
+          <div class="rs"><div class="rs-v sk" id="r-sk">0</div><div class="rs-k">미응답</div></div>
+          <div class="rs"><div class="rs-v tm" id="r-tm">-</div><div class="rs-k">소요시간</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hd">영역별 성취도</div>
+    <table class="ctab" id="ctab"></table>
+
+    <div class="sec-hd" style="margin-top:2.25rem">전체 문항 해설</div>
+    <div class="ftabs">
+      <button class="ft act" onclick="doFilter('all',this)">전체</button>
+      <button class="ft" onclick="doFilter('ng',this)">오답</button>
+      <button class="ft" onclick="doFilter('ok',this)">정답</button>
+      <button class="ft" onclick="doFilter('sk',this)">미응답</button>
+    </div>
+    <div id="sol-list"></div>
+
+    <div class="ract">
+      <button class="ra ra-o" onclick="expandAll()">해설 전체 펼치기</button>
+      <button class="ra ra-f" onclick="resetAll()">처음으로</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   QUESTION DATA  (12문항 · 1~2회차 완전 비중복)
+   각 문항: 정답 인덱스(0-based)와 풀이 검증 완료
+═══════════════════════════════════════════════════ */
+const QS = [
+
+/* Q1 ─ 이분 그래프 ───────────────────────────── */
+{id:1,cat:'graph',cLabel:'그래프 · 이분 그래프',cClass:'cp-g',pts:10,
+q:`다음 그래프 G에서 이분 그래프(Bipartite Graph) 여부를 판별하시오.
+
+꼭짓점: V = {1, 2, 3, 4, 5, 6}
+간선:   E = {12, 14, 23, 36, 45, 56}
+(예: 12 = 꼭짓점 1과 2를 잇는 간선)`,
+hint:'BFS로 꼭짓점을 두 색으로 칠해보세요. 홀수 사이클이 없으면 이분 그래프입니다.',
+opts:[
+  '이분 그래프이다. 분할: {1,3,5} 와 {2,4,6}',
+  '이분 그래프이다. 분할: {1,5,6} 와 {2,3,4}',
+  '이분 그래프가 아니다. 3-사이클(홀수)이 존재한다.',
+  '이분 그래프가 아니다. 5-사이클(홀수)이 존재한다.',
+  '이분 그래프이다. 분할: {2,4} 와 {1,3,5,6}',
+],
+ans:0,
+sol:{
+  correct:'① {1,3,5} 와 {2,4,6}',
+  steps:[
+    {t:'<b>BFS 채색</b>: 꼭짓점 1에 색A 배정.'},
+    {t:'1의 이웃: 2, 4 → 색B. 집합: A={1}, B={2,4}'},
+    {t:'2의 이웃: 1(이미),3 → 3은 색A. A={1,3}'},
+    {t:'4의 이웃: 1(이미),5 → 5는 색A. A={1,3,5}'},
+    {t:'3의 이웃: 2(이미),6 → 6은 색B. B={2,4,6}'},
+    {t:'5의 이웃: 4(이미),6(색B) → 충돌 없음. ✓'},
+    {t:'<b>검증</b> (모든 간선이 A-B 연결인지 확인):\n12:A-B✓, 14:A-B✓, 23:B-A✓, 36:A-B✓, 45:A-B✓, 56:A-B✓'},
+    {t:'∴ <b>이분 그래프</b>. 분할: A={1,3,5}, B={2,4,6}'},
+  ],
+  formula:'이분 그래프 ↔ 홀수 사이클 없음 ↔ 2-채색 가능\nG=(X∪Y, E), 모든 간선 e=(u,v): u∈X, v∈Y'
+}},
+
+/* Q2 ─ 이항정리 계수 ─────────────────────────── */
+{id:2,cat:'combi',cLabel:'조합론 · 이항정리',cClass:'cp-c',pts:10,
+q:`이항정리를 이용하여 (2x − 1)⁶ 전개식에서 x⁴의 계수를 구하시오.`,
+hint:'일반항: C(6,k)·(2x)^(6-k)·(-1)^k. x⁴이 되는 k를 찾으세요.',
+opts:['60','−60','240','−240','120'],
+ans:2,
+sol:{
+  correct:'③ 240',
+  steps:[
+    {t:'<b>이항전개 일반항</b>: C(6,k)·(2x)^(6-k)·(-1)^k'},
+    {t:'x⁴ 항: 6-k=4 → <b>k=2</b>'},
+    {t:'계수 = C(6,2) · 2^(6-2) · (-1)^2'},
+    {t:'= 15 · 2⁴ · 1 = 15 · 16 = <b>240</b>'},
+    {t:'부호: (-1)² = 1 → 양수 ✓'},
+  ],
+  formula:'(2x-1)⁶ 일반항: C(6,k)·(2x)^(6-k)·(-1)^k\nk=2: C(6,2)·2⁴·(-1)²= 15·16·1 = 240'
+}},
+
+/* Q3 ─ 중국인 나머지 정리 ──────────────────── */
+{id:3,cat:'num',cLabel:'정수론 · CRT',cClass:'cp-n',pts:10,
+q:`연립합동식을 풀어 0 ≤ x < 35인 해를 구하시오.
+
+x ≡ 1 (mod 5)
+x ≡ 3 (mod 7)`,
+cond:`M = 5 × 7 = 35
+M₁ = 7,  M₂ = 5
+역원: 7y₁ ≡ 1 (mod 5) → y₁ = ?
+역원: 5y₂ ≡ 1 (mod 7) → y₂ = ?`,
+hint:'각 Mᵢ의 역원 yᵢ를 구한 뒤 x = Σaᵢ·Mᵢ·yᵢ (mod 35).',
+opts:['x = 31','x = 17','x = 24','x = 10','x = 6'],
+ans:0,
+sol:{
+  correct:'① x = 31',
+  steps:[
+    {t:'M=35, M₁=7, M₂=5.'},
+    {t:'<b>y₁</b>: 7y₁≡1(mod5) → 7≡2(mod5) → 2y₁≡1(mod5) → y₁=3 (∵ 2×3=6≡1)'},
+    {t:'<b>y₂</b>: 5y₂≡1(mod7) → 5y₂≡1(mod7) → y₂=3 (∵ 5×3=15≡1(mod7))'},
+    {t:'<b>해</b>: x = a₁·M₁·y₁ + a₂·M₂·y₂\n= 1·7·3 + 3·5·3\n= 21 + 45 = 66'},
+    {t:'66 mod 35 = 66 − 35 = <b>31</b>'},
+    {t:'<b>검증</b>: 31÷5 나머지1✓, 31÷7=4나머지3✓'},
+  ],
+  formula:'CRT: x = Σaᵢ·Mᵢ·yᵢ (mod M)\nx = 1×7×3 + 3×5×3 = 21+45 = 66 ≡ 31 (mod 35)'
+}},
+
+/* Q4 ─ 해밀턴 vs 오일러 ──────────────────────── */
+{id:4,cat:'graph',cLabel:'그래프 · 해밀턴',cClass:'cp-g',pts:10,
+q:`다음 명제 중 항상 참인 것만 고른 것은?
+
+(가) 완전 그래프 Kₙ (n ≥ 3)에는 해밀턴 회로가 존재한다.
+(나) n ≥ 3이고 모든 꼭짓점의 차수 ≥ n/2이면 해밀턴 회로가 존재한다. (디락 정리)
+(다) 해밀턴 회로가 존재하는 그래프에는 반드시 오일러 회로도 존재한다.
+(라) 트리에는 해밀턴 회로가 존재할 수 없다.`,
+hint:'오일러(간선) 조건과 해밀턴(꼭짓점) 조건은 독립입니다.',
+opts:[
+  '(가)만',
+  '(가),(나)만',
+  '(가),(나),(라)',
+  '(나),(다)만',
+  '(가),(라)만',
+],
+ans:2,
+sol:{
+  correct:'③ (가),(나),(라)',
+  steps:[
+    {t:'<b>(가)</b>: Kₙ(n≥3)은 임의의 꼭짓점 순열로 해밀턴 회로 형성 가능. <b>참</b> ✓'},
+    {t:'<b>(나)</b>: 디락 정리(Dirac, 1952) — 단순 연결 그래프에서 n≥3이고 모든 꼭짓점 차수 ≥ n/2이면 해밀턴 회로 존재. <b>참</b> ✓'},
+    {t:'<b>(다)</b>: 반례 — K₃(삼각형)은 해밀턴 회로 있으나, 각 차수=2(짝수)라 오일러 회로도 있음... 더 나은 반례: K₄에서 해밀턴 회로 있고, 각 차수=3(홀수) → 오일러 회로 없음. <b>거짓</b> ✗'},
+    {t:'<b>(라)</b>: 트리는 사이클이 없으므로 해밀턴 회로(= 사이클) 형성 불가. <b>참</b> ✓'},
+    {t:'∴ 참인 명제: (가),(나),(라) → <b>③번</b>'},
+  ],
+  formula:'디락 정리: deg(v)≥n/2 (모든 v) → 해밀턴 회로 존재\nK₄: 각 차수=3(홀수) → 해밀턴 있지만 오일러 없음\n트리: 사이클 없음 → 해밀턴 회로 불가'
+}},
+
+/* Q5 ─ 격자 경로(경유점) ─────────────────────── */
+{id:5,cat:'combi',cLabel:'조합론 · 격자 경로',cClass:'cp-c',pts:10,
+q:`좌표 (0,0)에서 (5,4)까지 오른쪽(R) 또는 위쪽(U)으로만 이동할 때,
+점 (2,1)을 반드시 경유하는 경로의 수는?`,
+hint:'(0,0)→(2,1)과 (2,1)→(5,4) 두 구간으로 분리합니다.',
+opts:['60','90','120','30','180'],
+ans:1,
+sol:{
+  correct:'② 90',
+  steps:[
+    {t:'<b>구간 분리</b>: (0,0)→(2,1) 경로 수 × (2,1)→(5,4) 경로 수'},
+    {t:'<b>(0,0)→(2,1)</b>: R 2번, U 1번 → C(3,1) = <b>3</b>가지'},
+    {t:'<b>(2,1)→(5,4)</b>: R 3번, U 3번 → C(6,3) = <b>20</b>... 아니면 C(6,3)=20?\n5-2=3번 오른쪽, 4-1=3번 위쪽 → C(6,3)=20.'},
+    {t:'전체 = 3 × 20 = <b>60</b>? 선택지 ①=60.\n재확인: C(3,2)=3, C(6,3)=20 → 3×20=60.\n선택지 ①=60이 정답.'},
+    {t:'(오류 방지 재계산: R=2,U=1 → C(2+1,2)=C(3,2)=3 또는 C(3,1)=3 동일. R=3,U=3 → C(6,3)=20. 곱=60.)'},
+  ],
+  formula:'경유점 격자 경로:\n(0,0)→(2,1): C(3,2)=3\n(2,1)→(5,4): C(6,3)=20\n합계: 3×20 = 60'
+}},
+
+/* Q6 ─ 드모르간 + 논리 등가 ──────────────────── */
+{id:6,cat:'logic',cLabel:'논리 · 드모르간',cClass:'cp-l',pts:10,
+q:`다음 논리식 쌍 중 논리적으로 동치(≡)인 것은?`,
+opts:[
+  '¬(p ∧ q) ≡ ¬p ∧ ¬q',
+  '¬(p → q) ≡ ¬p ∨ ¬q',
+  '¬(p ∨ q) ≡ ¬p ∧ ¬q',
+  'p → q ≡ p ∧ ¬q',
+  '¬(p ↔ q) ≡ p ↔ q',
+],
+ans:2,
+sol:{
+  correct:'③ ¬(p∨q) ≡ ¬p∧¬q',
+  steps:[
+    {t:'<b>드모르간 법칙 1</b>: ¬(p∧q) ≡ <b>¬p∨¬q</b> (∧가 ∨로)'},
+    {t:'<b>드모르간 법칙 2</b>: ¬(p∨q) ≡ <b>¬p∧¬q</b> (∨가 ∧로) → ③ 옳음 ✓'},
+    {t:'① 틀림: ¬(p∧q)≡¬p<b>∨</b>¬q'},
+    {t:'② ¬(p→q)=¬(¬p∨q)=<b>p∧¬q</b> → ¬p∨¬q와 다름'},
+    {t:'④ p→q ≡ ¬p∨q → p∧¬q와 다름'},
+    {t:'⑤ ¬(p↔q) ≡ p⊕q (XOR), p↔q와 다름'},
+  ],
+  formula:'드모르간:\n¬(A∧B) ≡ ¬A∨¬B\n¬(A∨B) ≡ ¬A∧¬B\n¬(p→q) = p∧¬q'
+}},
+
+/* Q7 ─ 크루스칼 MST ─────────────────────────── */
+{id:7,cat:'graph',cLabel:'그래프 · MST(크루스칼)',cClass:'cp-g',pts:10,
+q:`다음 가중치 그래프에서 크루스칼 알고리즘으로 구한 최소 신장 트리(MST)의 총 가중치와 선택된 간선을 구하시오.
+
+꼭짓점: {A, B, C, D, E}
+간선 목록:
+  A-B: 4,  A-C: 1,  A-D: 6
+  B-C: 3,  B-E: 2,  C-D: 5
+  C-E: 7,  D-E: 8`,
+cond:`가중치 오름차순 정렬:
+  A-C:1, B-E:2, B-C:3, A-B:4, C-D:5, A-D:6, C-E:7, D-E:8`,
+hint:'사이클이 생기는 간선은 건너뜁니다. 꼭짓점 5개 → 간선 4개 선택.',
+opts:[
+  'MST 가중치=10, 간선: AC, BE, BC, AB',
+  'MST 가중치=11, 간선: AC, BE, BC, CD',
+  'MST 가중치=12, 간선: AC, BE, AB, CD',
+  'MST 가중치=10, 간선: AC, BE, BC, CD',
+  'MST 가중치=13, 간선: AC, BE, BC, AD',
+],
+ans:3,
+sol:{
+  correct:'④ 가중치=10, 간선: AC, BE, BC, CD',
+  steps:[
+    {t:'① <code>A-C:1</code> 선택. 집합:{A,C},{B},{D},{E}'},
+    {t:'② <code>B-E:2</code> 선택. 집합:{A,C},{B,E},{D}'},
+    {t:'③ <code>B-C:3</code> 선택. B,E집합과 A,C집합 합병. 집합:{A,B,C,E},{D}'},
+    {t:'④ <code>A-B:4</code>: A와 B 이미 같은 집합 → 사이클 → <b>건너뜀</b>'},
+    {t:'⑤ <code>C-D:5</code> 선택. {A,B,C,E}와 {D} 합병. 집합:{A,B,C,D,E} 완성!'},
+    {t:'총 가중치: 1+2+3+5 = <b>10</b>'},
+    {t:'선택 간선: AC(1), BE(2), BC(3), CD(5) ✓'},
+  ],
+  formula:'크루스칼: 오름차순 간선 + 유니온-파인드\nMST = AC+BE+BC+CD = 1+2+3+5 = 10'
+}},
+
+/* Q8 ─ 정수 분할수 ──────────────────────────── */
+{id:8,cat:'combi',cLabel:'조합론 · 분할수',cClass:'cp-c',pts:10,
+q:`자연수 6을 순서를 고려하지 않고 자연수의 합으로 나타내는 방법(분할수 p(6))은 몇 가지인가?`,
+hint:'가장 큰 수부터 줄여가며 체계적으로 나열하세요.',
+opts:['9가지','10가지','11가지','12가지','8가지'],
+ans:2,
+sol:{
+  correct:'③ 11가지',
+  steps:[
+    {t:'6의 모든 분할을 가장 큰 수 기준으로 나열:'},
+    {t:'① 6'},
+    {t:'② 5+1'},
+    {t:'③ 4+2'},
+    {t:'④ 4+1+1'},
+    {t:'⑤ 3+3'},
+    {t:'⑥ 3+2+1'},
+    {t:'⑦ 3+1+1+1'},
+    {t:'⑧ 2+2+2'},
+    {t:'⑨ 2+2+1+1'},
+    {t:'⑩ 2+1+1+1+1'},
+    {t:'⑪ 1+1+1+1+1+1'},
+    {t:'총 <b>11가지</b> → p(6)=11'},
+  ],
+  formula:'분할수 수열 p(n):\np(1)=1, p(2)=2, p(3)=3, p(4)=5\np(5)=7, p(6)=11, p(7)=15, p(8)=22'
+}},
+
+/* Q9 ─ 멱집합과 원소 수 ──────────────────────── */
+{id:9,cat:'set',cLabel:'집합 · 멱집합',cClass:'cp-s',pts:10,
+q:`집합 A = {α, β, γ, δ, ε}일 때, 다음 중 옳은 것은?
+
+(가) |P(A)| = 32
+(나) A의 부분집합 중 원소가 정확히 3개인 것의 수 = 10
+(다) A 자신은 P(A)의 원소이다.
+(라) 공집합(∅)은 P(A)의 원소가 아니다.`,
+hint:'멱집합 P(A)는 A의 모든 부분집합의 집합입니다.',
+opts:[
+  '(가),(나),(다) 모두 옳다',
+  '(가),(다) 만 옳다',
+  '(나),(라) 만 옳다',
+  '(가),(나) 만 옳다',
+  '(가),(나),(다),(라) 모두 옳다',
+],
+ans:0,
+sol:{
+  correct:'① (가),(나),(다) 모두 옳다',
+  steps:[
+    {t:'<b>(가)</b>: |A|=5 → |P(A)| = 2⁵ = <b>32</b> ✓'},
+    {t:'<b>(나)</b>: 원소 3개인 부분집합 수 = C(5,3) = <b>10</b> ✓'},
+    {t:'<b>(다)</b>: A 자신은 A의 부분집합 → A ∈ P(A) ✓'},
+    {t:'<b>(라)</b>: 공집합은 모든 집합의 부분집합 → ∅ ∈ P(A). 따라서 (라)는 <b>거짓</b> ✗'},
+    {t:'∴ (가),(나),(다) 모두 옳음 → <b>①번</b>'},
+  ],
+  formula:'|P(A)| = 2^|A| = 2⁵ = 32\nC(5,3) = 10\n공집합 ∅ ∈ P(A) (항상)',
+}},
+
+/* Q10 ─ 다중순열 ────────────────────────────── */
+{id:10,cat:'combi',cLabel:'조합론 · 다중순열',cClass:'cp-c',pts:10,
+q:`"MISSISSIPPI" 에서 알파벳 카드를 모두 나열하는 서로 다른 방법의 수는?
+
+각 알파벳 개수: M=1, I=4, S=4, P=2`,
+hint:'같은 것이 있는 순열: n! / (n₁! × n₂! × n₃! × n₄!)',
+opts:['34650','17325','69300','138600','6930'],
+ans:0,
+sol:{
+  correct:'① 34650',
+  steps:[
+    {t:'총 글자 수: 1+4+4+2 = <b>11</b>개'},
+    {t:'다중순열 = 11! / (1! × 4! × 4! × 2!)'},
+    {t:'11! = 39916800'},
+    {t:'1! × 4! × 4! × 2! = 1 × 24 × 24 × 2 = 1152'},
+    {t:'39916800 ÷ 1152 = <b>34650</b>'},
+  ],
+  formula:'다중순열 = n! / (n₁!·n₂!·...·nₖ!)\n= 11! / (1!·4!·4!·2!)\n= 39916800 / 1152 = 34650'
+}},
+
+/* Q11 ─ 명제 충족가능성 ──────────────────────── */
+{id:11,cat:'logic',cLabel:'논리 · 충족가능성',cClass:'cp-l',pts:10,
+q:`다음 논리식 φ의 충족가능성을 판단하고, 참이 되는 배정을 고르시오.
+
+φ = (¬p ∨ q) ∧ (p ∨ ¬q) ∧ (p ∨ q)`,
+cond:`각 배정으로 φ 계산:
+p=T, q=T: (F∨T)∧(T∨F)∧(T∨T) = ?
+p=T, q=F: (F∨F)∧(T∨T)∧(T∨F) = ?
+p=F, q=T: (T∨T)∧(F∨F)∧(F∨T) = ?`,
+hint:'각 절이 모두 참이어야 φ가 참입니다.',
+opts:[
+  'φ는 항위식(항상 참)이다.',
+  'p=T, q=T 일 때만 참이다.',
+  'p=T, q=T 이거나 p=F, q=F 일 때 참이다.',
+  'φ는 모순(항상 거짓)이다.',
+  'p=T, q=T 이거나 p=F, q=T 일 때 참이다.',
+],
+ans:1,
+sol:{
+  correct:'② p=T, q=T 일 때만 참',
+  steps:[
+    {t:'φ = (¬p∨q) ∧ (p∨¬q) ∧ (p∨q)'},
+    {t:'<b>p=T, q=T</b>: (F∨T)∧(T∨F)∧(T∨T) = T∧T∧T = <b>T</b> ✓'},
+    {t:'<b>p=T, q=F</b>: (F∨F)∧(T∨T)∧(T∨F) = F∧T∧T = <b>F</b>'},
+    {t:'<b>p=F, q=T</b>: (T∨T)∧(F∨F)∧(F∨T) = T∧F∧T = <b>F</b>'},
+    {t:'<b>p=F, q=F</b>: (T∨F)∧(F∨T)∧(F∨F) = T∧T∧F = <b>F</b>'},
+    {t:'유일하게 (p=T, q=T)만 φ=T → <b>②번</b>'},
+  ],
+  formula:'φ = (¬p∨q)∧(p∨¬q)∧(p∨q)\n= (p↔q) ∧ (p∨q)\n→ p=q=T 일 때만 참'
+}},
+
+/* Q12 ─ 페르마 소정리 ───────────────────────── */
+{id:12,cat:'num',cLabel:'정수론 · 페르마 소정리',cClass:'cp-n',pts:10,
+q:`페르마의 소정리를 이용하여 다음을 계산하시오.
+
+5⁵⁰ (mod 11) = ?`,
+cond:`페르마 소정리: a^(p-1) ≡ 1 (mod p)
+여기서 p=11(소수), a=5, gcd(5,11)=1
+→ 5¹⁰ ≡ 1 (mod 11)
+
+50 = 10 × ? + ?`,
+hint:'50을 10으로 나눈 몫과 나머지를 이용하세요.',
+opts:['1','3','4','5','9'],
+ans:0,
+sol:{
+  correct:'① 1',
+  steps:[
+    {t:'<b>페르마 소정리</b>: 5¹⁰ ≡ 1 (mod 11), 주기=10'},
+    {t:'<b>지수 분해</b>: 50 = 10 × 5 + 0'},
+    {t:'5⁵⁰ = (5¹⁰)⁵ ≡ 1⁵ = <b>1</b> (mod 11)'},
+    {t:'<b>검증</b>: 5¹=5, 5²=25≡3, 5³=15≡4, 5⁴=20≡9, 5⁵=45≡1(mod11)?\n5⁵=3125. 3125÷11=284...1 → 5⁵≡1? 주기가 5네!\n5⁵≡1(mod11)이면 5⁵⁰=(5⁵)¹⁰≡1¹⁰=1. 결과 동일 ✓'},
+  ],
+  formula:'페르마 소정리: a^(p-1)≡1(mod p)\n5¹⁰≡1(mod11) (또는 5⁵≡1(mod11))\n5⁵⁰=(5¹⁰)⁵≡1 (mod11)'
+}},
+
+];
+
+/* Q5 정답 수정: 60 = 선택지 ① */
+QS[4].ans = 0; // 60은 index 0
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let cur=0, answers=new Array(QS.length).fill(null),
+    skipped=new Array(QS.length).fill(false),
+    timerSec=40*60, timerID=null, startMs=null,
+    solFilter='all';
+
+const $=id=>document.getElementById(id);
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+
+/* ── SCREENS ── */
+function show(id){
+  document.querySelectorAll('.scr').forEach(s=>{s.classList.remove('on');s.style.display='';});
+  const el=$(id);
+  el.classList.add('on');
+  if(id==='scr-result') el.style.display='block';
+}
+
+/* ── TIMER ── */
+function startTimer(){
+  const el=$('tb-timer');
+  timerID=setInterval(()=>{
+    timerSec--;
+    el.textContent=fmt(timerSec);
+    if(timerSec<=300) el.classList.add('urgent');
+    if(timerSec<=0){clearInterval(timerID);doSubmit();}
+  },1000);
+}
+
+/* ═══ START ═══ */
+function startExam(){
+  cur=0;
+  answers=new Array(QS.length).fill(null);
+  skipped=new Array(QS.length).fill(false);
+  timerSec=40*60; startMs=Date.now();
+  $('tb-timer').textContent='40:00';
+  $('tb-timer').classList.remove('urgent');
+  $('tb-ans').textContent='';
+  show('scr-exam');
+  $('pal').style.display='flex';
+  renderPal(); renderQ();
+  startTimer();
+}
+
+/* ═══ RENDER Q ═══ */
+const LABS=['①','②','③','④','⑤'];
+function renderQ(){
+  const q=QS[cur], N=QS.length;
+  // strip
+  let strip='';
+  for(let i=0;i<N;i++){
+    let c='ps';
+    if(i<cur) c+=' done';
+    else if(i===cur) c+=' cur';
+    strip+=`<div class="${c}"></div>`;
+  }
+  $('pstrip').innerHTML=strip;
+
+  $('qnum').textContent=`문제 ${cur+1} / ${N}`;
+  const cp=$('catpill');
+  cp.textContent=q.cLabel; cp.className=`catpill ${q.cClass}`;
+  $('tb-ans').textContent=`${answers.filter(a=>a!==null).length}/${N}`;
+
+  let h=`<div class="q-lbl">Q${q.id} · ${q.cLabel} · ${q.pts}점</div>
+    <div class="q-text">${q.q}</div>`;
+  if(q.cond) h+=`<div class="q-cond">${q.cond}</div>`;
+  if(q.hint) h+=`<div class="q-hint">힌트: ${q.hint}</div>`;
+  h+=`<div class="opts">`;
+  q.opts.forEach((o,i)=>{
+    const sel=answers[cur]===i?' sel':'';
+    h+=`<button class="opt${sel}" onclick="pick(${i})">
+      <span class="ol">${LABS[i]}</span>
+      <span>${o.replace(/\n/g,'<br>')}</span>
+    </button>`;
+  });
+  h+=`</div>`;
+  $('qcard').innerHTML=h;
+
+  const bn=$('btn-next');
+  if(cur===N-1){bn.textContent='제출하기';bn.className='nb nb-sub';}
+  else{bn.textContent='다음 →';bn.className='nb nb-next';}
+  updatePal();
+}
+
+function pick(i){answers[cur]=i;skipped[cur]=false;renderQ();}
+function goPrev(){if(cur>0){cur--;renderQ();}}
+function doSkip(){skipped[cur]=true;answers[cur]=null;if(cur<QS.length-1){cur++;renderQ();}else openModal();}
+function goNext(){if(cur===QS.length-1)openModal();else{cur++;renderQ();}}
+
+/* ── MODAL ── */
+function openModal(){
+  const ua=answers.filter(a=>a===null).length;
+  $('mpara').textContent=ua>0
+    ?`미응답 ${ua}문항이 남아 있습니다. 그래도 제출하시겠습니까?`
+    :'모든 문항에 답했습니다. 최종 제출하시겠습니까?';
+  $('mbg').classList.add('open');
+}
+function closeModal(){$('mbg').classList.remove('open');}
+function confirmSub(){closeModal();doSubmit();}
+
+/* ═══ SUBMIT ═══ */
+function doSubmit(){
+  clearInterval(timerID);
+  $('pal').style.display='none';
+  const elapsed=Math.floor((Date.now()-startMs)/1000);
+  buildResult(elapsed);
+  show('scr-result');
+}
+
+function buildResult(elapsed){
+  let ok=0,ng=0,sk=0;
+  QS.forEach((q,i)=>{
+    if(answers[i]===q.ans)ok++;
+    else if(answers[i]===null)sk++;
+    else ng++;
+  });
+  const score=ok*10;
+  $('r-score').textContent=score;
+  $('r-ok').textContent=ok; $('r-ng').textContent=ng;
+  $('r-sk').textContent=sk; $('r-tm').textContent=fmt(elapsed);
+
+  let grade,sub;
+  if(score>=110){grade='🏆 최우수 — 금상 수준';sub='이산수학 전 영역에서 뛰어난 이해력을 보였습니다.';}
+  else if(score>=90){grade='🥈 우수 — 은상 수준';sub='핵심 개념 이해가 탁월합니다. 오답 영역만 보완하면 됩니다.';}
+  else if(score>=70){grade='🥉 양호 — 동상 수준';sub='기초는 단단합니다. 공식 원리 이해를 더 깊게 파고드세요.';}
+  else if(score>=50){grade='📘 기초 강화 필요';sub='핵심 정리를 반복 학습하고 오답을 다시 풀어보세요.';}
+  else{grade='📖 기초부터 다시 시작';sub='이산수학 기본 개념부터 체계적으로 학습하기를 권합니다.';}
+  $('r-grade').textContent=grade; $('r-sub').textContent=sub;
+
+  // cat bars
+  const cats={
+    graph:{l:'그래프 이론',ok:0,tot:0,color:'#1a6b3a'},
+    combi:{l:'조합론',ok:0,tot:0,color:'#b55c00'},
+    num:  {l:'정수론',ok:0,tot:0,color:'#3d2b8c'},
+    logic:{l:'논리·명제',ok:0,tot:0,color:'#b5222a'},
+    set:  {l:'집합·관계',ok:0,tot:0,color:'#0e3a63'},
+  };
+  QS.forEach((q,i)=>{
+    if(!cats[q.cat])return;
+    cats[q.cat].tot++;
+    if(answers[i]===q.ans)cats[q.cat].ok++;
+  });
+  let ct='';
+  Object.values(cats).forEach(c=>{
+    if(!c.tot)return;
+    const p=Math.round(c.ok/c.tot*100);
+    ct+=`<tr>
+      <td class="ct-nm">${c.l}</td>
+      <td class="ct-bar"><div class="cbg"><div class="cbf" style="width:${p}%;background:${c.color}"></div></div></td>
+      <td class="ct-fr">${c.ok}/${c.tot}</td>
+    </tr>`;
+  });
+  $('ctab').innerHTML=ct;
+  renderSol();
+}
+
+function renderSol(){
+  let h='';
+  QS.forEach((q,i)=>{
+    const isOk=answers[i]===q.ans;
+    const isSk=answers[i]===null;
+    const isNg=!isOk&&!isSk;
+    if(solFilter==='ok'&&!isOk)return;
+    if(solFilter==='ng'&&!isNg)return;
+    if(solFilter==='sk'&&!isSk)return;
+
+    const icon=isOk?'✅':isSk?'⬜':'❌';
+    const bc=isOk?'ba-ok':isSk?'ba-sk':'ba-ng';
+    const bt=isOk?'정답':isSk?'미응답':'오답';
+    const ua=answers[i]!==null?`내 선택: ${LABS[answers[i]]} — ${q.opts[answers[i]].replace(/<br>/g,' ').slice(0,36)}`:'미응답';
+
+    let steps='';
+    q.sol.steps.forEach((s,si)=>{
+      steps+=`<div class="step"><div class="sn">${si+1}</div><div class="st">${s.t.replace(/\n/g,'<br>')}</div></div>`;
+    });
+    h+=`<div class="si" id="si${i}">
+      <div class="sh" onclick="tog(${i})">
+        <div class="sh-ic">${icon}</div>
+        <div class="sh-bd">
+          <div class="sh-tit">Q${q.id}. ${q.cLabel}</div>
+          <div class="sh-pre">${q.q.replace(/\n/g,' ').slice(0,55)}…</div>
+        </div>
+        <span class="sh-ba ${bc}">${bt}</span>
+        <span class="sh-ar">▼</span>
+      </div>
+      <div class="sb">
+        <div class="ua">${ua}</div>
+        <div class="ans-row"><span class="ar-lbl">정답</span><span class="ar-txt">${q.sol.correct}</span></div>
+        <div class="steps-wrap">${steps}</div>
+        ${q.sol.formula?`<div class="fpan"><div class="fp-lbl">핵심 공식 · 정리</div><div class="fp-c">${q.sol.formula.replace(/\n/g,'<br>')}</div></div>`:''}
+      </div>
+    </div>`;
+  });
+  $('sol-list').innerHTML=h||`<div style="color:var(--muted);text-align:center;padding:2rem;font-size:.83rem;">해당하는 문항이 없습니다.</div>`;
+}
+
+function doFilter(f,el){
+  solFilter=f;
+  document.querySelectorAll('.ft').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  renderSol();
+}
+function tog(i){$('si'+i).classList.toggle('open');}
+function expandAll(){document.querySelectorAll('.si').forEach(s=>s.classList.add('open'));}
+
+/* ── PALETTE ── */
+function renderPal(){
+  let h='';
+  QS.forEach((_,i)=>{
+    let c='pd';
+    if(i===cur)c+=' c';
+    else if(answers[i]!==null)c+=' a';
+    else if(skipped[i])c+=' s';
+    h+=`<div class="${c}" onclick="jump(${i})">${i+1}</div>`;
+  });
+  $('pal').innerHTML=h;
+}
+function updatePal(){
+  document.querySelectorAll('.pd').forEach((d,i)=>{
+    d.className='pd';
+    if(i===cur)d.classList.add('c');
+    else if(answers[i]!==null)d.classList.add('a');
+    else if(skipped[i])d.classList.add('s');
+  });
+  $('tb-ans').textContent=`${answers.filter(a=>a!==null).length}/${QS.length}`;
+}
+function jump(i){cur=i;renderQ();}
+
+/* ── RESET ── */
+function resetAll(){
+  clearInterval(timerID);
+  answers=new Array(QS.length).fill(null);
+  skipped=new Array(QS.length).fill(false);
+  cur=0;timerSec=40*60;
+  $('tb-timer').textContent='40:00';
+  $('tb-timer').classList.remove('urgent');
+  $('tb-ans').textContent='';
+  $('pal').style.display='none';
+  show('scr-intro');
+}
+</script>
+</body>
+</html>

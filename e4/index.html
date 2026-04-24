@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOI 이산수학 모의고사 4회 | 중등부</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   DESIGN: 고급 학술지 감성 — 크림-세피아 라이트 테마
+   폰트: Nanum Myeongjo(명조체) + Source Code Pro
+   차별점: 수험 답안지 같은 정제된 학술 레이아웃,
+            좌측 넓은 번호 마진, 조각난 격자 배경
+════════════════════════════════════════ */
+:root{
+  --bg:     #1a1f2e;
+  --bg2:    #141824;
+  --s1:     #1f2640;
+  --s2:     #252d48;
+  --s3:     #2e3a58;
+  --s4:     #354469;
+  --em:     #00d4aa;   /* emerald accent */
+  --em2:    #00b894;
+  --em3:    rgba(0,212,170,.12);
+  --gold:   #ffd166;
+  --rose:   #ef5675;
+  --sky:    #68d8d6;
+  --lav:    #a29bfe;
+  --t1:     #e8f0fe;
+  --t2:     #8fa3c0;
+  --t3:     #4e6280;
+  --b1:     rgba(255,255,255,.06);
+  --b2:     rgba(255,255,255,.12);
+  --b3:     rgba(0,212,170,.25);
+  --mono:   'Source Code Pro', monospace;
+  --serif:  'Nanum Myeongjo', serif;
+  --r:      6px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  font-family:var(--serif);
+  background:var(--bg2);
+  color:var(--t1);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* dot-grid background */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(circle,rgba(0,212,170,.07) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+#hdr{
+  position:sticky;top:0;z-index:500;
+  background:rgba(20,24,36,.97);
+  border-bottom:1px solid var(--b1);
+  backdrop-filter:blur(14px);
+  height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.75rem;gap:1rem;
+}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-pill{
+  font-family:var(--mono);font-size:.58rem;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--em3);border:1px solid var(--b3);
+  color:var(--em);padding:3px 10px;border-radius:3px;
+}
+.hdr-name{font-size:.88rem;font-weight:700;letter-spacing:-.3px}
+.hdr-r{display:flex;align-items:center;gap:16px}
+#hdr-prog{font-family:var(--mono);font-size:.72rem;color:var(--t3)}
+#hdr-timer{
+  font-family:var(--mono);font-size:1.05rem;font-weight:600;
+  color:var(--em);background:var(--em3);border:1px solid var(--b3);
+  padding:4px 16px;border-radius:4px;letter-spacing:.5px;transition:.3s;
+}
+#hdr-timer.red{color:var(--rose);background:rgba(239,86,117,.1);border-color:rgba(239,86,117,.35);animation:blink .85s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── SCREENS ── */
+.scr{display:none;position:relative;z-index:1}
+.scr.on{display:block}
+
+/* ════════════════════════
+   INTRO
+════════════════════════ */
+#scr-intro{
+  min-height:calc(100vh - 54px);
+  display:none;flex-direction:column;
+  align-items:flex-start;justify-content:center;
+  max-width:740px;margin:0 auto;padding:3.5rem 2rem;gap:2.5rem;
+}
+#scr-intro.on{display:flex}
+
+.intro-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:.65rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--em);
+}
+.intro-tag::before{content:'';width:28px;height:1px;background:var(--em)}
+
+.intro-h1{
+  font-size:clamp(2.4rem,6vw,4rem);font-weight:800;
+  letter-spacing:-2.5px;line-height:1.05;
+  color:var(--t1);
+}
+.intro-h1 span{
+  background:linear-gradient(120deg,var(--em),var(--sky));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.intro-desc{font-size:.92rem;color:var(--t2);line-height:1.85;max-width:520px}
+
+/* stat grid */
+.stat-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;width:100%;
+}
+.stat-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:1rem .8rem;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--em),transparent);
+}
+.stat-v{
+  font-family:var(--mono);font-size:1.8rem;font-weight:600;
+  color:var(--em);display:block;
+}
+.stat-k{font-size:.65rem;color:var(--t3);margin-top:3px;display:block}
+
+/* topic tags */
+.topics{display:flex;flex-wrap:wrap;gap:.4rem}
+.ttag{
+  font-size:.68rem;font-family:var(--mono);
+  padding:3px 10px;border-radius:3px;
+  background:var(--s1);border:1px solid var(--b2);color:var(--t2);
+}
+
+.intro-rule{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:1.1rem 1.3rem;font-size:.8rem;color:var(--t2);line-height:1.95;
+  border-left:3px solid var(--em);
+}
+.intro-rule b{color:var(--t1)}
+
+.btn-start{
+  font-family:var(--serif);font-size:1rem;font-weight:800;
+  padding:13px 52px;border:none;border-radius:5px;cursor:pointer;
+  background:var(--em);color:var(--bg2);
+  letter-spacing:-.3px;transition:.2s;
+  box-shadow:0 0 28px rgba(0,212,170,.3);
+}
+.btn-start:hover{background:var(--em2);box-shadow:0 0 40px rgba(0,212,170,.45);transform:translateY(-1px)}
+.btn-start:active{transform:translateY(0)}
+
+/* ════════════════════════
+   EXAM
+════════════════════════ */
+#scr-exam{padding:2rem 1rem}
+.exam-wrap{max-width:800px;margin:0 auto}
+
+/* dot progress */
+.dot-prog{
+  display:flex;gap:5px;align-items:center;margin-bottom:2rem;
+  flex-wrap:wrap;
+}
+.dp{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.6rem;color:var(--t3);
+  cursor:pointer;transition:.2s;background:var(--s1);
+}
+.dp:hover{border-color:var(--em);color:var(--em)}
+.dp.done{background:var(--s3);border-color:var(--em);color:var(--em)}
+.dp.cur{background:var(--em);border-color:var(--em);color:var(--bg2);font-weight:700}
+.dp.skip{border-color:var(--rose);color:var(--rose)}
+
+/* question header */
+.q-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.2rem;flex-wrap:wrap;gap:.5rem;
+}
+.q-id{font-family:var(--mono);font-size:.72rem;color:var(--t3)}
+.q-cat{
+  font-family:var(--mono);font-size:.65rem;font-weight:600;
+  padding:3px 10px;border-radius:3px;letter-spacing:.5px;
+}
+.qc-g{background:rgba(34,211,170,.1);color:#34d1aa;border:1px solid rgba(34,211,170,.2)}
+.qc-c{background:rgba(253,209,102,.1);color:#fdd166;border:1px solid rgba(253,209,102,.2)}
+.qc-n{background:rgba(162,155,254,.1);color:#a29bfe;border:1px solid rgba(162,155,254,.2)}
+.qc-l{background:rgba(239,86,117,.1);color:#ef5675;border:1px solid rgba(239,86,117,.2)}
+.qc-s{background:rgba(104,216,214,.1);color:#68d8d6;border:1px solid rgba(104,216,214,.2)}
+
+/* Q card */
+.q-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:2rem 1.75rem;margin-bottom:1.25rem;
+  position:relative;overflow:hidden;
+}
+.q-card::after{
+  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+  background:linear-gradient(180deg,var(--em),transparent);
+}
+.q-pts{font-family:var(--mono);font-size:.62rem;color:var(--t3);margin-bottom:.6rem}
+.q-text{font-size:.98rem;font-weight:700;line-height:1.9;white-space:pre-wrap;color:var(--t1)}
+.q-cond{
+  background:var(--s2);border:1px solid var(--b1);border-radius:4px;
+  padding:.9rem 1.1rem;margin:1rem 0;
+  font-family:var(--mono);font-size:.8rem;color:var(--lav);
+  line-height:1.95;white-space:pre-wrap;
+}
+.q-hint{
+  font-family:var(--mono);font-size:.72rem;color:var(--t3);
+  font-style:normal;margin-top:.8rem;
+  padding:.6rem .9rem;border-left:2px solid var(--b2);
+  background:rgba(255,255,255,.02);border-radius:0 4px 4px 0;
+}
+.q-hint::before{content:'▸ 힌트: ';color:var(--em)}
+
+/* options */
+.opts{display:flex;flex-direction:column;gap:.55rem;margin-top:1.4rem}
+.opt{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:.82rem 1.1rem;
+  background:var(--s2);border:1.5px solid var(--b1);border-radius:5px;
+  cursor:pointer;transition:.15s;
+  font-family:var(--serif);font-size:.9rem;line-height:1.7;
+  color:var(--t1);width:100%;text-align:left;
+}
+.opt:hover:not(:disabled){border-color:var(--em);background:rgba(0,212,170,.05)}
+.opt.sel{border-color:var(--em);background:rgba(0,212,170,.08)}
+.opt:disabled{cursor:default}
+.opt-n{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--s3);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;font-family:var(--mono);
+  flex-shrink:0;margin-top:2px;color:var(--t2);transition:.15s;
+}
+.sel .opt-n{background:var(--em);border-color:var(--em);color:var(--bg2)}
+
+/* nav */
+.exam-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.4rem;flex-wrap:wrap;gap:.6rem}
+.nav-left{display:flex;gap:.5rem}
+.btn{
+  font-family:var(--serif);font-size:.85rem;font-weight:700;
+  padding:9px 22px;border-radius:4px;cursor:pointer;transition:.15s;
+  letter-spacing:-.2px;
+}
+.btn-prev{background:transparent;color:var(--t2);border:1.5px solid var(--b2)}
+.btn-prev:hover{border-color:var(--em);color:var(--em)}
+.btn-skip{background:transparent;color:var(--rose);border:1.5px solid rgba(239,86,117,.3)}
+.btn-skip:hover{background:rgba(239,86,117,.08)}
+.btn-next{background:var(--em);color:var(--bg2);border:none}
+.btn-next:hover{background:var(--em2)}
+.btn-submit{
+  background:linear-gradient(120deg,var(--em),var(--sky));
+  color:var(--bg2);border:none;
+}
+.btn-submit:hover{opacity:.88}
+
+/* ── MODAL ── */
+#mbg{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:600;display:none;align-items:center;justify-content:center;
+}
+#mbg.on{display:flex}
+.modal{
+  background:var(--s1);border:1px solid var(--b2);border-radius:var(--r);
+  padding:2rem;max-width:390px;width:90%;text-align:center;
+  box-shadow:0 0 60px rgba(0,212,170,.12);
+}
+.modal h3{font-size:1.05rem;font-weight:800;margin-bottom:.6rem;color:var(--t1)}
+.modal p{font-size:.82rem;color:var(--t2);line-height:1.75;margin-bottom:1.4rem}
+.modal-btns{display:flex;gap:.7rem;justify-content:center}
+.mb{font-family:var(--serif);font-size:.85rem;font-weight:700;padding:9px 26px;border-radius:4px;cursor:pointer;transition:.15s}
+.mb-no{background:transparent;color:var(--t2);border:1.5px solid var(--b2)}
+.mb-no:hover{border-color:var(--em);color:var(--em)}
+.mb-yes{background:var(--em);color:var(--bg2);border:none}
+.mb-yes:hover{background:var(--em2)}
+
+/* ════════════════════════
+   RESULT
+════════════════════════ */
+#scr-result{padding:2.5rem 1rem}
+.res-wrap{max-width:840px;margin:0 auto}
+
+/* score hero */
+.score-hero{
+  display:grid;grid-template-columns:auto 1fr;gap:2rem;
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:2rem;margin-bottom:2.5rem;align-items:center;
+  position:relative;overflow:hidden;
+}
+.score-hero::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,170,.08),transparent 70%);
+}
+@media(max-width:560px){.score-hero{grid-template-columns:1fr;text-align:center}}
+
+.score-ring{
+  width:150px;height:150px;border-radius:50%;
+  border:2px solid var(--em);background:var(--s2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;position:relative;z-index:1;
+  box-shadow:0 0 30px rgba(0,212,170,.15);
+}
+.sr-num{
+  font-family:var(--mono);font-size:2.6rem;font-weight:600;
+  color:var(--em);line-height:1;
+}
+.sr-of{font-size:.65rem;color:var(--t3);margin-top:4px}
+
+.grade{font-size:1.35rem;font-weight:800;margin-bottom:.35rem}
+.grade-sub{font-size:.85rem;color:var(--t2);line-height:1.75;margin-bottom:1.2rem}
+.stat-row{display:flex;gap:.6rem;flex-wrap:wrap}
+.sbox{
+  background:var(--s2);border:1px solid var(--b1);border-radius:4px;
+  padding:.65rem .9rem;text-align:center;min-width:68px;
+}
+.sv{font-family:var(--mono);font-size:1.25rem;font-weight:600}
+.sv.ok{color:var(--em)}.sv.ng{color:var(--rose)}.sv.sk{color:var(--gold)}.sv.tm{color:var(--sky)}
+.sk{font-size:.62rem;color:var(--t3);margin-top:2px}
+
+/* section headers */
+.sec-hd{
+  font-family:var(--mono);font-size:.65rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:2px;color:var(--t3);
+  margin:2.25rem 0 .85rem;padding-bottom:.5rem;
+  border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;gap:8px;
+}
+.sec-hd::before{content:'';width:12px;height:2px;background:var(--em)}
+
+/* cat breakdown */
+.cat-rows{display:flex;flex-direction:column;gap:.6rem}
+.cat-row{display:flex;align-items:center;gap:12px}
+.cat-label{font-size:.76rem;color:var(--t1);width:130px;flex-shrink:0}
+.cat-bar-bg{flex:1;height:6px;background:var(--s3);border-radius:3px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:3px;transition:width 1.3s ease}
+.cat-frac{font-family:var(--mono);font-size:.68rem;color:var(--t3);width:32px;text-align:right;flex-shrink:0}
+
+/* filter tabs */
+.filter-tabs{display:flex;gap:.4rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.ftab{
+  font-family:var(--mono);font-size:.7rem;font-weight:600;
+  padding:5px 14px;border-radius:3px;cursor:pointer;
+  border:1.5px solid var(--b2);background:transparent;color:var(--t2);
+  transition:.15s;letter-spacing:.3px;
+}
+.ftab:hover{border-color:var(--em);color:var(--em)}
+.ftab.act{background:var(--em);color:var(--bg2);border-color:var(--em)}
+
+/* solution cards */
+.sol-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  margin-bottom:.75rem;overflow:hidden;transition:.15s;
+}
+.sol-card:hover{border-color:var(--b2)}
+.sol-head{
+  display:flex;align-items:center;gap:12px;padding:.9rem 1.1rem;
+  cursor:pointer;user-select:none;
+}
+.sc-ic{font-size:1rem;flex-shrink:0}
+.sc-info{flex:1}
+.sc-title{font-size:.85rem;font-weight:700;color:var(--t1)}
+.sc-prev{font-size:.73rem;color:var(--t3);margin-top:2px;font-family:var(--mono)}
+.sc-badge{font-family:var(--mono);font-size:.62rem;font-weight:600;padding:2px 8px;border-radius:3px;flex-shrink:0}
+.scb-ok{background:rgba(0,212,170,.12);color:var(--em);border:1px solid rgba(0,212,170,.25)}
+.scb-ng{background:rgba(239,86,117,.1);color:var(--rose);border:1px solid rgba(239,86,117,.25)}
+.scb-sk{background:rgba(253,209,102,.1);color:var(--gold);border:1px solid rgba(253,209,102,.25)}
+.sc-arr{font-size:.7rem;color:var(--t3);flex-shrink:0;transition:.2s}
+.sol-card.open .sc-arr{transform:rotate(180deg)}
+.sol-body{display:none;border-top:1px solid var(--b1);padding:1.2rem 1.1rem;animation:fdin .2s}
+@keyframes fdin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.sol-card.open .sol-body{display:block}
+
+.my-ans{font-family:var(--mono);font-size:.73rem;color:var(--t3);margin-bottom:.7rem}
+.correct-row{
+  display:flex;align-items:center;gap:8px;padding:.65rem .9rem;
+  background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);
+  border-radius:4px;margin-bottom:.9rem;
+}
+.cr-lbl{font-family:var(--mono);font-size:.62rem;color:var(--em);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.cr-txt{font-size:.88rem;font-weight:700;color:var(--em)}
+
+.step-list{display:flex;flex-direction:column;gap:.48rem}
+.step{display:flex;gap:10px;background:var(--s2);padding:.75rem .9rem;border-radius:4px;align-items:flex-start}
+.snum{
+  width:20px;height:20px;border-radius:50%;background:var(--em);color:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:1px;
+}
+.stxt{flex:1;font-size:.82rem;color:var(--t2);line-height:1.85}
+.stxt b{color:var(--t1);font-weight:700}
+.stxt code{font-family:var(--mono);font-size:.77rem;color:var(--lav);background:var(--s3);padding:1px 5px;border-radius:3px}
+
+.formula-box{
+  background:var(--s2);border-left:3px solid var(--em);border-radius:0 4px 4px 0;
+  padding:.8rem 1rem;margin-top:.9rem;
+}
+.fb-label{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:4px}
+.fb-body{font-family:var(--mono);font-size:.78rem;color:var(--lav);white-space:pre-wrap;line-height:1.85}
+
+/* result actions */
+.res-actions{display:flex;gap:.7rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.ra{font-family:var(--serif);font-size:.88rem;font-weight:700;padding:10px 30px;border-radius:4px;cursor:pointer;transition:.15s}
+.ra-outline{background:transparent;color:var(--t2);border:1.5px solid var(--b2)}
+.ra-outline:hover{border-color:var(--em);color:var(--em)}
+.ra-solid{background:var(--em);color:var(--bg2);border:none}
+.ra-solid:hover{background:var(--em2)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="hdr-brand">
+    <span class="hdr-pill">KOI · 4회</span>
+    <span class="hdr-name">이산수학 실전 모의고사</span>
+  </div>
+  <div class="hdr-r">
+    <span id="hdr-prog"></span>
+    <span id="hdr-timer">40:00</span>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="mbg">
+  <div class="modal">
+    <h3>최종 제출</h3>
+    <p id="mpara"></p>
+    <div class="modal-btns">
+      <button class="mb mb-no" onclick="closeModal()">계속 풀기</button>
+      <button class="mb mb-yes" onclick="confirmSub()">제출 확정</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INTRO ═══ -->
+<div id="scr-intro" class="scr on">
+  <div class="intro-tag">한국정보올림피아드 중등부 대비</div>
+  <h1 class="intro-h1">이산수학<br><span>모의고사 4회</span></h1>
+  <p class="intro-desc">1·2·3회차와 완전히 다른 새 문제 12문항.<br>40분 실전 타이머 · 제출 후 전문항 해설 공개.</p>
+  <div class="stat-grid">
+    <div class="stat-card"><span class="stat-v">12</span><span class="stat-k">총 문항</span></div>
+    <div class="stat-card"><span class="stat-v">40</span><span class="stat-k">제한(분)</span></div>
+    <div class="stat-card"><span class="stat-v">120</span><span class="stat-k">만점</span></div>
+    <div class="stat-card"><span class="stat-v">5</span><span class="stat-k">출제 영역</span></div>
+  </div>
+  <div class="topics">
+    <span class="ttag">프뤼퍼 수열</span><span class="ttag">생성함수</span>
+    <span class="ttag">스털링 수</span><span class="ttag">뫼비우스 함수</span>
+    <span class="ttag">행렬 거듭제곱</span><span class="ttag">플로이드-워셜</span>
+    <span class="ttag">이진관계 합성</span><span class="ttag">함수의 전사성</span>
+    <span class="ttag">논리 CNF</span><span class="ttag">논리 완결성</span>
+    <span class="ttag">추이폐포</span><span class="ttag">번사이드 보조정리</span>
+  </div>
+  <div class="intro-rule">
+    <b>시험 안내</b><br>
+    · 시험 중 정답·해설 확인 불가 — 제출 후 즉시 공개<br>
+    · 상단 번호 클릭으로 자유롭게 문항 이동<br>
+    · 1·2·3회차와 단 한 문제도 중복 없는 신유형
+  </div>
+  <button class="btn-start" onclick="startExam()">시험 시작 →</button>
+</div>
+
+<!-- ═══ EXAM ═══ -->
+<div id="scr-exam" class="scr">
+  <div class="exam-wrap">
+    <div class="dot-prog" id="dot-prog"></div>
+    <div class="q-meta">
+      <span class="q-id" id="q-id-lbl"></span>
+      <span class="q-cat" id="q-cat-lbl"></span>
+    </div>
+    <div class="q-card" id="q-card"></div>
+    <div class="exam-nav">
+      <div class="nav-left">
+        <button class="btn btn-prev" onclick="goPrev()">← 이전</button>
+        <button class="btn btn-skip" onclick="doSkip()">건너뛰기</button>
+      </div>
+      <button class="btn btn-next" id="btn-next" onclick="goNext()">다음 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULT ═══ -->
+<div id="scr-result" class="scr">
+  <div class="res-wrap">
+    <div class="score-hero">
+      <div class="score-ring">
+        <div class="sr-num" id="r-score">-</div>
+        <div class="sr-of">/ 120점</div>
+      </div>
+      <div>
+        <div class="grade" id="r-grade"></div>
+        <div class="grade-sub" id="r-sub"></div>
+        <div class="stat-row">
+          <div class="sbox"><div class="sv ok" id="r-ok">0</div><div class="sk">정답</div></div>
+          <div class="sbox"><div class="sv ng" id="r-ng">0</div><div class="sk">오답</div></div>
+          <div class="sbox"><div class="sv sk" id="r-sk">0</div><div class="sk">미응답</div></div>
+          <div class="sbox"><div class="sv tm" id="r-tm">-</div><div class="sk">소요시간</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hd">영역별 성취도</div>
+    <div class="cat-rows" id="cat-rows"></div>
+
+    <div class="sec-hd" style="margin-top:2.25rem">전체 문항 해설</div>
+    <div class="filter-tabs">
+      <button class="ftab act" onclick="doFilter('all',this)">전체</button>
+      <button class="ftab" onclick="doFilter('ng',this)">오답</button>
+      <button class="ftab" onclick="doFilter('ok',this)">정답</button>
+      <button class="ftab" onclick="doFilter('sk',this)">미응답</button>
+    </div>
+    <div id="sol-list"></div>
+
+    <div class="res-actions">
+      <button class="ra ra-outline" onclick="expandAll()">해설 전체 펼치기</button>
+      <button class="ra ra-solid" onclick="resetAll()">처음으로</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   4회차 문제 은행 — 12문항 (1~3회 완전 비중복)
+
+   ▶ 출제 영역
+   그래프: 플로이드-워셜, 추이폐포, 색채다항식, 방향그래프
+   조합론: 번사이드 보조정리, 카탈란 수, 스털링 수, 생성함수
+   정수론: 뫼비우스 함수, 오일러 파이함수, 윌슨의 정리
+   논리:   CNF 변환, 전건긍정/후건부정
+   집합:   이진관계 합성, 전사함수 수
+═══════════════════════════════════════════════ */
+const QS = [
+
+/* ── Q1  플로이드-워셜 최단 거리 행렬 ───────── */
+{id:1,cat:'graph',cL:'그래프 · 플로이드-워셜',cC:'qc-g',pts:10,
+q:`꼭짓점이 {1,2,3,4}인 방향 가중치 그래프에서
+플로이드-워셜 알고리즘 적용 후 d[1][4]의 값은?
+
+간선(방향): 1→2:3, 1→3:8, 2→3:2, 2→4:5, 3→4:1`,
+hint:'d[i][j] = min(d[i][j], d[i][k]+d[k][j])를 모든 k에 대해 반복합니다.',
+opts:['6','7','8','9','10'],
+ans:0,
+sol:{
+  correct:'① 6',
+  steps:[
+    {t:'<b>초기 거리 행렬</b>:\nd[1][2]=3, d[1][3]=8, d[2][3]=2, d[2][4]=5, d[3][4]=1\n나머지(직접 간선 없음): ∞'},
+    {t:'<b>k=1</b>(1을 경유): d[i][j] = min(d[i][j], d[i][1]+d[1][j])\n→ 1→1이 출발점이므로 대부분 변화 없음'},
+    {t:'<b>k=2</b>(2를 경유):\nd[1][3] = min(8, d[1][2]+d[2][3]) = min(8, 3+2) = <b>5</b>\nd[1][4] = min(∞, d[1][2]+d[2][4]) = min(∞, 3+5) = <b>8</b>'},
+    {t:'<b>k=3</b>(3을 경유):\nd[1][4] = min(8, d[1][3]+d[3][4]) = min(8, 5+1) = <b>6</b>\nd[2][4] = min(5, d[2][3]+d[3][4]) = min(5, 2+1) = <b>3</b>'},
+    {t:'<b>k=4</b>: 4에서 나가는 간선 없음 → 변화 없음'},
+    {t:'<b>최종 d[1][4] = 6</b>\n경로: 1→2→3→4 = 3+2+1 = 6 ✓'},
+  ],
+  formula:'플로이드-워셜:\nfor k: for i: for j:\n  d[i][j] = min(d[i][j], d[i][k]+d[k][j])\n최단경로 1→2→3→4 = 3+2+1 = 6'
+}},
+
+/* ── Q2  카탈란 수 ─────────────────────────── */
+{id:2,cat:'combi',cL:'조합론 · 카탈란 수',cC:'qc-c',pts:10,
+q:`카탈란 수 Cₙ = C(2n,n)/(n+1)을 이용하여 다음을 구하시오.
+
+n쌍의 괄호를 올바르게 여닫는 방법의 수 C₄는?
+(예: C₂=2 → ()(), (()))`,
+cond:`C₀=1, C₁=1, C₂=2, C₃=5
+C₄ = C(8,4) / 5 = ? / 5`,
+hint:'C(8,4) = 70, 카탈란 점화식: Cₙ = Σ Cᵢ·Cₙ₋₁₋ᵢ',
+opts:['14','12','16','10','18'],
+ans:0,
+sol:{
+  correct:'① 14',
+  steps:[
+    {t:'<b>카탈란 수 공식</b>: Cₙ = C(2n, n) / (n+1)'},
+    {t:'C₄ = C(8, 4) / (4+1) = 70 / 5 = <b>14</b>'},
+    {t:'<b>검증 — 점화식</b>: C₄ = C₀·C₃ + C₁·C₂ + C₂·C₁ + C₃·C₀\n= 1·5 + 1·2 + 2·1 + 5·1 = 5+2+2+5 = 14 ✓'},
+    {t:'카탈란 수의 응용: 올바른 괄호 배열, 볼록 다각형 삼각분할,\nBST의 구조 수, 산길 경로 수 등'},
+  ],
+  formula:'Cₙ = C(2n,n)/(n+1)\nC₄ = C(8,4)/5 = 70/5 = 14\n수열: 1,1,2,5,14,42,132,...'
+}},
+
+/* ── Q3  오일러 φ 함수 ──────────────────────── */
+{id:3,cat:'num',cL:'정수론 · 오일러 φ 함수',cC:'qc-n',pts:10,
+q:`오일러의 파이 함수 φ(n)을 계산하시오.
+
+φ(36) = ?
+(φ(n): 1≤k≤n이고 gcd(k,n)=1인 k의 개수)`,
+cond:`36 = 2² × 3²
+φ(pᵃ) = pᵃ - pᵃ⁻¹ = pᵃ(1 - 1/p)
+φ는 곱셈적 함수: φ(mn)=φ(m)φ(n), gcd(m,n)=1`,
+hint:'36 = 4 × 9이고 gcd(4,9)=1이므로 φ(36) = φ(4)×φ(9).',
+opts:['12','18','24','6','16'],
+ans:0,
+sol:{
+  correct:'① 12',
+  steps:[
+    {t:'36 = 2² × 3²'},
+    {t:'φ(2²) = 2²(1 - 1/2) = 4 × 1/2 = <b>2</b>'},
+    {t:'φ(3²) = 3²(1 - 1/3) = 9 × 2/3 = <b>6</b>'},
+    {t:'gcd(4,9)=1이므로 곱셈성 적용:\nφ(36) = φ(4) × φ(9) = 2 × 6 = <b>12</b>'},
+    {t:'검증: 1~36 중 36과 서로소인 수의 개수\n= 36(1-1/2)(1-1/3) = 36×1/2×2/3 = 12 ✓'},
+  ],
+  formula:'φ(n) = n·∏(1-1/p) (소인수 p에 대해)\nφ(36) = 36·(1-1/2)·(1-1/3)\n= 36 · 1/2 · 2/3 = 12'
+}},
+
+/* ── Q4  이진관계 합성 ──────────────────────── */
+{id:4,cat:'set',cL:'집합 · 이진관계 합성',cC:'qc-s',pts:10,
+q:`집합 A={1,2,3}에서의 이진관계 R과 S가 다음과 같을 때,
+합성 관계 S∘R (R 먼저, S 다음)을 구하시오.
+
+R = {(1,2),(1,3),(2,3)}
+S = {(2,1),(3,1),(3,2)}`,
+hint:'S∘R: (a,c) ∈ S∘R ↔ ∃b: (a,b)∈R 이고 (b,c)∈S',
+opts:[
+  '{(1,1),(2,1),(1,2),(2,2)}',
+  '{(1,1),(2,1),(2,2)}',
+  '{(1,1),(1,2),(2,1)}',
+  '{(1,1),(1,2),(2,1),(2,2)}',
+  '{(1,1),(2,1)}',
+],
+ans:3,
+sol:{
+  correct:'④ {(1,1),(1,2),(2,1),(2,2)}',
+  steps:[
+    {t:'S∘R = {(a,c) | ∃b: (a,b)∈R, (b,c)∈S}'},
+    {t:'<b>a=1</b>: (1,2)∈R → (2,1)∈S → <code>(1,1)</code> ✓\n         (1,3)∈R → (3,1)∈S → <code>(1,1)</code>(중복)\n         (1,3)∈R → (3,2)∈S → <code>(1,2)</code> ✓'},
+    {t:'<b>a=2</b>: (2,3)∈R → (3,1)∈S → <code>(2,1)</code> ✓\n         (2,3)∈R → (3,2)∈S → <code>(2,2)</code> ✓'},
+    {t:'<b>a=3</b>: R에서 (3,?)인 원소 없음 → 해당 없음'},
+    {t:'S∘R = {(1,1),(1,2),(2,1),(2,2)} → <b>④번</b>'},
+  ],
+  formula:'S∘R = {(a,c)|∃b: (a,b)∈R ∧ (b,c)∈S}\n결과: {(1,1),(1,2),(2,1),(2,2)}'
+}},
+
+/* ── Q5  색채 다항식 ────────────────────────── */
+{id:5,cat:'graph',cL:'그래프 · 색채 다항식',cC:'qc-g',pts:10,
+q:`경로 그래프 Pₙ(꼭짓점 n개가 일렬로 연결된 그래프)의
+색채 다항식(Chromatic Polynomial) P(G,k)는?
+
+P₄(경로 그래프, 꼭짓점 4개)를 k=3으로 계산한 값은?`,
+cond:`경로 그래프 Pₙ의 색채 다항식:
+P(Pₙ, k) = k · (k-1)^(n-1)`,
+hint:'Pₙ은 트리이므로 색채 다항식이 간단합니다.',
+opts:['24','18','12','36','6'],
+ans:0,
+sol:{
+  correct:'① 24',
+  steps:[
+    {t:'<b>경로 그래프 P₄</b>: 꼭짓점 1-2-3-4 일렬 연결'},
+    {t:'색채 다항식: P(P₄, k) = k·(k-1)³'},
+    {t:'k=3 대입: 3·(3-1)³ = 3·2³ = 3·8 = <b>24</b>'},
+    {t:'<b>직관적 이해</b>: 첫 번째 꼭짓점은 k가지, 이후 각각 이전과 달라야 하므로 (k-1)가지씩 선택'},
+    {t:'3색으로 P₄를 칠하는 방법: 3×2×2×2 = 24 ✓'},
+  ],
+  formula:'P(Pₙ, k) = k·(k-1)^(n-1)\nP(P₄, 3) = 3·(3-1)³ = 3·8 = 24'
+}},
+
+/* ── Q6  전사 함수의 수(포함-배제) ──────────── */
+{id:6,cat:'set',cL:'집합 · 전사함수 수',cC:'qc-s',pts:10,
+q:`집합 A={1,2,3,4}에서 B={a,b,c}로의 전사함수(surjective function)의 수는?
+
+(전사함수: B의 모든 원소가 적어도 하나의 원상을 가짐)`,
+hint:'포함-배제 원리: |전사함수| = Σ(-1)^k·C(|B|,k)·(|B|-k)^|A|',
+opts:['36','24','48','12','60'],
+ans:0,
+sol:{
+  correct:'① 36',
+  steps:[
+    {t:'|A|=4, |B|=3. 전사함수 수 공식 (포함-배제):'},
+    {t:'surj(A,B) = Σₖ₌₀ⁿ (-1)ᵏ · C(n,k) · (n-k)^m\n여기서 n=|B|=3, m=|A|=4'},
+    {t:'k=0: (-1)⁰·C(3,0)·3⁴ = 1·1·81 = 81'},
+    {t:'k=1: (-1)¹·C(3,1)·2⁴ = -1·3·16 = -48'},
+    {t:'k=2: (-1)²·C(3,2)·1⁴ = 1·3·1 = 3'},
+    {t:'k=3: (-1)³·C(3,3)·0⁴ = -1·1·0 = 0'},
+    {t:'합계: 81 - 48 + 3 + 0 = <b>36</b>'},
+  ],
+  formula:'전사함수 수 = Σₖ₌₀ⁿ(-1)ᵏ·C(n,k)·(n-k)^m\n= 81-48+3 = 36\n(n=|B|=3, m=|A|=4)'
+}},
+
+/* ── Q7  윌슨의 정리 ────────────────────────── */
+{id:7,cat:'num',cL:'정수론 · 윌슨의 정리',cC:'qc-n',pts:10,
+q:`윌슨의 정리를 이용하여 다음을 계산하시오.
+
+14! (mod 15) = ?
+
+[참고] 윌슨의 정리: p가 소수 ↔ (p-1)! ≡ -1 (mod p)`,
+hint:'15=3×5 (합성수). (p-1)! mod p 형태로 분해하여 접근하세요.',
+opts:['0','1','14','4','6'],
+ans:0,
+sol:{
+  correct:'① 0',
+  steps:[
+    {t:'15는 합성수(15=3×5). 윌슨의 정리는 소수에만 적용 가능.'},
+    {t:'14!에는 3과 5(그리고 6,10,15 등)이 인수로 포함되어 있음.'},
+    {t:'구체적으로: 14! = 1×2×3×4×5×…×14'},
+    {t:'이 중 <b>3</b>과 <b>5</b>의 곱 = 15가 인수로 포함.\n→ 14! = 15×(다른 수들의 곱) → 15의 배수'},
+    {t:'따라서 14! ≡ <b>0</b> (mod 15)'},
+    {t:'일반화: n이 합성수이고 n>4이면 (n-1)! ≡ 0 (mod n)'},
+  ],
+  formula:'윌슨 정리: p 소수 ↔ (p-1)!≡-1(mod p)\n합성수 n>4: (n-1)!≡0(mod n)\n14! mod 15 = 0 (∵ 3×5=15|14!)'
+}},
+
+/* ── Q8  논리 CNF 변환 ──────────────────────── */
+{id:8,cat:'logic',cL:'논리 · CNF 변환',cC:'qc-l',pts:10,
+q:`다음 명제 논리식을 연언 표준형(CNF: Conjunctive Normal Form)으로 변환할 때,
+올바른 것은?
+
+φ = p → (q ∧ r)`,
+hint:'p→X ≡ ¬p∨X. 분배 법칙: A∨(B∧C) ≡ (A∨B)∧(A∨C)',
+opts:[
+  '(¬p ∨ q) ∧ (¬p ∨ r)',
+  '¬p ∨ (q ∧ r)',
+  '(¬p ∧ q) ∨ (¬p ∧ r)',
+  '¬p ∨ q ∨ r',
+  '(p ∨ q) ∧ (p ∨ r)',
+],
+ans:0,
+sol:{
+  correct:'① (¬p∨q) ∧ (¬p∨r)',
+  steps:[
+    {t:'<b>1단계</b>: 함의 제거\np→(q∧r) ≡ ¬p∨(q∧r)'},
+    {t:'<b>2단계</b>: 분배 법칙 (∨를 ∧ 안으로)\n¬p∨(q∧r) ≡ (¬p∨q) ∧ (¬p∨r)'},
+    {t:'이것이 CNF: 절(clause)들의 연언(∧)\n각 절은 리터럴들의 선언(∨)'},
+    {t:'검증: p=T, q=F, r=T 일 때\n원식: T→(F∧T)=T→F=F\nCNF: (F∨F)∧(F∨T)=F∧T=F ✓'},
+  ],
+  formula:'CNF 변환:\np→(q∧r)\n≡ ¬p∨(q∧r)  [함의 제거]\n≡ (¬p∨q)∧(¬p∨r)  [분배 법칙]'
+}},
+
+/* ── Q9  번사이드 보조정리 ─────────────────── */
+{id:9,cat:'combi',cL:'조합론 · 번사이드 보조정리',cC:'qc-c',pts:10,
+q:`정삼각형의 꼭짓점 3개를 빨강(R), 파랑(B) 두 가지 색으로 칠할 때,
+회전 대칭을 고려한 서로 다른 색칠 방법의 수는?
+
+(회전: 0°, 120°, 240° — 이 3가지 회전이 같은 군을 형성)`,
+hint:'번사이드: |X/G| = (1/|G|) · Σ|X^g| (각 군 원소 g에 대해 고정된 착색 수)',
+opts:['4','3','2','6','8'],
+ans:0,
+sol:{
+  correct:'① 4',
+  steps:[
+    {t:'꼭짓점 3개, 2색(R/B), 회전군 G={e, r₁₂₀, r₂₄₀}, |G|=3'},
+    {t:'<b>항등원 e(0°)</b>: 모든 2³=8가지 착색이 고정. |X^e|=8'},
+    {t:'<b>r₁₂₀(120° 회전)</b>: 고정되려면 세 꼭짓점이 같은 색.\n→ RRR, BBB → |X^r120|=2'},
+    {t:'<b>r₂₄₀(240° 회전)</b>: 마찬가지로 세 꼭짓점 같은 색.\n→ |X^r240|=2'},
+    {t:'<b>번사이드 공식</b>:\n|X/G| = (1/3)·(8+2+2) = 12/3 = <b>4</b>'},
+    {t:'4가지: RRR, BBB, RRB(=RBR=BRR), RBB(=BRB=BBR)'},
+  ],
+  formula:'번사이드 보조정리:\n|X/G| = (1/|G|)·Σ_{g∈G}|X^g|\n= (1/3)·(8+2+2) = 4'
+}},
+
+/* ── Q10  추이폐포(관계) ─────────────────────── */
+{id:10,cat:'set',cL:'집합 · 추이폐포',cC:'qc-s',pts:10,
+q:`집합 {1,2,3,4}에서 관계 R = {(1,2),(2,3),(3,4)}의
+추이폐포(Transitive Closure) t(R)은?`,
+hint:'추이폐포: R에 추이성이 성립할 때까지 쌍을 추가합니다.\n(a,b)∈R이고 (b,c)∈R이면 (a,c) 추가.',
+opts:[
+  '{(1,2),(2,3),(3,4),(1,3),(2,4),(1,4)}',
+  '{(1,2),(2,3),(3,4),(1,3),(2,4)}',
+  '{(1,2),(2,3),(3,4),(1,3)}',
+  '{(1,2),(2,3),(3,4),(1,4)}',
+  '{(1,2),(2,3),(3,4)}',
+],
+ans:0,
+sol:{
+  correct:'① {(1,2),(2,3),(3,4),(1,3),(2,4),(1,4)}',
+  steps:[
+    {t:'초기 R = {(1,2),(2,3),(3,4)}'},
+    {t:'<b>1단계</b>: (1,2)∈R, (2,3)∈R → (1,3) 추가\n         (2,3)∈R, (3,4)∈R → (2,4) 추가'},
+    {t:'<b>2단계</b>: (1,2)∈R, (2,4)∈추가 → (1,4) 추가\n         (1,3)∈추가, (3,4)∈R → (1,4) 이미 존재'},
+    {t:'<b>3단계</b>: 더 이상 추가할 쌍 없음'},
+    {t:'t(R) = {(1,2),(2,3),(3,4),(1,3),(2,4),(1,4)} → <b>①번</b>'},
+  ],
+  formula:'추이폐포: t(R) = R ∪ R² ∪ R³ ∪ ...\nR² = R∘R, 행렬곱으로도 계산 가능\nt(R)은 R을 포함하는 최소 추이적 관계'
+}},
+
+/* ── Q11  논리 추론 형식 ─────────────────────── */
+{id:11,cat:'logic',cL:'논리 · 추론 규칙',cC:'qc-l',pts:10,
+q:`다음 추론 중 논리적으로 타당한(valid) 것만 고른 것은?
+
+(가) 전건긍정(Modus Ponens):  p, p→q  ∴ q
+(나) 후건부정(Modus Tollens): ¬q, p→q  ∴ ¬p
+(다) 후건긍정(Affirming the Consequent): q, p→q  ∴ p
+(라) 전건부정(Denying the Antecedent): ¬p, p→q  ∴ ¬q`,
+hint:'타당한 추론: 전제가 모두 참이면 결론이 반드시 참인 경우.',
+opts:[
+  '(가)와 (나)만 타당',
+  '(가),(나),(다) 모두 타당',
+  '(가)만 타당',
+  '(나)와 (다)만 타당',
+  '(가),(나),(다),(라) 모두 타당',
+],
+ans:0,
+sol:{
+  correct:'① (가)와 (나)만 타당',
+  steps:[
+    {t:'<b>(가) 전건긍정</b>: p∧(p→q) → q. 진리표 확인: p=T, p→q=T이면 q=T. <b>타당</b> ✓'},
+    {t:'<b>(나) 후건부정</b>: ¬q∧(p→q) → ¬p.\np→q ≡ ¬q→¬p (대우). 대우는 동치이므로 타당. <b>타당</b> ✓'},
+    {t:'<b>(다) 후건긍정</b>: q∧(p→q) → p? 반례: p=F, q=T이면\np→q=T(전제 성립), q=T(전제 성립), 결론 p=F. <b>오류</b> ✗'},
+    {t:'<b>(라) 전건부정</b>: ¬p∧(p→q) → ¬q? 반례: p=F, q=T이면\n¬p=T, p→q=T, 결론 ¬q=F. <b>오류</b> ✗'},
+    {t:'∴ 타당한 추론: (가),(나) → <b>①번</b>'},
+  ],
+  formula:'타당한 추론 형식:\n전건긍정(MP): p, p→q ⊢ q\n후건부정(MT): ¬q, p→q ⊢ ¬p\n\n오류 추론:\n후건긍정·전건부정은 논리적 오류!'
+}},
+
+/* ── Q12  제2종 스털링 수 ──────────────────── */
+{id:12,cat:'combi',cL:'조합론 · 스털링 수',cC:'qc-c',pts:10,
+q:`제2종 스털링 수 S(n,k)는 n개의 원소를 k개의 비어 있지 않은 부분집합으로
+분할하는 방법의 수입니다.
+
+S(4,2) = ?`,
+cond:`점화식: S(n,k) = k·S(n-1,k) + S(n-1,k-1)
+초기값: S(n,1)=1, S(n,n)=1
+
+S(2,2)=1, S(3,2)=3 (주어진 값)`,
+hint:'S(4,2) = 2·S(3,2) + S(3,1) = 2×3 + 1 = 7',
+opts:['7','6','8','5','9'],
+ans:0,
+sol:{
+  correct:'① 7',
+  steps:[
+    {t:'<b>점화식</b>: S(n,k) = k·S(n-1,k) + S(n-1,k-1)'},
+    {t:'S(4,2) = 2·S(3,2) + S(3,1)'},
+    {t:'S(3,2) = 3 (주어진 값)\nS(3,1) = 1 (모든 원소를 하나의 집합에 넣는 방법)'},
+    {t:'S(4,2) = 2×3 + 1×1 = 6 + 1 = <b>7</b>'},
+    {t:'<b>직접 나열</b>: {1,2,3,4}를 2개의 비공집합으로 분할:\n{1}|{2,3,4}, {2}|{1,3,4}, {3}|{1,2,4}, {4}|{1,2,3},\n{1,2}|{3,4}, {1,3}|{2,4}, {1,4}|{2,3} → 7가지 ✓'},
+  ],
+  formula:'S(n,k) = k·S(n-1,k) + S(n-1,k-1)\nS(4,2) = 2·3 + 1 = 7\nS(n,1)=1, S(n,n)=1, S(n,n-1)=C(n,2)'
+}},
+
+]; /* END QS */
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let cur=0;
+let answers=new Array(QS.length).fill(null);
+let skipped=new Array(QS.length).fill(false);
+let timerSec=40*60, timerID=null, startMs=null;
+let solFilter='all';
+
+const $=id=>document.getElementById(id);
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+const L=['①','②','③','④','⑤'];
+
+/* ── SCREENS ── */
+function show(id){
+  document.querySelectorAll('.scr').forEach(s=>{s.classList.remove('on');});
+  const el=$(id);
+  el.classList.add('on');
+}
+
+/* ── TIMER ── */
+function startTimer(){
+  const el=$('hdr-timer');
+  timerID=setInterval(()=>{
+    timerSec--;
+    el.textContent=fmt(timerSec);
+    if(timerSec<=300) el.classList.add('red');
+    if(timerSec<=0){clearInterval(timerID);doSubmit();}
+  },1000);
+}
+
+/* ═══ START ═══ */
+function startExam(){
+  cur=0;
+  answers=new Array(QS.length).fill(null);
+  skipped=new Array(QS.length).fill(false);
+  timerSec=40*60; startMs=Date.now();
+  $('hdr-timer').textContent='40:00';
+  $('hdr-timer').classList.remove('red');
+  show('scr-exam');
+  renderDots(); renderQ(); startTimer();
+}
+
+/* ═══ RENDER DOTS ═══ */
+function renderDots(){
+  let h='';
+  QS.forEach((_,i)=>{
+    let c='dp';
+    if(i===cur) c+=' cur';
+    else if(answers[i]!==null) c+=' done';
+    else if(skipped[i]) c+=' skip';
+    h+=`<div class="${c}" onclick="jumpTo(${i})">${i+1}</div>`;
+  });
+  $('dot-prog').innerHTML=h;
+}
+
+function updateDots(){
+  const dots=$('dot-prog').querySelectorAll('.dp');
+  dots.forEach((d,i)=>{
+    d.className='dp';
+    if(i===cur) d.classList.add('cur');
+    else if(answers[i]!==null) d.classList.add('done');
+    else if(skipped[i]) d.classList.add('skip');
+  });
+}
+
+/* ═══ RENDER Q ═══ */
+function renderQ(){
+  const q=QS[cur], N=QS.length;
+  $('q-id-lbl').textContent=`Q${q.id} / ${N}  ·  ${q.pts}점`;
+  const cp=$('q-cat-lbl');
+  cp.textContent=q.cL; cp.className=`q-cat ${q.cC}`;
+  $('hdr-prog').textContent=`${answers.filter(a=>a!==null).length}/${N} 응답`;
+
+  let h=`<div class="q-pts">Q${q.id} — ${q.cL} — ${q.pts}점</div>
+    <div class="q-text">${q.q}</div>`;
+  if(q.cond) h+=`<div class="q-cond">${q.cond}</div>`;
+  if(q.hint) h+=`<div class="q-hint">${q.hint}</div>`;
+  h+=`<div class="opts">`;
+  q.opts.forEach((o,i)=>{
+    const sel=answers[cur]===i?' sel':'';
+    h+=`<button class="opt${sel}" onclick="pick(${i})">
+      <span class="opt-n">${L[i]}</span>
+      <span>${o.replace(/\n/g,'<br>')}</span>
+    </button>`;
+  });
+  h+=`</div>`;
+  $('q-card').innerHTML=h;
+
+  const bn=$('btn-next');
+  if(cur===N-1){bn.textContent='제출하기';bn.className='btn btn-submit';}
+  else{bn.textContent='다음 →';bn.className='btn btn-next';}
+  updateDots();
+}
+
+function pick(i){ answers[cur]=i; skipped[cur]=false; renderQ(); }
+function goPrev(){ if(cur>0){ cur--; renderQ(); } }
+function doSkip(){ skipped[cur]=true; answers[cur]=null; if(cur<QS.length-1){cur++;renderQ();}else openModal(); }
+function goNext(){ if(cur===QS.length-1) openModal(); else{ cur++; renderQ(); } }
+function jumpTo(i){ cur=i; renderQ(); }
+
+/* ── MODAL ── */
+function openModal(){
+  const ua=answers.filter(a=>a===null).length;
+  $('mpara').textContent=ua>0
+    ?`미응답 ${ua}문항이 있습니다. 그래도 제출하시겠습니까?`
+    :'모든 문항에 답했습니다. 최종 제출할까요?';
+  $('mbg').classList.add('on');
+}
+function closeModal(){ $('mbg').classList.remove('on'); }
+function confirmSub(){ closeModal(); doSubmit(); }
+
+/* ═══ SUBMIT ═══ */
+function doSubmit(){
+  clearInterval(timerID);
+  const elapsed=Math.floor((Date.now()-startMs)/1000);
+  buildResult(elapsed);
+  show('scr-result');
+}
+
+/* ═══ BUILD RESULT ═══ */
+function buildResult(elapsed){
+  let ok=0,ng=0,sk=0;
+  QS.forEach((q,i)=>{
+    if(answers[i]===q.ans) ok++;
+    else if(answers[i]===null) sk++;
+    else ng++;
+  });
+  const score=ok*10;
+  $('r-score').textContent=score;
+  $('r-ok').textContent=ok; $('r-ng').textContent=ng;
+  $('r-sk').textContent=sk; $('r-tm').textContent=fmt(elapsed);
+
+  let grade,sub;
+  if(score>=110){grade='🏆 최우수 — 금상 수준';sub='4회차까지 전 영역을 완벽하게 마스터했습니다.';}
+  else if(score>=90){grade='🥈 우수 — 은상 수준';sub='고난도 유형에서도 탄탄한 실력을 보였습니다.';}
+  else if(score>=70){grade='🥉 양호 — 동상 수준';sub='기초 개념은 갖추어졌습니다. 고급 유형을 반복 학습하세요.';}
+  else if(score>=50){grade='📘 기초 강화 필요';sub='핵심 정리와 공식 원리를 다시 정리해보세요.';}
+  else{grade='📖 개념 학습 필요';sub='이산수학 기본 개념부터 차근차근 쌓아가세요.';}
+  $('r-grade').textContent=grade;
+  $('r-sub').textContent=sub;
+
+  // category bars
+  const cats={
+    graph:{l:'그래프 이론',ok:0,tot:0,color:'#00d4aa'},
+    combi:{l:'조합론',ok:0,tot:0,color:'#ffd166'},
+    num:  {l:'정수론',ok:0,tot:0,color:'#a29bfe'},
+    logic:{l:'논리·명제',ok:0,tot:0,color:'#ef5675'},
+    set:  {l:'집합·관계',ok:0,tot:0,color:'#68d8d6'},
+  };
+  QS.forEach((q,i)=>{
+    if(!cats[q.cat]) return;
+    cats[q.cat].tot++;
+    if(answers[i]===q.ans) cats[q.cat].ok++;
+  });
+  let catHtml='';
+  Object.values(cats).forEach(c=>{
+    if(!c.tot) return;
+    const pct=Math.round(c.ok/c.tot*100);
+    catHtml+=`<div class="cat-row">
+      <div class="cat-label">${c.l}</div>
+      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${pct}%;background:${c.color}"></div></div>
+      <div class="cat-frac">${c.ok}/${c.tot}</div>
+    </div>`;
+  });
+  $('cat-rows').innerHTML=catHtml;
+
+  renderSol();
+}
+
+/* ═══ RENDER SOLUTIONS ═══ */
+function renderSol(){
+  let h='';
+  QS.forEach((q,i)=>{
+    const isOk=answers[i]===q.ans;
+    const isSk=answers[i]===null;
+    const isNg=!isOk&&!isSk;
+    if(solFilter==='ok'&&!isOk) return;
+    if(solFilter==='ng'&&!isNg) return;
+    if(solFilter==='sk'&&!isSk) return;
+
+    const icon=isOk?'✅':isSk?'⬜':'❌';
+    const bc=isOk?'scb-ok':isSk?'scb-sk':'scb-ng';
+    const bt=isOk?'정답':isSk?'미응답':'오답';
+    const ua=answers[i]!==null
+      ?`내 선택: ${L[answers[i]]} — ${q.opts[answers[i]].replace(/\n/g,' ').slice(0,40)}`
+      :'미응답';
+
+    let steps='';
+    q.sol.steps.forEach((s,si)=>{
+      steps+=`<div class="step">
+        <div class="snum">${si+1}</div>
+        <div class="stxt">${s.t.replace(/\n/g,'<br>')}</div>
+      </div>`;
+    });
+
+    h+=`<div class="sol-card" id="sc${i}">
+      <div class="sol-head" onclick="togSol(${i})">
+        <div class="sc-ic">${icon}</div>
+        <div class="sc-info">
+          <div class="sc-title">Q${q.id}. ${q.cL}</div>
+          <div class="sc-prev">${q.q.replace(/\n/g,' ').slice(0,52)}…</div>
+        </div>
+        <span class="sc-badge ${bc}">${bt}</span>
+        <span class="sc-arr">▼</span>
+      </div>
+      <div class="sol-body">
+        <div class="my-ans">${ua}</div>
+        <div class="correct-row">
+          <span class="cr-lbl">정답</span>
+          <span class="cr-txt">${q.sol.correct}</span>
+        </div>
+        <div class="step-list">${steps}</div>
+        ${q.sol.formula?`<div class="formula-box">
+          <div class="fb-label">핵심 공식 · 정리</div>
+          <div class="fb-body">${q.sol.formula.replace(/\n/g,'<br>')}</div>
+        </div>`:''}
+      </div>
+    </div>`;
+  });
+  $('sol-list').innerHTML=h
+    ||`<div style="color:var(--t3);text-align:center;padding:2.5rem;font-family:var(--mono);font-size:.8rem;">해당하는 문항이 없습니다.</div>`;
+}
+
+function doFilter(f,el){
+  solFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  renderSol();
+}
+function togSol(i){ $('sc'+i).classList.toggle('open'); }
+function expandAll(){ document.querySelectorAll('.sol-card').forEach(c=>c.classList.add('open')); }
+
+/* ── RESET ── */
+function resetAll(){
+  clearInterval(timerID);
+  answers=new Array(QS.length).fill(null);
+  skipped=new Array(QS.length).fill(false);
+  cur=0; timerSec=40*60;
+  $('hdr-timer').textContent='40:00';
+  $('hdr-timer').classList.remove('red');
+  $('hdr-prog').textContent='';
+  show('scr-intro');
+}
+</script>
+</body>
+</html>

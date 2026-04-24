@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOI Discrete Math Mock Exams</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --main-blue: #1a73e8;
+            --dark-blue: #0d47a1;
+            --white: #ffffff;
+            --gray: #606367;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard-wrapper {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .main-title {
+            font-size: 2rem;
+            color: var(--dark-blue);
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .sub-title {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        /* 그리드 시스템 */
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* 카드 스타일 */
+        .exam-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid #e0e0e0;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(26, 115, 232, 0.15);
+            border-color: var(--main-blue);
+        }
+
+        .exam-icon {
+            width: 60px;
+            height: 60px;
+            background: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--main-blue);
+        }
+
+        .exam-number {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .exam-status {
+            font-size: 0.85rem;
+            color: #155724;
+            background-color: #d4edda;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* 메인 허브 링크 섹션 */
+        .hub-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hub-link {
+            display: inline-block;
+            background: var(--dark-blue);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .hub-link:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .main-title { font-size: 1.5rem; }
+            .exam-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <header>
+        <div class="main-title">KOI Discrete Mathematics</div>
+        <div class="sub-title">정보올림피아드 이산수학 실전 모의고사 시리즈</div>
+    </header>
+
+    <div class="hub-section">
+        <a href="https://iioiinet-spec.github.io/koi" class="hub-link" target="_blank">
+            📁 모의고사 메인 홈 바로가기
+        </a>
+    </div>
+
+    <div class="exam-grid">
+        <a href="https://iioiinet-spec.github.io/koi/e1" class="exam-card" target="_blank">
+            <div class="exam-icon">📝</div>
+            <div class="exam-number">제 1 회</div>
+            <div class="exam-status">Available</div>
+        </a>
+
+        <a href="https://iioiinet-spec.github.io/koi/e2" class="exam-card" target="_blank">
+            <div class="exam-icon">✍️</div>
+            <div class="exam-number">제 2 회</div>
+            <div class="exam-status">Available</div>
+        </a>
+
+        <a href="https://iioiinet-spec.github.io/koi/e3" class="exam-card" target="_blank">
+            <div class="exam-icon">📊</div>
+            <div class="exam-number">제 3 회</div>
+            <div class="exam-status">Available</div>
+        </a>
+
+        <a href="https://iioiinet-spec.github.io/koi/e4" class="exam-card" target="_blank">
+            <div class="exam-icon">💡</div>
+            <div class="exam-number">제 4 회</div>
+            <div class="exam-status">Available</div>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
