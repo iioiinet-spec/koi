@@ -3,266 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>제5회 정보올림피아드 실전 모의고사 - 비버 마을의 에너지 나무</title>
-    <!-- 코드 하이라이팅 및 폰트 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <title>정보올림피아드 실무 모의고사 - 비버 마을의 에너지 나무</title>
     <style>
         :root {
-            --exam-bg: #ffffff;
-            --lecture-bg: #f8fafc;
-            --primary: #1e293b;
-            --accent: #2563eb;
-            --danger: #e11d48;
-            --border: #d1d5db;
+            --primary-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --paper-white: #ffffff;
+            --bg-gray: #f1f5f9;
+            --border-color: #cbd5e1;
+            --danger-red: #be123c;
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
+            font-family: 'Malgun Gothic', 'Dotum', sans-serif;
             margin: 0;
+            padding: 0;
             line-height: 1.8;
+            background-color: var(--bg-gray);
             color: #334155;
-            scroll-behavior: smooth;
+            word-break: keep-all;
         }
 
-        /* [첫 번째 화면: 실전 모의고사] */
-        .exam-page {
-            min-height: 100vh;
-            padding: 40px 20px;
-            background-color: #f1f5f9;
-            display: flex;
-            justify-content: center;
-        }
-
-        .exam-paper {
-            background: white;
+        .wrapper {
             max-width: 900px;
-            width: 100%;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* 시험지 스타일 카드 */
+        .exam-paper {
+            background-color: var(--paper-white);
             padding: 60px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color);
             position: relative;
         }
 
-        .exam-paper::before {
-            content: "CONFIDENTIAL - MOCK EXAM";
-            position: absolute;
-            top: 25px;
-            right: 40px;
-            font-weight: 900;
-            color: var(--danger);
-            border: 3px solid var(--danger);
-            padding: 5px 15px;
-            transform: rotate(5deg);
-            opacity: 0.3;
-        }
-
-        .exam-header {
+        /* 상단 헤더 */
+        .header {
             text-align: center;
-            border-bottom: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary-dark);
             margin-bottom: 30px;
+            padding-bottom: 10px;
         }
 
-        .exam-title {
+        .header h1 {
             font-size: 2.2rem;
             margin: 10px 0;
-            letter-spacing: -1px;
+            font-weight: 900;
         }
 
-        .info-box {
+        .exam-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 50px;
             font-weight: bold;
-            border: 2px solid #000;
-            padding: 15px;
+            margin-bottom: 40px;
+            border: 1px solid #000;
+            padding: 10px 20px;
         }
 
-        .problem-section h2 {
-            background: #334155;
+        /* 섹션 스타일 */
+        h2 {
+            font-size: 1.4rem;
             color: white;
-            padding: 5px 15px;
+            background-color: var(--primary-dark);
             display: inline-block;
-            font-size: 1.2rem;
+            padding: 5px 20px;
+            margin: 30px 0 15px 0;
         }
 
-        .example-block {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            background: #f8fafc;
-            padding: 25px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: 'Consolas', monospace;
-        }
-
-        /* [두 번째 화면: 상세 알고리즘 강의] */
-        .lecture-page {
-            background-color: var(--lecture-bg);
-            padding: 100px 20px;
-        }
-
-        .lecture-container {
-            max-width: 1050px;
-            margin: 0 auto;
-        }
-
-        .lecture-card {
-            background: white;
-            border-radius: 24px;
-            padding: 50px;
-            margin-bottom: 50px;
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .lecture-h2 {
-            color: var(--accent);
-            font-size: 2rem;
-            border-bottom: 4px solid var(--accent);
-            display: inline-block;
-            margin-bottom: 30px;
+        h3 {
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            margin-top: 25px;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 5px;
         }
 
-        .lecture-h3 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-top: 40px;
+        p, li {
+            font-size: 1rem;
+            margin-bottom: 10px;
         }
 
-        .concept-highlight {
-            background: #f0f9ff;
-            border-left: 6px solid var(--accent);
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        /* 제약 사항 강조 */
+        .constraints {
+            background-color: #fff1f2;
+            border: 1px solid #fda4af;
             padding: 20px;
-            border-radius: 4px;
+            border-radius: 8px;
             margin: 20px 0;
         }
 
-        .scroll-btn {
-            display: block;
-            margin: 50px auto;
-            padding: 18px 40px;
-            background: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 800;
-            text-align: center;
-            width: fit-content;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
+        .constraints strong {
+            color: var(--danger-red);
         }
 
-        .scroll-btn:hover { background: var(--accent); transform: translateY(-3px); }
-
-        pre { border-radius: 12px !important; margin: 25px 0 !important; }
-
-        .method-step {
-            display: flex;
+        /* 예제 입출력 레이아웃 */
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 25px;
+            margin-top: 20px;
         }
 
-        .step-num {
-            background: var(--accent);
-            color: white;
-            min-width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
+        .example-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 5px;
         }
 
+        .example-box strong {
+            display: block;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-font {
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+        }
+
+        /* 반응형 설정 */
         @media (max-width: 768px) {
-            .exam-paper, .lecture-card { padding: 30px; }
-            .example-block { grid-template-columns: 1fr; }
-            .exam-title { font-size: 1.6rem; }
+            .exam-paper {
+                padding: 30px 20px;
+            }
+            .example-grid {
+                grid-template-columns: 1fr;
+            }
+            .exam-info {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- [첫 번째 화면: 실전 문제지] -->
-    <div class="exam-page" id="exam">
-        <div class="exam-paper">
-            <div class="exam-header">
-                <p>2026학년도 정보올림피아드 실기 대비 모의고사</p>
-                <h1 class="exam-title">정보 처리 실기 - 비버 마을의 에너지 나무</h1>
-            </div>
-
-            <div class="info-box">
-                <span>수험 번호: ________________</span>
-                <span>성 명: ________________</span>
-            </div>
-
-            <div class="problem-section">
-                <h2>문제 : 비버 마을의 에너지 나무</h2>
-                <p>
-                    비버 마을에는 1번 마을회관을 중심으로 여러 집이 나무(Tree) 구조로 연결되어 있다.
-                    마을에는 총 N개의 집이 있고, 집들은 N-1개의 길로 연결되어 있다.
-                    모든 집은 길을 따라 1번 집까지 갈 수 있으며, 길 사이에 순환은 존재하지 않는다.
-                </p>
-                <p>
-                    각 집에는 에너지 저장 장치가 있으며, 초기 에너지 양 Ai가 주어진다.
-                    마을에서는 다음과 같은 두 종류의 작업이 빈번하게 발생한다.
-                </p>
-                <ul>
-                    <li><strong>1 u x:</strong> u번 집의 에너지를 x로 변경한다.</li>
-                    <li><strong>2 u:</strong> u번 집을 중심으로 하는 서브트리 전체의 에너지 합을 구한다.</li>
-                </ul>
-
-                <p>단순 DFS 방식은 시간 초과가 발생하므로, 트리를 선형 배열로 변환한 뒤 세그먼트 트리 등을 사용하여 효율적으로 해결해야 한다.</p>
-
-                <h3>[제약 조건]</h3>
-                <p>
-                    • N, Q (1 ~ 100,000)<br>
-                    • Ai, x (1 ~ 100,000)<br>
-                    • 결과값은 32비트 정수 범위를 넘을 수 있으므로 <strong>long long</strong>을 사용한다.
-                </p>
-
-                <h3>[예제 입출력]</h3>
-                <div class="example-block">
-                    <div>
-                        <strong>Input</strong><br>
-                        7 5<br>
-                        5 3 8 2 4 6 1<br>
-                        1 2<br>
-                        1 3<br>
-                        2 4<br>
-                        2 5<br>
-                        3 6<br>
-                        3 7<br>
-                        2 1<br>
-                        2 2<br>
-                        1 5 10<br>
-                        2 2<br>
-                        2 3
-                    </div>
-                    <div>
-                        <strong>Output</strong><br>
-                        29<br>
-                        9<br>
-                        15<br>
-                        15
-                    </div>
-                </div>
-            </div>
-
-            <a href="#lecture" class="scroll-btn">해설 및 강의 모드 전환</a>
+<div class="wrapper">
+    <div class="exam-paper">
+        <div class="header">
+            <p>2026학년도 정보올림피아드 실기 대비 모의고사</p>
+            <h1>비버 마을의 에너지 나무</h1>
         </div>
+
+        <div class="exam-info">
+            <span>수험번호: _______________</span>
+            <span>성 명: _______________</span>
+        </div>
+
+        <!-- 1. 문제 설명 -->
+        <h2>1. 문제 설명</h2>
+        <p>비버 마을에는 1번 마을회관을 중심으로 여러 집이 나무(Tree) 구조로 연결되어 있다. 마을에는 총 N개의 집이 있고, 집들은 N-1개의 길로 연결되어 있다.</p>
+        <p>모든 집은 길을 따라 마을회관인 1번 집까지 갈 수 있으며, 길 사이에 순환은 존재하지 않는다. 각 집에는 에너지 저장 장치가 하나씩 있고, 처음에는 각 집마다 정해진 에너지 양 Ai가 들어 있다.</p>
+        <p>비버 마을에서는 다음 두 가지 작업이 반복해서 일어난다.</p>
+        <ol>
+            <li>특정 집의 에너지 양이 바뀐다.[cite: 5]</li>
+            <li>특정 집 u를 중심으로 하는 마을 구역 전체의 에너지 합을 계산한다.</li>
+        </ol>
+        <p>여기서 <strong>마을 구역</strong>이란, 1번 집을 루트로 보았을 때 u번 집과 그 아래에 연결된 모든 자손 집들을 의미한다.</p>
+
+        <!-- 2. 입력 형식 -->
+        <h2>2. 입력 형식</h2>
+        <ul>
+            <li>첫 줄에 집의 개수 N과 명령의 개수 Q가 주어진다.</li>
+            <li>둘째 줄에 1번부터 N번 집까지의 초기 에너지 양 Ai가 차례대로 주어진다.</li>
+            <li>다음 N-1개의 줄에 걸쳐 길로 연결된 두 집의 번호 u, v가 주어진다.</li>
+            <li>마지막 Q개의 줄에 명령이 주어진다.</li>
+        </ul>
+        <div class="example-box" style="margin-top:10px;">
+            <strong>명령 종류:</strong>
+            - 1 u x : u번 집의 에너지를 x로 변경한다.<br>
+            - 2 u : u번 집을 루트로 하는 서브트리 전체의 에너지 합을 출력한다.
+        </div>
+
+        <!-- 3. 제한 사항 -->
+        <h2>3. 제한 사항</h2>
+        <div class="constraints">
+            <ul>
+                <li>1 &le; N &le; 100,000 | 1 &le; Q &le; 100,000</li>
+                <li>1 &le; Ai &le; 100,000 | 1 &le; x &le; 100,000</li>
+                <li>1 &le; u, v &le; N[cite: 5]</li>
+                <li><strong>주의:</strong> 합 계산 결과가 32비트 정수 범위를 초과할 수 있으므로 <strong>long long</strong> 자료형을 사용해야 한다.</li>
+            </ul>
+        </div>
+
+        <!-- 4. 예제 입출력 -->
+        <h2>4. 예제 입출력</h2>
+        <div class="example-grid">
+            <div class="example-box">
+                <strong>예제 입력 (Input)</strong>
+                <div class="code-font">7 5
+5 3 8 2 4 6 1
+1 2
+1 3
+2 4
+2 5
+3 6
+3 7
+2 1
+2 2
+1 5 10
+2 2
+2 3</div>
+            </div>
+            <div class="example-box">
+                <strong>예제 출력 (Output)</strong>
+                <div class="code-font">29
+9
+15
+15</div>
+            </div>
+        </div>
+
+        <!-- 5. 출력 설명 -->
+        <h3>[예제 설명]</h3>
+        <p>명령 <strong>2 1</strong>: 전체 마을의 합 (5+3+8+2+4+6+1) = 29</p>
+        <p>명령 <strong>2 2</strong>: 2번 집 서브트리(2, 4, 5)의 합 (3+2+4) = 9</p>
+        <p>명령 <strong>1 5 10</strong>: 5번 집의 에너지를 4에서 10으로 변경</p>
+        <p>명령 <strong>2 2</strong>: 변경된 2번 집 서브트리 합 (3+2+10) = 15</p>
+        <p>명령 <strong>2 3</strong>: 3번 집 서브트리(3, 6, 7)의 합 (8+6+1) = 15</p>
     </div>
+</div>
 
-   
+<footer style="text-align: center; padding-bottom: 40px; color: #94a3b8;">
+    &copy; 2026 Seyeong Coding Research Institute. 교육 목적으로만 사용 가능합니다.
+</footer>
 
-    <footer style="text-align: center; padding: 50px; color: #94a3b8; font-size: 0.9rem;">
-        &copy; 2026 Seyeong Coding Research Institute. 교육 목적으로만 사용 가능합니다.
-    </footer>
-
-    <!-- 스크립트: 코드 하이라이팅 및 수학 텍스트 처리 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
 </body>
 </html>
