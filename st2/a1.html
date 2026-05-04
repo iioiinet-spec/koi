@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보올림피아드 실전 모의고사 - 비버 농장의 물길 관리</title>
+    <!-- 코드 하이라이팅: Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --danger-red: #be123c;
+            --bg-gray: #f1f5f9;
+            --paper-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Dotum', sans-serif;
+            margin: 0;
+            line-height: 1.8;
+            color: #334155;
+            word-break: keep-all;
+            scroll-behavior: smooth;
+        }
+
+        /* [Section 1: 실전 시험지 페이지] */
+        .exam-container {
+            min-height: 100vh;
+            padding: 50px 20px;
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .exam-paper {
+            background: var(--paper-white);
+            max-width: 850px;
+            width: 100%;
+            padding: 60px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border: 1px solid #94a3b8;
+            position: relative;
+        }
+
+        .exam-watermark {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            font-weight: 800;
+            color: var(--danger-red);
+            border: 3px solid var(--danger-red);
+            padding: 5px 15px;
+            transform: rotate(5deg);
+            opacity: 0.3;
+            user-select: none;
+        }
+
+        .exam-header {
+            text-align: center;
+            border-bottom: 3px solid #000;
+            margin-bottom: 30px;
+        }
+
+        .exam-title {
+            font-size: 2rem;
+            margin: 10px 0;
+            font-weight: 900;
+        }
+
+        .candidate-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .candidate-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .problem-text h2 {
+            background: #000;
+            color: #fff;
+            padding: 5px 15px;
+            display: inline-block;
+            font-size: 1.1rem;
+        }
+
+        .example-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 20px;
+            border: 1px dashed #64748b;
+            margin-top: 20px;
+        }
+
+        /* [Section 2: 심화 강의 페이지] */
+        .lecture-container {
+            background-color: var(--bg-gray);
+            padding: 80px 20px;
+        }
+
+        .lecture-content {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .lecture-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .lecture-h2 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            border-left: 8px solid var(--accent-blue);
+            padding-left: 15px;
+            margin-bottom: 30px;
+        }
+
+        .formula-box {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin: 20px 0;
+        }
+
+        .scroll-btn {
+            display: block;
+            margin: 40px auto;
+            padding: 15px 40px;
+            background: var(--primary-dark);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            width: fit-content;
+        }
+
+        pre { border-radius: 8px !important; }
+
+        @media (max-width: 768px) {
+            .example-section { grid-template-columns: 1fr; }
+            .exam-paper { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- [1번 화면: 실전 시험지 스타일] -->
+    <div class="exam-container">
+        <div class="exam-paper">
+            <div class="exam-watermark">대외비 - 실전 모의고사</div>
+            
+            <div class="exam-header">
+                <p>2026학년도 정보올림피아드 실기 대비</p>
+                <h1 class="exam-title">문제 : 비버 농장의 물길 관리</h1>
+            </div>
+
+            <table class="candidate-table">
+                <tr>
+                    <td width="20%">지역</td>
+                    <td width="30%"></td>
+                    <td width="20%">성명</td>
+                    <td width="30%"></td>
+                </tr>
+            </table>
+
+            <div class="problem-text">
+                <h2>1. 문제 설명</h2>
+                <p>
+                    비버 마을에는 길게 이어진 N개의 농장이 있다. 농장은 왼쪽부터 오른쪽까지 1번부터 N번까지 번호가 붙어 있다.[cite: 6, 7]
+                    각 농장에는 처음에 정해진 양의 물 Ai가 저장되어 있으며, 관리자는 다음 두 가지 작업을 수행한다.[cite: 6, 7]
+                </p>
+                <ul>
+                    <li><strong>작업 1 (1 l r x):</strong> l번 농장부터 r번 농장까지 물을 각각 x만큼 더 공급한다.[cite: 6, 7]</li>
+                    <li><strong>작업 2 (2 l r):</strong> l번 농장부터 r번 농장까지 중 물이 가장 많은 농장의 물의 양을 출력한다.[cite: 6, 7]</li>
+                </ul>
+
+                <h3>[제약 사항 및 조건]</h3>
+                <p>
+                    • N, Q &le; 100,000 (농장 수 및 명령 수)[cite: 6, 7]<br>
+                    • Ai, x &le; 100,000 (초기 물의 양 및 증가량)[cite: 6, 7]<br>
+                    • 데이터 범위가 크므로 반드시 <strong>long long</strong> 타입을 사용해야 한다.[cite: 6, 7]<br>
+                    • 시간 제한: 2.0초 / 메모리 제한: 256MB
+                </p>
+
+                <div class="example-section">
+                    <div>
+                        <strong>[예제 입력]</strong><br>
+                        5 6<br>
+                        3 1 4 2 5<br>
+                        2 1 5<br>
+                        1 2 4 3<br>
+                        2 1 5<br>
+                        2 2 3<br>
+                        1 5 5 10<br>
+                        2 4 5
+                    </div>
+                    <div>
+                        <strong>[예제 출력]</strong><br>
+                        5<br>
+                        7<br>
+                        7<br>
+                        15
+                    </div>
+                </div>
+            </div>
+
+            <a href="#lecture" class="scroll-btn">심화 강의 및 코드 해설 확인</a>
+        </div>
+    </div>
+
+    <!-- [2번 화면: 상세 알고리즘 해설] -->
+    <div class="lecture-container" id="lecture">
+        <div class="lecture-content">
+            
+            <div class="lecture-card">
+                <h2 class="lecture-h2">1. 시간 복잡도 분석</h2>
+                <p>
+                    이 문제의 핵심은 N과 Q가 모두 100,000이라는 점입니다.[cite: 6, 7] 
+                    단순 반복문으로 구간 업데이트를 수행하면 최악의 경우 O(N*Q)가 되어 약 100억 번의 연산이 필요합니다.[cite: 6, 7] 
+                    따라서 <strong>O(Q log N)</strong>으로 해결 가능한 <strong>Lazy Propagation 세그먼트 트리</strong>가 필수적입니다.[cite: 6, 7]
+                </p>
+            </div>
+
+            <div class="lecture-card">
+                <h2 class="lecture-h2">2. 핵심 알고리즘: Lazy Propagation</h2>
+                <p>
+                    구간 업데이트 시, 하위 노드들을 즉시 갱신하지 않고 <strong>lazy 배열</strong>에 변경 사항을 기록해 두었다가, 
+                    해당 노드를 실제로 방문할 때 갱신(Push)하는 기법입니다.[cite: 6, 7]
+                </p>
+                
+                <div class="formula-box">
+                    • 점 수정: O(log N)<br>
+                    • 구간 수정(Lazy): O(log N)<br>
+                    • 구간 최댓값 질의: O(log N)
+                </div>
+            </div>
+
+            <div class="lecture-card">
+                <h2 class="lecture-h2">3. 정답 소스 코드 (C 언어)</h2>
+                <p>아래 코드는 예제 입력을 완벽하게 통과하며, 실제 대회 환경에서 바로 사용 가능한 표준 코드입니다.</p>
+
+                <pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+#define MAXN 100005
+#define INF_NEG -4000000000000000000LL // 최댓값 계산을 위한 작은 값[cite: 7]
+
+long long arr[MAXN], seg[MAXN * 4], lazy[MAXN * 4];
+
+long long max(long long a, long long b) { return (a > b) ? a : b; }
+
+// 트리의 기초를 형성하는 build 함수[cite: 7]
+void build(int node, int start, int end) {
+    if (start == end) {
+        seg[node] = arr[start];
+        return;
+    }
+    int mid = (start + end) / 2;
+    build(node * 2, start, mid);
+    build(node * 2 + 1, mid + 1, end);
+    seg[node] = max(seg[node * 2], seg[node * 2 + 1]);
+}
+
+// 미뤄둔 업데이트를 자식에게 전달하는 push 함수[cite: 7]
+void push(int node, int start, int end) {
+    if (lazy[node] != 0) {
+        if (start != end) {
+            lazy[node * 2] += lazy[node];
+            seg[node * 2] += lazy[node];
+            lazy[node * 2 + 1] += lazy[node];
+            seg[node * 2 + 1] += lazy[node];
+        }
+        lazy[node] = 0;
+    }
+}
+
+// 구간에 값을 더하는 update 함수[cite: 7]
+void update(int node, int start, int end, int left, int right, long long val) {
+    push(node, start, end);
+    if (right < start || end < left) return;
+    if (left <= start && end <= right) {
+        seg[node] += val;
+        lazy[node] += val;
+        return;
+    }
+    int mid = (start + end) / 2;
+    update(node * 2, start, mid, left, right, val);
+    update(node * 2 + 1, mid + 1, end, left, right, val);
+    seg[node] = max(seg[node * 2], seg[node * 2 + 1]);
+}
+
+// 구간 최댓값을 구하는 query 함수[cite: 7]
+long long query(int node, int start, int end, int left, int right) {
+    push(node, start, end);
+    if (right < start || end < left) return INF_NEG;
+    if (left <= start && end <= right) return seg[node];
+    int mid = (start + end) / 2;
+    return max(query(node * 2, start, mid, left, right), 
+               query(node * 2 + 1, mid + 1, end, left, right));
+}
+
+int main() {
+    int N, Q;
+    scanf("%d %d", &N, &Q);
+    for (int i = 1; i <= N; i++) scanf("%lld", &arr[i]);
+    
+    build(1, 1, N);
+    
+    while (Q--) {
+        int type, l, r;
+        scanf("%d %d %d", &type, &l, &r);
+        if (type == 1) {
+            long long x; scanf("%lld", &x);
+            update(1, 1, N, l, r, x);
+        } else {
+            printf("%lld\n", query(1, 1, N, l, r));
+        }
+    }
+    return 0;
+}
+                </code></pre>
+            </div>
+
+            <div class="lecture-card" style="background: var(--primary-dark); color: white;">
+                <h3>🎓 강의 마무리 및 핵심 요약</h3>
+                <ul>
+                    <li><strong>구간 업데이트</strong>가 포함된 문제는 100% Lazy Propagation 문제입니다.[cite: 6, 7]</li>
+                    <li>최댓값을 관리할 때는 구간 합과 달리 노드 범위 길이를 곱하지 않고 단순히 더해줍니다.[cite: 7]</li>
+                    <li><code>push</code> 함수는 자식 노드로 내려가기 직전(update, query 시작부)에 반드시 호출해야 합니다.[cite: 7]</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 40px; color: #94a3b8; font-size: 0.9rem;">
+        &copy; 2026 Seyeong Coding Research Institute. 교육 목적으로만 사용 가능합니다.
+    </footer>
+
+    <!-- 코드 하이라이팅 스크립트 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+</body>
+</html>

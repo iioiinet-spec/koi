@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코딩 심화 강의: 비버 마을의 에너지 나무</title>
+    <!-- 코드 하이라이팅: Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --logic-bg: #fff7ed;
+            --logic-border: #fdba74;
+            --text-main: #334155;
+            --bg-gray: #f8fafc;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Dotum', sans-serif;
+            margin: 0;
+            line-height: 1.8;
+            color: var(--text-main);
+            background-color: var(--bg-gray);
+            word-break: keep-all;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        h2 {
+            color: var(--accent);
+            font-size: 1.8rem;
+            border-left: 8px solid var(--accent);
+            padding-left: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logic-highlight {
+            background: var(--logic-bg);
+            border: 1px solid var(--logic-border);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .logic-title {
+            font-weight: 900;
+            color: #c2410c;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .method-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .method-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .method-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        pre {
+            border-radius: 10px !important;
+            margin-top: 20px !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .section-card { padding: 25px; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <p>Algorithm Master Class</p>
+            <h1>비버 마을의 에너지 나무: 심층 해설</h1>
+        </header>
+
+        <!-- 1. 핵심 알고리즘 전략 -->
+        <section class="section-card">
+            <h2>1. 알고리즘 핵심 전략</h2>
+            <p>
+                이 문제는 트리 구조에서 발생하는 대규모 쿼리를 처리해야 합니다. 
+                집의 개수 N과 명령의 개수 Q가 모두 100,000 이하이므로, 단순한 DFS 탐색(O(N))을 매 명령마다 반복하면 총 100억 번의 연산이 필요하여 시간 초과가 발생합니다.
+            </p>
+            
+            <div class="logic-highlight">
+                <span class="logic-title"> 최적화의 열쇠: 오일러 투어 테크닉 (ETT)</span>
+                트리를 DFS 순서로 탐색하여 진입 시간(in)과 탈출 시간(out)을 기록하면, <strong>임의의 노드 u를 루트로 하는 서브트리는 배열 상에서 [in[u], out[u]]라는 연속된 구간</strong>이 됩니다.
+            </div>
+        </section>
+
+        <!-- 2. 상세 로직 해설 -->
+        <section class="section-card">
+            <h2>2. 단계별 구현 로직</h2>
+            <ul class="method-list">
+                <li><strong>트리 일렬화:</strong> DFS를 통해 각 노드의 서브트리 범위를 배열 인덱스로 매핑합니다.[cite: 5]</li>
+                <li><strong>데이터 구조:</strong> 수시로 변하는 구간 합을 관리하기 위해 세그먼트 트리를 사용합니다.[cite: 5]</li>
+                <li><strong>업데이트:</strong> 노드 u의 값 변경 시, <code>in[u]</code> 위치의 값을 세그먼트 트리에서 갱신합니다.[cite: 5]</li>
+                <li><strong>쿼리:</strong> 서브트리 합 요청 시, <code>query(in[u], out[u])</code>를 수행하여 O(log N)에 결과를 얻습니다.[cite: 5]</li>
+            </ul>
+        </section>
+
+        <!-- 3. 전용 정답 코드 -->
+        <section class="section-card">
+            <h2>3. 정답 소스 코드 (C Language)</h2>
+            <p>이 코드는 오일러 투어 테크닉과 세그먼트 트리를 결합하여 <strong>O((N + Q) log N)</strong>의 복잡도로 동작합니다.[cite: 5]</p>
+            
+            <pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+#define MAXN 100005
+
+int N, Q, timer;
+int head[MAXN], to[MAXN * 2], nxt[MAXN * 2], edgeCount;
+int in[MAXN], out[MAXN];
+long long value[MAXN], arr[MAXN], seg[MAXN * 4];
+
+// [1] 인접 리스트로 트리 구성[cite: 5]
+void addEdge(int u, int v) {
+    to[edgeCount] = v;
+    nxt[edgeCount] = head[u];
+    head[u] = edgeCount++;
+}
+
+// [2] DFS를 이용한 오일러 투어 테크닉[cite: 5]
+void dfs(int cur, int prev) {
+    in[cur] = ++timer; // 구간 시작 위치 기록
+    for (int e = head[cur]; e != -1; e = nxt[e]) {
+        if (to[e] != prev) dfs(to[e], cur);
+    }
+    out[cur] = timer; // 구간 끝 위치 기록
+}
+
+// [3] 세그먼트 트리 구축 (초기화)[cite: 5]
+void build(int node, int start, int end) {
+    if (start == end) {
+        seg[node] = arr[start];
+        return;
+    }
+    int mid = (start + end) / 2;
+    build(node * 2, start, mid);
+    build(node * 2 + 1, mid + 1, end);
+    seg[node] = seg[node * 2] + seg[node * 2 + 1];
+}
+
+// [4] 세그먼트 트리 업데이트 (값 변경)[cite: 5]
+void update(int node, int start, int end, int idx, long long newVal) {
+    if (start == end) {
+        seg[node] = newVal;
+        return;
+    }
+    int mid = (start + end) / 2;
+    if (idx <= mid) update(node * 2, start, mid, idx, newVal);
+    else update(node * 2 + 1, mid + 1, end, idx, newVal);
+    seg[node] = seg[node * 2] + seg[node * 2 + 1];
+}
+
+// [5] 세그먼트 트리 쿼리 (구간 합)[cite: 5]
+long long query(int node, int start, int end, int left, int right) {
+    if (right < start || end < left) return 0;
+    if (left <= start && end <= right) return seg[node];
+    int mid = (start + end) / 2;
+    return query(node * 2, start, mid, left, right) + 
+           query(node * 2 + 1, mid + 1, end, left, right);
+}
+
+int main() {
+    scanf("%d %d", &N, &Q);
+    for (int i = 1; i <= N; i++) head[i] = -1;
+    for (int i = 1; i <= N; i++) scanf("%lld", &value[i]);
+    for (int i = 0; i < N - 1; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        addEdge(u, v); addEdge(v, u);
+    }
+
+    dfs(1, 0); // 트리 일렬화 수행[cite: 5]
+    for (int i = 1; i <= N; i++) arr[in[i]] = value[i];
+    build(1, 1, N); // 트리 생성[cite: 5]
+
+    while (Q--) {
+        int type, u;
+        scanf("%d %d", &type, &u);
+        if (type == 1) {
+            long long x;
+            scanf("%lld", &x);
+            update(1, 1, N, in[u], x); // 값 수정[cite: 5]
+        } else {
+            // 서브트리 범위 [in[u], out[u]] 합 출력[cite: 5]
+            printf("%lld\n", query(1, 1, N, in[u], out[u]));
+        }
+    }
+    return 0;
+}
+            </code></pre>
+        </section>
+
+        <!-- 4. 기술 통계 및 주의사항 -->
+        <section class="section-card">
+            <h2>4. 성능 분석 및 주의사항</h2>
+            <table>
+                <tr>
+                    <th>항목</th>
+                    <th>상세 내용</th>
+                </tr>
+                <tr>
+                    <td>시간 복잡도</td>
+                    <td>O((N + Q) log N)[cite: 5]</td>
+                </tr>
+                <tr>
+                    <td>데이터 범위</td>
+                    <td>N, Q &le; 100,000 (깨짐 방지: &amp;le; 사용)[cite: 5]</td>
+                </tr>
+                <tr>
+                    <td>자료형</td>
+                    <td>합 계산 시 <strong>long long</strong> 사용 필수[cite: 5]</td>
+                </tr>
+                <tr>
+                    <td>핵심 포인트</td>
+                    <td>서브트리 쿼리를 구간 쿼리로 변환하는 능력[cite: 5]</td>
+                </tr>
+            </table>
+        </section>
+    </div>
+
+    <footer>
+        &copy; 2026 Seyeong Coding Research Institute. 교육 목적으로만 사용 가능합니다.
+    </footer>
+
+    <!-- 코드 하이라이팅 스크립트 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+</body>
+</html>
