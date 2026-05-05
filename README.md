@@ -15,3 +15,7 @@ g2
 
 st1 : 세그먼트트리 예상문제, 정덥 a1.html, a2.html
 st2 : Lazy Propagation
+
+
+ex : 이산수학 모의고사 3회
+exa : 정답과 해설
