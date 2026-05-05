@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOI 중등부 문장제 모의고사 — 3회 시리즈</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root{--bg:#06050c;--card:#0e0d1c;--card2:#161428;--border:#222040;--border2:#302860;--faint:#403870;--muted:#6460a0;--dim:#8480c0;--text:#ccc8f0;--bright:#eeeaff;
+--r1:#9060ff;--r1b:#c090ff;--r2:#00d890;--r2b:#50f0b0;--r3:#ff9820;--r3b:#ffc060;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;line-height:1.8;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 10% -5%,rgba(144,96,255,.06),transparent),
+             radial-gradient(ellipse 50% 35% at 50% 50%,rgba(0,216,144,.04),transparent),
+             radial-gradient(ellipse 55% 35% at 90% 108%,rgba(255,152,32,.05),transparent);
+  pointer-events:none;z-index:0;}
+
+/* HEADER */
+.hub-hdr{text-align:center;padding:80px 24px 60px;position:relative;z-index:1;}
+.hub-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:7px;text-transform:uppercase;color:var(--faint);border:1px solid var(--border2);padding:6px 20px;margin-bottom:28px;display:inline-block;}
+.hub-title{font-family:'Noto Serif KR',serif;font-size:clamp(40px,8vw,82px);font-weight:900;line-height:.92;letter-spacing:-3px;color:var(--bright);margin-bottom:10px;}
+.hub-title .g1{color:var(--r1);text-shadow:0 0 28px rgba(144,96,255,.4);}
+.hub-title .g2{color:var(--r2);text-shadow:0 0 28px rgba(0,216,144,.4);}
+.hub-title .g3{color:var(--r3);text-shadow:0 0 28px rgba(255,152,32,.4);}
+.hub-sub{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:2px;margin-bottom:48px;}
+.hub-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border2);max-width:680px;margin:0 auto 60px;}
+.hs{background:var(--card);padding:18px 12px;text-align:center;}
+.hs-n{font-family:'Noto Serif KR',serif;font-size:30px;font-weight:900;display:block;line-height:1;}
+.hs-l{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:2px;}
+
+/* ROUND CARDS */
+.rounds{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
+.rcard{background:var(--card);border:1px solid var(--border2);overflow:hidden;transition:transform .2s,border-color .2s;}
+.rcard:hover{transform:translateY(-4px);}
+.rcard-stripe{height:4px;}
+.rcard-head{padding:24px 24px 16px;border-bottom:1px solid var(--border);}
+.rcard-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+.rcard-title{font-family:'Noto Serif KR',serif;font-size:26px;font-weight:900;line-height:1.1;margin-bottom:4px;}
+.rcard-sub{font-size:13px;color:var(--muted);}
+.rcard-body{padding:18px 24px;}
+.rcard-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.rtopic{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);border:1px solid var(--border2);padding:3px 9px;}
+.rcard-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border2);margin-bottom:18px;}
+.rm{background:var(--card2);padding:10px;text-align:center;}
+.rm-n{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;display:block;}
+.rm-l{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:1px;}
+.rcard-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rbtn{padding:11px 0;border:none;font-family:'Noto Serif KR',serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
+.rbtn-exam{color:var(--bg);}
+.rbtn-exam:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.rbtn-ans{background:transparent;border:1px solid;color:var(--text);}
+.rbtn-ans:hover{background:rgba(255,255,255,.05);transform:translateY(-1px);}
+
+/* INFO SECTION */
+.hub-info{max-width:900px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px;}
+.info-card{background:var(--card);border:1px solid var(--border2);padding:20px;text-align:center;}
+.info-icon{font-size:28px;margin-bottom:8px;display:block;}
+.info-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;color:var(--bright);margin-bottom:6px;}
+.info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;}
+.topics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border2);}
+.topic-row{background:var(--card);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;}
+.topic-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.topic-name{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:2px;}
+.topic-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.hub-footer{text-align:center;padding:32px 24px 48px;border-top:1px solid var(--border);position:relative;z-index:1;}
+.hub-footer-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:2px;}
+
+@media(max-width:900px){.rounds{grid-template-columns:1fr;max-width:500px;}.info-grid{grid-template-columns:1fr;}.topics-grid{grid-template-columns:1fr;}}
+@media(max-width:500px){.hub-stats{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hub-hdr">
+  <div class="hub-tag">KOI 중등부 · 문장제 모의고사 시리즈</div>
+  <div class="hub-title">
+    <span class="g1">제1회</span> &nbsp;
+    <span class="g2">제2회</span> &nbsp;
+    <span class="g3">제3회</span><br>
+    문장제 모의고사
+  </div>
+  <div class="hub-sub">한국정보올림피아드 중등부 기출 수준 · 실생활 문장제 60문제</div>
+  <div class="hub-stats">
+    <div class="hs"><span class="hs-n" style="color:var(--r1)">3</span><span class="hs-l">총 회차</span></div>
+    <div class="hs"><span class="hs-n" style="color:var(--r2)">60</span><span class="hs-l">총 문항</span></div>
+    <div class="hs"><span class="hs-n" style="color:var(--r3)">600</span><span class="hs-l">총 배점</span></div>
+    <div class="hs"><span class="hs-n" style="color:var(--dim)">270</span><span class="hs-l">제한(분)</span></div>
+  </div>
+</div>
+
+<!-- ROUND CARDS -->
+<div class="rounds">
+
+  <!-- 1회차 -->
+  <div class="rcard" style="border-color:rgba(144,96,255,.3);">
+    <div class="rcard-stripe" style="background:linear-gradient(90deg,var(--r1),var(--r1b));"></div>
+    <div class="rcard-head">
+      <div class="rcard-num">Round 01 · Indigo</div>
+      <div class="rcard-title" style="color:var(--r1b);">제1회<br>문장제 모의고사</div>
+      <div class="rcard-sub">정수론·조합론·알고리즘 기초 복합형</div>
+    </div>
+    <div class="rcard-body">
+      <div class="rcard-topics">
+        <span class="rtopic">택배 포장</span>
+        <span class="rtopic">캠퍼스 경로</span>
+        <span class="rtopic">도서관 정렬</span>
+        <span class="rtopic">암호화</span>
+        <span class="rtopic">경품 추첨</span>
+        <span class="rtopic">병원 대기</span>
+        <span class="rtopic">배달 경로</span>
+        <span class="rtopic">로봇 청소기</span>
+        <span class="rtopic">신호등</span>
+        <span class="rtopic">원탁 회의</span>
+        <span class="rtopic">보물찾기</span>
+        <span class="rtopic">소셜네트워크</span>
+        <span class="rtopic">여행 일정</span>
+        <span class="rtopic">적금 계산</span>
+        <span class="rtopic">주가 분석</span>
+        <span class="rtopic">Nim 게임</span>
+      </div>
+      <div class="rcard-meta">
+        <div class="rm"><span class="rm-n" style="color:var(--r1)">20</span><span class="rm-l">문항</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r2)">200</span><span class="rm-l">배점</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r3)">90</span><span class="rm-l">분</span></div>
+      </div>
+      <div class="rcard-btns">
+        <a class="rbtn rbtn-exam" href="koi_r1_exam.html" style="background:linear-gradient(135deg,var(--r1),rgba(80,40,200,1));">▶ 1회 풀기</a>
+        <a class="rbtn rbtn-ans" href="koi_r1_answers.html" style="border-color:var(--r1);color:var(--r1b);">📖 해설보기</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2회차 -->
+  <div class="rcard" style="border-color:rgba(0,216,144,.3);">
+    <div class="rcard-stripe" style="background:linear-gradient(90deg,var(--r2),#00b8d0);"></div>
+    <div class="rcard-head">
+      <div class="rcard-num">Round 02 · Emerald</div>
+      <div class="rcard-title" style="color:var(--r2b);">제2회<br>문장제 모의고사</div>
+      <div class="rcard-sub">정수론·확률·그래프·게임이론 복합형</div>
+    </div>
+    <div class="rcard-body">
+      <div class="rcard-topics">
+        <span class="rtopic">암호 키 생성</span>
+        <span class="rtopic">전염병 확산</span>
+        <span class="rtopic">사전 탐색</span>
+        <span class="rtopic">행성 주기</span>
+        <span class="rtopic">색 구슬</span>
+        <span class="rtopic">후위 표기식</span>
+        <span class="rtopic">레시피 순서</span>
+        <span class="rtopic">배송 최적화</span>
+        <span class="rtopic">게임 레벨</span>
+        <span class="rtopic">품질 검사</span>
+        <span class="rtopic">청소기 조건</span>
+        <span class="rtopic">수강 신청</span>
+        <span class="rtopic">부스 운영</span>
+        <span class="rtopic">건물 창문</span>
+        <span class="rtopic">배낭 채우기</span>
+        <span class="rtopic">투자 알고리즘</span>
+      </div>
+      <div class="rcard-meta">
+        <div class="rm"><span class="rm-n" style="color:var(--r2)">20</span><span class="rm-l">문항</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r2)">200</span><span class="rm-l">배점</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r3)">90</span><span class="rm-l">분</span></div>
+      </div>
+      <div class="rcard-btns">
+        <a class="rbtn rbtn-exam" href="koi_r2_exam.html" style="background:linear-gradient(135deg,var(--r2),rgba(0,180,100,1));color:#060c08;">▶ 2회 풀기</a>
+        <a class="rbtn rbtn-ans" href="koi_r2_answers.html" style="border-color:var(--r2);color:var(--r2b);">📖 해설보기</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3회차 -->
+  <div class="rcard" style="border-color:rgba(255,152,32,.3);">
+    <div class="rcard-stripe" style="background:linear-gradient(90deg,var(--r3),#ff5080);"></div>
+    <div class="rcard-head">
+      <div class="rcard-num">Round 03 · Amber ★ 심화</div>
+      <div class="rcard-title" style="color:var(--r3b);">제3회<br>문장제 모의고사</div>
+      <div class="rcard-sub">심화 — 분할정복·게임이론·LCS 복합형</div>
+    </div>
+    <div class="rcard-body">
+      <div class="rcard-topics">
+        <span class="rtopic">경시대회 편성</span>
+        <span class="rtopic">드론 경로</span>
+        <span class="rtopic">성적 정렬</span>
+        <span class="rtopic">해시 함수</span>
+        <span class="rtopic">포커 패</span>
+        <span class="rtopic">괄호 깊이</span>
+        <span class="rtopic">바이러스 확산</span>
+        <span class="rtopic">정수 분할</span>
+        <span class="rtopic">톱니바퀴</span>
+        <span class="rtopic">국제대표팀</span>
+        <span class="rtopic">스마트홈</span>
+        <span class="rtopic">백신 수열</span>
+        <span class="rtopic">인터넷 통계</span>
+        <span class="rtopic">파일 시스템</span>
+        <span class="rtopic">N-Queen</span>
+        <span class="rtopic">Misère Nim</span>
+      </div>
+      <div class="rcard-meta">
+        <div class="rm"><span class="rm-n" style="color:var(--r3)">20</span><span class="rm-l">문항</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r3)">200</span><span class="rm-l">배점</span></div>
+        <div class="rm"><span class="rm-n" style="color:var(--r3)">90</span><span class="rm-l">분</span></div>
+      </div>
+      <div class="rcard-btns">
+        <a class="rbtn rbtn-exam" href="koi_r3_exam.html" style="background:linear-gradient(135deg,var(--r3),rgba(220,140,0,1));color:#0d0900;">▶ 3회 풀기</a>
+        <a class="rbtn rbtn-ans" href="koi_r3_answers.html" style="border-color:var(--r3);color:var(--r3b);">📖 해설보기</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INFO SECTION -->
+<div class="hub-info">
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-icon">📝</span>
+      <div class="info-title">KOI 기출 수준</div>
+      <div class="info-desc">한국정보올림피아드 중등부 실제 기출과 동일한 형식의 문장제 문제로 구성</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">🔍</span>
+      <div class="info-title">즉시 해설 확인</div>
+      <div class="info-desc">각 문제 제출 즉시 핵심 개념·단계별 풀이·팁을 인터랙티브하게 확인 가능</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">📈</span>
+      <div class="info-title">회차별 난이도 상승</div>
+      <div class="info-desc">1회 기초→2회 응용→3회 심화로 점진적 난이도 상승 설계</div>
+    </div>
+  </div>
+
+  <div class="topics-grid">
+    <div class="topic-row">
+      <div class="topic-dot" style="background:var(--r1);"></div>
+      <div><div class="topic-name">정수론·수학</div><div class="topic-desc">약수·GCD/LCM·소수·모듈러·CRT·점화식</div></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-dot" style="background:var(--r2);"></div>
+      <div><div class="topic-name">조합론·확률</div><div class="topic-desc">순열·조합·격자경로·이항정리·중복조합·포함배제</div></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-dot" style="background:var(--r3);"></div>
+      <div><div class="topic-name">알고리즘·DP</div><div class="topic-desc">정렬·탐색·배낭·LIS·LCS·완전탐색·그리디</div></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-dot" style="background:#c060ff;"></div>
+      <div><div class="topic-name">자료구조</div><div class="topic-desc">스택·큐·트리순회·BFS/DFS·MST·다익스트라</div></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-dot" style="background:#60c0ff;"></div>
+      <div><div class="topic-name">논리·집합</div><div class="topic-desc">명제·대우·불대수·드모르간·포함배제·동치류</div></div>
+    </div>
+    <div class="topic-row">
+      <div class="topic-dot" style="background:#ff6080;"></div>
+      <div><div class="topic-name">게임이론·시뮬레이션</div><div class="topic-desc">Nim·Misère Nim·시뮬레이션·분할정복·위상정렬</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="hub-footer">
+  <div class="hub-footer-text">KOI 중등부 문장제 모의고사 시리즈 · 3회차 완성</div>
+</div>
+
+</body>
+</html>
