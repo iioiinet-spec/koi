@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>히스토그램 최대 직사각형 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --bg:       #f5f7fa;
+  --wh:       #ffffff;
+  --s1:       #edf0f8;
+  --s2:       #e2e6f4;
+  --bd:       #ccd3ea;
+  --bd2:      #b3bdd8;
+
+  --t1: #111628;
+  --t2: #283058;
+  --t3: #5a6390;
+  --t4: #9aa2c6;
+
+  /* Bar color: warm slate-blue — the "bricks" of the histogram */
+  --bar:      #4f72c4;
+  --bar-l:    #dce6ff;
+  --bar-d:    #2d4fa0;
+
+  /* Highlight: vivid lime-green for "current rectangle being calculated" */
+  --lime:     #22a64a;
+  --lime-l:   #d4f7e0;
+  --lime-m:   #6ee897;
+
+  /* Pop/discard: warm orange */
+  --ora:      #d4560a;
+  --ora-l:    #fff0e4;
+  --ora-m:    #fbb97a;
+
+  /* Best answer: golden */
+  --gold:     #b07d00;
+  --gold-l:   #fff8d6;
+  --gold-m:   #ffd966;
+
+  /* Stack push: sky */
+  --sky:      #0971b8;
+  --sky-l:    #dff0ff;
+  --sky-m:    #7dcfff;
+
+  /* Current bar: plum */
+  --plum:     #7c2fa8;
+  --plum-l:   #f3e8ff;
+  --plum-m:   #c9a0f5;
+
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px; --r2:16px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* HEADER */
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;align-items:stretch;min-height:64px;}
+.hdr-stripe{width:10px;background:repeating-linear-gradient(135deg,var(--bar) 0,var(--bar) 6px,var(--lime) 6px,var(--lime) 12px);flex-shrink:0;}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 28px;flex-wrap:wrap;flex:1;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.05em;}
+.hdr-div{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.01em;}
+.hdr-badge{background:var(--gold-l);color:var(--gold);border:1.5px solid var(--gold-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* NAV */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--bar-d);border-bottom-color:var(--bar);font-weight:700;}
+
+/* PAGES */
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .2s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* TYPE */
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--bar-d);}
+
+/* CALLOUT */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cb{background:var(--bar-l);color:var(--t2);border-color:var(--bar);}
+.cg{background:var(--lime-l);color:var(--t2);border-color:var(--lime);}
+.co2{background:var(--ora-l);color:var(--t2);border-color:var(--ora);}
+.ca{background:var(--gold-l);color:var(--t2);border-color:var(--gold);}
+.cs{background:var(--sky-l);color:var(--t2);border-color:var(--sky);}
+.cp{background:var(--plum-l);color:var(--t2);border-color:var(--plum);}
+
+/* CARD */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+/* STEP BAR */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;}
+.sbt{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.on{background:var(--bar-l);color:var(--bar-d);font-weight:700;}
+.sbt.dn{background:var(--lime-l);color:var(--lime);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* CODE */
+.cw{background:#141826;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #1d233a;}
+.cbr{background:#1a2035;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#6678bb;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1d233a;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#384060;font-style:italic;}.st{color:#86efac;}
+.hl {background:rgba(79,114,196,.22);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #6090e8;}
+.hl2{background:rgba(34,166,74,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #4ade80;}
+.hl3{background:rgba(212,86,10,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fb923c;}
+
+/* TAGS */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.tb{background:var(--bar-l);color:var(--bar-d);border:1px solid #a0b8f0;}
+.tg{background:var(--lime-l);color:var(--lime);border:1px solid var(--lime-m);}
+.to{background:var(--ora-l);color:var(--ora);border:1px solid var(--ora-m);}
+.tgd{background:var(--gold-l);color:var(--gold);border:1px solid var(--gold-m);}
+.ts{background:var(--sky-l);color:var(--sky);border:1px solid var(--sky-m);}
+.tp2{background:var(--plum-l);color:var(--plum);border:1px solid var(--plum-m);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ══════════════════════════════════
+   HISTOGRAM CANVAS AREA
+══════════════════════════════════ */
+.hist-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px;margin-bottom:16px;}
+#hist-canvas{display:block;width:100%;cursor:default;border-radius:var(--r);}
+
+/* bar index labels below canvas */
+.bar-idx-row{display:flex;justify-content:flex-start;padding:0 0 0 0;gap:0;margin-top:2px;}
+
+/* Stats row */
+.sim-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.sstat{background:var(--wh);border:1.5px solid var(--bd);border-radius:20px;padding:6px 16px;font-family:var(--mono);font-size:14px;color:var(--t2);}
+.sstat span{font-weight:700;}
+
+/* Stack panel */
+.stk-panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:18px 16px;}
+.stk-lbl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
+.stk-box{min-height:200px;background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;display:flex;flex-direction:column-reverse;gap:5px;position:relative;margin-bottom:12px;}
+.stk-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--bar);border-radius:0 0 var(--r) var(--r);}
+.stk-cell{border-radius:7px;padding:8px 12px;font-family:var(--mono);font-size:13px;font-weight:700;background:var(--wh);border:1.5px solid var(--bd2);color:var(--t2);text-align:center;transition:all .28s cubic-bezier(.34,1.56,.64,1);}
+.stk-cell.s-top{background:var(--sky-l);border-color:var(--sky);color:var(--sky);}
+.stk-cell.s-push{animation:spush .3s cubic-bezier(.34,1.56,.64,1);}
+.stk-cell.s-pop{animation:spop .25s ease forwards;}
+@keyframes spush{from{opacity:0;transform:scale(.8)translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes spop{from{opacity:1;}to{opacity:0;transform:scale(.7)translateX(14px);}}
+.stk-empty{color:var(--t4);font-size:13px;text-align:center;padding:18px 0;}
+
+.info-box{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);line-height:1.8;min-height:70px;}
+
+/* Sim layout */
+.sim-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start;}
+@media(max-width:720px){.sim-layout{grid-template-columns:1fr;}}
+
+/* Controls */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.btn{padding:10px 22px;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.btn:disabled{opacity:.38;cursor:default;}
+.bn{background:var(--bar);color:#fff;border-color:var(--bar);}        .bn:hover:not(:disabled){background:var(--bar-d);}
+.ba{background:var(--gold-l);color:var(--gold);border-color:var(--gold-m);}.ba:hover:not(:disabled){background:var(--gold);color:#fff;}
+.br{background:var(--wh);color:var(--t2);border-color:var(--bd2);}    .br:hover{border-color:var(--t2);}
+.be{background:var(--plum-l);color:var(--plum);border-color:var(--plum-m);}.be:hover{background:var(--plum);color:#fff;}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;}
+.inp:focus{border-color:var(--bar);}
+
+/* Log */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:145px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.95;}
+.lp{color:var(--sky);font-weight:600;}.lo{color:var(--ora);font-weight:600;}.lg{color:var(--lime);font-weight:600;}.lgd{color:var(--gold);font-weight:700;}.li{color:var(--t4);}
+
+/* Progress */
+.prog-lbl{font-size:13px;color:var(--t3);margin-bottom:5px;}
+.prog-wrap{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--bar),var(--lime));border-radius:3px;transition:width .4s;}
+
+/* Legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.leg{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t2);}
+.ldot{width:14px;height:14px;border-radius:4px;flex-shrink:0;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--bar);color:var(--bar-d);background:var(--bar-l);}
+.qopt.correct{background:var(--lime-l);border-color:var(--lime);color:var(--lime);}
+.qopt.wrong{background:var(--ora-l);border-color:var(--ora);color:var(--ora);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--lime-l);color:var(--lime);border:1px solid var(--lime-m);}
+.qfb.bad{background:var(--ora-l);color:var(--ora);border:1px solid var(--ora-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--bar-d);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:var(--bar);border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#141826;border:1.5px solid #1d233a;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d4f5;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--bar);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--bar);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:var(--bar-d);}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--lime);}.oe{color:var(--ora);}
+.ht{font-size:14px;color:var(--sky);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--gold-l);border-radius:var(--r);font-size:14px;color:var(--gold);border:1px solid var(--gold-m);line-height:1.7;}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+
+/* custom input row */
+.cinput-row{display:none;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+.cinput-row.show{display:flex;}
+.cinput-text{flex:1;min-width:180px;padding:9px 14px;border:2px solid var(--bd);border-radius:var(--r);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;}
+.cinput-text:focus{border-color:var(--bar);}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-stripe"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-div">|</span>
+    <span class="hdr-title">히스토그램 최대 직사각형</span>
+    <span class="hdr-badge">정올 골드 난이도</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on"  onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"     onclick="goPage('code')">💻 코드 단계</div>
+  <div class="nt"     onclick="goPage('sim')">🎬 시뮬레이터</div>
+  <div class="nt"     onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"     onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════════ PAGE 1: 개념 ═══════════════ -->
+<div class="pg on" id="page-concept">
+  <h2>히스토그램 최대 직사각형</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 심화 | 단조 증가 스택 응용</p>
+
+  <div class="co cb">
+    <strong>문제 정의</strong><br>
+    너비 1, 각기 다른 높이의 막대들로 이루어진 히스토그램에서
+    만들 수 있는 <strong>가장 큰 직사각형의 넓이</strong>를 구하라.<br>
+    직사각형은 연속된 막대들에 걸쳐 있을 수 있고, 높이는 구간 내 <strong>가장 낮은 막대</strong>로 결정된다.
+  </div>
+
+  <!-- Static SVG intro diagram -->
+  <div class="card">
+    <h3 style="margin-bottom:14px;">히스토그램 예시 — h = [2, 1, 5, 6, 2, 3]</h3>
+    <svg viewBox="0 0 540 200" style="width:100%;max-width:540px;display:block;margin:0 auto 14px;" xmlns="http://www.w3.org/2000/svg">
+      <!-- axes -->
+      <line x1="40" y1="10" x2="40" y2="175" stroke="#ccd3ea" stroke-width="1.5"/>
+      <line x1="40" y1="175" x2="520" y2="175" stroke="#ccd3ea" stroke-width="1.5"/>
+      <!-- bars -->
+      <rect x="45"  y="115" width="74" height="60" fill="#4f72c4" rx="3" opacity=".85"/>
+      <rect x="125" y="145" width="74" height="30" fill="#4f72c4" rx="3" opacity=".85"/>
+      <rect x="205" y="25"  width="74" height="150" fill="#4f72c4" rx="3" opacity=".85"/>
+      <rect x="285" y="0"   width="74" height="175" fill="#4f72c4" rx="3" opacity=".85"/>
+      <!-- highlight best rect: idx 2-3 height 5 = width 2 → area 10 -->
+      <rect x="205" y="25"  width="154" height="150" fill="none" stroke="#22a64a" stroke-width="3" rx="2" stroke-dasharray="6,3"/>
+      <rect x="205" y="25"  width="154" height="150" fill="#22a64a" opacity=".13" rx="2"/>
+      <rect x="365" y="55"  width="74" height="120" fill="#4f72c4" rx="3" opacity=".85"/>
+      <rect x="445" y="85"  width="74" height="90"  fill="#4f72c4" rx="3" opacity=".85"/>
+      <!-- labels -->
+      <text x="82"  y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">2</text>
+      <text x="162" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">1</text>
+      <text x="242" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">5</text>
+      <text x="322" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">6</text>
+      <text x="402" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">2</text>
+      <text x="482" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#5a6390">3</text>
+      <!-- best area label -->
+      <text x="282" y="20" text-anchor="middle" font-family="Noto Sans KR,sans-serif" font-size="14" fill="#22a64a" font-weight="700">최대 넓이 = 10 (높이5 × 너비2)</text>
+    </svg>
+    <div class="co cg" style="margin-bottom:0;">
+      <strong>왜 높이 5 × 너비 2 = 10이 최대일까?</strong><br>
+      인덱스 2(높이=5)와 3(높이=6) 구간 → 최소 높이 = 5 → 넓이 = 5 × 2 = <strong>10</strong><br>
+      인덱스 3 하나만: 6 × 1 = 6 / 전체: 1 × 6 = 6 / 2~4: 2 × 3 = 6 → 모두 10보다 작아!
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>브루트포스 vs 스택</h3>
+      <p>모든 구간 (i,j)의 최솟값 × 너비 를 계산하면 <strong>O(n²) 또는 O(n³)</strong>이야.</p>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <div style="flex:1;background:var(--ora-l);border:1.5px solid var(--ora-m);border-radius:var(--r);padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--ora);font-weight:700;margin-bottom:4px;">브루트포스</div>
+          <div style="font-size:24px;font-weight:900;color:var(--ora);font-family:var(--mono);">O(n²)</div>
+        </div>
+        <div style="flex:1;background:var(--lime-l);border:1.5px solid var(--lime-m);border-radius:var(--r);padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--lime);font-weight:700;margin-bottom:4px;">단조 스택</div>
+          <div style="font-size:24px;font-weight:900;color:var(--lime);font-family:var(--mono);">O(n)</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>핵심 관찰</h3>
+      <p>막대 i를 <strong>높이</strong>로 하는 최대 직사각형은:</p>
+      <ul style="padding-left:20px;font-size:15px;color:var(--t2);line-height:2;">
+        <li>왼쪽으로 h[i]보다 작은 막대가 나올 때까지 확장</li>
+        <li>오른쪽으로 h[i]보다 작은 막대가 나올 때까지 확장</li>
+        <li>넓이 = h[i] × (오른쪽 경계 − 왼쪽 경계 − 1)</li>
+      </ul>
+      <p style="margin-top:8px;font-size:14px;color:var(--t4);">→ 이 "경계 찾기"를 스택이 한 번에 처리!</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">단조 증가 스택 핵심 아이디어</h3>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:14px;padding:13px 16px;background:var(--sky-l);border-radius:var(--r);border:1.5px solid var(--sky-m);align-items:flex-start;">
+        <span style="font-size:22px;font-weight:900;color:var(--sky);font-family:var(--mono);flex-shrink:0;">①</span>
+        <div style="font-size:15px;color:var(--t2);">스택에 <strong>인덱스</strong>를 저장하고, 스택 안의 막대 높이를 <strong>단조 증가</strong>로 유지한다.</div>
+      </div>
+      <div style="display:flex;gap:14px;padding:13px 16px;background:var(--ora-l);border-radius:var(--r);border:1.5px solid var(--ora-m);align-items:flex-start;">
+        <span style="font-size:22px;font-weight:900;color:var(--ora);font-family:var(--mono);flex-shrink:0;">②</span>
+        <div style="font-size:15px;color:var(--t2);">현재 막대 h[i]가 스택 top보다 <strong>작으면(낮으면)</strong> pop! pop된 막대가 높이가 되는 직사각형의 넓이를 계산.</div>
+      </div>
+      <div style="display:flex;gap:14px;padding:13px 16px;background:var(--lime-l);border-radius:var(--r);border:1.5px solid var(--lime-m);align-items:flex-start;">
+        <span style="font-size:22px;font-weight:900;color:var(--lime);font-family:var(--mono);flex-shrink:0;">③</span>
+        <div style="font-size:15px;color:var(--t2);"><strong>너비 계산</strong>: pop 후 새 top이 "왼쪽 경계", 현재 i가 "오른쪽 경계"<br>
+          <code>width = i − stk[top] − 1</code> (스택이 비었으면 <code>width = i</code>)</div>
+      </div>
+      <div style="display:flex;gap:14px;padding:13px 16px;background:var(--gold-l);border-radius:var(--r);border:1.5px solid var(--gold-m);align-items:flex-start;">
+        <span style="font-size:22px;font-weight:900;color:var(--gold);font-family:var(--mono);flex-shrink:0;">④</span>
+        <div style="font-size:15px;color:var(--t2);">순회 후 스택에 남은 막대들도 같은 방식으로 넓이 계산. 오른쪽 경계 = n (배열 끝).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 2: 코드 ═══════════════ -->
+<div class="pg" id="page-code">
+  <h2>코드 단계별 이해</h2>
+  <p class="psub">선언부터 너비 계산 공식까지 6단계로 완전 분해!</p>
+
+  <div class="sbar" id="sbar-code">
+    <div class="sbt on"  onclick="goStep(0)"><span class="snum">01</span>선언·준비</div>
+    <div class="sbt"     onclick="goStep(1)"><span class="snum">02</span>pop 조건</div>
+    <div class="sbt"     onclick="goStep(2)"><span class="snum">03</span>너비 계산</div>
+    <div class="sbt"     onclick="goStep(3)"><span class="snum">04</span>남은 처리</div>
+    <div class="sbt"     onclick="goStep(4)"><span class="snum">05</span>완성 코드</div>
+    <div class="sbt"     onclick="goStep(5)"><span class="snum">06</span>센티널 기법</div>
+  </div>
+  <div id="code-panel"></div>
+</div>
+
+<!-- ═══════════════ PAGE 3: 시뮬레이터 ═══════════════ -->
+<div class="pg" id="page-sim">
+  <h2>히스토그램 시뮬레이터</h2>
+  <p class="psub">▶ 다음 단계 버튼을 눌러 막대가 어떻게 처리되는지 실제로 봐!</p>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="btn be" onclick="toggleCustom()">✏️ 배열 직접 입력</button>
+    <div class="cinput-row" id="cinput-row">
+      <input class="cinput-text" id="cinput" placeholder="높이를 공백으로 구분 (예: 2 1 5 6 2 3)" />
+      <button class="btn bn" onclick="applyCustom()">적용</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--bar-l);border:2px solid var(--bar);"></div>기본 막대</div>
+    <div class="leg"><div class="ldot" style="background:var(--plum-l);border:2px solid var(--plum);"></div>현재 처리 (i)</div>
+    <div class="leg"><div class="ldot" style="background:var(--sky-l);border:2px solid var(--sky);"></div>스택 안</div>
+    <div class="leg"><div class="ldot" style="background:var(--ora-l);border:2px solid var(--ora);"></div>방금 pop됨</div>
+    <div class="leg"><div class="ldot" style="background:var(--lime-l);border:2px solid var(--lime);"></div>계산 중인 직사각형</div>
+    <div class="leg"><div class="ldot" style="background:var(--gold-l);border:2px solid var(--gold);"></div>현재 최대 넓이</div>
+  </div>
+
+  <div class="prog-lbl" id="prog-lbl">진행: 0 / 0 단계</div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+
+  <div class="sim-layout">
+    <div>
+      <div class="hist-wrap">
+        <div class="sl">히스토그램</div>
+        <canvas id="hist-canvas" height="220"></canvas>
+      </div>
+
+      <div class="sim-stats">
+        <div class="sstat">현재 i = <span id="s-i" style="color:var(--plum);">-</span></div>
+        <div class="sstat">h[i] = <span id="s-hi" style="color:var(--plum);">-</span></div>
+        <div class="sstat">계산 넓이 = <span id="s-area" style="color:var(--ora);">-</span></div>
+        <div class="sstat">최대 넓이 = <span id="s-max" style="color:var(--gold);">0</span></div>
+      </div>
+
+      <div class="ctrl">
+        <button class="btn bn" id="btn-next" onclick="simNext()">▶ 다음 단계</button>
+        <button class="btn ba" id="btn-auto" onclick="simAuto()">⏩ 자동 실행</button>
+        <button class="btn br" onclick="simReset()">↺ 초기화</button>
+      </div>
+
+      <div class="sl">실행 로그</div>
+      <div class="log" id="sim-log"><span class="li">▶ "다음 단계" 버튼을 눌러서 시작!</span></div>
+    </div>
+
+    <div>
+      <div class="stk-panel">
+        <div class="stk-lbl">스택 (인덱스)</div>
+        <div class="stk-box" id="sim-stk">
+          <div class="stk-empty">비어 있음</div>
+        </div>
+        <div class="stk-lbl">현재 연산</div>
+        <div class="info-box" id="sim-info">대기 중...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 4: 퀴즈 ═══════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>히스토그램 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════════ PAGE 5: 도전 ═══════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">히스토그램 알고리즘을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   PAGE NAV
+═══════════════════════════════════════════ */
+const PM={concept:0,code:1,sim:2,quiz:3,challenge:4};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('on',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('on');
+  if(id==='sim') { simReset(); drawCanvas(); }
+}
+
+/* ═══════════════════════════════════════════
+   CODE STEPS
+═══════════════════════════════════════════ */
+const STEPS=[
+{t:'① 변수 선언 — 스택에 인덱스를 저장',
+ b:`<div class="co cb"><strong>핵심</strong>: 스택에 막대의 값이 아닌 <strong>인덱스</strong>를 저장해. pop할 때 h[idx]로 높이를, 스택의 새 top으로 왼쪽 경계를 동시에 얻을 수 있어!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span>  h[<span class="nm">MAX</span>];      <span class="cm">// 막대 높이 배열</span>
+<span class="tp">int</span>  stk[<span class="nm">MAX</span>];   <span class="cm">// 스택 — 인덱스 저장!</span>
+<span class="tp">int</span>  top = <span class="nm">-1</span>;   <span class="cm">// 스택 포인터</span>
+<span class="tp">long long</span> maxA = <span class="nm">0</span>; <span class="cm">// 최대 넓이 (long long! 최대 10^10)</span>
+<span class="tp">int</span>  n;
+</pre></div>
+<div class="co ca"><strong>long long을 쓰는 이유!</strong><br>
+n=100,000이고 모든 높이가 100,000이면 넓이 = 100,000 × 100,000 = 10¹⁰.<br>
+int의 최대값 약 21억 (2.1×10⁹)을 넘어버려! 반드시 <code>long long</code> 사용.</div>`},
+
+{t:'② pop 조건 — h[i]가 top보다 낮으면',
+ b:`<div class="co co2"><strong>단조 증가 스택</strong>이야. 현재 막대 h[i]가 스택 top의 높이보다 <strong>낮으면(작으면)</strong> pop!<br>
+pop된 막대가 높이(height)가 되고, 그때 너비를 계산해.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_pop_cond.c</span></div>
+<pre><span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt;= n; i++) {   <span class="cm">// n까지 포함 (n은 h=0 센티널)</span>
+    <span class="tp">int</span> cur = (i == n) ? <span class="nm">0</span> : h[i]; <span class="cm">// 배열 끝에 가상 막대 0</span>
+
+    <span class="cm">// 단조 증가 유지: 현재가 top보다 낮으면 pop</span>
+<span class="hl">    <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; h[stk[top]] &gt; cur) {</span>
+        <span class="cm">// ... 너비 계산 ...</span>
+    }
+    stk[++top] = i;
+}
+</pre></div>
+<div class="card"><h4>pop 조건 비교 — 오큰수 vs 히스토그램</h4>
+<table style="margin-bottom:0;">
+<tr><th>문제</th><th>스택 종류</th><th>pop 조건</th></tr>
+<tr><td>오큰수(NGE)</td><td>단조 감소</td><td><code>h[top] &lt; h[i]</code> (작으면 pop)</td></tr>
+<tr><td style="color:var(--bar-d);font-weight:700;">히스토그램</td><td>단조 증가</td><td><code style="color:var(--ora);">h[top] &gt; h[i]</code> (크면 pop)</td></tr>
+</table></div>`},
+
+{t:'③ 너비 계산 공식 — 핵심!',
+ b:`<div class="co cp"><strong>가장 중요한 공식이야! 반드시 외워!</strong><br>
+pop된 막대 인덱스 = <code>idx</code>, 현재 인덱스 = <code>i</code>, pop 후 새 top = <code>stk[top]</code>일 때:</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_width_formula.c</span></div>
+<pre><span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; h[stk[top]] &gt; cur) {
+    <span class="tp">int</span> idx    = stk[top--];    <span class="cm">// pop: 높이 기준 막대 인덱스</span>
+    <span class="tp">int</span> height = h[idx];         <span class="cm">// 직사각형 높이</span>
+
+    <span class="cm">// 너비 계산</span>
+<span class="hl">    <span class="tp">int</span> width;</span>
+<span class="hl">    <span class="kw">if</span> (top == <span class="nm">-1</span>)             <span class="cm">// 스택이 비었으면: 왼쪽 경계 없음</span></span>
+<span class="hl">        width = i;               <span class="cm">// 인덱스 0부터 i-1까지</span></span>
+<span class="hl">    <span class="kw">else</span></span>
+<span class="hl">        width = i - stk[top] - <span class="nm">1</span>; <span class="cm">// 스택 top과 i 사이</span></span>
+
+<span class="hl2">    <span class="tp">long long</span> area = (<span class="tp">long long</span>)height * width;</span>
+<span class="hl2">    <span class="kw">if</span> (area &gt; maxA) maxA = area;</span>
+}
+</pre></div>
+<div class="card"><h4>너비 공식 이해하기 — h = [2,1,5,6,2,3], i=4(h=2) 처리 시</h4>
+<div style="font-family:var(--mono);font-size:14px;line-height:2.2;background:var(--s1);padding:12px 16px;border-radius:var(--r);">
+  스택(인덱스): [ 1(h=1), 2(h=5), 3(h=6) ]<br>
+  i=4, cur=2<br>
+  pop idx=3 (h=6): <span style="color:var(--ora);">top=-1 아님, stk[top]=2</span> → width = 4-2-1 = <strong style="color:var(--ora);">1</strong> → 6×1=6<br>
+  pop idx=2 (h=5): <span style="color:var(--ora);">top=-1 아님, stk[top]=1</span> → width = 4-1-1 = <strong style="color:var(--ora);">2</strong> → 5×2=<strong style="color:var(--lime);">10 ★</strong><br>
+  h[stk[top]]=h[1]=1 ≤ 2 → 중단
+</div></div>`},
+
+{t:'④ 남은 막대 처리 — 센티널로 해결',
+ b:`<div class="co cg">순회 후 스택에 남은 막대들도 넓이를 계산해야 해. 가장 깔끔한 방법은 배열 끝에 <strong>높이 0짜리 가상 막대(센티널)</strong>를 추가하는 거야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_remain.c</span></div>
+<pre><span class="cm">// 방법 1: i = n 에 h[n] = 0 센티널 추가 → 루프를 i &lt;= n 으로</span>
+h[n] = <span class="nm">0</span>;  <span class="cm">// 가상 막대 — 모든 남은 막대를 강제로 pop</span>
+<span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt;= n; i++) {  <span class="cm">// &lt;= n 으로 변경!</span>
+    <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; h[stk[top]] &gt; h[i]) {
+        <span class="cm">// 똑같이 처리</span>
+    }
+    <span class="kw">if</span> (i &lt; n) stk[++top] = i;  <span class="cm">// 센티널 자체는 push 안 함</span>
+}
+
+<span class="cm">// 방법 2: 별도로 남은 원소 처리</span>
+<span class="kw">while</span> (top != <span class="nm">-1</span>) {
+    <span class="tp">int</span> idx = stk[top--];
+    <span class="tp">int</span> width = (top == <span class="nm">-1</span>) ? n : n - stk[top] - <span class="nm">1</span>;
+    <span class="tp">long long</span> area = (<span class="tp">long long</span>)h[idx] * width;
+    <span class="kw">if</span> (area &gt; maxA) maxA = area;
+}
+</pre></div>
+<div class="co ca"><strong>센티널(0)을 쓰는 이유</strong>: 높이 0이면 스택의 모든 막대보다 낮으니 전부 pop돼. 루프를 하나로 합칠 수 있어서 코드가 깔끔해!</div>`},
+
+{t:'⑤ 전체 완성 코드',
+ b:`<div class="co cb">완성 코드를 보면서 전체 흐름을 다시 확인해봐!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>histogram_complete.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100002</span>
+
+<span class="tp">int</span> h[<span class="nm">MAX</span>], stk[<span class="nm">MAX</span>];
+<span class="tp">int</span> top = <span class="nm">-1</span>;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n;
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;h[i]);
+    h[n] = <span class="nm">0</span>;  <span class="cm">// 센티널</span>
+
+    <span class="tp">long long</span> maxA = <span class="nm">0</span>;
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt;= n; i++) {
+<span class="hl">        <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; h[stk[top]] &gt; h[i]) {</span>
+            <span class="tp">int</span> idx = stk[top--];
+            <span class="tp">int</span> w   = (top == <span class="nm">-1</span>) ? i : i - stk[top] - <span class="nm">1</span>;
+<span class="hl2">            <span class="tp">long long</span> area = (<span class="tp">long long</span>)h[idx] * w;</span>
+<span class="hl2">            <span class="kw">if</span> (area &gt; maxA) maxA = area;</span>
+<span class="hl">        }</span>
+        stk[++top] = i;
+    }
+
+    <span class="fn">printf</span>(<span class="st">"%lld\n"</span>, maxA);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+</pre></div>
+<div class="card"><h4>실행 예시</h4>
+<p>입력: <code>6 / 2 1 5 6 2 3</code> → 출력: <code style="color:var(--lime);">10</code></p>
+<p>입력: <code>7 / 6 2 5 4 5 1 6</code> → 출력: <code style="color:var(--lime);">12</code></p>
+<p>시간복잡도: <strong style="color:var(--bar-d);">O(n)</strong> &nbsp;|&nbsp; 공간복잡도: <strong style="color:var(--bar-d);">O(n)</strong></p>
+</div>`},
+
+{t:'⑥ 센티널 기법 심화 — 왜 작동하나?',
+ b:`<div class="co cg"><strong>센티널(Sentinel)</strong>이란 알고리즘 종료를 강제하는 특수 값이야. h[n]=0은 어떤 막대보다도 낮아서 스택의 모든 원소를 pop하게 만들어!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>06_sentinel_trace.c</span></div>
+<pre><span class="cm">// h = [3, 5, 2] 에 센티널 h[3]=0 추가</span>
+<span class="cm">// i=0: push 0 → stk=[0]</span>
+<span class="cm">// i=1: h[0]=3 &lt; h[1]=5 → push → stk=[0,1]</span>
+<span class="cm">// i=2: h[1]=5 &gt; h[2]=2 → pop idx=1,</span>
+<span class="cm">//      w=2-0-1=1 → 5×1=5</span>
+<span class="cm">//      h[0]=3 &gt; 2 → pop idx=0,</span>
+<span class="cm">//      top==-1 → w=2 → 3×2=6 ← 최대</span>
+<span class="cm">//      push 2 → stk=[2]</span>
+<span class="cm">// i=3 (센티널 h=0): h[2]=2 &gt; 0 → pop idx=2,</span>
+<span class="cm">//      top==-1 → w=3 → 2×3=6 (동률)</span>
+<span class="cm">// 최대 = 6</span>
+
+<span class="cm">// 센티널 없이 처리하면:</span>
+<span class="kw">while</span> (top != <span class="nm">-1</span>) {          <span class="cm">// 루프 종료 후 별도 처리 필요</span>
+    <span class="tp">int</span> idx = stk[top--];
+    <span class="tp">int</span> w   = (top == <span class="nm">-1</span>) ? n : n - stk[top] - <span class="nm">1</span>;
+    ...
+}
+</pre></div>
+<div class="co cs"><strong>너비 공식 w = i − stk[top] − 1의 의미</strong><br>
+pop된 막대 idx의 왼쪽 경계 = 스택에 남은 top (그 막대가 왼쪽에서 막아줌)<br>
+오른쪽 경계 = i (현재 처리 중인 더 낮은 막대)<br>
+두 경계 사이의 순수 너비 = i − stk[top] − 1 (경계 자체 제외)</div>`}
+];
+
+let curStep=0;
+function goStep(n){
+  curStep=n;
+  document.getElementById('code-panel').innerHTML=
+    `<div class="card"><h3>${STEPS[n].t}</h3>${STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-code .sbt').forEach((b,i)=>{
+    b.classList.toggle('on',i===n);
+    b.classList.toggle('dn',i<n);
+  });
+}
+goStep(0);
+
+/* ═══════════════════════════════════════════
+   SIMULATOR
+═══════════════════════════════════════════ */
+let simH = [2,1,5,6,2,3];
+let simStk, simI, simMaxA, simDone, autoTimer;
+let simState = []; // snapshot at each step for drawing
+
+// Canvas drawing
+const CANV_PAD_L=30, CANV_PAD_R=20, CANV_PAD_T=18, CANV_PAD_BOT=30;
+
+function getCanvas(){ return document.getElementById('hist-canvas'); }
+
+function drawCanvas(){
+  const cv = getCanvas();
+  if(!cv) return;
+  const W = cv.offsetWidth||700;
+  cv.width = W; cv.height = 220;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,W,220);
+
+  const n = simH.length;
+  const maxH = Math.max(...simH, 1);
+  const drawW = W - CANV_PAD_L - CANV_PAD_R;
+  const drawH = 220 - CANV_PAD_T - CANV_PAD_BOT;
+  const bw = drawW / n;
+  const scale = drawH / (maxH + 1);
+
+  // Draw highlighted rectangle (lime) if any
+  if(simState && simState.rectLeft!==undefined){
+    const rl=simState.rectLeft, rr=simState.rectRight, rh=simState.rectH;
+    const rx = CANV_PAD_L + rl*bw;
+    const rw2 = (rr-rl)*bw;
+    const ry = CANV_PAD_T + drawH - rh*scale;
+    const rht = rh*scale;
+    ctx.fillStyle='rgba(34,166,74,0.18)';
+    ctx.strokeStyle='#22a64a';
+    ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.roundRect(rx,ry,rw2,rht,3); ctx.fill(); ctx.stroke();
+  }
+
+  // Draw bars
+  for(let i=0;i<n;i++){
+    const x = CANV_PAD_L + i*bw + 2;
+    const bh = simH[i]*scale;
+    const y  = CANV_PAD_T + drawH - bh;
+    const bw2 = bw - 4;
+
+    let fill='#4f72c4', stroke='#3a58a0', alpha=0.85;
+    if(simState){
+      if(i===simState.cur)            { fill='#7c2fa8'; stroke='#5a1e82'; alpha=1; }
+      else if(simState.popped && simState.popped.includes(i)) { fill='#d4560a'; stroke='#a03e08'; alpha=1; }
+      else if(simStk && simStk.includes(i)) { fill='#0971b8'; stroke='#065a94'; alpha=0.9; }
+    }
+    ctx.globalAlpha=alpha;
+    ctx.fillStyle=fill;
+    ctx.strokeStyle=stroke;
+    ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(x,y,bw2,bh,3);
+    ctx.fill(); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    // height label
+    ctx.fillStyle='#283058';
+    ctx.font=`bold 13px JetBrains Mono,monospace`;
+    ctx.textAlign='center';
+    ctx.fillText(simH[i], x+bw2/2, y-4);
+
+    // index label
+    ctx.fillStyle='#9aa2c6';
+    ctx.font=`12px JetBrains Mono,monospace`;
+    ctx.fillText(i, x+bw2/2, CANV_PAD_T+drawH+16);
+  }
+
+  // Best area highlight (gold border) if done
+  if(simDone && simMaxA>0){
+    // just show text
+    ctx.fillStyle='#b07d00';
+    ctx.font=`bold 15px Noto Sans KR,sans-serif`;
+    ctx.textAlign='left';
+    ctx.fillText(`최대 넓이 = ${simMaxA}`, CANV_PAD_L, 14);
+  }
+
+  // axis
+  ctx.strokeStyle='#ccd3ea'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(CANV_PAD_L,CANV_PAD_T);
+  ctx.lineTo(CANV_PAD_L,CANV_PAD_T+drawH);
+  ctx.lineTo(W-CANV_PAD_R,CANV_PAD_T+drawH);
+  ctx.stroke();
+}
+
+function toggleCustom(){
+  document.getElementById('cinput-row').classList.toggle('show');
+  if(document.getElementById('cinput-row').classList.contains('show'))
+    document.getElementById('cinput').value=simH.join(' ');
+}
+function applyCustom(){
+  const raw=document.getElementById('cinput').value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x)&&x>0);
+  if(raw.length<2||raw.length>12){alert('2~12개 양수를 입력해줘!');return;}
+  simH=raw;
+  document.getElementById('cinput-row').classList.remove('show');
+  simReset();
+}
+
+function addLog(msg,cls){
+  const log=document.getElementById('sim-log');
+  const d=document.createElement('div');d.className=cls;d.innerHTML=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderStk(){
+  const box=document.getElementById('sim-stk');
+  if(!simStk||simStk.length===0){box.innerHTML='<div class="stk-empty">비어 있음</div>';return;}
+  box.innerHTML=simStk.map((idx,pos)=>{
+    const isTop=pos===simStk.length-1;
+    return `<div class="stk-cell ${isTop?'s-top':''}">i=${idx} &nbsp;h=${simH[idx]}</div>`;
+  }).join('');
+}
+
+function updateStats(i, area){
+  document.getElementById('s-i').textContent  = i>=0&&i<simH.length?i:'-';
+  document.getElementById('s-hi').textContent = i>=0&&i<simH.length?simH[i]:'-';
+  document.getElementById('s-area').textContent= area>=0?area:'-';
+  document.getElementById('s-max').textContent = simMaxA;
+}
+
+function simReset(){
+  clearTimeout(autoTimer);
+  simStk=[]; simI=0; simMaxA=0; simDone=false;
+  simState={cur:-1,popped:[]};
+  document.getElementById('btn-next').disabled=false;
+  document.getElementById('btn-auto').disabled=false;
+  document.getElementById('sim-log').innerHTML='<span class="li">▶ "다음 단계" 버튼을 눌러서 시작!</span>';
+  document.getElementById('sim-info').textContent='대기 중...';
+  document.getElementById('prog-fill').style.width='0%';
+  document.getElementById('prog-lbl').textContent=`진행: 0 / ${simH.length} 막대 처리`;
+  updateStats(-1,-1);
+  renderStk();
+  drawCanvas();
+}
+
+// Each call processes ONE sub-step: either one pop or one push
+let subStepQueue=[];
+
+function simNext(){
+  if(simDone)return;
+
+  // Build step queue if empty
+  if(subStepQueue.length===0){
+    if(simI>simH.length){
+      simDone=true;
+      document.getElementById('btn-next').disabled=true;
+      document.getElementById('btn-auto').disabled=true;
+      simState={cur:-1,popped:[]};
+      drawCanvas();
+      addLog(`✅ 완료! 최대 넓이 = ${simMaxA}`,'lgd');
+      document.getElementById('s-max').textContent=simMaxA;
+      document.getElementById('prog-fill').style.width='100%';
+      document.getElementById('prog-lbl').textContent=`진행: ${simH.length} / ${simH.length} 막대 처리 완료`;
+      document.getElementById('sim-info').textContent=`최대 넓이 = ${simMaxA}`;
+      return;
+    }
+
+    const i=simI;
+    const cur=(i===simH.length)?0:simH[i];
+    const steps=[];
+
+    // collect pops
+    let tmpStk=[...simStk];
+    while(tmpStk.length&&simH[tmpStk[tmpStk.length-1]]>cur){
+      const idx=tmpStk.pop();
+      const w=(tmpStk.length===0)?i:i-tmpStk[tmpStk.length-1]-1;
+      const area=simH[idx]*w;
+      steps.push({type:'pop',idx,w,area,i,cur});
+    }
+    if(i<simH.length) steps.push({type:'push',i,cur});
+    else steps.push({type:'done_sentinel',i});
+    subStepQueue=steps;
+    simI++;
+  }
+
+  const step=subStepQueue.shift();
+
+  if(step.type==='pop'){
+    const idx=simStk.pop();
+    const w=(simStk.length===0)?step.i:step.i-simStk[simStk.length-1]-1;
+    const area=simH[idx]*w;
+    if(area>simMaxA)simMaxA=area;
+
+    // compute rect bounds for drawing
+    const rl=(simStk.length===0)?0:simStk[simStk.length-1]+1;
+    const rr=step.i;
+    simState={cur:step.i<simH.length?step.i:-1, popped:[idx], rectLeft:rl, rectRight:rr, rectH:simH[idx]};
+    renderStk(); drawCanvas();
+    updateStats(step.i,area);
+    addLog(`  ▼ pop i=${idx} (h=${simH[idx]}) → 너비=${w}, 넓이=${simH[idx]}×${w}=<strong>${area}</strong>${area>=simMaxA?` 🏆 최대!`:''}`, 'lo');
+    document.getElementById('sim-info').textContent=`pop i=${idx} h=${simH[idx]}\n너비 = ${step.i} - ${simStk.length?simStk[simStk.length-1]:'(비어)'} - 1 = ${w}\n넓이 = ${simH[idx]} × ${w} = ${area}`;
+  } else if(step.type==='push'){
+    simStk.push(step.i);
+    simState={cur:step.i,popped:[]};
+    renderStk(); drawCanvas();
+    updateStats(step.i,-1);
+    addLog(`── i=${step.i}, h=${simH[step.i]} → push`, 'lp');
+    document.getElementById('sim-info').textContent=`push i=${step.i}\n(h[${step.i}]=${simH[step.i]})`;
+    const pct=Math.round(simI/simH.length*100);
+    document.getElementById('prog-fill').style.width=pct+'%';
+    document.getElementById('prog-lbl').textContent=`진행: ${simI} / ${simH.length} 막대 처리`;
+  } else {
+    // sentinel done
+    simState={cur:-1,popped:[]};
+    drawCanvas();
+    addLog(`센티널(h=0) 처리 완료`, 'li');
+    document.getElementById('sim-info').textContent='센티널 처리 완료';
+    document.getElementById('prog-fill').style.width='100%';
+    document.getElementById('prog-lbl').textContent=`진행: ${simH.length} / ${simH.length} 막대 처리 완료`;
+    // finalize
+    simDone=true;
+    document.getElementById('btn-next').disabled=true;
+    document.getElementById('btn-auto').disabled=true;
+    addLog(`✅ 완료! 최대 넓이 = ${simMaxA}`,'lgd');
+    document.getElementById('s-max').textContent=simMaxA;
+    document.getElementById('sim-info').textContent=`완료!\n최대 넓이 = ${simMaxA}`;
+    return;
+  }
+}
+
+function simAuto(){
+  simReset();
+  const total=(simH.length)*3+2;
+  let cnt=0;
+  function tick(){simNext();cnt++;if(cnt<total&&!simDone)autoTimer=setTimeout(tick,500);}
+  tick();
+}
+
+window.addEventListener('resize',drawCanvas);
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+const QUIZ=[
+  {q:'히스토그램 알고리즘에서 단조 스택의 종류는?',
+   opts:['단조 감소 스택','단조 증가 스택','일반 스택','덱(deque)'],ans:1,
+   fb:'히스토그램은 단조 증가 스택! 스택 안의 막대 높이가 아래→위로 갈수록 커야 해. pop 조건: h[top] > h[i].'},
+  {q:'h=[2,1,5,6,2,3]에서 최대 직사각형 넓이는?',
+   opts:['6','8','10','12'],ans:2,
+   fb:'인덱스 2~3 (h=5,6) 구간: 최소높이=5, 너비=2 → 5×2=10이 최대!'},
+  {q:'pop 조건은? (히스토그램, cur = 현재 높이)',
+   opts:['h[stk[top]] < cur','h[stk[top]] > cur','h[stk[top]] == cur','top == -1'],ans:1,
+   fb:'단조 증가 유지: 현재가 top보다 낮으면(cur이 작으면) pop! h[top] > cur이면 pop해서 넓이 계산.'},
+  {q:'스택이 비어있을 때(top==-1) pop된 막대의 너비 공식은?',
+   opts:['i - 1','stk[top] + 1','i','i + 1'],ans:2,
+   fb:'스택이 비었다 = 왼쪽에 현재보다 낮은 막대가 없음 = 인덱스 0부터 i-1까지가 범위 → 너비 = i!'},
+  {q:'스택이 비어있지 않을 때 너비 공식은?',
+   opts:['i - stk[top]','i - stk[top] - 1','stk[top] - i','i + stk[top]'],ans:1,
+   fb:'왼쪽 경계=stk[top], 오른쪽 경계=i, 둘 사이의 순수 너비 = i - stk[top] - 1 (경계 자체 제외)'},
+  {q:'센티널(0)을 배열 끝에 추가하는 이유는?',
+   opts:['넓이를 0으로 만들기 위해','루프 후 스택 잔여 막대를 모두 강제 pop하기 위해','경계 오류 방지','배열 초기화'],ans:1,
+   fb:'h=0은 어떤 막대보다 낮아서 스택의 모든 막대를 pop하게 만들어. 별도의 후처리 루프 없이 깔끔하게 처리!'},
+  {q:'넓이 계산에 long long을 써야 하는 이유는?',
+   opts:['음수가 나올 수 있어서','n=100000, h=100000이면 넓이가 10^10으로 int 초과','float 계산 필요','C 언어 규칙'],ans:1,
+   fb:'int 최대 약 21억(2.1×10^9), 최대 넓이 100000×100000=10^10 → int 범위 초과! long long(최대 약 9.2×10^18) 필요.'},
+  {q:'h=[3,3,3,3] 최대 넓이는?',
+   opts:['3','6','12','9'],ans:2,
+   fb:'전체가 높이 3 → 3×4=12! 모든 막대가 같은 높이니 전체가 하나의 직사각형.'},
+  {q:'알고리즘 시간복잡도는?',
+   opts:['O(n log n)','O(n²)','O(n)','O(n³)'],ans:2,
+   fb:'각 막대는 정확히 1번 push, 1번 pop → 총 2n번 연산 → O(n)!'},
+  {q:'h=[6,2,5,4,5,1,6] 최대 넓이는?',
+   opts:['10','12','14','6'],ans:1,
+   fb:'h=2 구간: 2×7=14? 아냐! h=2는 전체 7개지만 h[5]=1이 중간에 있어 막음. 인덱스 0~3: min=2, 너비=4 → 8. 인덱스 2~4: min=4, 너비=3 → 12가 최대!'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans)document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplbl').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ═══════════════════════════════════════════
+   CHALLENGES
+═══════════════════════════════════════════ */
+const CHS=[
+{title:'도전 1 — 히스토그램 최대 직사각형 완성',
+ tags:['tb:정올 핵심','tg:골드 입문'],
+ desc:'빈칸을 채워서 히스토그램 알고리즘을 완성해봐!<br><br><strong>입력:</strong> <code>6 / 2 1 5 6 2 3</code><br><strong>출력:</strong> <code style="color:var(--lime);">10</code>',
+ hint:'while 조건: top != -1 && h[stk[top]] > h[i] / 너비: top==-1 ? i : i-stk[top]-1 / 넓이: (long long)h[idx] * w',
+ start:`#include <stdio.h>
+#define MAX 100002
+
+int h[MAX], stk[MAX];
+int top = -1;
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) scanf("%d", &h[i]);
+    h[n] = 0;  // 센티널
+
+    long long maxA = 0;
+
+    for (int i = 0; i <= n; i++) {
+        // TODO: while 조건 — 현재가 top보다 낮으면(작으면) pop
+        while ( /* 조건 작성! */ ) {
+            int idx = stk[top--];  // pop
+            // TODO: 너비 계산
+            int w = /* top==-1 이면 i, 아니면 i-stk[top]-1 */;
+            // TODO: 넓이 계산 및 최대 업데이트
+            long long area = /* ... */;
+            if (area > maxA) maxA = area;
+        }
+        // TODO: 현재 인덱스 push (센티널 제외)
+        if (i < n) stk[++top] = i;
+    }
+
+    printf("%lld\\n", maxA);
+    return 0;
+}`},
+{title:'도전 2 — 브루트포스로 먼저 이해하기',
+ tags:['tb:입문','tgd:비교용'],
+ desc:'O(n²) 브루트포스로 히스토그램 문제를 풀어봐. 스택 풀이와 결과를 비교해보자!<br><br><strong>입력:</strong> <code>6 / 2 1 5 6 2 3</code><br><strong>출력:</strong> <code style="color:var(--lime);">10</code><br><span style="font-size:14px;color:var(--t3);">모든 (i,j) 구간의 최솟값×너비를 계산해!</span>',
+ hint:'이중 for문: i부터 j까지 탐색, 그 구간의 min값 × (j-i+1)을 계산. min은 구간을 늘리면서 갱신!',
+ start:`#include <stdio.h>
+#define MAX 100002
+
+int h[MAX];
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) scanf("%d", &h[i]);
+
+    long long maxA = 0;
+
+    // O(n²) 브루트포스
+    for (int i = 0; i < n; i++) {
+        int minH = h[i];  // i부터 j까지의 최소 높이
+        for (int j = i; j < n; j++) {
+            // TODO: minH 갱신
+            
+            // TODO: 넓이 계산 및 최대 업데이트
+            // area = minH * (j - i + 1)
+            
+        }
+    }
+
+    printf("%lld\\n", maxA);
+    return 0;
+}`},
+{title:'도전 3 — 모든 막대에서 최대 직사각형 높이 출력',
+ tags:['to:응용','tp2:실버+'],
+ desc:'각 막대 i를 높이로 하는 최대 직사각형 넓이를 배열로 출력해봐.<br><br><strong>입력:</strong> <code>6 / 2 1 5 6 2 3</code><br><strong>출력:</strong> <code style="color:var(--lime);">6 6 10 6 10 9</code><br><span style="font-size:14px;color:var(--t3);">(각 막대를 기준 높이로 했을 때 최대 너비 × 그 높이)</span>',
+ hint:'각 막대 i에 대해 왼쪽으로 h[i]보다 낮은 막대 위치(left[i])와 오른쪽(right[i])을 구해. 너비 = right[i] - left[i] - 1. 이걸 두 번의 단조 스택 순회로 구할 수 있어!',
+ start:`#include <stdio.h>
+#define MAX 100002
+
+int h[MAX], left_bd[MAX], right_bd[MAX];
+int stk[MAX], top = -1;
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) scanf("%d", &h[i]);
+
+    // 왼쪽 경계 계산 (왼→오, 단조 증가 스택)
+    // left_bd[i] = i 왼쪽에서 h[i]보다 낮은 막대의 인덱스 (-1이면 없음)
+    top = -1;
+    for (int i = 0; i < n; i++) {
+        while (top != -1 && h[stk[top]] >= h[i]) top--;
+        left_bd[i] = (top == -1) ? -1 : stk[top];
+        stk[++top] = i;
+    }
+
+    // TODO: 오른쪽 경계 계산 (오→왼)
+    // right_bd[i] = i 오른쪽에서 h[i]보다 낮은 막대의 인덱스 (n이면 없음)
+    top = -1;
+    for (int i = n-1; i >= 0; i--) {
+        // TODO: 단조 증가 스택으로 right_bd 계산
+        
+    }
+
+    // TODO: 각 막대의 최대 넓이 출력
+    // 너비 = right_bd[i] - left_bd[i] - 1
+    for (int i = 0; i < n; i++) {
+        long long w = /* ... */;
+        long long area = (long long)h[i] * w;
+        printf("%lld%c", area, i<n-1?' ':'\\n');
+    }
+    return 0;
+}`}
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="26" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+
+  if(ci===0){
+    const hasWhile = code.includes('while') && code.includes('stk[top]') && code.includes('h[i]');
+    const hasGT    = /h\[stk\[top\]\]\s*>\s*h\[i\]/.test(code);
+    const hasPop   = code.includes('top--');
+    const hasW     = code.includes('top == -1') && (code.includes('? i') || code.includes('?i'));
+    const hasArea  = code.includes('long long') && (code.includes('* w') || code.includes('*w'));
+    const hasPush  = code.includes('stk[++top]') || code.includes('stk[++top] = i');
+    if(!hasWhile){r+='❌ while 루프 조건이 없어!\n';ok=false;}
+    else if(!hasGT){r+='❌ pop 조건이 틀렸어! h[stk[top]] > h[i] 를 써야 해.\n';ok=false;}
+    else if(!hasPop){r+='❌ pop(top--) 로직이 없어!\n';ok=false;}
+    else if(!hasW){r+='❌ 너비 계산에서 top==-1 분기가 없어!\n';ok=false;}
+    else if(!hasArea){r+='❌ long long area 계산이 없어!\n';ok=false;}
+    else if(!hasPush){r+='❌ push(stk[++top]=i) 로직이 없어!\n';ok=false;}
+    if(ok) r=`✅ 히스토그램 코드 완성!
+
+while 조건: h[stk[top]] > h[i]   ✓
+pop 로직:   top--                  ✓
+너비 계산:  top==-1 ? i : i-top-1  ✓
+넓이:       long long × w          ✓
+push:       stk[++top]=i           ✓
+
+입력 [2,1,5,6,2,3] 시뮬:
+i=0: push → stk=[0]
+i=1: h[0]=2>1 pop, w=1, 2×1=2 → push(1) → stk=[1]
+i=2: h[1]=1<5 push → stk=[1,2]
+i=3: h[2]=5<6 push → stk=[1,2,3]
+i=4: h[3]=6>2 pop(3), w=4-2-1=1, 6×1=6
+     h[2]=5>2 pop(2), w=4-1-1=2, 5×2=10 ★
+     h[1]=1≤2 stop, push(4) → stk=[1,4]
+i=5: h[4]=2<3 push → stk=[1,4,5]
+i=6(센티널): pop(5),w=6-4-1=1,3×1=3
+             pop(4),w=6-1-1=4,2×4=8
+             pop(1),w=6, 1×6=6
+최대 = 10  ✓`;
+  } else if(ci===1){
+    const hasOuter = code.includes('for') && code.includes('i');
+    const hasInner = code.split('for').length>=3;
+    const hasMin   = code.includes('minH') || code.includes('min_h') || code.includes('mn');
+    const hasArea  = code.includes('long long') || (code.includes('area') && code.includes('max'));
+    if(!hasOuter){r+='❌ 외부 for 루프가 없어!\n';ok=false;}
+    else if(!hasInner){r+='❌ 내부 for 루프(j)가 없어!\n';ok=false;}
+    else if(!hasMin){r+='❌ 최소 높이(minH)를 갱신하는 코드가 없어!\n';ok=false;}
+    else if(!hasArea){r+='❌ 넓이 계산 코드가 없어!\n';ok=false;}
+    if(ok) r=`✅ 브루트포스 구현 완성!
+
+외부 for i:  ✓
+내부 for j:  ✓
+minH 갱신:   ✓
+넓이 계산:   ✓
+
+입력 [2,1,5,6,2,3] 시뮬:
+i=0: j=0→min=2,넓이=2 / j=1→min=1,넓이=2 / ...
+i=2: j=2→5,5 / j=3→5,10★ / j=4→2,6 / j=5→2,6
+최대 = 10 ✓
+
+O(n²) vs 스택 O(n):
+n=100,000: 브루트포스 100억번, 스택 20만번!`;
+  } else {
+    const hasRight = code.includes('right_bd') && code.includes('for') && code.includes('i = n-1');
+    const hasRStk  = code.includes('stk[++top]') || code.includes('right_bd[i]');
+    const hasW2    = code.includes('right_bd[i]') && code.includes('left_bd[i]');
+    if(!hasRight){r+='❌ 오른쪽 경계 계산 for 루프(i=n-1부터)가 없어!\n';ok=false;}
+    else if(!hasRStk){r+='❌ right_bd 스택 로직이 없어!\n';ok=false;}
+    else if(!hasW2){r+='❌ 너비 = right_bd[i] - left_bd[i] - 1 공식이 없어!\n';ok=false;}
+    if(ok) r=`✅ 경계 계산 완성!
+
+왼쪽 경계 계산: ✓ (제공됨)
+오른쪽 경계 계산: ✓
+너비 공식: right-left-1 ✓
+
+입력 [2,1,5,6,2,3]:
+left_bd:  [-1,-1, 1, 2, 1, 4]
+right_bd: [ 1, 6, 4, 4, 6, 6]
+너비:       1, 6, 2, 1, 4, 1
+넓이:       2, 6,10, 6, 8, 3
+
+출력: 2 6 10 6 8 3 ✓`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+
+// Init canvas on load
+window.addEventListener('load', ()=>{ simReset(); drawCanvas(); });
+</script>
+</body>
+</html>

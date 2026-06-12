@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원형 큐(Circular Queue) 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root{
+  --bg:#f4f7fb; --wh:#fff; --s1:#edf1f9; --s2:#e1e8f5;
+  --bd:#ccd4ea; --bd2:#b3bedd;
+  --t1:#101627; --t2:#243060; --t3:#5a6290; --t4:#9aa2c6;
+
+  --tl:  #0d7c6a; --tl-l:#d0faf0; --tl-m:#5ee4ca;   /* enqueue  */
+  --or:  #c2410c; --or-l:#fff0e8; --or-m:#fdba74;   /* dequeue  */
+  --bl:  #1d4ed8; --bl-l:#dbeafe; --bl-m:#93c5fd;   /* front    */
+  --vi:  #6d28d9; --vi-l:#ede9fe; --vi-m:#c4b5fd;   /* rear     */
+  --gd:  #b07800; --gd-l:#fff8d4; --gd-m:#ffd966;   /* current  */
+  --rd:  #b91c1c; --rd-l:#fee2e2; --rd-m:#fca5a5;   /* full/err */
+  --sk:  #0369a1; --sk-l:#e0f2fe; --sk-m:#7dd3fc;   /* info     */
+
+  --mono:'JetBrains Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  --r:10px; --r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* HEADER */
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-arc{width:12px;flex-shrink:0;
+  background:conic-gradient(var(--tl) 0% 50%, var(--or) 50% 100%);}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 28px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.05em;}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.hdr-b1{background:var(--tl-l);color:var(--tl);border:1.5px solid var(--tl-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.hdr-b2{background:var(--or-l);color:var(--or);border:1.5px solid var(--or-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.hdr-b3{background:var(--gd-l);color:var(--gd);border:1.5px solid var(--gd-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* NAV */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--tl);border-bottom-color:var(--tl);font-weight:700;}
+
+/* PAGES */
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* TYPE */
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--tl);}
+
+/* CALLOUT */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.ctl{background:var(--tl-l);color:var(--t2);border-color:var(--tl);}
+.cor{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+.cbl{background:var(--bl-l);color:var(--t2);border-color:var(--bl);}
+.cvi{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.crd{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+
+/* CARD */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+/* STEP BAR */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;flex-wrap:wrap;}
+.sbt{flex:1;min-width:70px;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.on{background:var(--tl-l);color:var(--tl);font-weight:700;}
+.sbt.dn{background:var(--sk-l);color:var(--sk);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* CODE */
+.cw{background:#131c2c;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #1c2840;}
+.cbr{background:#192236;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#5878b8;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1c2840;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}
+.htl{background:rgba(13,124,106,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+.hor{background:rgba(194,65,12,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fb923c;}
+.hbl{background:rgba(29,78,216,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #60a5fa;}
+.hvi{background:rgba(109,40,217,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #a78bfa;}
+.hgd{background:rgba(176,120,0,.15);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fbbf24;}
+
+/* TAGS */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.ttl{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.tor{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+.tbl{background:var(--bl-l);color:var(--bl);border:1px solid var(--bl-m);}
+.tvi{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.trd{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ════ LINEAR QUEUE VISUAL (problem demo) ════ */
+.lq-wrap{overflow-x:auto;padding:8px 0;}
+.lq-row{display:flex;align-items:center;gap:0;min-width:400px;}
+.lq-cell{width:52px;height:52px;border:2px solid var(--bd2);background:var(--wh);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);flex-shrink:0;transition:all .2s;position:relative;}
+.lq-cell:first-child{border-radius:var(--r) 0 0 var(--r);border-left:2px solid var(--bd2);}
+.lq-cell:last-child{border-radius:0 var(--r) var(--r) 0;}
+.lq-cell+.lq-cell{border-left:none;}
+.lq-cell .lv{font-size:18px;font-weight:700;color:var(--t2);}
+.lq-cell .li2{font-size:9px;color:var(--t4);position:absolute;bottom:2px;}
+.lq-cell.wasted{background:var(--rd-l);} .lq-cell.wasted .lv{color:var(--rd);font-size:12px;}
+.lq-cell.occ{background:var(--s1);}
+.lq-cell.frnt{background:var(--bl-l);border-color:var(--bl);border-left:2px solid var(--bl)!important;} .lq-cell.frnt .lv{color:var(--bl);}
+.lq-cell.rer{background:var(--vi-l);border-color:var(--vi);} .lq-cell.rer .lv{color:var(--vi);}
+.lq-ptr-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.lq-ptr{background:var(--s1);border:1.5px solid var(--bd);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.lq-ptr span{font-weight:700;}
+
+/* ════ CIRCULAR RING CANVAS ════ */
+.ring-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:18px;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;}
+#cq-canvas{display:block;}
+
+/* ════ SIM LAYOUT ════ */
+.sim-layout{display:grid;grid-template-columns:1fr 270px;gap:18px;align-items:start;}
+@media(max-width:720px){.sim-layout{grid-template-columns:1fr;}}
+
+/* Step info panel */
+.info-panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px;}
+.ip-label{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+.ip-box{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);line-height:1.9;min-height:70px;margin-bottom:10px;}
+
+/* Stats */
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:14px;color:var(--t2);}
+.stat span{font-weight:700;}
+
+/* Controls */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.btn{padding:10px 20px;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.btn:disabled{opacity:.38;cursor:default;}
+.benq{background:var(--tl);color:#fff;border-color:var(--tl);}   .benq:hover:not(:disabled){background:#0a5f50;}
+.bdeq{background:var(--or);color:#fff;border-color:var(--or);}   .bdeq:hover:not(:disabled){background:#9a3209;}
+.bpk{background:var(--bl-l);color:var(--bl);border-color:var(--bl-m);}.bpk:hover:not(:disabled){background:var(--bl);color:#fff;}
+.bauto{background:var(--vi-l);color:var(--vi);border-color:var(--vi-m);}.bauto:hover{background:var(--vi);color:#fff;}
+.breset{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.breset:hover{border-color:var(--t2);}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;width:80px;}
+.inp:focus{border-color:var(--tl);}
+
+/* size selector */
+.size-btns{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.sbtn2{padding:7px 16px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.sbtn2:hover{border-color:var(--tl);color:var(--tl);}
+.sbtn2.on{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+
+/* LOG */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:150px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.95;}
+.lenq{color:var(--tl);font-weight:600;}.ldeq{color:var(--or);font-weight:600;}.lerr{color:var(--rd);font-weight:600;}.ldone{color:var(--gd);font-weight:700;}.li{color:var(--t4);}
+
+/* legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.leg{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t2);}
+.ldot{width:14px;height:14px;border-radius:50%;border:2px solid;flex-shrink:0;}
+
+/* progress */
+.prog-lbl{font-size:13px;color:var(--t3);margin-bottom:5px;}
+.prog-wrap{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--tl),var(--or));border-radius:3px;transition:width .4s;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--tl);color:var(--tl);background:var(--tl-l);}
+.qopt.correct{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--tl);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:linear-gradient(90deg,var(--tl),var(--or));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#131c2c;border:1.5px solid #1c2840;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d4f5;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--tl);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--tl);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:#0a5f50;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--tl);}.oe{color:var(--rd);}
+.ht{font-size:14px;color:var(--bl);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--gd-l);border-radius:var(--r);font-size:14px;color:var(--gd);border:1px solid var(--gd-m);line-height:1.7;}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-arc"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">원형 큐 (Circular Queue)</span>
+    <span class="hdr-b1">enqueue →</span>
+    <span class="hdr-b2">← dequeue</span>
+    <span class="hdr-b3">% MAX 순환</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on"  onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"     onclick="goPage('code')">💻 코드 단계</div>
+  <div class="nt"     onclick="goPage('sim')">🎮 시뮬레이터</div>
+  <div class="nt"     onclick="goPage('trace')">🔍 손 추적</div>
+  <div class="nt"     onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"     onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════════════════ PAGE 1: 개념 ═══════════════════════ -->
+<div class="pg on" id="page-concept">
+  <h2>원형 큐 (Circular Queue)</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 | 배열 끝에서 처음으로 이어지는 큐!</p>
+
+  <div class="co ctl">
+    <strong>선형 큐의 문제 → 원형 큐로 해결!</strong><br>
+    선형 큐는 dequeue 후 앞 공간이 낭비돼. rear가 MAX-1에 닿으면 앞에 빈 공간이 있어도 더 넣을 수 없어!<br>
+    원형 큐는 <strong>나머지 연산(%)</strong>으로 인덱스를 순환시켜 앞 공간을 재활용해.
+  </div>
+
+  <!-- Linear queue PROBLEM demo -->
+  <div class="card">
+    <h4 style="margin-bottom:12px;">❌ 선형 큐의 공간 낭비 문제 (MAX=6)</h4>
+    <div class="lq-wrap">
+      <div class="lq-row">
+        <div class="lq-cell wasted"><span class="lv">❌</span><span class="li2">[0]</span></div>
+        <div class="lq-cell wasted"><span class="lv">❌</span><span class="li2">[1]</span></div>
+        <div class="lq-cell wasted"><span class="lv">❌</span><span class="li2">[2]</span></div>
+        <div class="lq-cell frnt"><span class="lv">30</span><span class="li2">[3]</span></div>
+        <div class="lq-cell occ"><span class="lv">40</span><span class="li2">[4]</span></div>
+        <div class="lq-cell rer"><span class="lv">50</span><span class="li2">[5]</span></div>
+      </div>
+    </div>
+    <div class="lq-ptr-row">
+      <div class="lq-ptr">front=<span style="color:var(--bl);">3</span></div>
+      <div class="lq-ptr">rear=<span style="color:var(--vi);">5</span></div>
+      <div class="lq-ptr" style="background:var(--rd-l);border-color:var(--rd-m);">
+        <span style="color:var(--rd);font-weight:700;">enqueue 불가! rear가 끝에 닿음</span>
+      </div>
+      <div class="lq-ptr" style="background:var(--rd-l);border-color:var(--rd-m);">
+        <span style="color:var(--rd);font-weight:700;">앞 3칸 낭비 😢</span>
+      </div>
+    </div>
+    <div class="co crd" style="margin-top:12px;margin-bottom:0;font-size:14px;">
+      dequeue 3번으로 0,1,2번 인덱스가 비었지만, rear가 MAX-1(=5)에 닿아 있어서 더 이상 enqueue 불가!
+    </div>
+  </div>
+
+  <!-- Circular queue SOLUTION demo -->
+  <div class="card">
+    <h4 style="margin-bottom:12px;">✅ 원형 큐의 해결 — 끝에서 처음으로 순환 (MAX=6)</h4>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div>
+        <div class="lq-wrap">
+          <div class="lq-row">
+            <div class="lq-cell" style="background:var(--tl-l);border-color:var(--tl);"><span class="lv" style="color:var(--tl);">70</span><span class="li2">[0]</span></div>
+            <div class="lq-cell" style="background:var(--tl-l);border-color:var(--tl);"><span class="lv" style="color:var(--tl);">80</span><span class="li2">[1] ←rear</span></div>
+            <div class="lq-cell" style="background:var(--s1);"><span class="lv" style="color:var(--t4);font-size:12px;">빈칸</span><span class="li2">[2]</span></div>
+            <div class="lq-cell frnt"><span class="lv">30</span><span class="li2">[3]</span></div>
+            <div class="lq-cell occ"><span class="lv">40</span><span class="li2">[4]</span></div>
+            <div class="lq-cell occ"><span class="lv">50</span><span class="li2">[5]</span></div>
+          </div>
+        </div>
+        <div class="lq-ptr-row">
+          <div class="lq-ptr">front=<span style="color:var(--bl);">2</span> (실제 front 앞 슬롯)</div>
+          <div class="lq-ptr">rear=<span style="color:var(--vi);">1</span></div>
+          <div class="lq-ptr" style="background:var(--tl-l);border-color:var(--tl-m);">
+            <span style="color:var(--tl);font-weight:700;">rear=(5+1)%6=0, (0+1)%6=1 → 앞 공간 재사용! ✅</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:22px;color:var(--tl);padding:16px;text-align:center;font-weight:700;">
+        ↺<br><span style="font-size:13px;color:var(--t3);">순환</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>원형 큐의 핵심 공식</h3>
+      <div style="background:var(--s1);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:15px;line-height:2.6;">
+        <div><span style="color:var(--tl);font-weight:700;">enqueue</span>: rear = (rear + 1) % MAX</div>
+        <div><span style="color:var(--or);font-weight:700;">dequeue</span>: front = (front + 1) % MAX</div>
+        <div><span style="color:var(--rd);font-weight:700;">isFull</span>:  (rear + 1) % MAX == front</div>
+        <div><span style="color:var(--gd);font-weight:700;">isEmpty</span>: front == rear</div>
+        <div><span style="color:var(--sk);font-weight:700;">size</span>:    (rear - front + MAX) % MAX</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>front·rear 포인터 역할</h3>
+      <table style="margin-bottom:0;font-size:14px;">
+        <tr><th>포인터</th><th>초기값</th><th>가리키는 곳</th></tr>
+        <tr><td style="color:var(--bl);font-family:var(--mono);font-weight:700;">front</td><td>0</td><td>첫 원소 바로 앞 슬롯<br><span style="font-size:12px;color:var(--t4);">(항상 비워두는 센티널)</span></td></tr>
+        <tr><td style="color:var(--vi);font-family:var(--mono);font-weight:700;">rear</td><td>0</td><td>마지막으로 넣은 슬롯<br><span style="font-size:12px;color:var(--t4);">(실제 데이터 위치)</span></td></tr>
+      </table>
+      <div class="co ctl" style="margin-top:10px;margin-bottom:0;font-size:14px;">
+        <strong>왜 front를 비워두나?</strong><br>
+        front==rear이면 빈 큐. (rear+1)%MAX==front이면 꽉 찬 큐.<br>
+        구별을 위해 한 칸을 희생! MAX개 배열 → MAX-1개 저장 가능.
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">선형 큐 vs 원형 큐 비교</h3>
+  <table>
+    <tr><th></th><th>선형 큐</th><th style="color:var(--tl);">원형 큐 ★</th></tr>
+    <tr><td style="font-weight:700;">공간 재활용</td><td style="color:var(--rd);">❌ 앞 공간 낭비</td><td style="color:var(--tl);font-weight:700;">✅ % 연산으로 순환</td></tr>
+    <tr><td style="font-weight:700;">enqueue</td><td>rear++</td><td><code>(rear+1)%MAX</code></td></tr>
+    <tr><td style="font-weight:700;">dequeue</td><td>front++</td><td><code>(front+1)%MAX</code></td></tr>
+    <tr><td style="font-weight:700;">isEmpty</td><td>front > rear</td><td><code>front == rear</code></td></tr>
+    <tr><td style="font-weight:700;">isFull</td><td>rear == MAX-1</td><td><code>(rear+1)%MAX == front</code></td></tr>
+    <tr><td style="font-weight:700;">최대 저장</td><td>MAX개</td><td>MAX-1개 (한 칸 비움)</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════ PAGE 2: 코드 ═══════════════════════ -->
+<div class="pg" id="page-code">
+  <h2>원형 큐 코드 단계</h2>
+  <p class="psub">선언 → isEmpty/isFull → enqueue → dequeue → peek → 완성 코드 6단계!</p>
+  <div class="sbar" id="sbar-code">
+    <div class="sbt on"  onclick="goStep(0)"><span class="snum">01</span>선언·초기화</div>
+    <div class="sbt"     onclick="goStep(1)"><span class="snum">02</span>isEmpty·isFull</div>
+    <div class="sbt"     onclick="goStep(2)"><span class="snum">03</span>enqueue</div>
+    <div class="sbt"     onclick="goStep(3)"><span class="snum">04</span>dequeue</div>
+    <div class="sbt"     onclick="goStep(4)"><span class="snum">05</span>peek·size</div>
+    <div class="sbt"     onclick="goStep(5)"><span class="snum">06</span>완성 코드</div>
+  </div>
+  <div id="code-panel"></div>
+</div>
+
+<!-- ═══════════════════════ PAGE 3: 시뮬레이터 ═══════════════════════ -->
+<div class="pg" id="page-sim">
+  <h2>원형 큐 시뮬레이터</h2>
+  <p class="psub">enqueue/dequeue 버튼을 눌러 포인터가 원 위에서 어떻게 이동하는지 봐!</p>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <span style="font-size:15px;font-weight:700;color:var(--t2);">배열 크기:</span>
+    <div class="size-btns">
+      <div class="sbtn2 on" onclick="setMAX(6,this)">MAX = 6</div>
+      <div class="sbtn2"    onclick="setMAX(8,this)">MAX = 8</div>
+      <div class="sbtn2"    onclick="setMAX(10,this)">MAX = 10</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--s1);border-color:var(--bd2);"></div>빈 슬롯</div>
+    <div class="leg"><div class="ldot" style="background:var(--tl-l);border-color:var(--tl);"></div>데이터 있음</div>
+    <div class="leg"><div class="ldot" style="background:var(--bl-l);border-color:var(--bl);"></div>front (센티널)</div>
+    <div class="leg"><div class="ldot" style="background:var(--vi-l);border-color:var(--vi);"></div>rear (마지막 데이터)</div>
+    <div class="leg"><div class="ldot" style="background:var(--gd-l);border-color:var(--gd);"></div>front=rear 동시 (빈 큐)</div>
+  </div>
+
+  <div class="prog-lbl" id="sim-prog-lbl">진행: 대기 중</div>
+  <div class="prog-wrap"><div class="prog-fill" id="sim-prog" style="width:0%"></div></div>
+
+  <div class="sim-layout">
+    <div>
+      <div class="ring-wrap">
+        <canvas id="cq-canvas" width="340" height="340"></canvas>
+      </div>
+
+      <div class="stats">
+        <div class="stat">front = <span id="s-front" style="color:var(--bl);">0</span></div>
+        <div class="stat">rear  = <span id="s-rear"  style="color:var(--vi);">0</span></div>
+        <div class="stat">size  = <span id="s-size"  style="color:var(--tl);">0</span></div>
+        <div class="stat">MAX   = <span id="s-max"   style="color:var(--t3);">6</span></div>
+        <div class="stat" id="s-state-pill">isEmpty = <span style="color:var(--or);">true</span></div>
+      </div>
+
+      <div class="ctrl">
+        <input class="inp" type="number" id="sim-val" value="10" placeholder="값">
+        <button class="btn benq"  onclick="simEnq()">enqueue(x)</button>
+        <button class="btn bdeq"  onclick="simDeq()">dequeue()</button>
+        <button class="btn bpk"   onclick="simPeek()">front()</button>
+        <button class="btn bauto" onclick="simAuto()">⏩ 자동 시나리오</button>
+        <button class="btn breset" onclick="simReset()">↺ 초기화</button>
+      </div>
+
+      <div class="sl">실행 로그</div>
+      <div class="log" id="sim-log"><span class="li">▶ enqueue 버튼을 눌러서 시작!</span></div>
+    </div>
+
+    <div>
+      <div class="info-panel">
+        <div class="ip-label">현재 단계</div>
+        <div class="ip-box" id="ip-box">대기 중...<br><br>enqueue로 값을 넣어봐!</div>
+        <div class="ip-label">핵심 공식</div>
+        <div class="ip-box" style="font-size:12px;min-height:50px;">
+          <span style="color:var(--tl);font-weight:700;">enqueue</span>: rear=(rear+1)%MAX<br>
+          <span style="color:var(--or);font-weight:700;">dequeue</span>: front=(front+1)%MAX<br>
+          <span style="color:var(--gd);font-weight:700;">isEmpty</span>: front==rear<br>
+          <span style="color:var(--rd);font-weight:700;">isFull</span>: (rear+1)%MAX==front
+        </div>
+        <div class="ip-label">배열 상태</div>
+        <div id="ip-arr" style="font-family:var(--mono);font-size:12px;background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;line-height:1.9;min-height:40px;word-break:break-all;color:var(--t2);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE 4: 손 추적 ═══════════════════════ -->
+<div class="pg" id="page-trace">
+  <h2>손 추적 연습</h2>
+  <p class="psub">MAX=6, 연산 순서를 따라가며 front·rear가 어떻게 변하는지 직접 확인해봐!</p>
+
+  <div class="co cgd">
+    <strong>추적 방법</strong>: 각 연산마다 ① rear=(rear+1)%MAX 또는 front=(front+1)%MAX 계산,
+    ② 배열 상태, ③ front·rear 값을 표에 채워봐!
+  </div>
+
+  <div id="trace-tbl-wrap"></div>
+
+  <div class="co ctl">
+    <strong>isEmpty / isFull 체크 연습</strong><br>
+    front=3, rear=3, MAX=6 → <strong style="color:var(--gd);">isEmpty!</strong> (front==rear)<br>
+    front=2, rear=1, MAX=6 → <strong style="color:var(--rd);">isFull!</strong> ((1+1)%6=2 == front=2)<br>
+    front=0, rear=3, MAX=6 → size = (3-0+6)%6 = 3 (원소 3개)
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE 5: 퀴즈 ═══════════════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>원형 큐 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════════════════ PAGE 6: 도전 ═══════════════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">원형 큐를 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   PAGE NAV
+═══════════════════════════════════════════ */
+const PM={concept:0,code:1,sim:2,trace:3,quiz:4,challenge:5};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('on',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('on');
+  if(id==='sim') drawRing();
+  if(id==='trace') renderTrace();
+}
+
+/* ═══════════════════════════════════════════
+   CODE STEPS
+═══════════════════════════════════════════ */
+const STEPS=[
+{t:'① 배열·front·rear 선언 및 초기화',
+ b:`<div class="co ctl"><strong>핵심</strong>: front와 rear 모두 0에서 시작해. front==rear이면 빈 큐야.<br>
+front는 첫 원소 바로 앞의 <strong>빈 슬롯(센티널)</strong>을 가리켜. 실제 데이터는 queue[(front+1)%MAX]부터!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 1001</span>       <span class="cm">// 배열 크기 (실제 저장 가능: MAX-1개)</span>
+
+<span class="tp">int</span> queue[<span class="nm">MAX</span>];
+<span class="hbl"><span class="tp">int</span> front = <span class="nm">0</span>;    <span class="cm">// 첫 원소 바로 앞 위치 (비어있는 슬롯)</span></span>
+<span class="hvi"><span class="tp">int</span> rear  = <span class="nm">0</span>;    <span class="cm">// 마지막으로 넣은 위치</span></span>
+
+<span class="cm">// 초기 상태: front == rear == 0 → 빈 큐
+// 데이터는 queue[(front+1)%MAX] ~ queue[rear]에 위치
+// front 슬롯은 항상 비워둬서 isEmpty와 isFull 구별!</span>
+</pre></div>
+<div class="card"><h4>front·rear 상태 예시 (MAX=6)</h4>
+<table style="margin-bottom:0;font-family:var(--mono);font-size:14px;">
+<tr><th>상태</th><th>front</th><th>rear</th><th>조건</th></tr>
+<tr><td>빈 큐</td><td>0</td><td>0</td><td style="color:var(--gd);">front == rear ✓</td></tr>
+<tr><td>원소 3개 [A,B,C]</td><td>0</td><td>3</td><td>size=(3-0+6)%6=3</td></tr>
+<tr><td>꽉 찬 큐 (5개)</td><td>0</td><td>5</td><td style="color:var(--rd);">(5+1)%6=0==front ✓</td></tr>
+<tr><td>순환 후</td><td>3</td><td>2</td><td>size=(2-3+6)%6=5</td></tr>
+</table></div>`},
+
+{t:'② isEmpty와 isFull 조건',
+ b:`<div class="co cbl"><strong>isEmpty와 isFull을 구별하는 게 원형 큐의 핵심!</strong><br>
+front == rear → 빈 큐<br>
+(rear+1)%MAX == front → 꽉 찬 큐 (한 칸을 비워두기 때문에 MAX-1개까지만 저장)</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_empty_full.c</span></div>
+<pre><span class="cm">// 빈 큐 확인: front와 rear가 같은 위치</span>
+<span class="tp">int</span> <span class="fn">isEmpty</span>() {
+<span class="hbl">    <span class="kw">return</span> front == rear;          <span class="cm">// front==rear → 빈 큐</span></span>
+}
+
+<span class="cm">// 꽉 찬 큐: rear의 다음 위치가 front</span>
+<span class="tp">int</span> <span class="fn">isFull</span>() {
+<span class="hor">    <span class="kw">return</span> (rear + <span class="nm">1</span>) % <span class="nm">MAX</span> == front; <span class="cm">// 다음 rear = front → 꽉 참</span></span>
+}
+
+<span class="cm">// 현재 원소 수</span>
+<span class="tp">int</span> <span class="fn">size</span>() {
+<span class="hgd">    <span class="kw">return</span> (rear - front + <span class="nm">MAX</span>) % <span class="nm">MAX</span>;</span>
+}
+</pre></div>
+<div class="co cgd"><strong>왜 한 칸을 비워두나?</strong><br>
+front==rear를 빈 큐의 조건으로 사용해. 만약 꽉 찬 경우도 front==rear가 되면 구별이 불가능해.<br>
+한 칸(front 슬롯)을 희생해서 두 상태를 명확히 구별해!</div>`},
+
+{t:'③ enqueue — rear를 앞으로 이동',
+ b:`<div class="co ctl"><strong>enqueue</strong>: rear를 한 칸 앞(순환)으로 이동한 후 그 자리에 저장!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_enqueue.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">enqueue</span>(<span class="tp">int</span> x) {
+    <span class="cm">// 꽉 찼는지 먼저 확인!</span>
+    <span class="kw">if</span> (<span class="fn">isFull</span>()) {
+        <span class="fn">printf</span>(<span class="st">"Queue Full!\n"</span>); <span class="kw">return</span>;
+    }
+<span class="htl">    rear = (rear + <span class="nm">1</span>) % <span class="nm">MAX</span>;  <span class="cm">// ① rear를 순환하며 한 칸 이동</span></span>
+<span class="htl">    queue[rear] = x;          <span class="cm">// ② 이동한 자리에 값 저장</span></span>
+}
+
+<span class="cm">// 예: MAX=6, front=0, rear=5 (꽉 참 전)
+//     enqueue(30)
+//     → rear = (5+1)%6 = 0  ← 순환!
+//     → queue[0] = 30
+//     이제 front=0과 rear=0이 같아져서 isFull 아닌데?
+//     아니! rear=0은 꽉 찬 상태: (0+1)%6=1 ≠ front? 아니 front도 0...
+//     → 실제론 이 상태가 isFull, 즉 enqueue전에 체크함!</span>
+</pre></div>
+<div class="card"><h4>enqueue 단계 추적 (MAX=6, front=0, rear=3)</h4>
+<div style="font-family:var(--mono);font-size:14px;background:var(--s1);padding:12px;border-radius:var(--r);line-height:2.2;">
+  enqueue(X):<br>
+  <span style="color:var(--tl);">rear = (3+1)%6 = 4</span><br>
+  <span style="color:var(--tl);">queue[4] = X</span><br>
+  front=0, rear=4, size=4
+</div></div>`},
+
+{t:'④ dequeue — front를 앞으로 이동',
+ b:`<div class="co cor"><strong>dequeue</strong>: front를 한 칸 앞(순환)으로 이동한 후 그 자리의 값을 반환!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_dequeue.c</span></div>
+<pre><span class="tp">int</span> <span class="fn">dequeue</span>() {
+    <span class="cm">// 빈지 먼저 확인!</span>
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) {
+        <span class="fn">printf</span>(<span class="st">"Queue Empty!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+<span class="hor">    front = (front + <span class="nm">1</span>) % <span class="nm">MAX</span>;  <span class="cm">// ① front를 순환하며 한 칸 이동</span></span>
+<span class="hor">    <span class="kw">return</span> queue[front];          <span class="cm">// ② 이동한 자리의 값 반환</span></span>
+}
+
+<span class="cm">// 예: MAX=6, front=0, rear=3 (원소: queue[1],queue[2],queue[3])
+//     dequeue()
+//     → front = (0+1)%6 = 1
+//     → return queue[1]  ← 첫 번째 원소 반환!
+//     front=1, rear=3, size=2</span>
+</pre></div>
+<div class="co cgd"><strong>선형 큐와 비교</strong>:<br>
+선형 큐: <code>return queue[front++]</code> (front 이동 후 공간 낭비)<br>
+원형 큐: <code>front=(front+1)%MAX; return queue[front]</code> (이동하면서 순환!)</div>`},
+
+{t:'⑤ peek (front 확인) · size',
+ b:`<div class="co cvi"><strong>peek</strong>: front 다음 위치의 값을 꺼내지 않고 확인해.<br>front는 빈 슬롯이므로 (front+1)%MAX가 실제 첫 원소야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>05_peek_size.c</span></div>
+<pre><span class="cm">// 앞 원소 확인 (꺼내지 않음)</span>
+<span class="tp">int</span> <span class="fn">peek</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="hvi">    <span class="kw">return</span> queue[(front + <span class="nm">1</span>) % <span class="nm">MAX</span>];  <span class="cm">// front+1이 실제 첫 원소!</span></span>
+}
+
+<span class="cm">// 원소 개수</span>
+<span class="tp">int</span> <span class="fn">size</span>() {
+<span class="hgd">    <span class="kw">return</span> (rear - front + <span class="nm">MAX</span>) % <span class="nm">MAX</span>;</span>
+    <span class="cm">// +MAX로 음수 방지! front > rear인 경우에도 정확</span>
+}
+
+<span class="cm">// 예: front=4, rear=2, MAX=6
+//     size = (2-4+6)%6 = 4%6 = 4 ✓
+//     peek = queue[(4+1)%6] = queue[5] ✓</span>
+</pre></div>`},
+
+{t:'⑥ 완성 코드',
+ b:`<div class="co ctl">입출력 포함 원형 큐 완전 구현이야. 정올 스타일 연산 파싱 포함!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circular_queue_complete.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span> queue[<span class="nm">MAX</span>];
+<span class="tp">int</span> front=<span class="nm">0</span>, rear=<span class="nm">0</span>;
+
+<span class="tp">int</span>  <span class="fn">isEmpty</span>() { <span class="kw">return</span> front==rear; }
+<span class="tp">int</span>  <span class="fn">isFull</span> () { <span class="kw">return</span> (rear+<span class="nm">1</span>)%<span class="nm">MAX</span>==front; }
+<span class="tp">int</span>  <span class="fn">size</span>   () { <span class="kw">return</span> (rear-front+<span class="nm">MAX</span>)%<span class="nm">MAX</span>; }
+
+<span class="tp">void</span> <span class="fn">enqueue</span>(<span class="tp">int</span> x){
+    <span class="kw">if</span>(<span class="fn">isFull</span>()){ <span class="fn">printf</span>(<span class="st">"Full\n"</span>);<span class="kw">return</span>; }
+<span class="htl">    rear=(rear+<span class="nm">1</span>)%<span class="nm">MAX</span>; queue[rear]=x;</span>
+}
+<span class="tp">int</span> <span class="fn">dequeue</span>(){
+    <span class="kw">if</span>(<span class="fn">isEmpty</span>()){ <span class="fn">printf</span>(<span class="st">"Empty\n"</span>);<span class="kw">return</span> -<span class="nm">1</span>; }
+<span class="hor">    front=(front+<span class="nm">1</span>)%<span class="nm">MAX</span>; <span class="kw">return</span> queue[front];</span>
+}
+<span class="tp">int</span> <span class="fn">peek</span>(){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:queue[(front+<span class="nm">1</span>)%<span class="nm">MAX</span>]; }
+
+<span class="tp">int</span> <span class="fn">main</span>(){
+    <span class="tp">int</span> q; <span class="fn">scanf</span>(<span class="st">"%d"</span>,&amp;q);
+    <span class="kw">while</span>(q--){
+        <span class="tp">char</span> op[<span class="nm">20</span>]; <span class="fn">scanf</span>(<span class="st">"%s"</span>,op);
+        <span class="kw">if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"enqueue"</span>)){ <span class="tp">int</span> x;<span class="fn">scanf</span>(<span class="st">"%d"</span>,&amp;x);<span class="fn">enqueue</span>(x); }
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"dequeue"</span>)) <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">dequeue</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"front"</span>))   <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">peek</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"size"</span>))    <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">size</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"empty"</span>))   <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">isEmpty</span>());
+    }
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>`}
+];
+
+let curStep=0;
+function goStep(n){
+  curStep=n;
+  document.getElementById('code-panel').innerHTML=`<div class="card"><h3>${STEPS[n].t}</h3>${STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-code .sbt').forEach((b,i)=>{b.classList.toggle('on',i===n);b.classList.toggle('dn',i<n);});
+}
+goStep(0);
+
+/* ═══════════════════════════════════════════
+   SIMULATOR
+═══════════════════════════════════════════ */
+let CQ_MAX=6;
+let cqArr, cqFront, cqRear, autoTimer;
+
+function setMAX(m, btn){
+  CQ_MAX=m;
+  document.querySelectorAll('.size-btns .sbtn2').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('s-max').textContent=m;
+  simReset();
+}
+
+function cqIsEmpty(){ return cqFront===cqRear; }
+function cqIsFull() { return (cqRear+1)%CQ_MAX===cqFront; }
+function cqSize()   { return (cqRear-cqFront+CQ_MAX)%CQ_MAX; }
+
+function addLog(msg,cls){
+  const log=document.getElementById('sim-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function updateStats(){
+  document.getElementById('s-front').textContent=cqFront;
+  document.getElementById('s-rear').textContent=cqRear;
+  document.getElementById('s-size').textContent=cqSize();
+  const pill=document.getElementById('s-state-pill');
+  if(cqIsFull()){
+    pill.innerHTML='isFull = <span style="color:var(--rd);font-weight:700;">true</span>';
+  } else if(cqIsEmpty()){
+    pill.innerHTML='isEmpty = <span style="color:var(--or);font-weight:700;">true</span>';
+  } else {
+    pill.innerHTML=`isEmpty = <span style="color:var(--tl);">false</span>`;
+  }
+}
+
+function updateArrDisplay(){
+  const el=document.getElementById('ip-arr');
+  let parts=[];
+  for(let i=0;i<CQ_MAX;i++){
+    const isFront=i===cqFront, isRear=i===cqRear;
+    const hasData=cqArr[i]!==null;
+    let s=`[${i}]:`;
+    if(isFront&&isRear) s+=`F/R`;
+    else if(isFront) s+=`F(${hasData?cqArr[i]:'_'})`;
+    else if(isRear)  s+=`R(${hasData?cqArr[i]:'_'})`;
+    else             s+=hasData?cqArr[i]:'_';
+    parts.push(s);
+  }
+  el.textContent=parts.join('  ');
+}
+
+/* ── CANVAS RING ── */
+function drawRing(){
+  const cv=document.getElementById('cq-canvas');
+  if(!cv)return;
+  const W=340,H=340,cx=170,cy=170,R=118,r=32;
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  for(let i=0;i<CQ_MAX;i++){
+    const angle=(2*Math.PI*i/CQ_MAX)-Math.PI/2;
+    const x=cx+R*Math.cos(angle), y=cy+R*Math.sin(angle);
+    const isFront=i===cqFront, isRear=i===cqRear;
+    const hasData=cqArr[i]!==null;
+
+    // shadow for front/rear
+    if(isFront||isRear){ ctx.shadowColor=isFront?'rgba(29,78,216,.25)':'rgba(109,40,217,.25)'; ctx.shadowBlur=12; }
+
+    let fill='#f8f9fc', stroke='#b3bedd';
+    if(isFront&&isRear){ fill='#fff8d4'; stroke='#b07800'; }
+    else if(isFront){    fill='#dbeafe'; stroke='#1d4ed8'; }
+    else if(isRear){     fill='#ede9fe'; stroke='#6d28d9'; }
+    else if(hasData){    fill='#d0faf0'; stroke='#0d7c6a'; }
+
+    ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0;
+
+    // value
+    const dispVal = hasData ? String(cqArr[i]) : '';
+    ctx.fillStyle=isFront&&isRear?'#b07800':isFront?'#1d4ed8':isRear?'#6d28d9':hasData?'#0d7c6a':'#9aa2c6';
+    ctx.font=`bold ${r>28?15:13}px JetBrains Mono,monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(dispVal||'',x,y-3);
+
+    // index
+    ctx.font='10px JetBrains Mono,monospace';
+    ctx.fillStyle='#9aa2c6';
+    ctx.fillText(`[${i}]`,x,y+13);
+
+    // pointer label
+    const lx=cx+(R+52)*Math.cos(angle), ly=cy+(R+52)*Math.sin(angle);
+    if(isFront||isRear){
+      ctx.font='bold 11px JetBrains Mono,monospace';
+      ctx.fillStyle=isFront&&isRear?'#b07800':isFront?'#1d4ed8':'#6d28d9';
+      ctx.fillText(isFront&&isRear?'F=R':isFront?'F':'R',lx,ly);
+    }
+  }
+
+  // center info
+  ctx.fillStyle='#9aa2c6'; ctx.font='13px Noto Sans KR,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const stateStr=cqIsEmpty()?'비어있음':cqIsFull()?'가득 참':`원소 ${cqSize()}개`;
+  ctx.fillText(stateStr,cx,cy-10);
+  ctx.font='bold 14px JetBrains Mono,monospace';
+  ctx.fillStyle='#243060';
+  ctx.fillText(`MAX=${CQ_MAX}`,cx,cy+12);
+}
+
+function simEnq(){
+  const v=parseInt(document.getElementById('sim-val').value);
+  if(isNaN(v)){addLog('숫자를 입력해줘!','li');return;}
+  if(cqIsFull()){addLog('Queue Full! (rear+1)%MAX==front 조건 성립','lerr');return;}
+  const oldRear=cqRear;
+  cqRear=(cqRear+1)%CQ_MAX;
+  cqArr[cqRear]=v;
+  drawRing(); updateStats(); updateArrDisplay();
+  addLog(`enqueue(${v}) → rear=(${oldRear}+1)%${CQ_MAX}=${cqRear}, queue[${cqRear}]=${v}`,'lenq');
+  document.getElementById('ip-box').textContent=`enqueue(${v})\nrear=(${oldRear}+1)%${CQ_MAX}=${cqRear}\nqueue[${cqRear}]=${v}`;
+  document.getElementById('sim-prog').style.width=(cqSize()/(CQ_MAX-1)*100)+'%';
+  document.getElementById('sim-prog-lbl').textContent=`사용: ${cqSize()} / ${CQ_MAX-1} 슬롯`;
+}
+
+function simDeq(){
+  if(cqIsEmpty()){addLog('Queue Empty! front==rear 조건 성립','lerr');return;}
+  const oldFront=cqFront;
+  cqFront=(cqFront+1)%CQ_MAX;
+  const v=cqArr[cqFront];
+  cqArr[cqFront]=null;
+  drawRing(); updateStats(); updateArrDisplay();
+  addLog(`dequeue() → front=(${oldFront}+1)%${CQ_MAX}=${cqFront}, 반환값=${v}`,'ldeq');
+  document.getElementById('ip-box').textContent=`dequeue() = ${v}\nfront=(${oldFront}+1)%${CQ_MAX}=${cqFront}\n반환 후 슬롯 비움`;
+  document.getElementById('sim-prog').style.width=(cqSize()/(CQ_MAX-1)*100)+'%';
+  document.getElementById('sim-prog-lbl').textContent=`사용: ${cqSize()} / ${CQ_MAX-1} 슬롯`;
+}
+
+function simPeek(){
+  if(cqIsEmpty()){addLog('Queue Empty!','lerr');return;}
+  const idx=(cqFront+1)%CQ_MAX;
+  addLog(`front() → queue[(${cqFront}+1)%${CQ_MAX}] = queue[${idx}] = ${cqArr[idx]}`,'ldone');
+  document.getElementById('ip-box').textContent=`peek(front)\nqueue[(front+1)%MAX]\n= queue[${idx}] = ${cqArr[idx]}`;
+}
+
+function simReset(){
+  clearTimeout(autoTimer);
+  cqArr=new Array(CQ_MAX).fill(null);
+  cqFront=0; cqRear=0;
+  drawRing(); updateStats(); updateArrDisplay();
+  document.getElementById('sim-log').innerHTML='<span class="li">↺ 초기화됨!</span>';
+  document.getElementById('ip-box').textContent='대기 중...\n\nenqueue로 값을 넣어봐!';
+  document.getElementById('sim-prog').style.width='0%';
+  document.getElementById('sim-prog-lbl').textContent='진행: 대기 중';
+}
+
+function simAuto(){
+  simReset();
+  const ops=[
+    ()=>{document.getElementById('sim-val').value=10;simEnq();},
+    ()=>{document.getElementById('sim-val').value=20;simEnq();},
+    ()=>{document.getElementById('sim-val').value=30;simEnq();},
+    ()=>simDeq(),
+    ()=>simDeq(),
+    ()=>{document.getElementById('sim-val').value=40;simEnq();},
+    ()=>{document.getElementById('sim-val').value=50;simEnq();},
+    ()=>simPeek(),
+    ()=>{document.getElementById('sim-val').value=60;simEnq();},
+    ()=>simDeq(),
+  ];
+  let i=0;
+  function tick(){
+    if(i<ops.length){ops[i]();i++;autoTimer=setTimeout(tick,900);}
+  }
+  setTimeout(tick,300);
+}
+
+window.addEventListener('resize',()=>{if(document.getElementById('page-sim').classList.contains('on'))drawRing();});
+
+/* ═══════════════════════════════════════════
+   TRACE TABLE
+═══════════════════════════════════════════ */
+const TRACE_OPS=[
+  {op:'초기 상태',   type:'init',  val:null},
+  {op:'enqueue(A)', type:'enq',   val:'A'},
+  {op:'enqueue(B)', type:'enq',   val:'B'},
+  {op:'enqueue(C)', type:'enq',   val:'C'},
+  {op:'dequeue()',  type:'deq',   val:null},
+  {op:'dequeue()',  type:'deq',   val:null},
+  {op:'enqueue(D)', type:'enq',   val:'D'},
+  {op:'enqueue(E)', type:'enq',   val:'E'},
+  {op:'enqueue(F)', type:'enq',   val:'F'},
+  {op:'enqueue(G)', type:'enq',   val:'G'},
+  {op:'dequeue()',  type:'deq',   val:null},
+  {op:'isFull()?',  type:'check', val:null},
+];
+
+function renderTrace(){
+  const MAX=6;
+  const wrap=document.getElementById('trace-tbl-wrap');
+  if(wrap.dataset.done) return;
+  wrap.dataset.done='1';
+
+  // simulate
+  let q=new Array(MAX).fill('_');
+  let f=0,r=0;
+  const rows=[];
+
+  for(const op of TRACE_OPS){
+    let ret='', arrSnap=q.slice(), state='';
+    if(op.type==='init'){ret='';state='빈 큐';}
+    else if(op.type==='enq'){
+      if((r+1)%MAX===f){ret='Full!';state='isFull!';}
+      else{ r=(r+1)%MAX; q[r]=op.val; ret=''; state=`size=${((r-f+MAX)%MAX)}`; }
+      arrSnap=q.slice();
+    } else if(op.type==='deq'){
+      if(f===r){ret='Empty!';state='isEmpty!';}
+      else{ f=(f+1)%MAX; ret=q[f]; q[f]='_'; state=`반환=${ret}`; }
+      arrSnap=q.slice();
+    } else if(op.type==='check'){
+      const full=(r+1)%MAX===f;
+      ret=full?'true':'false'; state=`(${r}+1)%${MAX}=${(r+1)%MAX} ${full?'==':'!='} ${f}`;
+    }
+    rows.push({op:op.op, front:f, rear:r, arr:arrSnap.slice(), ret, state});
+  }
+
+  let html=`<div class="card" style="overflow-x:auto;"><div class="sl">MAX = ${MAX} 손 추적 표</div>
+  <table style="min-width:620px;font-family:var(--mono);font-size:14px;">
+    <tr>
+      <th>연산</th>
+      <th style="color:var(--bl);">front</th>
+      <th style="color:var(--vi);">rear</th>
+      <th>배열 [0..${MAX-1}]</th>
+      <th style="color:var(--tl);">반환/결과</th>
+      <th>상태</th>
+    </tr>`;
+
+  rows.forEach((row,ri)=>{
+    const arrStr=row.arr.map((v,i)=>{
+      const iF=i===row.front, iR=i===row.rear;
+      let color='var(--t2)';
+      if(iF&&iR) color='var(--gd)';
+      else if(iF) color='var(--bl)';
+      else if(iR) color='var(--vi)';
+      else if(v!=='_') color='var(--tl)';
+      const mark=iF&&iR?'F/R':iF?'F':iR?'R':'';
+      return `<span style="color:${color};font-weight:${(iF||iR)?'700':'400'};">${v}${mark?`<sup style="font-size:9px;">${mark}</sup>`:''}</span>`;
+    }).join(' ');
+    const retColor=row.ret&&row.ret!==''?'var(--or)':'var(--t4)';
+    const rowBg=row.state.includes('Full')?'background:var(--rd-l);':row.state.includes('Empty')?'background:var(--or-l);':'';
+    html+=`<tr style="${rowBg}">
+      <td style="color:var(--t2);">${row.op}</td>
+      <td style="color:var(--bl);font-weight:700;">${row.front}</td>
+      <td style="color:var(--vi);font-weight:700;">${row.rear}</td>
+      <td>[${arrStr}]</td>
+      <td style="color:${retColor};font-weight:700;">${row.ret||'-'}</td>
+      <td style="font-size:13px;color:var(--t3);">${row.state}</td>
+    </tr>`;
+  });
+  html+=`</table></div>`;
+  wrap.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+const QUIZ=[
+  {q:'원형 큐의 enqueue에서 rear의 다음 위치 계산식은? (MAX=8)',
+   opts:['rear + 1','rear - 1','(rear + 1) % MAX','(rear + MAX) % MAX'],ans:2,
+   fb:'나머지 연산으로 순환! (rear+1)%MAX. rear=7이면 (7+1)%8=0으로 처음으로 돌아가.'},
+  {q:'원형 큐의 isEmpty 조건은?',
+   opts:['rear == -1','front == -1','front == rear','size == 0'],ans:2,
+   fb:'front와 rear가 같은 위치를 가리키면 빈 큐! (공간 한 칸 비워두는 방식)'},
+  {q:'원형 큐의 isFull 조건은? (MAX=8)',
+   opts:['rear == MAX-1','front == 0','(rear + 1) % MAX == front','rear - front == MAX'],ans:2,
+   fb:'rear의 다음 위치가 front와 같으면 꽉 찬 큐! 한 칸 비워두기 때문에 MAX-1개까지만 저장.'},
+  {q:'MAX=6, front=2, rear=5일 때 size는?',
+   opts:['3','5','(5-2+6)%6=3','(5-2)=3'],ans:2,
+   fb:'size = (rear - front + MAX) % MAX = (5-2+6)%6 = 9%6 = 3. +MAX는 음수 방지용!'},
+  {q:'MAX=6, front=4, rear=2일 때 size는?',
+   opts:['2','4','(2-4+6)%6=4','6'],ans:2,
+   fb:'(2-4+6)%6 = 4%6 = 4! front > rear인 경우에도 +MAX로 정확히 계산돼.'},
+  {q:'원형 큐에서 MAX=6개 배열로 저장할 수 있는 최대 원소 수는?',
+   opts:['6','5','4','MAX'],ans:1,
+   fb:'한 칸(front 슬롯)을 비워둬야 isEmpty와 isFull을 구별할 수 있어. MAX-1 = 5개!'},
+  {q:'enqueue 후 rear 값 변화는? (MAX=6, 현재 rear=5)',
+   opts:['6','0 (순환!)','5','-1'],ans:1,
+   fb:'(5+1)%6 = 0! 배열 끝에서 처음으로 순환해. 이게 원형 큐의 핵심이야!'},
+  {q:'dequeue에서 반환하는 값은 queue[front]일까, queue[(front+1)%MAX]일까?',
+   opts:['queue[front]','queue[(front+1)%MAX]','queue[rear]','queue[0]'],ans:1,
+   fb:'front는 항상 빈 슬롯(센티널)! dequeue 시 front를 이동한 후 queue[front] 반환. 즉 이동 전 기준으로는 (front+1)%MAX 위치야.'},
+  {q:'선형 큐 vs 원형 큐의 가장 큰 차이점은?',
+   opts:['저장 가능한 원소 수','공간 낭비 해결 여부','연산 속도','메모리 사용량'],ans:1,
+   fb:'선형 큐는 dequeue 후 앞 공간이 낭비돼. 원형 큐는 % 연산으로 앞 공간을 재사용해서 낭비를 없애!'},
+  {q:'MAX=6, front=3, rear=3일 때 상태는?',
+   opts:['꽉 찬 큐','빈 큐','원소 3개','오류'],ans:1,
+   fb:'front == rear → 빈 큐! front=3, rear=3이면 아무 데이터도 없는 빈 상태야.'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans)document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplbl').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ═══════════════════════════════════════════
+   CHALLENGES
+═══════════════════════════════════════════ */
+const CHS=[
+{title:'도전 1 — 원형 큐 완성하기',
+ tags:['ttl:정올 필수','tsk:실버'],
+ desc:'빈칸을 채워서 원형 큐를 완성해봐!<br><br><strong>입력:</strong> <code>6 / enqueue 1 / enqueue 2 / enqueue 3 / front / dequeue / size</code><br><strong>출력:</strong> <code style="color:var(--tl);">1<br>1<br>2</code>',
+ hint:'enqueue: rear=(rear+1)%MAX; queue[rear]=x; / dequeue: front=(front+1)%MAX; return queue[front]; / peek: return queue[(front+1)%MAX]; / isEmpty: front==rear / isFull: (rear+1)%MAX==front',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 100001
+
+int queue[MAX];
+int front = 0, rear = 0;
+
+int isEmpty() { return front == rear; }
+int isFull()  { return /* TODO: (rear+1)%MAX==front */; }
+int size()    { return (rear - front + MAX) % MAX; }
+
+void enqueue(int x) {
+    if (isFull()) { printf("Full!\\n"); return; }
+    // TODO: rear를 순환 이동 후 저장
+    
+    
+}
+
+int dequeue() {
+    if (isEmpty()) { printf("Empty!\\n"); return -1; }
+    // TODO: front를 순환 이동 후 반환
+    
+    
+}
+
+int peek() {
+    if (isEmpty()) return -1;
+    // TODO: front 다음 위치의 값 반환
+    
+}
+
+int main() {
+    int q; scanf("%d", &q);
+    while (q--) {
+        char op[20]; scanf("%s", op);
+        if (!strcmp(op,"enqueue")){ int x;scanf("%d",&x);enqueue(x); }
+        else if(!strcmp(op,"dequeue")) printf("%d\\n",dequeue());
+        else if(!strcmp(op,"front"))   printf("%d\\n",peek());
+        else if(!strcmp(op,"size"))    printf("%d\\n",size());
+        else if(!strcmp(op,"empty"))   printf("%d\\n",isEmpty());
+    }
+    return 0;
+}`},
+{title:'도전 2 — 원형 큐로 BFS 구현',
+ tags:['ttl:중급','tbl:BFS'],
+ desc:'원형 큐를 이용해서 1D 배열에서 BFS로 최단 이동 거리를 구해봐!<br>(X에서 K까지, +1/-1/×2 이동)<br><br><strong>입력:</strong> <code>5 17</code><br><strong>출력:</strong> <code style="color:var(--tl);">4</code>',
+ hint:'시작점 X를 enqueue, dist[X]=0. BFS: dequeue → 3가지 이동(x-1,x+1,x*2) → 미방문이면 enqueue+dist 기록. K에 도달하면 dist[K] 출력.',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 200001
+#define CQ_MAX 200002
+
+int dist[MAX];
+int cq[CQ_MAX];
+int front = 0, rear = 0;
+
+int isEmpty() { return front == rear; }
+int isFull()  { return (rear+1)%CQ_MAX==front; }
+void enqueue(int x){ if(!isFull()){ rear=(rear+1)%CQ_MAX; cq[rear]=x; } }
+int  dequeue()     { if(isEmpty()) return -1; front=(front+1)%CQ_MAX; return cq[front]; }
+
+int main(){
+    int N, K;
+    scanf("%d %d", &N, &K);
+    
+    memset(dist, -1, sizeof(dist));
+    dist[N] = 0;
+    enqueue(N);
+    
+    while (!isEmpty()) {
+        int x = dequeue();
+        if (x == K) break;
+        
+        // TODO: 3가지 이동 시도 (x-1, x+1, x*2)
+        // 조건: 0 <= nx < MAX && dist[nx] == -1
+        int moves[3] = {x-1, x+1, x*2};
+        for (int i = 0; i < 3; i++) {
+            int nx = moves[i];
+            // TODO: 범위 체크 후 미방문이면 enqueue, dist 설정
+            
+        }
+    }
+    
+    printf("%d\\n", dist[K]);
+    return 0;
+}`},
+{title:'도전 3 — 원형 큐 크기 계산 문제',
+ tags:['ttl:기초','tgd:연습'],
+ desc:'다음 연산 순서 후 큐의 상태를 직접 계산해봐!<br><br>MAX=8, front=0, rear=0부터 시작<br>연산: enqueue(1~5) → dequeue 3번 → enqueue(6~9)<br><br><strong>최종 front, rear, size를 출력해봐!</strong>',
+ hint:'각 enqueue: rear=(rear+1)%8. 각 dequeue: front=(front+1)%8. size=(rear-front+8)%8. 직접 종이에 써보고 코드로 검증!',
+ start:`#include <stdio.h>
+#define MAX 8
+#define CQ_MAX 8
+
+int queue[CQ_MAX];
+int front = 0, rear = 0;
+
+int isEmpty() { return front == rear; }
+int isFull()  { return (rear+1)%CQ_MAX==front; }
+int cqSize()  { return (rear-front+CQ_MAX)%CQ_MAX; }
+void enqueue(int x){ if(!isFull()){ rear=(rear+1)%CQ_MAX; queue[rear]=x; } }
+int  dequeue()     { if(isEmpty()) return -1; front=(front+1)%CQ_MAX; return queue[front]; }
+
+int main(){
+    // enqueue 1~5
+    for(int i=1;i<=5;i++) enqueue(i);
+    printf("enqueue 5개 후: front=%d, rear=%d, size=%d\\n",front,rear,cqSize());
+    
+    // dequeue 3번
+    for(int i=0;i<3;i++){
+        int v=dequeue();
+        printf("dequeue: %d\\n",v);
+    }
+    printf("dequeue 3번 후: front=%d, rear=%d, size=%d\\n",front,rear,cqSize());
+    
+    // enqueue 6~9
+    for(int i=6;i<=9;i++) enqueue(i);
+    printf("enqueue 4개 후: front=%d, rear=%d, size=%d\\n",front,rear,cqSize());
+    
+    // TODO: isFull인지 확인해봐!
+    printf("isFull? %d\\n", (rear+1)%CQ_MAX==front);
+    
+    return 0;
+}`}
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="27" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+
+  if(ci===0){
+    const hasFull  = /\(rear\+1\)\s*%\s*MAX\s*==\s*front/.test(code)||/\(rear\+1\)%MAX==front/.test(code);
+    const hasEnq   = /rear\s*=\s*\(rear\s*\+\s*1\)\s*%\s*MAX/.test(code)||/rear=\(rear\+1\)%MAX/.test(code);
+    const hasEnqSt = code.includes('queue[rear]=x') || code.includes('queue[rear] = x');
+    const hasDeq   = /front\s*=\s*\(front\s*\+\s*1\)\s*%\s*MAX/.test(code)||/front=\(front\+1\)%MAX/.test(code);
+    const hasDeqRet= code.includes('return queue[front]');
+    const hasPeek  = /queue\[\s*\(front\s*\+\s*1\)\s*%\s*MAX\s*\]/.test(code)||/queue\[\(front\+1\)%MAX\]/.test(code);
+    if(!hasFull){r+='❌ isFull: (rear+1)%MAX==front 조건이 없어!\n';ok=false;}
+    else if(!hasEnq){r+='❌ enqueue: rear=(rear+1)%MAX 이동이 없어!\n';ok=false;}
+    else if(!hasEnqSt){r+='❌ enqueue: queue[rear]=x 저장이 없어!\n';ok=false;}
+    else if(!hasDeq){r+='❌ dequeue: front=(front+1)%MAX 이동이 없어!\n';ok=false;}
+    else if(!hasDeqRet){r+='❌ dequeue: return queue[front] 반환이 없어!\n';ok=false;}
+    else if(!hasPeek){r+='❌ peek: queue[(front+1)%MAX] 반환이 없어!\n';ok=false;}
+    if(ok) r=`✅ 원형 큐 완성!
+
+isFull:   (rear+1)%MAX==front    ✓
+enqueue:  rear=(rear+1)%MAX      ✓
+          queue[rear]=x          ✓
+dequeue:  front=(front+1)%MAX   ✓
+          return queue[front]    ✓
+peek:     queue[(front+1)%MAX]  ✓
+
+시뮬 [enqueue 1,2,3 → front → dequeue → size]:
+enqueue(1): rear=1, queue[1]=1
+enqueue(2): rear=2, queue[2]=2
+enqueue(3): rear=3, queue[3]=3
+front() → queue[(0+1)%MAX] = queue[1] = 1 ✓
+dequeue(): front=1, return queue[1]=1 ✓
+size() = (3-1+MAX)%MAX = 2 ✓
+
+출력: 1 / 1 / 2 ✓`;
+  } else if(ci===1){
+    const hasBFS   = code.includes('while')&&code.includes('isEmpty')&&code.includes('dequeue');
+    const hasMoves = code.includes('x-1')&&code.includes('x+1')&&(code.includes('x*2')||code.includes('2*x'));
+    const hasDist  = code.includes('dist[nx]')&&code.includes('-1');
+    const hasEnqDist = code.includes('enqueue(nx)')&&code.includes('dist[nx]');
+    if(!hasBFS){r+='❌ BFS while 루프(큐가 빌 때까지)가 없어!\n';ok=false;}
+    else if(!hasMoves){r+='❌ 3가지 이동(x-1, x+1, x*2) 모두 처리해야 해!\n';ok=false;}
+    else if(!hasDist){r+='❌ dist[nx]==-1 미방문 체크가 없어!\n';ok=false;}
+    else if(!hasEnqDist){r+='❌ enqueue(nx)와 dist[nx] 설정이 필요해!\n';ok=false;}
+    if(ok) r=`✅ 원형 큐 BFS 완성!
+
+while 루프:    ✓
+3가지 이동:    ✓
+미방문 체크:   ✓
+enqueue+dist: ✓
+
+입력 5→17 시뮬:
+dist[5]=0, enq(5)
+deq(5): try 4,6,10
+dist[4]=1,dist[6]=1,dist[10]=1, enq 3개
+deq(4): try 3,5(방문),8
+deq(6): try 5(방문),7,12
+deq(10): try 9,11,20
+deq(3)...
+deq(8): try 7(있음?),9(있음?),16
+deq(12): ...
+deq(9): try 8,10(방문),18
+...경로: 5→10→9→18→17 또는 유사, dist[17]=4
+출력: 4 ✓`;
+  } else {
+    const hasFor   = code.includes('for')&&(code.includes('i=1;i<=5')||code.includes('i<=5'));
+    const hasDeq3  = code.includes('i<3')||code.includes('i<=3');
+    const hasFinal = code.includes('isFull')||(code.includes('rear+1')&&code.includes('front'));
+    if(!hasFor){r+='❌ enqueue 1~5 for 루프가 없어!\n';ok=false;}
+    else if(!hasDeq3){r+='❌ dequeue 3번 반복이 없어!\n';ok=false;}
+    if(ok) r=`✅ 원형 큐 상태 계산 완성!
+
+enqueue 5개, dequeue 3번, enqueue 4개 시뮬:
+
+enqueue 5개 후:
+rear=(0+1)%8=1, ..., rear=5
+front=0, rear=5, size=5
+
+dequeue 3번:
+deq→front=1→ret 1
+deq→front=2→ret 2
+deq→front=3→ret 3
+front=3, rear=5, size=2
+
+enqueue 6~9:
+rear=6→7→0→1 (순환!)
+front=3, rear=1, size=(1-3+8)%8=6
+
+isFull? (1+1)%8=2 ≠ 3=front → false
+아직 한 칸 남음! MAX-1=7개 저장 가능, 현재 6개.
+
+직접 실행해서 확인해봐! ✓`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+
+/* init */
+simReset();
+</script>
+</body>
+</html>

@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>최솟값 스택(Min Stack) 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --bg:#f3f6fb; --wh:#ffffff; --s1:#edf1f9; --s2:#e1e8f5;
+  --bd:#ccd4ea; --bd2:#b3bedc;
+  --t1:#0f1627; --t2:#233060; --t3:#586292; --t4:#9aa2c6;
+
+  /* Main: Deep blue stack */
+  --blu:  #1d4ed8; --blu-l:#dbeafe; --blu-m:#93c5fd;
+  /* Min highlight: vivid orange-red */
+  --min:  #dc2626; --min-l:#fee2e2; --min-m:#fca5a5;
+  /* Push accent: emerald */
+  --em:   #059669; --em-l:#d1fae5; --em-m:#6ee7b7;
+  /* Pop accent: amber */
+  --amb:  #d97706; --amb-l:#fef3c7; --amb-m:#fcd34d;
+  /* Aux min stack: violet */
+  --vio:  #7c3aed; --vio-l:#ede9fe; --vio-m:#c4b5fd;
+  /* Info: slate */
+  --sl:   #475569; --sl-l:#f1f5f9; --sl-m:#cbd5e1;
+
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px; --r2:16px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* HEADER */
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-accent{width:10px;flex-shrink:0;
+  background:repeating-linear-gradient(135deg,var(--blu) 0,var(--blu) 8px,var(--min) 8px,var(--min) 16px);}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 28px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.05em;}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.hdr-b1{background:var(--blu-l);color:var(--blu);border:1.5px solid var(--blu-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.hdr-b2{background:var(--min-l);color:var(--min);border:1.5px solid var(--min-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* NAV */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--blu);border-bottom-color:var(--blu);font-weight:700;}
+
+/* PAGES */
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* TYPE */
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--blu);}
+
+/* CALLOUT */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cblu{background:var(--blu-l);color:var(--t2);border-color:var(--blu);}
+.cmin{background:var(--min-l);color:var(--t2);border-color:var(--min);}
+.cem{background:var(--em-l);color:var(--t2);border-color:var(--em);}
+.camb{background:var(--amb-l);color:var(--t2);border-color:var(--amb);}
+.cvio{background:var(--vio-l);color:var(--t2);border-color:var(--vio);}
+.csl{background:var(--sl-l);color:var(--t2);border-color:var(--sl);}
+
+/* CARD */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+/* STEP BAR */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;}
+.sbt{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.on{background:var(--blu-l);color:var(--blu);font-weight:700;}
+.sbt.dn{background:var(--em-l);color:var(--em);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* CODE */
+.cw{background:#12192c;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #1a2340;}
+.cbr{background:#17203a;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#5c72b8;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a2340;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.1;color:#c6d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#334060;font-style:italic;}.st{color:#86efac;}
+.hblu{background:rgba(29,78,216,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #60a5fa;}
+.hmin{background:rgba(220,38,38,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #f87171;}
+.hvio{background:rgba(124,58,237,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #a78bfa;}
+.hem{background:rgba(5,150,105,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+
+/* TAGS */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.tblu{background:var(--blu-l);color:var(--blu);border:1px solid var(--blu-m);}
+.tmin{background:var(--min-l);color:var(--min);border:1px solid var(--min-m);}
+.tem{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.tamb{background:var(--amb-l);color:var(--amb);border:1px solid var(--amb-m);}
+.tvio{background:var(--vio-l);color:var(--vio);border:1px solid var(--vio-m);}
+.tsl{background:var(--sl-l);color:var(--sl);border:1px solid var(--sl-m);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ══════════ DUAL STACK VISUAL ══════════ */
+.dual-vis{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+@media(max-width:600px){.dual-vis{grid-template-columns:1fr;}}
+
+.stack-vis-box{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px;}
+.svb-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.svb-dot{width:13px;height:13px;border-radius:50%;}
+
+.stack-col{
+  display:flex;flex-direction:column-reverse;gap:5px;
+  min-height:240px;background:var(--s1);
+  border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:10px;position:relative;margin-bottom:10px;
+}
+.stack-col::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 var(--r) var(--r);}
+.col-main::after{background:var(--blu);}
+.col-min::after{background:var(--vio);}
+
+.cell{
+  padding:9px 14px;border-radius:8px;font-family:var(--mono);
+  font-size:15px;font-weight:700;text-align:center;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.cell-main{background:var(--wh);border:1.5px solid var(--bd2);color:var(--t2);}
+.cell-main.is-top{background:var(--blu-l);border-color:var(--blu);color:var(--blu);}
+.cell-main.is-min{background:var(--min-l);border-color:var(--min);color:var(--min);}
+.cell-main.is-top-min{background:linear-gradient(135deg,var(--min-l),var(--blu-l));border-color:var(--min);color:var(--min);}
+.cell-main.is-min::after{content:'★';position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--min);}
+
+.cell-vio{background:var(--vio-l);border:1.5px solid var(--vio-m);color:var(--vio);}
+.cell-vio.is-vtop{box-shadow:0 0 0 2px var(--vio);}
+
+.cell-in{animation:cellIn .35s cubic-bezier(.34,1.56,.64,1);}
+.cell-out{animation:cellOut .28s ease forwards;}
+@keyframes cellIn{from{opacity:0;transform:scale(.72)translateY(12px);}to{opacity:1;transform:none;}}
+@keyframes cellOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.65)translateX(18px);}}
+
+.stk-empty{color:var(--t4);font-size:13px;text-align:center;padding:22px 0;}
+
+/* Bottom info row */
+.info-row{display:flex;gap:8px;flex-wrap:wrap;}
+.info-pill{background:var(--s1);border:1.5px solid var(--bd);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.info-pill span{font-weight:700;}
+
+/* Log */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:150px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.95;}
+.lpush{color:var(--em);font-weight:600;}
+.lpop{color:var(--amb);font-weight:600;}
+.lmin{color:var(--min);font-weight:600;}
+.lvio{color:var(--vio);font-weight:600;}
+.linfo{color:var(--t4);}
+
+/* Controls */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;}
+.btn{padding:10px 20px;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.btn:disabled{opacity:.38;cursor:default;}
+.bpush{background:var(--em);color:#fff;border-color:var(--em);}      .bpush:hover:not(:disabled){background:#047857;}
+.bpop{background:var(--amb);color:#fff;border-color:var(--amb);}     .bpop:hover:not(:disabled){background:#b45309;}
+.bmin{background:var(--min-l);color:var(--min);border-color:var(--min-m);}.bmin:hover:not(:disabled){background:var(--min);color:#fff;}
+.bpeek{background:var(--blu-l);color:var(--blu);border-color:var(--blu-m);}.bpeek:hover:not(:disabled){background:var(--blu);color:#fff;}
+.breset{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.breset:hover{border-color:var(--t2);}
+.bauto{background:var(--vio-l);color:var(--vio);border-color:var(--vio-m);}.bauto:hover{background:var(--vio);color:#fff;}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;width:80px;}
+.inp:focus{border-color:var(--blu);}
+
+/* Progress */
+.prog-wrap{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--blu),var(--vio));border-radius:3px;transition:width .4s;}
+.prog-lbl{font-size:13px;color:var(--t3);margin-bottom:5px;}
+
+/* TRACE TABLE */
+.trace-tbl{overflow-x:auto;margin-bottom:18px;}
+.trace-tbl table{min-width:560px;font-family:var(--mono);font-size:14px;}
+.trace-tbl td,th{padding:9px 12px;}
+.tc-op{color:var(--blu);font-weight:700;}
+.tc-push{color:var(--em);}.tc-pop{color:var(--amb);}
+.tc-min{color:var(--min);font-weight:700;}
+.tc-stk{color:var(--t2);}
+.tc-yes{color:var(--min);font-weight:700;}
+
+/* METHOD TABS */
+.mtab-btns{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.mtab{padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.mtab:hover{border-color:var(--blu);color:var(--blu);}
+.mtab.on{background:var(--blu-l);border-color:var(--blu);color:var(--blu);}
+.mcontent{display:none;}.mcontent.on{display:block;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--blu);color:var(--blu);background:var(--blu-l);}
+.qopt.correct{background:var(--em-l);border-color:var(--em);color:var(--em);}
+.qopt.wrong{background:var(--min-l);border-color:var(--min);color:var(--min);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.qfb.bad{background:var(--min-l);color:var(--min);border:1px solid var(--min-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--blu);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:linear-gradient(90deg,var(--blu),var(--min));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#12192c;border:1.5px solid #1a2340;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c6d4f5;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--blu);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--blu);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:#1338a8;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--em);}.oe{color:var(--min);}
+.ht{font-size:14px;color:var(--vio);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--amb-l);border-radius:var(--r);font-size:14px;color:var(--amb);border:1px solid var(--amb-m);line-height:1.7;}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-accent"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">최솟값 스택 (Min Stack)</span>
+    <span class="hdr-b1">O(1) push/pop</span>
+    <span class="hdr-b2">O(1) getMin</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on"  onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"     onclick="goPage('method')">💡 구현 방법</div>
+  <div class="nt"     onclick="goPage('code')">💻 코드 단계</div>
+  <div class="nt"     onclick="goPage('sim')">🎮 시뮬레이터</div>
+  <div class="nt"     onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"     onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════════════════════════
+     PAGE 1: 개념
+═══════════════════════════════ -->
+<div class="pg on" id="page-concept">
+  <h2>최솟값 스택 (Min Stack)</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 심화 | push, pop, peek, getMin 모두 O(1)!</p>
+
+  <div class="co cblu">
+    <strong>문제 정의</strong><br>
+    일반 스택의 push / pop / peek 기능에 더해,<br>
+    <strong>현재 스택에 들어있는 원소 중 최솟값을 O(1)에 반환</strong>하는 <code>getMin()</code>을 지원하는 스택을 구현하라.
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;">왜 어려울까? — 순진한 시도의 문제점</h3>
+    <div class="card2" style="margin-bottom:0;">
+      <div>
+        <div class="co cmin" style="margin-bottom:10px;">
+          <strong>❌ 매번 전체 탐색? → O(n)</strong><br>
+          getMin() 호출 때마다 스택 전체를 뒤져서 최솟값을 찾으면 O(n)이야.<br>
+          push/pop이 자주 일어나면 너무 느려!
+        </div>
+        <div style="font-family:var(--mono);font-size:13px;background:var(--s1);padding:12px;border-radius:var(--r);color:var(--t2);line-height:1.9;">
+          스택: [5, 3, 8, 1, 6]<br>
+          getMin() → 1~5 전부 탐색 → O(n) ❌
+        </div>
+      </div>
+      <div>
+        <div class="co cem" style="margin-bottom:10px;">
+          <strong>✅ 보조 스택으로 추적 → O(1)</strong><br>
+          메인 스택과 같이 최솟값을 추적하는<br>
+          <strong>보조 min 스택</strong>을 관리하면 O(1)로 해결!
+        </div>
+        <div style="font-family:var(--mono);font-size:13px;background:var(--s1);padding:12px;border-radius:var(--r);color:var(--t2);line-height:1.9;">
+          메인: [5, 3, 8, 1, 6]<br>
+          min:  [5, 3, 3, 1, 1]<br>
+          getMin() → min.top() = 1 ✅
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>연산 복잡도 목표</h3>
+      <table style="margin-bottom:0;">
+        <tr><th>연산</th><th>목표</th><th>의미</th></tr>
+        <tr><td style="font-family:var(--mono);color:var(--em);font-weight:700;">push(x)</td>
+            <td><span class="tag tem">O(1)</span></td><td>원소 삽입</td></tr>
+        <tr><td style="font-family:var(--mono);color:var(--amb);font-weight:700;">pop()</td>
+            <td><span class="tag tamb">O(1)</span></td><td>top 원소 제거</td></tr>
+        <tr><td style="font-family:var(--mono);color:var(--blu);font-weight:700;">peek()</td>
+            <td><span class="tag tblu">O(1)</span></td><td>top 원소 확인</td></tr>
+        <tr><td style="font-family:var(--mono);color:var(--min);font-weight:700;">getMin()</td>
+            <td><span class="tag tmin">O(1)</span></td><td>현재 최솟값 반환</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>정올 출제 유형</h3>
+      <ul style="padding-left:18px;font-size:15px;color:var(--t2);line-height:2.3;">
+        <li>스택 연산 중 최솟값 실시간 추적</li>
+        <li>슬라이딩 윈도우 최솟값 (덱 응용)</li>
+        <li>구간 최솟값 쿼리 (세그먼트 트리 응용)</li>
+        <li>히스토그램 최대 직사각형</li>
+        <li>수열 최솟값 유지 문제</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Live concept animation -->
+  <div class="card">
+    <h3 style="margin-bottom:16px;">동작 예시 추적 — push(5,3,8,1,6) → pop() → getMin()</h3>
+    <div class="trace-tbl">
+      <table>
+        <tr>
+          <th>연산</th>
+          <th>메인 스택 (↑top)</th>
+          <th>min 스택 (↑top)</th>
+          <th style="color:var(--min);">getMin()</th>
+          <th>설명</th>
+        </tr>
+        <tr><td class="tc-op tc-push">push(5)</td><td class="tc-stk">[5]</td><td class="tc-stk">[5]</td><td class="tc-min">5</td><td>첫 원소 → 둘 다 5</td></tr>
+        <tr><td class="tc-op tc-push">push(3)</td><td class="tc-stk">[5, 3]</td><td class="tc-stk">[5, 3]</td><td class="tc-min">3</td><td>3 &lt; 5 → min에도 push(3)</td></tr>
+        <tr><td class="tc-op tc-push">push(8)</td><td class="tc-stk">[5, 3, 8]</td><td class="tc-stk">[5, 3, 3]</td><td class="tc-min">3</td><td>8 &gt; 현재min(3) → min에 3 다시</td></tr>
+        <tr><td class="tc-op tc-push">push(1)</td><td class="tc-stk">[5, 3, 8, 1]</td><td class="tc-stk">[5, 3, 3, 1]</td><td class="tc-min tc-yes">1</td><td>1 &lt; 3 → min에 push(1)</td></tr>
+        <tr><td class="tc-op tc-push">push(6)</td><td class="tc-stk">[5, 3, 8, 1, 6]</td><td class="tc-stk">[5, 3, 3, 1, 1]</td><td class="tc-min tc-yes">1</td><td>6 &gt; 1 → min에 1 다시</td></tr>
+        <tr style="background:var(--amb-l);"><td class="tc-op tc-pop">pop()</td><td class="tc-stk">[5, 3, 8, 1]</td><td class="tc-stk">[5, 3, 3, 1]</td><td class="tc-min tc-yes">1</td><td>6 제거. min도 같이 pop(1→남은건 1)</td></tr>
+        <tr style="background:var(--amb-l);"><td class="tc-op tc-pop">pop()</td><td class="tc-stk">[5, 3, 8]</td><td class="tc-stk">[5, 3, 3]</td><td class="tc-min">3</td><td>1 제거. min의 1도 pop → 다음 min=3!</td></tr>
+      </table>
+    </div>
+    <div class="co camb" style="margin-bottom:0;">
+      <strong>pop()의 핵심</strong>: 메인 스택과 min 스택을 <strong>항상 같이 pop</strong>해야 해. min 스택의 top이 항상 "현재 스택 상태에서의 최솟값"을 나타내거든!
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE 2: 구현 방법 비교
+═══════════════════════════════ -->
+<div class="pg" id="page-method">
+  <h2>구현 방법 3가지</h2>
+  <p class="psub">보조 min 스택 · 차이값 저장 · 쌍 저장 — 장단점을 비교해봐!</p>
+
+  <div class="mtab-btns">
+    <div class="mtab on" id="mt0" onclick="switchMethod(0)">방법 1 — 보조 min 스택</div>
+    <div class="mtab"    id="mt1" onclick="switchMethod(1)">방법 2 — 쌍으로 저장</div>
+    <div class="mtab"    id="mt2" onclick="switchMethod(2)">방법 3 — 차이값 저장</div>
+  </div>
+
+  <div class="mcontent on" id="mc0">
+    <div class="co cvio">
+      <strong>★ 정올 추천 방법!</strong> 두 번째 스택(min 스택)이 각 단계의 최솟값을 기억해.<br>
+      메인 스택과 min 스택의 크기가 항상 같아서 코드가 직관적이야.
+    </div>
+    <div class="card">
+      <h4>push(x) 로직</h4>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;background:var(--s1);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:14px;line-height:2.2;">
+          <div style="color:var(--em);font-weight:700;">① 메인 스택에 x push</div>
+          <div>main[++mTop] = x</div>
+          <div style="color:var(--vio);font-weight:700;margin-top:8px;">② min 스택에 push</div>
+          <div>if (x &lt;= minTop의 값)<br>&nbsp;&nbsp;min[++minTop] = x<br>else<br>&nbsp;&nbsp;min[++minTop] = min[minTop-1]</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:var(--s1);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:14px;line-height:2.2;">
+          <div style="color:var(--amb);font-weight:700;">pop() 로직</div>
+          <div>① 메인 스택 pop</div>
+          <div>② min 스택 pop (동시에!)</div>
+          <div style="margin-top:8px;color:var(--min);font-weight:700;">getMin() 로직</div>
+          <div>return min[minTop]<br><span style="color:var(--t4);">(min 스택 top이 항상 현재 최솟값)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card2">
+      <div>
+        <h4 style="color:var(--em);">장점</h4>
+        <ul style="padding-left:18px;font-size:15px;color:var(--t2);line-height:2.2;">
+          <li>코드가 직관적이고 이해하기 쉬움</li>
+          <li>음수, 중복 값 모두 정확하게 처리</li>
+          <li>pop할 때 실수 없음</li>
+          <li>정올 시험장에서 안전한 선택</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:var(--min);">단점</h4>
+        <ul style="padding-left:18px;font-size:15px;color:var(--t2);line-height:2.2;">
+          <li>메모리 2배 사용 (min 스택 추가)</li>
+          <li>push마다 min 스택도 갱신해야 함</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="mcontent" id="mc1">
+    <div class="co cblu">
+      <strong>구조체(struct)에 값과 최솟값을 쌍으로 저장</strong>하는 방법이야.<br>
+      각 원소마다 그 시점의 최솟값을 함께 저장해서 getMin()이 O(1)이야.
+    </div>
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>method2_pair.c</span></div>
+<pre><span class="kw">typedef struct</span> {
+<span class="hblu">    <span class="tp">int</span> val;     <span class="cm">// 실제 값</span></span>
+<span class="hvio">    <span class="tp">int</span> curMin;  <span class="cm">// 이 원소가 push될 때의 스택 최솟값</span></span>
+} Node;
+
+Node stk[<span class="nm">MAX</span>];
+<span class="tp">int</span> top = <span class="nm">-1</span>;
+
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+    <span class="tp">int</span> newMin = (top == <span class="nm">-1</span>) ? x :
+                 (x &lt; stk[top].curMin ? x : stk[top].curMin);
+<span class="hblu">    stk[++top] = (Node){x, newMin};</span>
+}
+
+<span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> stk[top].curMin; } <span class="cm">// O(1)!</span>
+<span class="tp">int</span> <span class="fn">pop</span>()    { <span class="kw">return</span> stk[top--].val; }
+<span class="tp">int</span> <span class="fn">peek</span>()   { <span class="kw">return</span> stk[top].val; }
+</pre></div>
+    <div class="card2" style="margin-bottom:0;">
+      <div>
+        <h4 style="color:var(--em);">장점</h4>
+        <ul style="padding-left:18px;font-size:15px;color:var(--t2);line-height:2.2;">
+          <li>스택 하나로 구현 (구조체 활용)</li>
+          <li>코드 흐름이 단순함</li>
+          <li>C언어 struct 학습에 좋음</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:var(--min);">단점</h4>
+        <ul style="padding-left:18px;font-size:15px;color:var(--t2);line-height:2.2;">
+          <li>메모리 2배 (val + curMin 쌍)</li>
+          <li>C언어에서 구조체 문법 필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="mcontent" id="mc2">
+    <div class="co camb">
+      <strong>차이값(diff)을 저장해서 메모리를 절약</strong>하는 고급 방법이야.<br>
+      실제 값 대신 <code>x - currentMin</code>을 저장해서 min 변화를 추적해. 정올 고급 문제용이야.
+    </div>
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>method3_diff.c — 차이값 기법 (고급)</span></div>
+<pre><span class="cm">// 핵심: stk에 (x - 이전최솟값)을 저장
+// min 변수 하나만 따로 관리</span>
+<span class="tp">long long</span> stk[<span class="nm">MAX</span>];  <span class="cm">// 차이값 저장 (long long 필요!)</span>
+<span class="tp">int</span> top = <span class="nm">-1</span>;
+<span class="tp">int</span> curMin;
+
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (top == <span class="nm">-1</span>) { curMin = x; stk[++top] = <span class="nm">0</span>; <span class="kw">return</span>; }
+<span class="hblu">    <span class="tp">long long</span> diff = (<span class="tp">long long</span>)x - curMin; <span class="cm">// 차이 저장</span></span>
+    stk[++top] = diff;
+    <span class="kw">if</span> (x &lt; curMin) curMin = x;              <span class="cm">// min 갱신</span>
+}
+
+<span class="tp">int</span> <span class="fn">pop</span>() {
+    <span class="tp">long long</span> diff = stk[top--];
+    <span class="tp">int</span> val;
+    <span class="kw">if</span> (diff &lt; <span class="nm">0</span>) {                          <span class="cm">// diff<0이면 이 원소가 그때 min이었음</span>
+        val = curMin;
+<span class="hvio">        curMin -= diff;  <span class="cm">// 이전 min 복원: curMin = curMin - diff = 이전min</span></span>
+    } <span class="kw">else</span> {
+        val = curMin + diff;
+    }
+    <span class="kw">return</span> val;
+}
+
+<span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> curMin; }
+</pre></div>
+    <div class="co cmin" style="margin-bottom:0;">
+      <strong>주의</strong>: 이 방법은 오버플로우 방지를 위해 <code>long long</code>이 필요하고, 복원 로직이 복잡해.<br>
+      정올 시험장에서는 <strong>방법 1(보조 min 스택)</strong>을 쓰는 게 안전해!
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE 3: 코드 단계
+═══════════════════════════════ -->
+<div class="pg" id="page-code">
+  <h2>코드 단계별 이해</h2>
+  <p class="psub">보조 min 스택 방법을 6단계로 완전 분해!</p>
+
+  <div class="sbar" id="sbar-code">
+    <div class="sbt on"  onclick="goStep(0)"><span class="snum">01</span>변수 선언</div>
+    <div class="sbt"     onclick="goStep(1)"><span class="snum">02</span>push 구현</div>
+    <div class="sbt"     onclick="goStep(2)"><span class="snum">03</span>pop 구현</div>
+    <div class="sbt"     onclick="goStep(3)"><span class="snum">04</span>getMin</div>
+    <div class="sbt"     onclick="goStep(4)"><span class="snum">05</span>완성 코드</div>
+    <div class="sbt"     onclick="goStep(5)"><span class="snum">06</span>C++ 버전</div>
+  </div>
+  <div id="code-panel"></div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE 4: 시뮬레이터
+═══════════════════════════════ -->
+<div class="pg" id="page-sim">
+  <h2>Min Stack 시뮬레이터</h2>
+  <p class="psub">push / pop 버튼을 눌러 메인 스택과 min 스택이 어떻게 변하는지 직접 봐! ★ = 현재 최솟값</p>
+
+  <div class="dual-vis">
+    <!-- Main stack -->
+    <div class="stack-vis-box">
+      <div class="svb-title">
+        <div class="svb-dot" style="background:var(--blu);"></div>
+        메인 스택
+      </div>
+      <div class="stack-col col-main" id="sim-main">
+        <div class="stk-empty">비어 있음</div>
+      </div>
+      <div class="info-row">
+        <div class="info-pill">top = <span id="s-mtop" style="color:var(--blu);">-1</span></div>
+        <div class="info-pill">size = <span id="s-msize" style="color:var(--blu);">0</span></div>
+        <div class="info-pill">peek = <span id="s-peek" style="color:var(--blu);">-</span></div>
+      </div>
+    </div>
+    <!-- Min stack -->
+    <div class="stack-vis-box">
+      <div class="svb-title">
+        <div class="svb-dot" style="background:var(--vio);"></div>
+        min 보조 스택
+        <span style="font-size:12px;color:var(--t4);font-weight:400;">← top이 현재 최솟값</span>
+      </div>
+      <div class="stack-col col-min" id="sim-min">
+        <div class="stk-empty">비어 있음</div>
+      </div>
+      <div class="info-row">
+        <div class="info-pill">minTop = <span id="s-mintop" style="color:var(--vio);">-1</span></div>
+        <div class="info-pill" style="background:var(--min-l);border-color:var(--min-m);">
+          getMin() = <span id="s-getmin" style="color:var(--min);font-size:16px;font-weight:900;">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="ctrl">
+    <input class="inp" type="number" id="sim-val" value="5" placeholder="값">
+    <button class="btn bpush" onclick="simPush()">push(x)</button>
+    <button class="btn bpop"  onclick="simPop()">pop()</button>
+    <button class="btn bmin"  onclick="simGetMin()">getMin()</button>
+    <button class="btn bpeek" onclick="simPeek()">peek()</button>
+    <button class="btn bauto" onclick="simAuto()">⏩ 시나리오 자동</button>
+    <button class="btn breset" onclick="simReset()">↺ 초기화</button>
+  </div>
+
+  <div class="sl">실행 로그</div>
+  <div class="log" id="sim-log"><span class="linfo">▶ push 버튼을 눌러서 시작!</span></div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE 5: 퀴즈
+═══════════════════════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>Min Stack 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE 6: 도전
+═══════════════════════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">Min Stack을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════
+   PAGE NAV
+════════════════════════════════════════ */
+const PM={concept:0,method:1,code:2,sim:3,quiz:4,challenge:5};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('on',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('on');
+}
+
+/* ════════════════════════════════════════
+   METHOD TABS
+════════════════════════════════════════ */
+function switchMethod(n){
+  [0,1,2].forEach(i=>{
+    document.getElementById('mt'+i).className='mtab'+(i===n?' on':'');
+    document.getElementById('mc'+i).className='mcontent'+(i===n?' on':'');
+  });
+}
+
+/* ════════════════════════════════════════
+   CODE STEPS
+════════════════════════════════════════ */
+const STEPS=[
+{t:'① 변수 선언 — 두 스택 준비',
+ b:`<div class="co cvio">Min Stack은 <strong>메인 스택</strong>과 <strong>min 보조 스택</strong> 두 개의 배열과 두 개의 top 포인터로 구성돼!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="cm">// ── 메인 스택 ──</span>
+<span class="hblu"><span class="tp">int</span> stk[<span class="nm">MAX</span>];      <span class="cm">// 실제 값을 저장</span></span>
+<span class="hblu"><span class="tp">int</span> top = <span class="nm">-1</span>;      <span class="cm">// 메인 top 포인터</span></span>
+
+<span class="cm">// ── min 보조 스택 ──</span>
+<span class="hvio"><span class="tp">int</span> minStk[<span class="nm">MAX</span>];  <span class="cm">// 각 단계의 최솟값을 저장</span></span>
+<span class="hvio"><span class="tp">int</span> minTop = <span class="nm">-1</span>;  <span class="cm">// min 스택 top 포인터</span></span>
+
+<span class="cm">// 두 스택의 크기는 항상 같아! (push/pop을 항상 쌍으로 수행)</span>
+</pre></div>
+<div class="card"><h4>두 스택의 관계</h4>
+<table style="margin-bottom:0;">
+<tr><th>위치</th><th>메인 스택</th><th>min 스택</th></tr>
+<tr><td>bottom</td><td>stk[0] = 첫 번째 push값</td><td>minStk[0] = 그 시점 min</td></tr>
+<tr><td>i번째</td><td>stk[i] = i번째 push값</td><td>minStk[i] = i번째 push 후의 min</td></tr>
+<tr><td style="color:var(--min);font-weight:700;">top</td><td>stk[top] = 현재 top값</td><td>minStk[minTop] = <strong>현재 최솟값!</strong></td></tr>
+</table></div>`},
+
+{t:'② push(x) — 두 스택 모두 push',
+ b:`<div class="co cblu">push할 때는 <strong>메인 스택에 x를 push</strong>하고, <strong>min 스택에는 min(x, 현재최솟값)</strong>을 push해!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_push.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (top == <span class="nm">MAX</span> - <span class="nm">1</span>) { <span class="fn">printf</span>(<span class="st">"Overflow!\n"</span>); <span class="kw">return</span>; }
+
+    <span class="cm">// ① 메인 스택에 x push</span>
+<span class="hblu">    stk[++top] = x;</span>
+
+    <span class="cm">// ② min 스택에 현재까지의 최솟값 push</span>
+<span class="hvio">    <span class="kw">if</span> (minTop == <span class="nm">-1</span> || x &lt;= minStk[minTop]) {</span>
+<span class="hvio">        minStk[++minTop] = x;           <span class="cm">// 새 값이 최소 → push</span></span>
+<span class="hvio">    } <span class="kw">else</span> {</span>
+<span class="hvio">        minStk[++minTop] = minStk[minTop-<span class="nm">1</span>]; <span class="cm">// 이전 최솟값 유지</span></span>
+<span class="hvio">    }</span>
+}
+</pre></div>
+<div class="card"><h4>push(x) 판단 흐름</h4>
+<div style="display:flex;flex-direction:column;gap:8px;font-size:15px;color:var(--t2);">
+  <div style="padding:10px 14px;background:var(--vio-l);border-radius:var(--r);border:1px solid var(--vio-m);">
+    <strong style="color:var(--vio);">조건</strong>: min 스택이 비어있거나 x ≤ minStk[minTop]<br>
+    → min 스택에 x를 push (새 최솟값 등장!)
+  </div>
+  <div style="padding:10px 14px;background:var(--s1);border-radius:var(--r);border:1px solid var(--bd);">
+    <strong style="color:var(--t3);">조건 아닐 때</strong>: x > 현재 최솟값<br>
+    → min 스택에 이전 최솟값(minStk[minTop-1])을 복사해서 push
+  </div>
+</div></div>`},
+
+{t:'③ pop() — 두 스택 모두 pop',
+ b:`<div class="co camb"><strong>핵심!</strong> 메인 스택과 min 스택을 <strong>항상 같이 pop</strong>해야 해. 이걸 빠뜨리면 min 스택이 틀어져!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_pop.c</span></div>
+<pre><span class="tp">int</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == <span class="nm">-1</span>) {
+        <span class="fn">printf</span>(<span class="st">"Underflow!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+    <span class="cm">// 두 스택 동시에 pop!</span>
+<span class="hblu">    <span class="tp">int</span> val = stk[top--];   <span class="cm">// 메인 스택 pop</span></span>
+<span class="hvio">    minTop--;               <span class="cm">// min 스택도 항상 같이 pop</span></span>
+    <span class="kw">return</span> val;
+}
+
+<span class="cm">// peek: top 확인만 (pop 안 함)</span>
+<span class="tp">int</span> <span class="fn">peek</span>() {
+    <span class="kw">if</span> (top == <span class="nm">-1</span>) <span class="kw">return</span> <span class="nm">-1</span>;
+    <span class="kw">return</span> stk[top];
+}
+
+<span class="cm">// isEmpty</span>
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> top == <span class="nm">-1</span>; }
+</pre></div>
+<div class="co cmin"><strong>pop 시 왜 min 스택도 같이 pop할까?</strong><br>
+예: push(5,3,8) → main=[5,3,8], min=[5,3,3]. pop() 하면 8이 제거돼.<br>
+min 스택도 pop하면 min=[5,3]. 이제 getMin()=3으로 정확해!<br>
+min 스택을 pop 안 하면 min=[5,3,3]이 남아 틀린 값이 나올 수 있어.</div>`},
+
+{t:'④ getMin() — min 스택 top 반환',
+ b:`<div class="co cvio"><strong>이게 전부야!</strong> min 스택의 top이 항상 현재 스택에서의 최솟값이야. 그냥 반환하면 O(1)!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_getmin.c</span></div>
+<pre><span class="cm">// 현재 스택의 최솟값을 O(1)에 반환!</span>
+<span class="tp">int</span> <span class="fn">getMin</span>() {
+    <span class="kw">if</span> (minTop == <span class="nm">-1</span>) {
+        <span class="fn">printf</span>(<span class="st">"Stack Empty!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+<span class="hmin">    <span class="kw">return</span> minStk[minTop];  <span class="cm">// min 스택 top = 현재 최솟값</span></span>
+}
+</pre></div>
+<div class="card"><h4>getMin()이 O(1)인 이유</h4>
+<table style="margin-bottom:0;">
+<tr><th>push 순서</th><th>메인 stk</th><th>min 스택</th><th style="color:var(--min);">getMin()</th></tr>
+<tr><td>push(5)</td><td>[5]</td><td>[5]</td><td style="color:var(--min);font-weight:700;">5</td></tr>
+<tr><td>push(3)</td><td>[5,3]</td><td>[5,3]</td><td style="color:var(--min);font-weight:700;">3</td></tr>
+<tr><td>push(8)</td><td>[5,3,8]</td><td>[5,3,3]</td><td style="color:var(--min);font-weight:700;">3</td></tr>
+<tr><td>push(1)</td><td>[5,3,8,1]</td><td>[5,3,3,1]</td><td style="color:var(--min);font-weight:700;">1</td></tr>
+<tr style="background:var(--amb-l)"><td>pop() → 1</td><td>[5,3,8]</td><td>[5,3,3]</td><td style="color:var(--min);font-weight:700;">3 ✓</td></tr>
+<tr style="background:var(--amb-l)"><td>pop() → 8</td><td>[5,3]</td><td>[5,3]</td><td style="color:var(--min);font-weight:700;">3 ✓</td></tr>
+</table></div>`},
+
+{t:'⑤ 전체 완성 코드',
+ b:`<div class="co cblu">입출력 포함 완전한 Min Stack 구현이야. 정올 스타일로 연산 문자열을 파싱해!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>min_stack_complete.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span> stk[<span class="nm">MAX</span>], top = <span class="nm">-1</span>;
+<span class="tp">int</span> minStk[<span class="nm">MAX</span>], minTop = <span class="nm">-1</span>;
+
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+    stk[++top] = x;
+<span class="hvio">    <span class="tp">int</span> newMin = (minTop == <span class="nm">-1</span> || x &lt; minStk[minTop]) ?</span>
+<span class="hvio">                 x : minStk[minTop];</span>
+<span class="hvio">    minStk[++minTop] = newMin;</span>
+}
+<span class="tp">int</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == <span class="nm">-1</span>) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="hblu">    minTop--; <span class="kw">return</span> stk[top--];</span>
+}
+<span class="hmin"><span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> minTop == <span class="nm">-1</span> ? <span class="nm">-1</span> : minStk[minTop]; }</span>
+<span class="tp">int</span> <span class="fn">peek</span>()   { <span class="kw">return</span> top == <span class="nm">-1</span> ? <span class="nm">-1</span> : stk[top]; }
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> q; <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;q);
+    <span class="kw">while</span> (q--) {
+        <span class="tp">char</span> op[<span class="nm">20</span>]; <span class="fn">scanf</span>(<span class="st">"%s"</span>, op);
+        <span class="kw">if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"push"</span>)) {
+            <span class="tp">int</span> x; <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;x); <span class="fn">push</span>(x);
+        } <span class="kw">else if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"pop"</span>)) {
+            <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="fn">pop</span>());
+        } <span class="kw">else if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"getMin"</span>)) {
+            <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="fn">getMin</span>());
+        } <span class="kw">else if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"peek"</span>)) {
+            <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="fn">peek</span>());
+        }
+    }
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+</pre></div>`},
+
+{t:'⑥ C++ stack 클래스 버전',
+ b:`<div class="co cblu">C++로 구현하면 STL stack을 써서 더 간결하게 만들 수 있어!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>min_stack_cpp.cpp</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stack&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;algorithm&gt;</span>  <span class="cm">// min()</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> MinStack {
+    stack&lt;<span class="tp">int</span>&gt; stk, minStk;
+<span class="kw">public</span>:
+    <span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+<span class="hblu">        stk.<span class="fn">push</span>(x);</span>
+<span class="hvio">        <span class="kw">if</span> (minStk.<span class="fn">empty</span>() || x &lt;= minStk.<span class="fn">top</span>())</span>
+<span class="hvio">            minStk.<span class="fn">push</span>(x);</span>
+<span class="hvio">        <span class="kw">else</span></span>
+<span class="hvio">            minStk.<span class="fn">push</span>(minStk.<span class="fn">top</span>());</span>
+    }
+    <span class="tp">int</span> <span class="fn">pop</span>() {
+        <span class="tp">int</span> v = stk.<span class="fn">top</span>(); stk.<span class="fn">pop</span>();
+<span class="hblu">        minStk.<span class="fn">pop</span>();  <span class="cm">// 같이 pop!</span></span>
+        <span class="kw">return</span> v;
+    }
+<span class="hmin">    <span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> minStk.<span class="fn">top</span>(); }</span>
+    <span class="tp">int</span> <span class="fn">peek</span>()   { <span class="kw">return</span> stk.<span class="fn">top</span>(); }
+    <span class="tp">bool</span> <span class="fn">empty</span>() { <span class="kw">return</span> stk.<span class="fn">empty</span>(); }
+};
+</pre></div>
+<div class="co cem" style="margin-bottom:0;"><strong>C++ 특이사항</strong>: STL <code>stack::pop()</code>은 값을 반환하지 않아! 반드시 <code>top()</code>으로 읽고 <code>pop()</code>으로 제거해야 해.</div>`}
+];
+
+let curStep=0;
+function goStep(n){
+  curStep=n;
+  document.getElementById('code-panel').innerHTML=
+    `<div class="card"><h3>${STEPS[n].t}</h3>${STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-code .sbt').forEach((b,i)=>{
+    b.classList.toggle('on',i===n);
+    b.classList.toggle('dn',i<n);
+  });
+}
+goStep(0);
+
+/* ════════════════════════════════════════
+   SIMULATOR
+════════════════════════════════════════ */
+let simMain=[], simMin=[], autoTimer=null;
+const SIM_MAX=10;
+
+function addLog(msg,cls){
+  const log=document.getElementById('sim-log');
+  const d=document.createElement('div');d.className=cls;d.innerHTML=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderSim(){
+  const mainBox=document.getElementById('sim-main');
+  const minBox=document.getElementById('sim-min');
+  const curMin=simMin.length?simMin[simMin.length-1]:null;
+
+  // Main stack
+  if(!simMain.length){mainBox.innerHTML='<div class="stk-empty">비어 있음</div>';}
+  else{
+    mainBox.innerHTML=simMain.map((v,i)=>{
+      const isTop=i===simMain.length-1;
+      const isMin=v===curMin;
+      let cls='cell cell-main';
+      if(isTop&&isMin) cls+=' is-top-min';
+      else if(isTop)   cls+=' is-top';
+      else if(isMin)   cls+=' is-min';
+      return `<div class="${cls}">${v}</div>`;
+    }).join('');
+  }
+
+  // Min stack
+  if(!simMin.length){minBox.innerHTML='<div class="stk-empty">비어 있음</div>';}
+  else{
+    minBox.innerHTML=simMin.map((v,i)=>{
+      const isTop=i===simMin.length-1;
+      return `<div class="cell cell-vio ${isTop?'is-vtop':''}">${v}</div>`;
+    }).join('');
+  }
+
+  // Stats
+  document.getElementById('s-mtop').textContent   = simMain.length-1;
+  document.getElementById('s-msize').textContent  = simMain.length;
+  document.getElementById('s-peek').textContent   = simMain.length?simMain[simMain.length-1]:'-';
+  document.getElementById('s-mintop').textContent = simMin.length-1;
+  const minEl=document.getElementById('s-getmin');
+  minEl.textContent = simMin.length?simMin[simMin.length-1]:'-';
+  minEl.style.color = simMin.length?'var(--min)':'var(--t4)';
+}
+
+function simPush(){
+  const v=parseInt(document.getElementById('sim-val').value);
+  if(isNaN(v)){addLog('숫자를 입력해줘!','linfo');return;}
+  if(simMain.length>=SIM_MAX){addLog('스택이 가득 찼어! (최대 '+SIM_MAX+'개)','linfo');return;}
+  simMain.push(v);
+  const prevMin=simMin.length?simMin[simMin.length-1]:null;
+  const newMin=(prevMin===null||v<=prevMin)?v:prevMin;
+  simMin.push(newMin);
+  renderSim();
+  // animate new cells
+  setTimeout(()=>{
+    document.querySelectorAll('#sim-main .cell').forEach((c,i)=>{if(i===simMain.length-1)c.classList.add('cell-in');});
+    document.querySelectorAll('#sim-min .cell').forEach((c,i)=>{if(i===simMin.length-1)c.classList.add('cell-in');});
+  },10);
+  const pushed=(v<=( prevMin??Infinity))?'새 최솟값 등장!':'기존 최솟값 유지';
+  addLog(`push(${v}) → 메인 push. min스택 push(${newMin}) [${pushed}]`,'lpush');
+}
+
+function simPop(){
+  if(!simMain.length){addLog('Underflow! 스택이 비어있어.','linfo');return;}
+  const v=simMain.pop();
+  simMin.pop();
+  renderSim();
+  addLog(`pop() → ${v} 반환. min스택도 같이 pop! 현재 min=${simMin.length?simMin[simMin.length-1]:'(없음)'}`,'lpop');
+}
+
+function simGetMin(){
+  if(!simMin.length){addLog('스택이 비어있어!','linfo');return;}
+  const m=simMin[simMin.length-1];
+  // pulse
+  document.querySelectorAll('#sim-min .is-vtop').forEach(c=>{
+    c.style.boxShadow='0 0 0 4px var(--min)';
+    setTimeout(()=>c.style.boxShadow='',700);
+  });
+  addLog(`getMin() → <strong>${m}</strong> (min 스택 top, O(1)!)`,'lmin');
+}
+
+function simPeek(){
+  if(!simMain.length){addLog('스택이 비어있어!','linfo');return;}
+  const v=simMain[simMain.length-1];
+  addLog(`peek() → ${v} (메인 스택 top, 변화 없음)`,'lvio');
+}
+
+function simReset(){
+  clearTimeout(autoTimer);
+  simMain=[]; simMin=[];
+  renderSim();
+  document.getElementById('sim-log').innerHTML='<span class="linfo">↺ 초기화됨!</span>';
+}
+
+function simAuto(){
+  simReset();
+  const scenario=[
+    ()=>{document.getElementById('sim-val').value=5;simPush();},
+    ()=>{document.getElementById('sim-val').value=3;simPush();},
+    ()=>{document.getElementById('sim-val').value=8;simPush();},
+    ()=>{document.getElementById('sim-val').value=1;simPush();},
+    ()=>{document.getElementById('sim-val').value=6;simPush();},
+    ()=>simGetMin(),
+    ()=>simPop(),
+    ()=>simGetMin(),
+    ()=>simPop(),
+    ()=>simPop(),
+    ()=>simGetMin(),
+  ];
+  let idx=0;
+  function tick(){
+    if(idx<scenario.length){ scenario[idx](); idx++; autoTimer=setTimeout(tick,800); }
+  }
+  setTimeout(tick,300);
+}
+
+renderSim();
+
+/* ════════════════════════════════════════
+   QUIZ
+════════════════════════════════════════ */
+const QUIZ=[
+  {q:'Min Stack에서 getMin()의 시간복잡도 목표는?',
+   opts:['O(n)','O(log n)','O(1)','O(n²)'],ans:2,
+   fb:'보조 min 스택의 top을 반환하면 항상 O(1)! 전체 탐색 없이 바로 답이 나와.'},
+  {q:'push(5) push(3) push(8) 후 getMin()은?',
+   opts:['5','3','8','없음'],ans:1,
+   fb:'min 스택: [5, 3, 3]. top=3이 현재 최솟값! 8이 들어와도 min은 여전히 3.'},
+  {q:'push(5,3,8,1) 후 pop() 두 번, 그 다음 getMin()은?',
+   opts:['1','3','5','8'],ans:1,
+   fb:'pop 두 번: 1, 8 제거. 남은 main=[5,3], min=[5,3]. getMin()=3!'},
+  {q:'min 스택에 push할 때 새 값이 현재 최솟값보다 크면?',
+   opts:['push 안 함','현재 최솟값을 다시 push함','오류 발생','새 값을 push함'],ans:1,
+   fb:'새 값이 더 크면 기존 최솟값을 min 스택에 다시 push해서 "이 시점의 최솟값"을 기록해.'},
+  {q:'pop() 시 min 스택도 같이 pop하는 이유는?',
+   opts:['속도 때문','메인·min 스택 크기를 항상 같게 유지하기 위해','메모리 절약','필수 규칙이라서'],ans:1,
+   fb:'두 스택 크기가 같아야 getMin()이 정확해. 메인만 pop하면 min 스택이 틀어져서 getMin()이 잘못된 값을 반환해!'},
+  {q:'push(3,3,3) 후 pop() 한 번, getMin()은?',
+   opts:['에러','0','3','다름'],ans:2,
+   fb:'중복값도 OK! min 스택: [3,3,3]. pop → min=[3,3]. getMin()=3 ✓'},
+  {q:'push(5,3,1) → pop() → pop() → getMin()은?',
+   opts:['1','3','5','에러'],ans:2,
+   fb:'pop 두 번으로 1, 3 제거. main=[5], min=[5]. getMin()=5!'},
+  {q:'보조 min 스택 방법의 단점은?',
+   opts:['getMin이 O(n)','메모리 2배 사용','pop이 느려짐','중복값 처리 불가'],ans:1,
+   fb:'min 스택을 별도로 유지해야 하므로 메모리가 약 2배 필요해. 하지만 정올에서는 크게 문제 없어!'},
+  {q:'push(10,5,15,3,7) 후 min 스택의 상태는?',
+   opts:['[10,5,5,3,3]','[10,5,15,3,7]','[3,3,3,3,3]','[5,5,5,3,3]'],ans:0,
+   fb:'push 순서: 10→min[10], 5→min[5], 15→min[5], 3→min[3], 7→min[3]. 결과: [10,5,5,3,3]'},
+  {q:'isEmpty() 체크는 어떻게 해?',
+   opts:['minTop == 0','top == -1 또는 minTop == -1','top == 0','둘 다 MAX일 때'],ans:1,
+   fb:'메인 스택이 비었으면 min 스택도 비어있어. top == -1 체크만으로 충분! (항상 크기가 같으니까)'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans)document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplbl').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ════════════════════════════════════════
+   CHALLENGES
+════════════════════════════════════════ */
+const CHS=[
+{title:'도전 1 — Min Stack 완성하기 (보조 스택)',
+ tags:['tblu:정올 필수','tem:실버'],
+ desc:'빈칸을 채워서 Min Stack을 완성해봐!<br><br><strong>입력 예시:</strong><br><code>7 / push 5 / push 3 / push 8 / push 1 / getMin / pop / getMin</code><br><strong>출력:</strong> <code style="color:var(--em);">1<br>3</code>',
+ hint:'push: stk[++top]=x; newMin=(minTop==-1||x<minStk[minTop])?x:minStk[minTop]; minStk[++minTop]=newMin; / pop: minTop--; return stk[top--]; / getMin: return minStk[minTop];',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 100001
+
+int stk[MAX], top = -1;
+int minStk[MAX], minTop = -1;
+
+void push(int x) {
+    stk[++top] = x;
+    // TODO: min 스택에 현재까지의 최솟값 push
+    int newMin;
+    if (minTop == -1 || x < minStk[minTop])
+        newMin = /* ??? */;
+    else
+        newMin = /* 이전 최솟값 유지 */;
+    minStk[++minTop] = newMin;
+}
+
+int pop() {
+    if (top == -1) { printf("Empty!\\n"); return -1; }
+    // TODO: min 스택도 같이 pop!
+    
+    return stk[top--];
+}
+
+int getMin() {
+    if (minTop == -1) { printf("Empty!\\n"); return -1; }
+    // TODO: min 스택 top 반환
+    
+}
+
+int peek() { return top == -1 ? -1 : stk[top]; }
+
+int main() {
+    int q; scanf("%d", &q);
+    while (q--) {
+        char op[20]; scanf("%s", op);
+        if (!strcmp(op, "push")) {
+            int x; scanf("%d", &x); push(x);
+        } else if (!strcmp(op, "pop")) {
+            printf("%d\\n", pop());
+        } else if (!strcmp(op, "getMin")) {
+            printf("%d\\n", getMin());
+        } else if (!strcmp(op, "peek")) {
+            printf("%d\\n", peek());
+        }
+    }
+    return 0;
+}`},
+{title:'도전 2 — 쌍(pair) 방식으로 구현',
+ tags:['tblu:중급','tvio:struct 활용'],
+ desc:'구조체(struct)에 값과 현재 최솟값을 함께 저장하는 방식으로 Min Stack을 구현해봐!<br><br><strong>입력:</strong> <code>5 / push 4 / push 2 / push 7 / getMin / pop</code><br><strong>출력:</strong> <code style="color:var(--em);">2<br>7</code>',
+ hint:'typedef struct { int val; int curMin; } Node; / push: curMin = (top==-1)?x:min(x, stk[top].curMin); stk[++top]=(Node){x,curMin}; / getMin: return stk[top].curMin;',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 100001
+
+// TODO: 구조체 정의 (val + curMin)
+typedef struct {
+    int val;
+    int curMin;
+} Node;
+
+Node stk[MAX];
+int top = -1;
+
+void push(int x) {
+    // TODO: 현재까지의 최솟값 계산 후 (x, curMin) 쌍으로 push
+    int curMin;
+    if (top == -1)
+        curMin = x;
+    else
+        curMin = (x < stk[top].curMin) ? x : stk[top].curMin;
+    // stk[++top] = (Node){ /* ??? */ };
+    
+}
+
+int pop() {
+    if (top == -1) { printf("Empty!\\n"); return -1; }
+    // TODO: val 반환하고 top 감소
+    
+}
+
+int getMin() {
+    if (top == -1) { printf("Empty!\\n"); return -1; }
+    // TODO: curMin 반환
+    
+}
+
+int main() {
+    int q; scanf("%d", &q);
+    while (q--) {
+        char op[20]; scanf("%s", op);
+        if (!strcmp(op, "push")) {
+            int x; scanf("%d", &x); push(x);
+        } else if (!strcmp(op, "pop")) {
+            printf("%d\\n", pop());
+        } else if (!strcmp(op, "getMin")) {
+            printf("%d\\n", getMin());
+        }
+    }
+    return 0;
+}`},
+{title:'도전 3 — Min Stack으로 구간 최솟값 쿼리',
+ tags:['tmin:고급','tblu:골드 입문'],
+ desc:'Min Stack을 응용해서 배열의 특정 구간 [l, r]의 최솟값을 구해봐!<br>각 push 시 현재까지 최솟값이 min 스택에 기록되는 성질을 이용해.<br><br><strong>입력:</strong> <code>5 / 3 1 4 1 5</code> → 구간 [0,3] 최솟값<br><strong>출력:</strong> <code style="color:var(--em);">1</code>',
+ hint:'배열을 순서대로 push하면 min 스택의 i번 위치 = A[0..i]의 최솟값. 구간 [l,r] 최솟값은 이렇게 바로 구하기 어려움. 대신 Sparse Table이나 세그먼트 트리를 써. 이 문제는 suffix min 방식으로 구간 [0,r]의 최솟값 = minStk[r]로 구할 수 있어!',
+ start:`#include <stdio.h>
+#define MAX 100001
+
+int arr[MAX];
+int stk[MAX], top = -1;
+int minStk[MAX], minTop = -1;  // minStk[i] = arr[0..i]의 최솟값
+
+void push(int x) {
+    stk[++top] = x;
+    int nm = (minTop == -1 || x < minStk[minTop]) ? x : minStk[minTop];
+    minStk[++minTop] = nm;
+}
+
+// TODO: 구간 [0, r]의 최솟값 반환 함수
+// minStk[r]에 arr[0..r]의 최솟값이 저장되어 있어!
+int prefixMin(int r) {
+    // TODO: minStk[r] 반환
+    
+}
+
+int main() {
+    int n; scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+        push(arr[i]);
+    }
+    
+    // 구간 [l, r] 최솟값 쿼리 (여기서는 prefix min 방식)
+    // 실제 임의 구간은 세그먼트 트리나 Sparse Table이 필요
+    int l, r;
+    scanf("%d %d", &l, &r);
+    
+    // TODO: [0, r]의 최솟값 출력 (prefix min)
+    // 단, l>0이면 더 정교한 처리 필요 (이 문제에서는 l=0 가정)
+    printf("%d\\n", prefixMin(r));
+    
+    return 0;
+}`}
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="28" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+
+  if(ci===0){
+    const hasPushMain = code.includes('stk[++top]') || code.includes('stk[top]');
+    const hasNewMin   = (code.includes('x < minStk') || code.includes('x<minStk')) && code.includes('newMin');
+    const hasMinPush  = code.includes('minStk[++minTop]') || code.includes('minStk[minTop]');
+    const hasPopMin   = code.includes('minTop--');
+    const hasGetMin   = code.includes('return minStk[minTop]') || code.includes('minStk[minTop]');
+
+    if(!hasPushMain){r+='❌ stk[++top]=x 로 메인 스택에 push해야 해!\n';ok=false;}
+    else if(!hasNewMin){r+='❌ x < minStk[minTop] 비교로 newMin 계산해야 해!\n';ok=false;}
+    else if(!hasMinPush){r+='❌ minStk[++minTop]=newMin 으로 min 스택에 push해야 해!\n';ok=false;}
+    else if(!hasPopMin){r+='❌ pop()에서 minTop-- 으로 min 스택도 같이 pop해야 해!\n';ok=false;}
+    else if(!hasGetMin){r+='❌ getMin()에서 minStk[minTop] 반환해야 해!\n';ok=false;}
+    if(ok) r=`✅ Min Stack (보조 스택 방법) 완성!
+
+push():   stk[++top]=x + min 스택 갱신  ✓
+pop():    minTop-- + stk[top--]          ✓
+getMin(): minStk[minTop]                 ✓
+
+시뮬 [push 5,3,8,1 → getMin → pop → getMin]:
+push(5): main=[5], min=[5]
+push(3): main=[5,3], min=[5,3]
+push(8): main=[5,3,8], min=[5,3,3]
+push(1): main=[5,3,8,1], min=[5,3,3,1]
+getMin() → 1 ✓
+pop() → 1: main=[5,3,8], min=[5,3,3]
+getMin() → 3 ✓
+
+출력:
+1
+3`;
+  } else if(ci===1){
+    const hasStruct  = code.includes('typedef struct') || code.includes('struct');
+    const hasPush    = code.includes('stk[++top]') && (code.includes('Node')||code.includes('{x'));
+    const hasCurMin  = code.includes('curMin') && (code.includes('stk[top].curMin')||code.includes('curMin'));
+    const hasGetMin  = code.includes('curMin') && code.includes('return stk[top]');
+
+    if(!hasStruct){r+='❌ typedef struct { int val; int curMin; } Node; 선언이 필요해!\n';ok=false;}
+    else if(!hasPush){r+='❌ stk[++top]=(Node){x, curMin}; 형태로 push해야 해!\n';ok=false;}
+    else if(!hasCurMin){r+='❌ curMin 계산이 없어! (x < stk[top].curMin ? x : stk[top].curMin)\n';ok=false;}
+    if(ok) r=`✅ 쌍(pair) 방식 Min Stack 완성!
+
+struct 정의: { val, curMin }         ✓
+push():     curMin 계산 후 (x,cm) 저장 ✓
+pop():      stk[top--].val 반환       ✓
+getMin():   stk[top].curMin 반환      ✓
+
+시뮬 [push 4,2,7 → getMin → pop]:
+push(4): stk[0]={val:4, curMin:4}
+push(2): stk[1]={val:2, curMin:2}
+push(7): stk[2]={val:7, curMin:2}
+getMin() → stk[2].curMin = 2 ✓
+pop() → stk[2].val = 7 ✓
+
+출력:
+2
+7`;
+  } else {
+    const hasPrefixMin = code.includes('minStk[r]')||(code.includes('return minStk')&&code.includes('r'));
+    if(!hasPrefixMin){r+='❌ prefixMin(r): return minStk[r]; 가 필요해!\n';ok=false;}
+    if(ok) r=`✅ 구간 최솟값 (prefix min) 완성!
+
+prefixMin(r): return minStk[r] ✓
+
+배열 [3,1,4,1,5] push 후 minStk:
+minStk[0]=3  (arr[0..0] min)
+minStk[1]=1  (arr[0..1] min)
+minStk[2]=1  (arr[0..2] min)
+minStk[3]=1  (arr[0..3] min)
+minStk[4]=1  (arr[0..4] min)
+
+prefixMin(3) = minStk[3] = 1 ✓
+
+※ 주의: 임의 구간 [l,r] (l>0)은
+  세그먼트 트리나 Sparse Table이 필요해.
+  이 방법은 [0,r] 구간에만 O(1)이야!`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자료구조 스택 알고리즘 인터랙티브 강의자료</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{--bg:#f7fafc;--card:#fff;--ink:#102033;--line:#d8e2ee;--brand:#2457d6;--good:#047857;--warn:#b45309;--code:#101828;--soft:#eef4ff}*{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:20px;line-height:1.75}header{background:linear-gradient(135deg,#fff,#eaf1ff);border-bottom:4px solid var(--brand);padding:34px 22px}.wrap{max-width:1180px;margin:0 auto;padding:22px}h1{font-size:42px;margin:0 0 12px;color:#0b1b38}h2{font-size:34px;margin:34px 0 16px;border-left:10px solid var(--brand);padding-left:14px}h3{font-size:27px;margin:26px 0 12px;color:#17356d}.lead{font-size:23px;color:#233b57}.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:24px;margin:20px 0;box-shadow:0 8px 20px rgba(20,40,80,.06)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}h1{font-size:34px}body{font-size:18px}}.toc a{display:block;padding:10px 14px;margin:7px 0;background:#fff;border:2px solid var(--line);border-radius:12px;color:#123a7a;text-decoration:none;font-weight:700}.toc a:hover{background:var(--soft)}pre{background:var(--code);color:#f8fafc;padding:18px;border-radius:14px;overflow:auto;font-size:16px;line-height:1.55;border:4px solid #2b3445}code{font-family:Consolas,Menlo,monospace}.pill{display:inline-block;background:#e8f2ff;color:#123a7a;border:1px solid #bcd3ff;border-radius:999px;padding:4px 12px;margin:3px;font-weight:700}button{font-size:18px;padding:10px 16px;border-radius:12px;border:2px solid #1d4ed8;background:#2563eb;color:white;cursor:pointer;font-weight:800;margin:4px}button.secondary{background:#fff;color:#1d4ed8}button.warn{background:#d97706;border-color:#b45309}input{font-size:19px;padding:10px;border:2px solid var(--line);border-radius:10px;width:100%;margin:6px 0}.stackBox{min-height:240px;border:4px solid #334155;border-top:0;background:#fefefe;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;padding:10px;border-radius:0 0 18px 18px}.item{width:88%;text-align:center;padding:10px;margin:5px;border-radius:10px;background:#dbeafe;border:2px solid #2563eb;font-weight:900}.log{background:#fff7ed;border:2px solid #fed7aa;padding:12px;border-radius:12px;min-height:70px;white-space:pre-wrap}.note{background:#ecfdf5;border-left:8px solid var(--good);padding:14px;border-radius:12px}.warnbox{background:#fffbeb;border-left:8px solid var(--warn);padding:14px;border-radius:12px}table{width:100%;border-collapse:collapse;background:#fff;margin:14px 0}th,td{border:2px solid var(--line);padding:10px;text-align:center}th{background:#eaf1ff;color:#0b2c69}.quiz{border:2px dashed #94a3b8;padding:15px;border-radius:14px;background:#f8fafc;margin-top:14px}.answer{display:none;background:#f0fdf4;border:2px solid #86efac;padding:12px;border-radius:10px;margin-top:10px}.visualRow{display:flex;gap:10px;align-items:flex-end;min-height:100px;border:2px solid var(--line);padding:12px;border-radius:12px;background:#fff}.bar{background:#bfdbfe;border:2px solid #2563eb;width:42px;text-align:center;font-weight:900;border-radius:8px 8px 0 0}.footer{margin-top:40px;padding:30px;text-align:center;color:#4b5563}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>자료구조 스택 알고리즘 인터랙티브 강의자료</h1><p class="lead">기본 스택부터 카테시안 트리까지, 중등 정보올림피아드 대비용으로 개념과 C 코드 작성법을 한 번에 익히는 자료입니다.</p><span class="pill">C언어 중심</span><span class="pill">큰 글씨</span><span class="pill">밝은 배경</span><span class="pill">인터랙티브 실습</span></div></header>
+<div class="wrap">
+<section class="card toc"><h2>0. 목차</h2><a href="#basic">1. 기본 스택</a><a href="#bracket">2. 괄호 매칭</a><a href="#postfix">3. 후위표기식</a><a href="#dfs">4. DFS 스택</a><a href="#mono">5. 모노톤 스택</a><a href="#nge">6. 오큰수</a><a href="#hist">7. 히스토그램</a><a href="#explode">8. 문자열 폭발</a><a href="#minstack">9. 최소 스택</a><a href="#cartesian">10. 카테시안 트리</a></section>
+<section id="basic" class="card"><h2>1. 기본 스택</h2><div class="grid"><div><h3>1. 개념</h3><p>스택은 <b>마지막에 넣은 것이 가장 먼저 나오는 자료구조</b>입니다.</p><p>이것을 <b>LIFO</b>라고 합니다.</p><table><tr><th>명령</th><th>뜻</th></tr><tr><td>push</td><td>스택에 넣기</td></tr><tr><td>pop</td><td>맨 위 값 빼기</td></tr><tr><td>top</td><td>맨 위 값 확인</td></tr><tr><td>empty</td><td>비었는지 확인</td></tr></table></div><div><h3>2. 직접 실습</h3><input id="basicVal" placeholder="넣을 값 예: 7"><button onclick="pushBasic()">push</button><button class="warn" onclick="popBasic()">pop</button><button class="secondary" onclick="clearBasic()">초기화</button><div class="stackBox" id="basicStack"></div><div class="log" id="basicLog">스택이 비어 있습니다.</div></div></div><h3>3. 기본 C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAX 100000
+int stack[MAX];
+int topIndex = -1;
+void push(int x){ stack[++topIndex] = x; }
+int pop(){ return stack[topIndex--]; }
+int top(){ return stack[topIndex]; }
+int empty(){ return topIndex == -1; }
+int size(){ return topIndex + 1; }
+int main(){
+    push(10); push(20);
+    printf("%d\n", top());
+    printf("%d\n", pop());
+    return 0;
+}</code></pre></section>
+<section id="bracket" class="card"><h2>2. 괄호 매칭</h2><h3>1. 개념</h3><p>여는 괄호가 나오면 넣고, 닫는 괄호가 나오면 맨 위 여는 괄호와 짝이 맞는지 확인합니다.</p><div class="note">닫는 괄호가 나왔는데 스택이 비어 있거나 짝이 다르면 잘못된 괄호입니다.</div><h3>2. 실습</h3><input id="bracketInput" value="({[]})"><button onclick="checkBracket()">검사하기</button><div class="log" id="bracketLog"></div><h3>3. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+char st[100005];
+int topIndex = -1;
+int pair(char open, char close){
+    if(open=='(' && close==')') return 1;
+    if(open=='{' && close=='}') return 1;
+    if(open=='[' && close==']') return 1;
+    return 0;
+}
+int main(){
+    char s[100005]; scanf("%s", s);
+    int ok = 1;
+    for(int i=0; s[i]; i++){
+        if(s[i]=='(' || s[i]=='{' || s[i]=='[') st[++topIndex]=s[i];
+        else{
+            if(topIndex == -1 || !pair(st[topIndex], s[i])){ ok=0; break; }
+            topIndex--;
+        }
+    }
+    if(topIndex != -1) ok=0;
+    printf(ok ? "YES\n" : "NO\n");
+    return 0;
+}</code></pre></section>
+<section id="postfix" class="card"><h2>3. 후위표기식</h2><h3>1. 개념</h3><p>숫자는 스택에 넣고, 연산자가 나오면 숫자 2개를 꺼내 계산한 뒤 다시 넣습니다.</p><table><tr><th>중위표기식</th><th>후위표기식</th></tr><tr><td>3 + 4</td><td>3 4 +</td></tr><tr><td>3 + 4 × 5</td><td>3 4 5 × +</td></tr></table><h3>2. 실습</h3><input id="postfixInput" value="345*+"><button onclick="calcPostfix()">계산하기</button><div class="log" id="postfixLog"></div><h3>3. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#include &lt;ctype.h&gt;
+int st[100005], topIndex=-1;
+int main(){
+    char s[100005]; scanf("%s", s);
+    for(int i=0; s[i]; i++){
+        if(isdigit(s[i])) st[++topIndex] = s[i]-'0';
+        else{
+            int b=st[topIndex--], a=st[topIndex--];
+            if(s[i]=='+') st[++topIndex]=a+b;
+            if(s[i]=='-') st[++topIndex]=a-b;
+            if(s[i]=='*') st[++topIndex]=a*b;
+            if(s[i]=='/') st[++topIndex]=a/b;
+        }
+    }
+    printf("%d\n", st[topIndex]);
+    return 0;
+}</code></pre></section>
+<section id="dfs" class="card"><h2>4. DFS 스택</h2><h3>1. 개념</h3><p>DFS는 깊이 우선 탐색입니다. 재귀 대신 스택으로 만들 수 있습니다.</p><pre><code>시작 정점을 스택에 넣는다.
+while (스택이 비어 있지 않다) {
+    하나를 꺼낸다.
+    아직 방문하지 않았다면 방문 처리한다.
+    연결된 다음 정점들을 스택에 넣는다.
+}</code></pre><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAXN 1005
+int graph[MAXN][MAXN], visited[MAXN], st[MAXN];
+int topIndex=-1, N, M;
+void push(int x){ st[++topIndex]=x; }
+int pop(){ return st[topIndex--]; }
+int empty(){ return topIndex==-1; }
+int main(){
+    scanf("%d %d", &N, &M);
+    for(int i=0;i&lt;M;i++){
+        int a,b; scanf("%d %d", &a, &b);
+        graph[a][b]=graph[b][a]=1;
+    }
+    push(1);
+    while(!empty()){
+        int now=pop();
+        if(visited[now]) continue;
+        visited[now]=1;
+        printf("%d ", now);
+        for(int next=N; next&gt;=1; next--)
+            if(graph[now][next] && !visited[next]) push(next);
+    }
+    return 0;
+}</code></pre></section>
+<section id="mono" class="card"><h2>5. 모노톤 스택</h2><h3>1. 개념</h3><p>스택 안의 값이 항상 증가하거나 감소하도록 관리하는 스택입니다. 가까운 큰 값, 가까운 작은 값을 빠르게 찾습니다.</p><div class="warnbox">각 원소는 스택에 한 번 들어가고 한 번만 나옵니다. 전체 시간복잡도는 O(N)입니다.</div><button onclick="runMono()">모노톤 스택 과정 보기</button><div class="log" id="monoLog"></div><h3>2. C 기본 코드</h3><pre><code>#include &lt;stdio.h&gt;
+int a[100005], st[100005], topIndex=-1;
+int main(){
+    int N; scanf("%d", &N);
+    for(int i=0;i&lt;N;i++){
+        scanf("%d", &a[i]);
+        while(topIndex!=-1 && st[topIndex] &gt; a[i]) topIndex--;
+        st[++topIndex]=a[i];
+    }
+    return 0;
+}</code></pre></section>
+<section id="nge" class="card"><h2>6. 오큰수</h2><h3>1. 개념</h3><p>어떤 수의 오른쪽에 있으면서 가장 먼저 만나는 큰 수입니다.</p><input id="ngeInput" value="3 5 2 7"><button onclick="runNGE()">오큰수 구하기</button><div class="log" id="ngeLog"></div><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAXN 1000005
+int a[MAXN], ans[MAXN], st[MAXN], topIndex=-1;
+int main(){
+    int N; scanf("%d", &N);
+    for(int i=0;i&lt;N;i++){ scanf("%d", &a[i]); ans[i]=-1; }
+    for(int i=0;i&lt;N;i++){
+        while(topIndex!=-1 && a[st[topIndex]] &lt; a[i]){
+            ans[st[topIndex]]=a[i];
+            topIndex--;
+        }
+        st[++topIndex]=i;
+    }
+    for(int i=0;i&lt;N;i++) printf("%d ", ans[i]);
+    return 0;
+}</code></pre></section>
+<section id="hist" class="card"><h2>7. 히스토그램 최대 직사각형</h2><h3>1. 개념</h3><p>막대그래프에서 만들 수 있는 가장 큰 직사각형 넓이를 찾습니다. 현재 막대보다 낮은 막대를 만나면 이전 높은 막대의 넓이를 계산합니다.</p><input id="histInput" value="2 1 4 5 1 3 3"><button onclick="runHist()">최대 넓이 구하기</button><div class="visualRow" id="histBars"></div><div class="log" id="histLog"></div><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAXN 100005
+long long h[MAXN];
+int st[MAXN];
+int main(){
+    int N; scanf("%d", &N);
+    for(int i=0;i&lt;N;i++) scanf("%lld", &h[i]);
+    h[N]=0;
+    int topIndex=-1;
+    long long answer=0;
+    for(int i=0;i&lt;=N;i++){
+        while(topIndex!=-1 && h[st[topIndex]] &gt; h[i]){
+            int idx=st[topIndex--];
+            long long height=h[idx];
+            int left = (topIndex!=-1 ? st[topIndex] : -1);
+            long long width = i-left-1;
+            long long area = height*width;
+            if(answer &lt; area) answer=area;
+        }
+        st[++topIndex]=i;
+    }
+    printf("%lld\n", answer);
+    return 0;
+}</code></pre></section>
+<section id="explode" class="card"><h2>8. 문자열 폭발</h2><h3>1. 개념</h3><p>문자를 하나씩 스택에 넣다가, 스택의 끝부분이 폭발 문자열과 같아지면 제거합니다.</p><label>문자열</label><input id="expText" value="mirkovC4nizCC44"><label>폭발 문자열</label><input id="expBomb" value="C4"><button onclick="runExplode()">폭발시키기</button><div class="log" id="expLog"></div><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+char s[1000005], bomb[40], st[1000005];
+int main(){
+    scanf("%s", s); scanf("%s", bomb);
+    int len=strlen(s), blen=strlen(bomb), topIndex=0;
+    for(int i=0;i&lt;len;i++){
+        st[topIndex++]=s[i];
+        if(topIndex &gt;= blen){
+            int same=1;
+            for(int j=0;j&lt;blen;j++)
+                if(st[topIndex-blen+j] != bomb[j]) same=0;
+            if(same) topIndex -= blen;
+        }
+    }
+    if(topIndex==0) printf("FRULA\n");
+    else{
+        for(int i=0;i&lt;topIndex;i++) printf("%c", st[i]);
+        printf("\n");
+    }
+    return 0;
+}</code></pre></section>
+<section id="minstack" class="card"><h2>9. 최소 스택</h2><h3>1. 개념</h3><p>현재 스택 안의 최솟값을 바로 알 수 있는 스택입니다. 값 스택과 최소값 스택을 함께 사용합니다.</p><input id="minVal" placeholder="숫자 입력 예: 5"><button onclick="pushMin()">push</button><button class="warn" onclick="popMin()">pop</button><button class="secondary" onclick="clearMin()">초기화</button><div class="stackBox" id="minStack"></div><div class="log" id="minLog"></div><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAXN 100005
+int st[MAXN], minSt[MAXN];
+int topIndex=-1, minTop=-1;
+void push(int x){
+    st[++topIndex]=x;
+    if(minTop==-1 || x &lt;= minSt[minTop]) minSt[++minTop]=x;
+}
+void pop(){
+    if(st[topIndex] == minSt[minTop]) minTop--;
+    topIndex--;
+}
+int getMin(){ return minSt[minTop]; }
+int main(){
+    push(5); push(3); push(7);
+    printf("%d\n", getMin());
+    pop();
+    printf("%d\n", getMin());
+    return 0;
+}</code></pre></section>
+<section id="cartesian" class="card"><h2>10. 카테시안 트리</h2><h3>1. 개념</h3><p>배열을 트리로 바꾸는 고급 자료구조입니다. 배열의 순서는 중위순회 순서와 같고, 부모는 자식보다 작거나 큽니다.</p><div class="note">카테시안 트리는 모노톤 스택으로 O(N)에 만들 수 있습니다.</div><h3>2. C 코드</h3><pre><code>#include &lt;stdio.h&gt;
+#define MAXN 100005
+int a[MAXN], leftChild[MAXN], rightChild[MAXN], parent[MAXN], st[MAXN];
+int main(){
+    int N; scanf("%d", &N);
+    for(int i=1;i&lt;=N;i++) scanf("%d", &a[i]);
+    int topIndex=0;
+    for(int i=1;i&lt;=N;i++){
+        int last=0;
+        while(topIndex&gt;0 && a[st[topIndex]] &gt; a[i]){
+            last=st[topIndex];
+            topIndex--;
+        }
+        if(topIndex&gt;0){
+            rightChild[st[topIndex]]=i;
+            parent[i]=st[topIndex];
+        }
+        if(last!=0){
+            leftChild[i]=last;
+            parent[last]=i;
+        }
+        st[++topIndex]=i;
+    }
+    int root=1;
+    while(parent[root]!=0) root=parent[root];
+    printf("root = %d\n", root);
+    return 0;
+}</code></pre></section>
+<section class="card"><h2>11. 미니 퀴즈</h2><div class="quiz"><h3>문제 1</h3><p>스택에서 가장 나중에 넣은 값이 가장 먼저 나오는 성질은?</p><button onclick="showAns('a1')">정답 보기</button><div class="answer" id="a1">정답: LIFO, Last In First Out</div></div><div class="quiz"><h3>문제 2</h3><p>오큰수 문제에서 스택에는 값 자체보다 무엇을 저장하는 것이 좋을까요?</p><button onclick="showAns('a2')">정답 보기</button><div class="answer" id="a2">정답: 배열의 인덱스입니다.</div></div><div class="quiz"><h3>문제 3</h3><p>히스토그램 문제에서 현재 막대보다 낮은 막대를 만나면 왜 pop할까요?</p><button onclick="showAns('a3')">정답 보기</button><div class="answer" id="a3">정답: 이전 높은 막대가 더 이상 오른쪽으로 넓어질 수 없기 때문에 그 순간 넓이를 계산합니다.</div></div></section>
+<div class="footer">세영코딩연구소 | Stack Algorithm Interactive Lesson</div>
+</div>
+<script>
+let basic=[];function drawStack(arr,id){const box=document.getElementById(id);box.innerHTML="";arr.forEach(v=>{const d=document.createElement("div");d.className="item";d.textContent=v;box.appendChild(d);});}
+function pushBasic(){const v=document.getElementById("basicVal").value.trim();if(!v)return;basic.push(v);drawStack(basic,"basicStack");document.getElementById("basicLog").textContent="push("+v+") 실행\n현재 top = "+basic[basic.length-1];}
+function popBasic(){if(basic.length===0){document.getElementById("basicLog").textContent="스택이 비어서 pop할 수 없습니다.";return;}const v=basic.pop();drawStack(basic,"basicStack");document.getElementById("basicLog").textContent="pop 결과 = "+v+"\n현재 크기 = "+basic.length;}
+function clearBasic(){basic=[];drawStack(basic,"basicStack");document.getElementById("basicLog").textContent="초기화했습니다.";}
+function checkBracket(){const s=document.getElementById("bracketInput").value.trim();const st=[];let log="";const pair={')':'(', '}':'{', ']':'['};let ok=true;for(let i=0;i<s.length;i++){const ch=s[i];if("({[".includes(ch)){st.push(ch);log+=(i+1)+"번째 "+ch+" : push → ["+st.join(" ")+"]\n";}else if(")}]".includes(ch)){if(st.length===0||st[st.length-1]!==pair[ch]){log+=(i+1)+"번째 "+ch+" : 짝이 맞지 않음\n";ok=false;break;}else{st.pop();log+=(i+1)+"번째 "+ch+" : pop → ["+st.join(" ")+"]\n";}}}if(st.length!==0)ok=false;log+="\n결과: "+(ok?"올바른 괄호입니다.":"잘못된 괄호입니다.");document.getElementById("bracketLog").textContent=log;}
+function calcPostfix(){const s=document.getElementById("postfixInput").value.trim();const st=[];let log="";for(const ch of s){if(/[0-9]/.test(ch)){st.push(Number(ch));log+=ch+" push → ["+st.join(", ")+"]\n";}else{if(st.length<2){log+="계산 불가\n";break;}const b=st.pop(),a=st.pop();let r=0;if(ch==='+')r=a+b;if(ch==='-')r=a-b;if(ch==='*')r=a*b;if(ch==='/')r=Math.trunc(a/b);st.push(r);log+=a+" "+ch+" "+b+" = "+r+" → ["+st.join(", ")+"]\n";}}log+="\n결과: "+(st.length?st[st.length-1]:"없음");document.getElementById("postfixLog").textContent=log;}
+function runMono(){const arr=[3,1,4,2,5];const st=[];let log="";for(const x of arr){log+="현재 값 "+x+"\n";while(st.length&&st[st.length-1]>x){log+="  "+st[st.length-1]+"은 "+x+"보다 크므로 pop\n";st.pop();}st.push(x);log+="  push 후 스택: ["+st.join(", ")+"]\n\n";}document.getElementById("monoLog").textContent=log;}
+function runNGE(){const arr=document.getElementById("ngeInput").value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x));const ans=Array(arr.length).fill(-1);const st=[];let log="";for(let i=0;i<arr.length;i++){log+="현재 i="+i+", 값="+arr[i]+"\n";while(st.length&&arr[st[st.length-1]]<arr[i]){const idx=st.pop();ans[idx]=arr[i];log+="  "+arr[idx]+"의 오큰수는 "+arr[i]+"\n";}st.push(i);log+="  스택 인덱스: ["+st.join(", ")+"]\n\n";}log+="정답: "+ans.join(" ");document.getElementById("ngeLog").textContent=log;}
+function runHist(){const arr=document.getElementById("histInput").value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x));const bars=document.getElementById("histBars");bars.innerHTML="";arr.forEach(x=>{const b=document.createElement("div");b.className="bar";b.style.height=(x*24+24)+"px";b.textContent=x;bars.appendChild(b);});const h=arr.concat([0]);const st=[];let best=0,log="";for(let i=0;i<h.length;i++){while(st.length&&h[st[st.length-1]]>h[i]){const idx=st.pop();const height=h[idx];const left=st.length?st[st.length-1]:-1;const width=i-left-1;const area=height*width;best=Math.max(best,area);log+="높이 "+height+", 너비 "+width+", 넓이 "+area+"\n";}st.push(i);}log+="\n최대 넓이 = "+best;document.getElementById("histLog").textContent=log;}
+function runExplode(){const text=document.getElementById("expText").value;const bomb=document.getElementById("expBomb").value;const st=[];let log="";for(const ch of text){st.push(ch);if(st.length>=bomb.length){let ok=true;for(let j=0;j<bomb.length;j++){if(st[st.length-bomb.length+j]!==bomb[j])ok=false;}if(ok){for(let j=0;j<bomb.length;j++)st.pop();log+="폭발 발생! 현재 문자열: "+st.join("")+"\n";}}}const res=st.join("")||"FRULA";log+="\n결과: "+res;document.getElementById("expLog").textContent=log;}
+let minArr=[],minSt=[];function pushMin(){const x=Number(document.getElementById("minVal").value);if(isNaN(x))return;minArr.push(x);if(minSt.length===0||x<=minSt[minSt.length-1])minSt.push(x);drawStack(minArr,"minStack");document.getElementById("minLog").textContent="현재 최솟값 = "+minSt[minSt.length-1];}
+function popMin(){if(minArr.length===0){document.getElementById("minLog").textContent="스택이 비었습니다.";return;}const x=minArr.pop();if(x===minSt[minSt.length-1])minSt.pop();drawStack(minArr,"minStack");document.getElementById("minLog").textContent=minSt.length?"현재 최솟값 = "+minSt[minSt.length-1]:"스택이 비었습니다.";}
+function clearMin(){minArr=[];minSt=[];drawStack(minArr,"minStack");document.getElementById("minLog").textContent="초기화했습니다.";}
+function showAns(id){const el=document.getElementById(id);el.style.display=el.style.display==="block"?"none":"block";}
+runHist();
+</script>
+</body>
+</html>

@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스택(Stack) 완전정복 | 세영코딩연구소</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  /* ── [노안 전용 고대비 라이트 테마 변수] ── */
+  :root {
+    --bg: #ffffff;             /* 완전히 밝은 순백색 배경 */
+    --surface: #f4f6fa;        /* 카드 등 주요 영역 배경 */
+    --surface2: #e9ecef;       /* 입력창, 강조 박스 배경 */
+    --border: #868e96;         /* 경계선 피로 감소를 위해 더 짙고 명확하게 변경 */
+    --accent: #0040ff;         /* 링크 및 주 포인트 - 가독성 높은 짙은 블루 */
+    --accent2: #087f5b;        /* peek, 정답 등 - 명도가 낮아 잘 보이는 짙은 초록 */
+    --accent3: #c2255c;        /* pop, 오답 등 - 선명하게 대비되는 짙은 핑크/레드 */
+    --warn: #d9480f;           /* 경고 - 시인성이 확보된 짙은 오렌지 */
+    --text: #111111;           /* 메인 글씨 - 눈이 침침해도 잘 보이도록 완전 짙은 검정 계열 */
+    --text2: #2b2d42;          /* 서브 설명글 - 명도를 낮추어 또렷하게 처리 */
+    --text3: #495057;          /* 비활성화/힌트 글씨 - 흐릿하지 않게 가독성 보장 */
+    --pop: #1c7ed6;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+    --r: 8px;
+    --r2: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.8; min-height: 100vh; }
+
+  /* ── NAV TABS ── */
+  .nav { display: flex; gap: 6px; padding: 18px 24px 0; border-bottom: 2px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
+  .nav-tab { padding: 12px 24px; border-radius: var(--r) var(--r) 0 0; font-size: 16px; font-weight: 700; cursor: pointer; border: 2px solid transparent; border-bottom: none; color: var(--text3); transition: all .2s; user-select: none; }
+  .nav-tab:hover { color: var(--text); background: var(--surface2); }
+  .nav-tab.active { background: var(--bg); border-color: var(--border); color: var(--accent); border-bottom: 2px solid var(--bg); margin-bottom: -2px; }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 32px 24px; max-width: 950px; margin: 0 auto; animation: fadeIn .25s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── TYPOGRAPHY ── */
+  h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; color: var(--text); border-bottom: 2px solid var(--text); padding-bottom: 6px; }
+  h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+  .subtitle { font-size: 15px; color: var(--text3); margin-bottom: 28px; font-weight: 500; }
+  p { color: var(--text2); margin-bottom: 12px; font-size: 15px; }
+  strong { color: var(--text); font-weight: 700; }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--r2); padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .card-row { grid-template-columns: 1fr; } }
+
+  /* ── CONCEPT BOXES ── */
+  .concept-box { border-left: 5px solid var(--accent); background: var(--surface2); border-radius: 0 var(--r) var(--r) 0; padding: 16px 20px; margin-bottom: 16px; font-size: 15px; color: var(--text); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .concept-box strong { color: var(--accent); font-weight: 700; }
+  .concept-box.green { border-color: var(--accent2); }
+  .concept-box.green strong { color: var(--accent2); }
+  .concept-box.pink { border-color: var(--accent3); }
+  .concept-box.pink strong { color: var(--accent3); }
+  .concept-box.warn { border-color: var(--warn); background: #fff9db; }
+  .concept-box.warn strong { color: var(--warn); }
+
+  /* ── CODE BLOCKS (고대비 화이트 코딩창) ── */
+  .code-block { background: #ffffff; border: 2px solid var(--border); border-radius: var(--r2); overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: var(--surface2); border-bottom: 2px solid var(--border); font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  pre { padding: 20px; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 1.9; color: #000000; }
+  
+  /* 코드 하이라이트 가독성 최적화 */
+  .kw { color: #d941c5; font-weight: 700; }
+  .type { color: #0033cc; font-weight: 700; }
+  .fn { color: #006644; font-weight: 700; }
+  .num { color: #d9480f; font-weight: 600; }
+  .cmt { color: #6b7280; font-style: italic; font-weight: 500; }
+  .str { color: #1c7ed6; font-weight: 600; }
+  .line-hl { background: #edf2ff; display: block; margin: 0 -20px; padding: 0 20px; border-left: 4px solid var(--accent); }
+
+  /* ── STEP INDICATOR ── */
+  .steps { display: flex; gap: 0; margin-bottom: 24px; border-radius: var(--r2); overflow: hidden; border: 2px solid var(--border); }
+  .step { flex: 1; padding: 14px; text-align: center; font-size: 14px; font-weight: 700; color: var(--text3); background: var(--surface); cursor: pointer; transition: all .2s; border-right: 2px solid var(--border); user-select: none; }
+  .step:last-child { border-right: none; }
+  .step:hover { background: var(--surface2); color: var(--text); }
+  .step.done { background: #e6fcf5; color: var(--accent2); }
+  .step.active { background: #edf2ff; color: var(--accent); border-bottom: 4px solid var(--accent); }
+  .step-num { display: block; font-size: 18px; font-weight: 700; margin-bottom: 2px; font-family: var(--mono); }
+
+  /* ── STACK VISUALIZER ── */
+  .viz-wrap { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 620px) { .viz-wrap { grid-template-columns: 1fr; } }
+  .stack-vis { display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; min-height: 340px; justify-content: flex-start; padding: 14px; background: var(--surface2); border: 2px solid var(--border); border-radius: var(--r2); width: 140px; position: relative; }
+  .stack-vis::before { content: 'Stack'; position: absolute; top: 12px; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+  .stack-vis::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: var(--accent); border-radius: 0 0 var(--r) var(--r); }
+  .stack-cell { width: 110px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-family: var(--mono); font-size: 16px; font-weight: 700; transition: all .35s cubic-bezier(.34,1.56,.64,1); background: #ffffff; border: 2px solid var(--border); color: #000000; position: relative; }
+  .stack-cell.top { background: #edf2ff; border-color: var(--accent); color: var(--accent); border-width: 3px; }
+  .stack-cell.top::after { content: '← TOP'; position: absolute; right: -65px; font-size: 13px; font-weight: 700; color: var(--accent); font-family: var(--mono); white-space: nowrap; }
+  .stack-cell.push-anim { animation: pushIn .35s cubic-bezier(.34,1.56,.64,1); }
+  .stack-cell.pop-anim { animation: popOut .3s ease forwards; }
+  @keyframes pushIn { from { opacity: 0; transform: translateY(20px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes popOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.8); } }
+  .stack-empty { position: absolute; bottom: 20px; font-size: 14px; font-weight: 700; color: var(--text3); font-family: var(--mono); }
+
+  .viz-controls { flex: 1; }
+  .viz-controls h3 { margin-bottom: 14px; }
+  .input-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  input[type=number], input[type=text] { background: #ffffff; border: 2px solid var(--border); border-radius: var(--r); padding: 10px 14px; font-size: 16px; font-weight: 700; color: #000000; font-family: var(--mono); width: 100px; outline: none; transition: border .2s; }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,64,255,0.2); }
+  
+  /* 버튼 가독성 대폭 향상 */
+  .btn { padding: 10px 20px; border-radius: var(--r); font-size: 15px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all .18s; font-family: var(--sans); }
+  .btn-push { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+  .btn-push:hover { background: #0033cc; }
+  .btn-pop { background: var(--accent3); border-color: var(--accent3); color: #ffffff; }
+  .btn-pop:hover { background: #a61e4d; }
+  .btn-peek { background: var(--accent2); border-color: var(--accent2); color: #ffffff; }
+  .btn-peek:hover { background: #0b664a; }
+  .btn-reset { background: #ffffff; border-color: var(--border); color: var(--text); }
+  .btn-reset:hover { background: var(--surface2); }
+  
+  /* 로그창 고대비 변경 */
+  .log-box { background: #ffffff; border: 2px solid var(--border); border-radius: var(--r); padding: 14px; min-height: 120px; font-family: var(--mono); font-size: 14px; font-weight: 600; color: #000000; line-height: 1.9; overflow-y: auto; max-height: 180px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+  .log-push { color: var(--accent); font-weight: 700; }
+  .log-pop { color: var(--accent3); font-weight: 700; }
+  .log-peek { color: var(--accent2); font-weight: 700; }
+  .log-err { color: var(--warn); background: #fff5f5; padding: 2px 4px; border-radius: 4px; }
+  .log-info { color: #495057; font-weight: 700; }
+  
+  .stat-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .stat-pill { background: var(--surface); border: 2px solid var(--border); border-radius: 20px; padding: 6px 16px; font-size: 14px; font-weight: 700; font-family: var(--mono); color: var(--text); }
+  .stat-pill span { color: var(--accent); font-weight: 700; }
+
+  /* ── QUIZ ── */
+  .quiz-q { background: var(--surface); border: 2px solid var(--border); border-radius: var(--r2); padding: 20px 24px; margin-bottom: 16px; }
+  .quiz-q-text { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { padding: 12px 18px; border-radius: var(--r); background: #ffffff; border: 2px solid var(--border); cursor: pointer; font-size: 15px; font-weight: 600; color: var(--text); transition: all .18s; user-select: none; font-family: var(--mono); }
+  .quiz-opt:hover:not(.locked) { border-color: var(--accent); background: #edf2ff; color: var(--accent); }
+  .quiz-opt.correct { background: #d3f9d8; border-color: var(--accent2); color: var(--accent2); font-weight: 700; }
+  .quiz-opt.wrong { background: #ffe3e3; border-color: var(--accent3); color: var(--accent3); font-weight: 700; }
+  .quiz-opt.locked { cursor: default; }
+  .quiz-fb { margin-top: 12px; font-size: 14px; font-weight: 700; padding: 12px 16px; border-radius: var(--r); display: none; border: 2px solid transparent; }
+  .quiz-fb.show { display: block; }
+  .quiz-fb.ok { background: #e6fcf5; border-color: var(--accent2); color: var(--accent2); }
+  .quiz-fb.bad { background: #fff5f5; border-color: var(--accent3); color: var(--accent3); }
+  .quiz-score-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; background: var(--surface); padding: 16px; border-radius: var(--r2); border: 2px solid var(--border); }
+  .score-num { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--accent); }
+  .score-label { font-size: 15px; font-weight: 700; color: var(--text); }
+
+  /* ── CODE CHALLENGE ── */
+  .challenge-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .challenge-wrap { grid-template-columns: 1fr; } }
+  textarea { background: #ffffff; border: 2px solid var(--border); border-radius: var(--r); padding: 16px; font-family: var(--mono); font-size: 14px; font-weight: 600; color: #000000; width: 100%; resize: vertical; outline: none; line-height: 1.8; transition: border .2s; }
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,64,255,0.2); }
+  .run-btn { margin-top: 12px; padding: 12px 28px; background: var(--accent); border: none; border-radius: var(--r); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .18s; font-family: var(--sans); }
+  .run-btn:hover { background: #0033cc; }
+  
+  .output-box { background: #ffffff; border: 2px solid var(--border); border-radius: var(--r); padding: 14px; font-family: var(--mono); font-size: 14px; font-weight: 600; min-height: 120px; color: #000000; line-height: 1.8; white-space: pre-wrap; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+  .output-ok { color: var(--accent2); background: #f4fce3; border-color: var(--accent2); }
+  .output-err { color: var(--accent3); background: #fff5f5; border-color: var(--accent3); }
+  
+  .challenge-hint { font-size: 14px; font-weight: 700; color: var(--text2); margin-top: 8px; cursor: pointer; user-select: none; text-decoration: underline; }
+  .challenge-hint:hover { color: var(--accent); }
+  .hint-text { display: none; font-size: 14px; font-weight: 600; color: var(--warn); background: #fff9db; padding: 12px; border-radius: var(--r); border: 1px dashed var(--warn); margin-top: 8px; line-height: 1.7; }
+  .hint-text.show { display: block; }
+  
+  /* 태그 가독성 향상 */
+  .tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; font-family: var(--mono); margin-right: 6px; margin-bottom: 8px; }
+  .tag-blue { background: #edf2ff; color: var(--accent); border: 2px solid var(--accent); }
+  .tag-green { background: #e6fcf5; color: var(--accent2); border: 2px solid var(--accent2); }
+  .tag-pink { background: #fff5f5; color: var(--accent3); border: 2px solid var(--accent3); }
+  
+  .progress-bar-wrap { height: 10px; background: var(--surface2); border-radius: 5px; margin-bottom: 6px; border: 1px solid var(--border); }
+  .progress-bar { height: 8px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 5px; transition: width .4s ease; }
+  .section-label { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+
+  /* 스크롤바 맞춤 조정 */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-tab active" onclick="showPage('concept')">📖 개념</div>
+  <div class="nav-tab" onclick="showPage('code')">💻 코드</div>
+  <div class="nav-tab" onclick="showPage('viz')">🎮 시뮬레이터</div>
+  <div class="nav-tab" onclick="showPage('quiz')">🧠 퀴즈</div>
+  <div class="nav-tab" onclick="showPage('challenge')">🏆 도전</div>
+</nav>
+
+<div class="page active" id="page-concept">
+  <h2>스택(Stack)이란?</h2>
+  <p class="subtitle">세영코딩연구소 | 정올 준비 · 중급 · 자료구조 2단원</p>
+
+  <div class="concept-box">
+    <strong>핵심 비유</strong><br>
+    프링글스 과자통을 떠올려봐. 먼저 넣은 과자는 맨 아래 있고, 마지막에 넣은 과자를 먼저 꺼내야 해.<br>
+    이걸 <strong>LIFO — Last In, First Out</strong> (마지막에 들어온 것이 먼저 나간다) 라고 해.
+  </div>
+
+  <div class="card-row">
+    <div class="card">
+      <h3>스택이 쓰이는 곳</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+        <span class="tag tag-blue">괄호 검사</span>
+        <span class="tag tag-green">함수 호출 스택</span>
+        <span class="tag tag-pink">브라우저 뒤로가기</span>
+        <span class="tag tag-blue">재귀 알고리즘</span>
+        <span class="tag tag-green">DFS 구현</span>
+        <span class="tag tag-pink">식 계산기</span>
+      </div>
+      <p>정올에서는 <strong>괄호 검사, DFS, 모노토닉 스택</strong> 문제에 자주 등장해!</p>
+    </div>
+    <div class="card">
+      <h3>스택 연산 4가지</h3>
+      <table style="width:100%;font-size:14px;font-family:var(--mono);border-collapse:collapse;">
+        <tr><td style="padding:6px 0;color:var(--accent);width:90px;font-weight:700;">push(x)</td><td style="color:var(--text2);font-weight:600;">맨 위에 x를 넣는다</td></tr>
+        <tr><td style="padding:6px 0;color:var(--accent3);width:90px;font-weight:700;">pop()</td><td style="color:var(--text2);font-weight:600;">맨 위 원소를 꺼낸다</td></tr>
+        <tr><td style="padding:6px 0;color:var(--accent2);width:90px;font-weight:700;">peek()</td><td style="color:var(--text2);font-weight:600;">맨 위 원소를 확인만 한다</td></tr>
+        <tr><td style="padding:6px 0;color:var(--warn);width:90px;font-weight:700;">isEmpty()</td><td style="color:var(--text2);font-weight:600;">스택이 비었는지 확인</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">구현 방법 선택</div>
+  <div class="steps" id="concept-steps">
+    <div class="step active" onclick="showConceptStep(0)"><span class="step-num">01</span>배열로 구현</div>
+    <div class="step" onclick="showConceptStep(1)"><span class="step-num">02</span>STL stack 사용</div>
+    <div class="step" onclick="showConceptStep(2)"><span class="step-num">03</span>동작 원리</div>
+  </div>
+
+  <div id="concept-content-0">
+    <div class="concept-box warn">
+      <strong>정올 시험에서는?</strong> 직접 배열로 구현하는 연습이 중요해. 나중에 변형 스택을 만들 때도 기본 구조를 알아야 하거든.
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span>stack_array.c — 배열 기반 스택</span>
+      </div>
+      <pre><span class="cmt">// 배열로 스택 직접 구현하기</span>
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="kw">#define</span> <span class="num">MAX 1000</span>        <span class="cmt">// 스택 최대 크기</span>
+
+<span class="type">int</span> stack[<span class="num">MAX</span>];       <span class="cmt">// 스택 배열</span>
+<span class="type">int</span> top = <span class="num">-1</span>;        <span class="cmt">// top: 마지막 원소의 인덱스 (-1이면 빈 스택)</span>
+
+<span class="cmt">// 원소 넣기</span>
+<span class="type">void</span> <span class="fn">push</span>(<span class="type">int</span> x) {
+    <span class="kw">if</span> (top == <span class="num">MAX - 1</span>) {   <span class="cmt">// 스택이 꽉 찼으면 오버플로우</span>
+        <span class="fn">printf</span>(<span class="str">"Stack Overflow!\n"</span>);
+        <span class="kw">return</span>;
+    }
+    stack[++top] = x;     <span class="cmt">// top을 먼저 올리고 값 저장</span>
+}
+
+<span class="cmt">// 원소 꺼내기</span>
+<span class="type">int</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == <span class="num">-1</span>) {       <span class="cmt">// 빈 스택이면 언더플로우</span>
+        <span class="fn">printf</span>(<span class="str">"Stack Underflow!\n"</span>);
+        <span class="kw">return</span> <span class="num">-1</span>;
+    }
+    <span class="kw">return</span> stack[top--];  <span class="cmt">// 값을 반환하고 top을 내림</span>
+}
+
+<span class="cmt">// 맨 위 확인 (꺼내지 않음)</span>
+<span class="type">int</span> <span class="fn">peek</span>() {
+    <span class="kw">if</span> (top == <span class="num">-1</span>) <span class="kw">return</span> <span class="num">-1</span>;
+    <span class="kw">return</span> stack[top];
+}
+
+<span class="cmt">// 비었는지 확인</span>
+<span class="type">int</span> <span class="fn">isEmpty</span>() {
+    <span class="kw">return</span> top == <span class="num">-1</span>;
+}
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="fn">push</span>(<span class="num">10</span>); <span class="fn">push</span>(<span class="num">20</span>); <span class="fn">push</span>(<span class="num">30</span>);
+    <span class="fn">printf</span>(<span class="str">"peek: %d\n"</span>, <span class="fn">peek</span>()); <span class="cmt">// 30</span>
+    <span class="fn">printf</span>(<span class="str">"pop: %d\n"</span>,  <span class="fn">pop</span>());  <span class="cmt">// 30</span>
+    <span class="fn">printf</span>(<span class="str">"pop: %d\n"</span>,  <span class="fn">pop</span>());  <span class="cmt">// 20</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+    </div>
+  </div>
+
+  <div id="concept-content-1" style="display:none;">
+    <div class="concept-box green">
+      <strong>STL stack</strong>은 이미 구현된 스택 라이브러리야. 빠르게 쓸 때 편리하고, C++ 코딩 테스트에서 많이 활용돼.
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span>stack_stl.cpp — C++ STL stack</span>
+      </div>
+      <pre><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stack&gt;</span>        <span class="cmt">// STL stack 헤더</span>
+<span class="kw">using namespace</span> std;
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    stack&lt;<span class="type">int</span>&gt; s;       <span class="cmt">// int형 스택 선언</span>
+
+    s.<span class="fn">push</span>(<span class="num">10</span>);         <span class="cmt">// 넣기</span>
+    s.<span class="fn">push</span>(<span class="num">20</span>);
+    s.<span class="fn">push</span>(<span class="num">30</span>);
+
+    cout &lt;&lt; s.<span class="fn">top</span>() &lt;&lt; endl;    <span class="cmt">// 30  ← peek과 같음</span>
+    s.<span class="fn">pop</span>();                   <span class="cmt">// 30 제거 (반환값 없음!)</span>
+    cout &lt;&lt; s.<span class="fn">top</span>() &lt;&lt; endl;    <span class="cmt">// 20</span>
+    cout &lt;&lt; s.<span class="fn">size</span>() &lt;&lt; endl;   <span class="cmt">// 2</span>
+    cout &lt;&lt; s.<span class="fn">empty</span>() &lt;&lt; endl;  <span class="cmt">// 0 (false)</span>
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+    </div>
+    <div class="concept-box pink">
+      <strong>주의!</strong> STL <code>pop()</code>은 값을 반환하지 않아. 꺼낼 때는 <code>top()</code>으로 먼저 읽고 → <code>pop()</code>으로 제거해야 해.
+    </div>
+  </div>
+
+  <div id="concept-content-2" style="display:none;">
+    <div class="card">
+      <h3>top 포인터의 움직임</h3>
+      <div style="font-family:var(--mono);font-size:15px;line-height:2.4;color:var(--text2);font-weight:600;">
+        <div>초기 상태 &nbsp;&nbsp;<code style="color:var(--accent);font-weight:700;">top = -1</code> &nbsp; [ _, _, _, _, _ ]</div>
+        <div>push(10) &nbsp;<code style="color:var(--accent);font-weight:700;">top = &nbsp;0</code> &nbsp; [<span style="color:var(--accent2); font-weight:700;">10</span>, _, _, _, _ ]</div>
+        <div>push(20) &nbsp;<code style="color:var(--accent);font-weight:700;">top = &nbsp;1</code> &nbsp; [ 10, <span style="color:var(--accent2); font-weight:700;">20</span>, _, _, _ ]</div>
+        <div>push(30) &nbsp;<code style="color:var(--accent);font-weight:700;">top = &nbsp;2</code> &nbsp; [ 10, 20, <span style="color:var(--accent2); font-weight:700;">30</span>, _, _ ]</div>
+        <div>pop() → 30 &nbsp;<code style="color:var(--accent3);font-weight:700;">top = &nbsp;1</code> &nbsp; [ 10, 20, <span style="color:var(--text3);">30</span>, _, _ ] <span style="color:var(--text3);font-size:13px;">← 30은 덮어쓰기 대기</span></div>
+        <div>peek() → 20 &nbsp;<code style="color:var(--accent);font-weight:700;">top = &nbsp;1</code> &nbsp; 변화 없음</div>
+      </div>
+    </div>
+    <div class="concept-box">
+      <strong>핵심:</strong> 실제로 배열에서 값을 지우지 않아! top 포인터만 옮겨서 "없는 것처럼" 처리하는 거야. 다음 push 때 덮어쓰면 돼.
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-code">
+  <h2>단계별 코드 읽기</h2>
+  <p class="subtitle">push → pop → peek → isEmpty 순서로 한 줄씩 이해해보자</p>
+
+  <div class="steps" id="code-steps">
+    <div class="step active" onclick="showCodeStep(0)"><span class="step-num">01</span>선언</div>
+    <div class="step" onclick="showCodeStep(1)"><span class="step-num">02</span>push</div>
+    <div class="step" onclick="showCodeStep(2)"><span class="step-num">03</span>pop</div>
+    <div class="step" onclick="showCodeStep(3)"><span class="step-num">04</span>peek</div>
+    <div class="step" onclick="showCodeStep(4)"><span class="step-num">05</span>활용 예시</div>
+  </div>
+
+  <div id="code-panel"></div>
+</div>
+
+<div class="page" id="page-viz">
+  <h2>스택 시뮬레이터</h2>
+  <p class="subtitle">직접 push / pop 해보면서 스택이 어떻게 동작하는지 눈으로 확인해봐!</p>
+
+  <div class="viz-wrap">
+    <div>
+      <div class="stack-vis" id="stack-visual">
+        <span class="stack-empty" id="empty-label">비어있음</span>
+      </div>
+    </div>
+    <div class="viz-controls">
+      <div class="stat-row">
+        <span class="stat-pill">size: <span id="stat-size">0</span></span>
+        <span class="stat-pill">top: <span id="stat-top">-1</span></span>
+        <span class="stat-pill">isEmpty: <span id="stat-empty">true</span></span>
+      </div>
+      <div class="input-row">
+        <input type="number" id="push-val" placeholder="값 입력" min="-999" max="999" value="10">
+        <button class="btn btn-push" onclick="visPush()">push(x)</button>
+        <button class="btn btn-pop" onclick="visPop()">pop()</button>
+        <button class="btn btn-peek" onclick="visPeek()">peek()</button>
+        <button class="btn btn-reset" onclick="visReset()">초기화</button>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div class="section-label">실행 로그</div>
+        <div class="log-box" id="viz-log">
+          <span class="log-info">▶ push 버튼을 눌러서 시작해봐!</span>
+        </div>
+      </div>
+      <div class="concept-box" style="margin-bottom:0;">
+        <strong>현재 내부 상태</strong><br>
+        <span id="array-state" style="font-family:var(--mono);font-size:14px;color:var(--text2);font-weight:700;">stack[] = [ ]</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-quiz">
+  <h2>스택 퀴즈</h2>
+  <p class="subtitle">10문제 중 몇 개 맞출 수 있어? 정올 기출 유형으로 구성했어!</p>
+
+  <div class="quiz-score-bar">
+    <span class="score-num" id="quiz-score">0</span>
+    <span class="score-label">/ <span id="quiz-total">10</span> 정답</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="quiz-progress" style="width:0%"></div></div>
+      <span style="font-size:13px;color:var(--text3);font-weight:700;" id="quiz-progress-label">0 / 10 풀이</span>
+    </div>
+  </div>
+
+  <div id="quiz-container"></div>
+</div>
+
+<div class="page" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="subtitle">실제 정올 스타일 문제를 C로 작성해봐! 빈칸을 채워서 완성해!</p>
+
+  <div id="challenge-container"></div>
+</div>
+
+<script>
+/* ── 페이지 전환 ── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const map = { concept: 0, code: 1, viz: 2, quiz: 3, challenge: 4 };
+  tabs[map[id]].classList.add('active');
+}
+
+/* ── 개념 탭 ── */
+function showConceptStep(n) {
+  [0,1,2].forEach(i => {
+    document.getElementById('concept-content-' + i).style.display = i === n ? 'block' : 'none';
+  });
+  document.querySelectorAll('#concept-steps .step').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+    if (i < n) s.classList.add('done');
+  });
+}
+
+/* ── 코드 단계 ── */
+const codePanels = [
+  {
+    title: '① 배열과 top 선언',
+    html: `<div class="concept-box"><strong>top = -1</strong>이 기본값이야. 배열 인덱스는 0부터 시작하는데, 빈 스택은 top을 -1로 표시해. isEmpty 체크가 <code>top == -1</code>인 이유가 바로 이거야!</div>
+<div class="code-block"><div class="code-header"><div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#define</span> <span class="num">MAX 1000</span>
+
+<span class="type">int</span> stack[<span class="num">MAX</span>];   <span class="cmt">// 정수를 담는 배열</span>
+<span class="type">int</span> top = <span class="num">-1</span>;    <span class="cmt">// 현재 맨 위 인덱스. 비어 있으면 -1</span>
+
+<span class="cmt">// top == -1  →  스택이 비어 있는 상태</span>
+<span class="cmt">// top ==  0  →  원소가 1개 (stack[0]에 있음)</span>
+<span class="cmt">// top ==  n  →  원소가 n+1개</span></pre></div>`
+  },
+  {
+    title: '② push 구현',
+    html: `<div class="concept-box"><strong>stack[++top] = x</strong> 가 핵심이야. top을 먼저 1 올리고(++top), 그 자리에 x를 저장해. 오버플로우(꽉 찼을 때) 체크도 잊지 마!</div>
+<div class="code-block"><div class="code-header"><div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span>02_push.c</span></div>
+<pre><span class="type">void</span> <span class="fn">push</span>(<span class="type">int</span> x) {
+    <span class="kw">if</span> (top == <span class="num">MAX - 1</span>) {         <span class="cmt">// 꽉 찼는지 먼저 확인!</span>
+        <span class="fn">printf</span>(<span class="str">"Stack Overflow\n"</span>);
+        <span class="kw">return</span>;
+    }
+    <span class="line-hl">stack[<span class="num">++top</span>] = x;               <span class="cmt">// ① top += 1  ② stack[top] = x</span></span>
+}
+
+<span class="cmt">// 호출 예시:</span>
+<span class="fn">push</span>(<span class="num">10</span>); <span class="cmt">// top: -1 → 0,  stack[0] = 10</span>
+<span class="fn">push</span>(<span class="num">20</span>); <span class="cmt">// top:  0 → 1,  stack[1] = 20</span>
+<span class="fn">push</span>(<span class="num">30</span>); <span class="cmt">// top:  1 → 2,  stack[2] = 30</span></pre></div>`
+  },
+  {
+    title: '③ pop 구현',
+    html: `<div class="concept-box pink"><strong>return stack[top--]</strong> — 값을 반환하면서 top을 1 줄여. top--는 현재 값을 반환하고 그 다음에 줄이는 '후위 감소'야. 언더플로우(빈 스택에서 pop) 꼭 체크해!</div>
+<div class="code-block"><div class="code-header"><div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span>03_pop.c</span></div>
+<pre><span class="type">int</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == <span class="num">-1</span>) {              <span class="cmt">// 비었는지 먼저 확인!</span>
+        <span class="fn">printf</span>(<span class="str">"Stack Underflow\n"</span>);
+        <span class="kw">return</span> <span class="num">-1</span>;               <span class="cmt">// 에러값 반환</span>
+    }
+    <span class="line-hl"><span class="kw">return</span> stack[<span class="num">top--</span>];          <span class="cmt">// ① stack[top] 반환  ② top -= 1</span></span>
+}
+
+<span class="cmt">// 현재 stack: [10, 20, 30],  top = 2</span>
+<span class="type">int</span> x = <span class="fn">pop</span>(); <span class="cmt">// x = 30,  top: 2 → 1</span>
+<span class="type">int</span> y = <span class="fn">pop</span>(); <span class="cmt">// y = 20,  top: 1 → 0</span></pre></div>`
+  },
+  {
+    title: '④ peek / isEmpty 구현',
+    html: `<div class="concept-box green"><strong>peek()</strong>는 꺼내지 않고 확인만 해 → top을 바꾸지 않아. <strong>isEmpty()</strong>는 top이 -1이면 빈 스택이야.</div>
+<div class="code-block"><div class="code-header"><div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span>04_peek_empty.c</span></div>
+<pre><span class="cmt">// peek: 맨 위 원소를 보기만 함 (pop 안 함)</span>
+<span class="type">int</span> <span class="fn">peek</span>() {
+    <span class="kw">if</span> (top == <span class="num">-1</span>) <span class="kw">return</span> <span class="num">-1</span>;
+    <span class="line-hl"><span class="kw">return</span> stack[top];            <span class="cmt">// top 변화 없음!</span></span>
+}
+
+<span class="cmt">// isEmpty: 스택이 비었는지 확인</span>
+<span class="type">int</span> <span class="fn">isEmpty</span>() {
+    <span class="line-hl"><span class="kw">return</span> top == <span class="num">-1</span>;            <span class="cmt">// 1(true) or 0(false)</span></span>
+}
+
+<span class="cmt">// 스택에 [10, 20] 이 있을 때:</span>
+<span class="fn">peek</span>();    <span class="cmt">// → 20,  top은 여전히 1</span>
+<span class="fn">isEmpty</span>(); <span class="cmt">// → 0 (false)</span></pre></div>`
+  },
+  {
+    title: '⑤ 실전 예시 — 괄호 검사',
+    html: `<div class="concept-box warn"><strong>정올 단골 문제!</strong> 여는 괄호는 push, 닫는 괄호가 나오면 pop해서 짝이 맞는지 확인해. 마지막에 스택이 비어 있으면 올바른 괄호식이야.</div>
+<div class="code-block"><div class="code-header"><div class="code-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span>05_bracket.c — 괄호 검사</span></div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+
+<span class="type">char</span> stack[<span class="num">1000</span>];
+<span class="type">int</span> top = <span class="num">-1</span>;
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">char</span> s[<span class="num">1000</span>];
+    <span class="fn">scanf</span>(<span class="str">"%s"</span>, s);
+    <span class="type">int</span> n = <span class="fn">strlen</span>(s);
+
+    <span class="kw">for</span> (<span class="type">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+        <span class="kw">if</span> (s[i] == <span class="str">'('</span>) {
+            stack[++top] = <span class="str">'('</span>;      <span class="cmt">// 여는 괄호 push</span>
+        } <span class="kw">else if</span> (s[i] == <span class="str">')'</span>) {
+            <span class="kw">if</span> (top == <span class="num">-1</span>) {          <span class="cmt">// 짝 없는 닫는 괄호</span>
+                <span class="fn">printf</span>(<span class="str">"NO\n"</span>);
+                <span class="kw">return</span> <span class="num">0</span>;
+            }
+            top--;                    <span class="cmt">// 짝 맞는 여는 괄호 pop</span>
+        }
+    }
+    <span class="fn">printf</span>(top == <span class="num">-1</span> ? <span class="str">"YES\n"</span> : <span class="str">"NO\n"</span>); <span class="cmt">// 스택 비었으면 OK</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre></div>`
+  }
+];
+
+let currentCodeStep = 0;
+function showCodeStep(n) {
+  currentCodeStep = n;
+  const panel = document.getElementById('code-panel');
+  const d = codePanels[n];
+  panel.innerHTML = `<div class="card"><h3>${d.title}</h3>${d.html}</div>`;
+  document.querySelectorAll('#code-steps .step').forEach((s, i) => {
+    s.classList.toggle('active', i === n);
+    s.classList.toggle('done', i < n);
+  });
+}
+showCodeStep(0);
+
+/* ── 시뮬레이터 ── */
+let visStack = [];
+const MAX_VIS = 8;
+
+function addLog(msg, cls) {
+  const log = document.getElementById('viz-log');
+  const line = document.createElement('div');
+  line.className = 'log-' + cls;
+  const time = new Date().toLocaleTimeString('ko-KR', {hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.textContent = `[${time}] ${msg}`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updateVis() {
+  const vis = document.getElementById('stack-visual');
+  const existing = vis.querySelectorAll('.stack-cell');
+  existing.forEach(e => e.remove());
+  const emptyLabel = document.getElementById('empty-label');
+
+  if (visStack.length === 0) {
+    emptyLabel.style.display = 'block';
+  } else {
+    emptyLabel.style.display = 'none';
+    visStack.forEach((val, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'stack-cell' + (i === visStack.length - 1 ? ' top' : '');
+      cell.textContent = val;
+      vis.appendChild(cell);
+    });
+  }
+
+  document.getElementById('stat-size').textContent = visStack.length;
+  document.getElementById('stat-top').textContent = visStack.length - 1;
+  document.getElementById('stat-empty').textContent = visStack.length === 0 ? 'true' : 'false';
+
+  let arrStr = 'stack[] = [ ';
+  arrStr += visStack.map((v,i) => {
+    if (i === visStack.length-1) return `<span style="color:var(--accent);font-weight:700;">${v}</span>`;
+    return `<span style="color:#000000;font-weight:600;">${v}</span>`;
+  }).join(', ');
+  arrStr += ' ]';
+  if (visStack.length === 0) arrStr = 'stack[] = [ <span style="color:var(--text3);">비어있음</span> ]';
+  document.getElementById('array-state').innerHTML = arrStr;
+}
+
+function visPush() {
+  const val = parseInt(document.getElementById('push-val').value);
+  if (isNaN(val)) { addLog('숫자를 입력해줘!', 'err'); return; }
+  if (visStack.length >= MAX_VIS) { addLog('Stack Overflow! (최대 ' + MAX_VIS + '개)', 'err'); return; }
+  visStack.push(val);
+  updateVis();
+  setTimeout(() => {
+    const cells = document.querySelectorAll('.stack-cell');
+    if (cells.length) cells[cells.length-1].classList.add('push-anim');
+  }, 10);
+  addLog(`push(${val}) → stack에 ${val} 추가됨, top = ${visStack.length-1}`, 'push');
+}
+
+function visPop() {
+  if (visStack.length === 0) { addLog('Stack Underflow! 빈 스택에서 pop 불가', 'err'); return; }
+  const cells = document.querySelectorAll('.stack-cell');
+  const topCell = cells[cells.length - 1];
+  const val = visStack[visStack.length - 1];
+  topCell.classList.add('pop-anim');
+  setTimeout(() => {
+    visStack.pop();
+    updateVis();
+  }, 280);
+  addLog(`pop() → ${val} 반환, top = ${visStack.length-2}`, 'pop');
+}
+
+function visPeek() {
+  if (visStack.length === 0) { addLog('Stack Underflow! 빈 스택은 peek 불가', 'err'); return; }
+  const val = visStack[visStack.length - 1];
+  const cells = document.querySelectorAll('.stack-cell');
+  const topCell = cells[cells.length - 1];
+  topCell.style.boxShadow = '0 0 0 3px var(--accent2)';
+  setTimeout(() => { topCell.style.boxShadow = ''; }, 700);
+  addLog(`peek() → ${val} (스택 변화 없음, top = ${visStack.length-1})`, 'peek');
+}
+
+function visReset() {
+  visStack = [];
+  updateVis();
+  document.getElementById('viz-log').innerHTML = '<span class="log-info">▶ 초기화됨. 다시 시작해봐!</span>';
+}
+
+updateVis();
+
+/* ── 퀴즈 ── */
+const quizData = [
+  { q: 'top = -1인 스택에서 push(5)를 하면 top의 값은?', opts: ['0','1','-1','5'], ans: 0, fb: 'push하면 top을 먼저 1 올려. -1 + 1 = 0이야!' },
+  { q: 'stack = [3, 7, 2] (top=2) 상태에서 pop()의 반환값은?', opts: ['3','7','2','에러'], ans: 2, fb: 'LIFO! 마지막에 들어온 2가 먼저 나가. stack[top--] = stack[2] = 2' },
+  { q: '빈 스택에서 pop()을 호출하면?', opts: ['0을 반환','Stack Underflow 에러','자동으로 무시','프로그램 종료'], ans: 1, fb: '언더플로우(Underflow)! 비었는지 꼭 체크해야 해 (top == -1)' },
+  { q: 'peek()과 pop()의 차이는?', opts: ['반환값이 다르다','peek은 top을 바꾸지 않는다','속도가 다르다','pop은 배열을 삭제한다'], ans: 1, fb: 'peek()은 값을 읽기만 하고 top을 그대로 유지해. 스택 크기가 변하지 않아!' },
+  { q: '"(()())" 괄호 검사 시 스택의 최대 크기는?', opts: ['1','2','3','6'], ans: 1, fb: '"((" 구간에서 최대 2개. "(" push push → ")" pop → "(" push → ")" pop pop"' },
+  { q: 'push(1) push(2) push(3) pop() pop() push(4) peek() 의 결과는?', opts: ['1','2','3','4'], ans: 3, fb: '1,2,3 push → pop 2번으로 3,2 제거 → 4 push → peek = 4' },
+  { q: 'C에서 stack[++top] = x; 에서 ++top의 의미는?', opts: ['top을 먼저 1 증가시킨 후 사용','top을 사용한 후 1 증가','top을 2 증가','top을 초기화'], ans: 0, fb: '전위 증가(++top)는 먼저 올리고 사용해. 후위(top++)는 사용 후 올려!' },
+  { q: '스택을 배열로 구현할 때 MAX = 100이면 push할 수 있는 최대 횟수는?', opts: ['99','100','101','제한 없음'], ans: 1, fb: 'stack[0] ~ stack[99]로 100개 저장 가능. top 최대값은 MAX-1 = 99' },
+  { q: 'DFS(깊이 우선 탐색)에서 스택이 쓰이는 이유는?', opts: ['정렬이 필요해서','되돌아가기(백트래킹) 위해서','빠른 검색을 위해서','중복 제거를 위해서'], ans: 1, fb: '막다른 길에서 이전 위치로 되돌아갈 때 스택이 꼭 필요해! LIFO 특성이 딱 맞아.' },
+  { q: '함수 호출 시 매개변수와 복귀 주소를 저장하는 메모리 구조는?', opts: ['힙(Heap)','큐(Queue)','콜 스택(Call Stack)','배열'], ans: 2, fb: '운영체제는 함수 호출마다 "스택 프레임"을 콜 스택에 push하고, 함수 종료 시 pop해!' }
+];
+
+let quizScore = 0;
+let quizAnswered = 0;
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = quizData.map((q, qi) => `
+    <div class="quiz-q" id="quiz-${qi}">
+      <div class="quiz-q-text">Q${qi+1}. ${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((opt, oi) => `<div class="quiz-opt" onclick="answerQuiz(${qi},${oi})" id="qopt-${qi}-${oi}">${String.fromCharCode(65+oi)}. ${opt}</div>`).join('')}
+      </div>
+      <div class="quiz-fb" id="qfb-${qi}"></div>
+    </div>
+  `).join('');
+  document.getElementById('quiz-total').textContent = quizData.length;
+}
+
+function answerQuiz(qi, oi) {
+  const q = quizData[qi];
+  if (document.getElementById(`qopt-${qi}-0`).classList.contains('locked')) return;
+  const allOpts = document.querySelectorAll(`#quiz-${qi} .quiz-opt`);
+  allOpts.forEach(o => o.classList.add('locked'));
+  document.getElementById(`qopt-${qi}-${oi}`).classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi === q.ans) {
+    quizScore++;
+    document.getElementById('quiz-score').textContent = quizScore;
+  } else {
+    document.getElementById(`qopt-${qi}-${q.ans}`).classList.add('correct');
+  }
+  const fb = document.getElementById(`qfb-${qi}`);
+  fb.className = 'quiz-fb show ' + (oi === q.ans ? 'ok' : 'bad');
+  fb.innerHTML = (oi === q.ans ? '✓ 정답! ' : '✗ 오답. ') + q.fb;
+  quizAnswered++;
+  document.getElementById('quiz-progress').style.width = (quizAnswered / quizData.length * 100) + '%';
+  document.getElementById('quiz-progress-label').textContent = `${quizAnswered} / ${quizData.length} 풀이`;
+}
+renderQuiz();
+
+/* ── 도전 문제 ── */
+const challenges = [
+  {
+    title: '문제 1 — 스택 직접 구현',
+    tags: ['tag-blue:입문', 'tag-green:정올 브론즈'],
+    desc: `배열로 스택을 구현하고, n개의 연산(push x / pop / print)을 처리해라.<br><br>
+    <strong>입력 예시:</strong><br>
+    <code style="font-family:var(--mono);font-size:14px;color:var(--accent2);font-weight:700;">5<br>push 3<br>push 7<br>pop<br>push 1<br>print</code><br><br>
+    <strong>출력 예시:</strong> <code style="font-family:var(--mono);color:var(--accent);font-weight:700;">1</code>`,
+    hint: 'pop 후 남은 원소: [3, 1]. print는 맨 위(top)을 출력해. isEmpty 체크 잊지 마!',
+    starter: `#include <stdio.h>
+
+#define MAX 1000
+int stack[MAX];
+int top = -1;
+
+void push(int x) {
+    // TODO: 오버플로우 체크 후 push
+    
+}
+
+int pop() {
+    // TODO: 언더플로우 체크 후 pop
+    
+}
+
+int peek() {
+    // TODO: 맨 위 원소 반환
+    
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        char op[10];
+        scanf("%s", op);
+        if (op[0] == 'p' && op[1] == 'u') {
+            int x; scanf("%d", &x);
+            push(x);
+        } else if (op[0] == 'p' && op[1] == 'o') {
+            pop();
+        } else {
+            printf("%d\\n", peek());
+        }
+    }
+    return 0;
+}`
+  },
+  {
+    title: '문제 2 — 괄호 검사',
+    tags: ['tag-pink:정올 실버', 'tag-blue:문자열'],
+    desc: `주어진 괄호 문자열이 올바른지 판별해라.<br><br>
+    <strong>입력:</strong> 괄호만으로 이루어진 문자열 (최대 1000자)<br>
+    <strong>올바른 예:</strong> <code style="font-family:var(--mono);color:var(--accent2);font-weight:700;">(()()) → YES</code><br>
+    <strong>틀린 예:</strong> <code style="font-family:var(--mono);color:var(--accent3);font-weight:700;">((() → NO</code>`,
+    hint: '여는 괄호(()는 push, 닫는 괄호())는 pop. pop 시 스택이 비어있으면 NO. 마지막에 스택이 비어있으면 YES, 아니면 NO!',
+    starter: `#include <stdio.h>
+#include <string.h>
+
+char stack[1000];
+int top = -1;
+
+int main() {
+    char s[1001];
+    scanf("%s", s);
+    int n = strlen(s);
+    
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '(') {
+            // TODO: push
+            
+        } else {
+            // TODO: pop (비어있으면 NO 출력하고 종료)
+            
+        }
+    }
+    
+    // TODO: 마지막에 스택 상태 확인 후 YES/NO 출력
+    
+    return 0;
+}`
+  }
+];
+
+function renderChallenges() {
+  const container = document.getElementById('challenge-container');
+  container.innerHTML = challenges.map((ch, ci) => `
+    <div class="card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <h3 style="margin:0;">${ch.title}</h3>
+        ${ch.tags.map(t => { const [cls,label] = t.split(':'); return `<span class="tag ${cls}">${label}</span>`; }).join('')}
+      </div>
+      <p style="font-size:15px;margin-bottom:16px;">${ch.desc}</p>
+      <div class="challenge-wrap">
+        <div>
+          <div class="section-label">코드 작성</div>
+          <textarea id="code-${ci}" rows="22" spellcheck="false">${ch.starter}</textarea>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="run-btn" onclick="runChallenge(${ci})">▶ 실행 (C 시뮬)</button>
+            <span class="challenge-hint" onclick="toggleHint(${ci})">💡 힌트 보기</span>
+          </div>
+          <div class="hint-text" id="hint-${ci}">${ch.hint}</div>
+        </div>
+        <div>
+          <div class="section-label">출력 결과</div>
+          <div class="output-box" id="output-${ci}">▶ 실행 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleHint(ci) {
+  const h = document.getElementById('hint-' + ci);
+  h.classList.toggle('show');
+}
+
+function runChallenge(ci) {
+  const code = document.getElementById('code-' + ci).value;
+  const out = document.getElementById('output-' + ci);
+
+  try {
+    let result = '';
+    if (ci === 0) {
+      result = simulateStack1(code);
+    } else if (ci === 1) {
+      result = simulateStack2(code);
+    }
+    out.className = 'output-box output-ok';
+    out.textContent = result;
+  } catch(e) {
+    out.className = 'output-box output-err';
+    out.textContent = '오류: ' + e.message;
+  }
+}
+
+function simulateStack1(code) {
+  const hasOverflow = code.includes('MAX - 1') || code.includes('MAX-1');
+  const hasUnderflow = code.includes('-1') && code.includes('top ==');
+  const hasPushLogic = code.includes('++top') || code.includes('top + 1');
+  const hasPopLogic = code.includes('top--') || code.includes('top - 1');
+  const hasPeekLogic = code.includes('stack[top]');
+
+  if (!hasPushLogic) return '❌ push() 함수에 top 증가 로직이 없어! (++top 또는 top+1 사용)';
+  if (!hasPopLogic) return '❌ pop() 함수에 top 감소 로직이 없어! (top-- 사용)';
+  if (!hasPeekLogic) return '❌ peek() 함수가 stack[top]을 반환하지 않아!';
+  if (!hasUnderflow) return '⚠️ 거의 다 왔어! pop()에서 언더플로우 체크(top == -1)를 추가해봐.';
+
+  return `✅ 잘 작성했어! 코드 분석 결과:
+
+push(): ${hasPushLogic ? '✓ top 증가 로직 확인' : '✗ 미완성'}
+pop():  ${hasPopLogic ? '✓ top 감소 로직 확인' : '✗ 미완성'}
+peek(): ${hasPeekLogic ? '✓ stack[top] 반환 확인' : '✗ 미완성'}
+오버플로우 체크: ${hasOverflow ? '✓' : '△ 추가하면 더 좋아'}
+언더플로우 체크: ${hasUnderflow ? '✓' : '△ 추가하면 더 좋아'}
+
+입력 예시 [push 3, push 7, pop, push 1, print] 실행:
+→ push(3): stack=[3], top=0
+→ push(7): stack=[3,7], top=1
+→ pop():   stack=[3], top=0 (7 반환)
+→ push(1): stack=[3,1], top=1
+→ print:   출력 = 1  ✓`;
+}
+
+function simulateStack2(code) {
+  const hasPush = (code.includes('++top') || code.includes('top++') || code.includes('top +')) && code.includes("'('");
+  const hasPop = (code.includes('top--') || code.includes('--top') || code.includes('top-')) && code.includes("')'");
+  const hasEmptyCheck = code.includes('top == -1') || code.includes('-1 ==');
+  const hasFinalCheck = code.includes('"YES"') || code.includes("'Y'");
+
+  if (!hasPush) return '❌ 여는 괄호 ( 를 push하는 코드가 없어!';
+  if (!hasPop) return '❌ 닫는 괄호 ) 에서 pop하는 코드가 없어!';
+  if (!hasEmptyCheck) return '⚠️ 거의 다 왔어! 빈 스택 체크(top == -1)를 추가해봐.';
+  if (!hasFinalCheck) return '⚠️ 마지막에 YES/NO 출력을 추가해봐! (top == -1 ? "YES" : "NO")';
+
+  return `✅ 괄호 검사 로직 완성!
+
+테스트 실행:
+"(()())" → push push pop push pop pop
+            → 스택이 최종적으로 비어있음 → YES ✓
+
+"((()" → push push push pop
+          → 스택에 2개 남음 → NO ✓
+
+"())" → push pop → 빈 스택에서 pop 시도
+         → Underflow 감지 → NO ✓
+
+구현 체크:
+여는 괄호 push: ✓
+닫는 괄호 pop:  ✓
+언더플로우 체크: ${hasEmptyCheck ? '✓' : '△'}
+최종 결과 출력: ✓`;
+}
+
+renderChallenges();
+</script>
+</body>
+</html>

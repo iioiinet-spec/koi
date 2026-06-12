@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>두 개의 스택 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --bg:#f4f7fb; --wh:#fff; --s1:#edf1f9; --s2:#e2e8f5;
+  --bd:#cdd5ec; --bd2:#b4bedd;
+  --t1:#111829; --t2:#273060; --t3:#5a6490; --t4:#9ba3c8;
+
+  /* Stack A — teal */
+  --a:  #0d7c6a; --a-l:#d0faf0; --a-m:#5ee4ca;
+  /* Stack B — violet */
+  --b:  #6d28d9; --b-l:#ede9fe; --b-m:#c4b5fd;
+  /* Accent — coral (transfer moment) */
+  --ac: #dc4a1a; --ac-l:#fff0e8; --ac-m:#fdb99a;
+  /* Gold — best / answer */
+  --gd: #b07800; --gd-l:#fff8d4; --gd-m:#ffd966;
+  /* Sky — info */
+  --sk: #0369a1; --sk-l:#e0f2fe; --sk-m:#7dd3fc;
+  /* Slate */
+  --sl: #475569; --sl-l:#f1f5f9; --sl-m:#cbd5e1;
+
+  --mono:'JetBrains Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  --r:10px; --r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* HEADER */
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:64px;}
+.hdr-stripe{width:10px;flex-shrink:0;background:linear-gradient(180deg,var(--a) 0%,var(--b) 100%);}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 26px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.05em;}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.hdr-ba{background:var(--a-l);color:var(--a);border:1.5px solid var(--a-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.hdr-bb{background:var(--b-l);color:var(--b);border:1.5px solid var(--b-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* NAV */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--a);border-bottom-color:var(--a);font-weight:700;}
+
+/* PAGES */
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* TYPE */
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--b);}
+
+/* CALLOUT */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.ca2{background:var(--a-l);color:var(--t2);border-color:var(--a);}
+.cb2{background:var(--b-l);color:var(--t2);border-color:var(--b);}
+.cac{background:var(--ac-l);color:var(--t2);border-color:var(--ac);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+.csl{background:var(--sl-l);color:var(--t2);border-color:var(--sl);}
+
+/* CARD */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+/* STEP BAR */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;}
+.sbt{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.on{background:var(--a-l);color:var(--a);font-weight:700;}
+.sbt.dn{background:var(--b-l);color:var(--b);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* CODE */
+.cw{background:#141c2e;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #1e2840;}
+.cbr{background:#1a2438;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#6278b8;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e2840;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d5f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}
+.hla{background:rgba(13,124,106,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+.hlb{background:rgba(109,40,217,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #a78bfa;}
+.hlc{background:rgba(220,74,26,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fb923c;}
+
+/* TAGS */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.ta{background:var(--a-l);color:var(--a);border:1px solid var(--a-m);}
+.tb{background:var(--b-l);color:var(--b);border:1px solid var(--b-m);}
+.tac{background:var(--ac-l);color:var(--ac);border:1px solid var(--ac-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+.tsl{background:var(--sl-l);color:var(--sl);border:1px solid var(--sl-m);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ══════════════════════════
+   DUAL STACK VISUAL (shared array)
+══════════════════════════ */
+.dstack-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px;margin-bottom:18px;}
+.array-track{display:flex;gap:0;overflow-x:auto;padding:4px 0 8px;}
+.arr-slot{width:52px;height:56px;border-top:2px solid var(--bd);border-bottom:2px solid var(--bd);border-right:2px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;transition:all .28s cubic-bezier(.34,1.56,.64,1);position:relative;}
+.arr-slot:first-child{border-left:2px solid var(--bd);border-radius:var(--r) 0 0 var(--r);}
+.arr-slot:last-child{border-radius:0 var(--r) var(--r) 0;}
+.arr-slot .sv{font-size:18px;color:var(--t1);}
+.arr-slot .si{font-size:10px;color:var(--t4);position:absolute;bottom:3px;}
+.arr-slot.sa{background:var(--a-l);border-color:var(--a);} .arr-slot.sa .sv{color:var(--a);}
+.arr-slot.sb{background:var(--b-l);border-color:var(--b);} .arr-slot.sb .sv{color:var(--b);}
+.arr-slot.sa.top1{box-shadow:inset 0 -4px 0 var(--a);} .arr-slot.sb.top2{box-shadow:inset 0 -4px 0 var(--b);}
+.arr-slot.clash{background:var(--ac-l);border-color:var(--ac);animation:clashPulse .6s ease;}
+@keyframes clashPulse{0%,100%{transform:none;}50%{transform:scale(1.12);}}
+.arr-slot.push-anim{animation:slotIn .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes slotIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:none;}}
+
+.ptr-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;}
+.ptr{background:var(--s1);border:1.5px solid var(--bd);border-radius:8px;padding:6px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.ptr span{font-weight:700;}
+
+/* two-panel stack display for queue-via-two-stacks */
+.two-stacks-display{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start;margin-bottom:16px;}
+@media(max-width:600px){.two-stacks-display{grid-template-columns:1fr;}}
+.stk-visual-box{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:14px;}
+.stk-visual-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.stk-col{display:flex;flex-direction:column-reverse;gap:4px;min-height:180px;background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;position:relative;}
+.stk-col::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 var(--r) var(--r);}
+.stk-col.col-a::after{background:var(--a);}
+.stk-col.col-b::after{background:var(--b);}
+.stk-item{padding:7px 12px;border-radius:7px;font-family:var(--mono);font-size:15px;font-weight:700;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.stk-item.ia{background:var(--a-l);border:1.5px solid var(--a-m);color:var(--a);}
+.stk-item.ib{background:var(--b-l);border:1.5px solid var(--b-m);color:var(--b);}
+.stk-item.i-top-a{box-shadow:0 0 0 2px var(--a);}
+.stk-item.i-top-b{box-shadow:0 0 0 2px var(--b);}
+.stk-item.i-in{animation:itemIn .32s cubic-bezier(.34,1.56,.64,1);}
+@keyframes itemIn{from{opacity:0;transform:scale(.75)translateY(10px);}to{opacity:1;transform:none;}}
+.stk-empty-msg{color:var(--t4);font-size:13px;text-align:center;padding:16px 0;}
+.transfer-arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--ac);padding:60px 0 0;}
+
+/* Controls */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.btn{padding:10px 20px;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.btn:disabled{opacity:.38;cursor:default;}
+.bna{background:var(--a);color:#fff;border-color:var(--a);}    .bna:hover:not(:disabled){background:#0a5f50;}
+.bnb{background:var(--b);color:#fff;border-color:var(--b);}    .bnb:hover:not(:disabled){background:#5219b0;}
+.bac{background:var(--ac);color:#fff;border-color:var(--ac);}  .bac:hover:not(:disabled){background:#b23a14;}
+.bgd{background:var(--gd-l);color:var(--gd);border-color:var(--gd-m);}.bgd:hover:not(:disabled){background:var(--gd);color:#fff;}
+.br{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.br:hover{border-color:var(--t2);}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;width:76px;}
+.inp:focus{border-color:var(--a);}
+
+/* LOG */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:145px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.95;}
+.la2{color:var(--a);font-weight:600;} .lb2{color:var(--b);font-weight:600;} .lac{color:var(--ac);font-weight:600;} .lgd2{color:var(--gd);font-weight:700;} .li2{color:var(--t4);}
+
+/* STATS */
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:14px;color:var(--t2);}
+.stat span{font-weight:700;}
+
+/* TABS within page */
+.tab-btns{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.tbtn{padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.tbtn:hover{border-color:var(--a);color:var(--a);}
+.tbtn.on{background:var(--a-l);border-color:var(--a);color:var(--a);}
+.tbtn.onb{background:var(--b-l);border-color:var(--b);color:var(--b);}
+.tab-content{display:none;} .tab-content.on{display:block;}
+
+/* SL */
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--a);color:var(--a);background:var(--a-l);}
+.qopt.correct{background:var(--a-l);border-color:var(--a);color:var(--a);}
+.qopt.wrong{background:var(--ac-l);border-color:var(--ac);color:var(--ac);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--a-l);color:var(--a);border:1px solid var(--a-m);}
+.qfb.bad{background:var(--ac-l);color:var(--ac);border:1px solid var(--ac-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--a);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:linear-gradient(90deg,var(--a),var(--b));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#141c2e;border:1.5px solid #1e2840;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d5f5;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--a);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--a);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:#0a5f50;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--a);}.oe{color:var(--ac);}
+.ht{font-size:14px;color:var(--b);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--gd-l);border-radius:var(--r);font-size:14px;color:var(--gd);border:1px solid var(--gd-m);line-height:1.7;}
+.hb.show{display:block;}
+
+/* PROGRESS */
+.prog-lbl{font-size:13px;color:var(--t3);margin-bottom:5px;}
+.prog-wrap{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--a),var(--b));border-radius:3px;transition:width .4s;}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-stripe"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">두 개의 스택 (Two Stacks)</span>
+    <span class="hdr-ba">스택 A</span>
+    <span class="hdr-bb">스택 B</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on"  onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"     onclick="goPage('shared')">🔗 공유 배열</div>
+  <div class="nt"     onclick="goPage('queue')">🔄 큐 구현</div>
+  <div class="nt"     onclick="goPage('sim')">🎮 시뮬레이터</div>
+  <div class="nt"     onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"     onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     PAGE 1: 개념
+═══════════════════════════════════════ -->
+<div class="pg on" id="page-concept">
+  <h2>두 개의 스택</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 심화 | 스택 2개를 활용하는 핵심 기법 2가지</p>
+
+  <div class="co ca2">
+    <strong>왜 두 개의 스택을 배워야 할까?</strong><br>
+    스택 하나로 해결할 수 없는 문제들을 두 개를 조합하면 풀 수 있어.<br>
+    정올·코딩 테스트에서 자주 나오는 두 가지 핵심 기법을 배워보자!
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3 style="color:var(--a);">기법 ① — 하나의 배열에 두 스택</h3>
+      <p>배열 하나를 <strong>왼쪽·오른쪽</strong>으로 나눠 두 스택이 <strong>서로 반대 방향</strong>으로 성장해.<br>공간을 최대로 효율적으로 쓸 수 있어!</p>
+      <div style="font-family:var(--mono);font-size:13px;background:var(--s1);padding:12px 14px;border-radius:var(--r);line-height:2;">
+        <span style="color:var(--a);font-weight:700;">[A→ A→ A→ &nbsp; &nbsp; &nbsp; ←B ←B]</span><br>
+        Stack A: 인덱스 0에서 오른쪽으로<br>
+        Stack B: 인덱스 MAX-1에서 왼쪽으로
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--b);">기법 ② — 두 스택으로 큐 구현</h3>
+      <p>스택 2개를 조합해서 <strong>큐(FIFO)</strong>를 만들어.<br>각 연산의 분할 상환 복잡도가 <strong>O(1)</strong>이야!</p>
+      <div style="font-family:var(--mono);font-size:13px;background:var(--s1);padding:12px 14px;border-radius:var(--r);line-height:2;">
+        <span style="color:var(--a);font-weight:700;">inbox 스택</span>: enqueue 시 push<br>
+        <span style="color:var(--b);font-weight:700;">outbox 스택</span>: dequeue 시 pop<br>
+        outbox 비면 → inbox 전부 이동!
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">두 기법 한눈에 비교</h3>
+  <table>
+    <tr><th></th><th>하나의 배열에 두 스택</th><th>두 스택으로 큐 구현</th></tr>
+    <tr><td style="font-weight:700;">목적</td><td>공간 효율 극대화</td><td>큐 기능을 스택으로 흉내</td></tr>
+    <tr><td style="font-weight:700;">자료구조</td><td>배열 1개를 공유</td><td>스택 2개 (inbox + outbox)</td></tr>
+    <tr><td style="font-weight:700;">push/enqueue</td><td>O(1)</td><td>O(1)</td></tr>
+    <tr><td style="font-weight:700;">pop/dequeue</td><td>O(1)</td><td>분할상환 O(1)</td></tr>
+    <tr><td style="font-weight:700;">오버플로우 조건</td><td>top1 + 1 == top2</td><td>inbox가 가득 찰 때</td></tr>
+    <tr><td style="font-weight:700;">정올 출제</td><td><span class="tag ta">중급</span></td><td><span class="tag tb">실버~골드</span></td></tr>
+  </table>
+
+  <div class="co cgd">
+    <strong>분할 상환(Amortized) O(1)이란?</strong><br>
+    두 스택으로 큐를 구현할 때, 개별 dequeue는 O(n)이 걸릴 수 있어 (inbox → outbox 이동).<br>
+    하지만 <strong>n번의 연산 총합은 O(n)</strong>이야. 평균하면 각 연산이 O(1)이란 뜻!<br>
+    각 원소는 inbox push 1번 → outbox push 1번 → outbox pop 1번 = 최대 3번만 처리돼.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 2: 공유 배열 두 스택
+═══════════════════════════════════════ -->
+<div class="pg" id="page-shared">
+  <h2>기법 ① — 하나의 배열에 두 스택</h2>
+  <p class="psub">배열 양 끝에서 서로 마주보며 성장하는 두 스택!</p>
+
+  <div class="sbar" id="sbar-shared">
+    <div class="sbt on"  onclick="goShared(0)"><span class="snum">01</span>구조 설계</div>
+    <div class="sbt"     onclick="goShared(1)"><span class="snum">02</span>push 구현</div>
+    <div class="sbt"     onclick="goShared(2)"><span class="snum">03</span>pop 구현</div>
+    <div class="sbt"     onclick="goShared(3)"><span class="snum">04</span>완성 코드</div>
+  </div>
+  <div id="panel-shared"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 3: 두 스택으로 큐
+═══════════════════════════════════════ -->
+<div class="pg" id="page-queue">
+  <h2>기법 ② — 두 스택으로 큐 구현</h2>
+  <p class="psub">inbox + outbox 패턴으로 FIFO를 스택 2개로 만들어봐!</p>
+
+  <div class="sbar" id="sbar-queue">
+    <div class="sbt on"  onclick="goQueue(0)"><span class="snum">01</span>아이디어</div>
+    <div class="sbt"     onclick="goQueue(1)"><span class="snum">02</span>enqueue</div>
+    <div class="sbt"     onclick="goQueue(2)"><span class="snum">03</span>dequeue</div>
+    <div class="sbt"     onclick="goQueue(3)"><span class="snum">04</span>전체 코드</div>
+  </div>
+  <div id="panel-queue"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 4: 시뮬레이터
+═══════════════════════════════════════ -->
+<div class="pg" id="page-sim">
+  <h2>인터랙티브 시뮬레이터</h2>
+  <p class="psub">두 가지 기법을 직접 조작하면서 눈으로 확인해봐!</p>
+
+  <!-- tab switcher -->
+  <div class="tab-btns">
+    <div class="tbtn on" id="stab-0" onclick="switchSim(0)">🔗 공유 배열 두 스택</div>
+    <div class="tbtn"    id="stab-1" onclick="switchSim(1)">🔄 두 스택으로 큐</div>
+  </div>
+
+  <!-- SIM A: shared array -->
+  <div class="tab-content on" id="sim-a">
+    <div class="dstack-wrap">
+      <div class="sl">공유 배열 (MAX = 10)</div>
+      <div class="array-track" id="shared-arr"></div>
+      <div class="ptr-row">
+        <div class="ptr">top1 = <span id="s-top1" style="color:var(--a);">-1</span></div>
+        <div class="ptr">top2 = <span id="s-top2" style="color:var(--b);">10</span></div>
+        <div class="ptr">남은 공간 = <span id="s-free" style="color:var(--gd);">10</span></div>
+        <div class="ptr">isEmpty A = <span id="s-emA" style="color:var(--ac);">true</span></div>
+        <div class="ptr">isEmpty B = <span id="s-emB" style="color:var(--ac);">true</span></div>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <input class="inp" type="number" id="sa-val" value="5" placeholder="값">
+      <button class="btn bna" onclick="sharedPushA()">A에 push</button>
+      <button class="btn bnb" onclick="sharedPushB()">B에 push</button>
+      <button class="btn bna" style="background:var(--a-l);color:var(--a);border-color:var(--a-m);" onclick="sharedPopA()">A에서 pop</button>
+      <button class="btn bnb" style="background:var(--b-l);color:var(--b);border-color:var(--b-m);" onclick="sharedPopB()">B에서 pop</button>
+      <button class="btn br" onclick="sharedReset()">↺ 초기화</button>
+    </div>
+    <div class="sl">실행 로그</div>
+    <div class="log" id="sa-log"><span class="li2">▶ A 또는 B에 값을 push해봐!</span></div>
+  </div>
+
+  <!-- SIM B: queue via two stacks -->
+  <div class="tab-content" id="sim-b">
+    <div class="two-stacks-display">
+      <div class="stk-visual-box">
+        <div class="stk-visual-title">
+          <div style="width:14px;height:14px;border-radius:50%;background:var(--a);"></div>
+          inbox 스택 (enqueue 전용)
+        </div>
+        <div class="stk-col col-a" id="q-inbox">
+          <div class="stk-empty-msg">비어 있음</div>
+        </div>
+      </div>
+      <div class="transfer-arrow" id="transfer-sign">
+        <div style="text-align:center;font-size:14px;color:var(--ac);font-weight:700;line-height:1.6;">
+          outbox<br>비면<br>↓<br>전부<br>이동<br>↓
+        </div>
+      </div>
+      <div class="stk-visual-box">
+        <div class="stk-visual-title">
+          <div style="width:14px;height:14px;border-radius:50%;background:var(--b);"></div>
+          outbox 스택 (dequeue 전용)
+        </div>
+        <div class="stk-col col-b" id="q-outbox">
+          <div class="stk-empty-msg">비어 있음</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">inbox size = <span id="q-ins" style="color:var(--a);">0</span></div>
+      <div class="stat">outbox size = <span id="q-outs" style="color:var(--b);">0</span></div>
+      <div class="stat">큐 총 크기 = <span id="q-total" style="color:var(--gd);">0</span></div>
+      <div class="stat">front = <span id="q-front" style="color:var(--b);">-</span></div>
+    </div>
+
+    <div class="ctrl">
+      <input class="inp" type="number" id="qb-val" value="10" placeholder="값">
+      <button class="btn bna" onclick="qEnqueue()">enqueue(x)</button>
+      <button class="btn bnb" onclick="qDequeue()">dequeue()</button>
+      <button class="btn bgd" onclick="qPeek()">front()</button>
+      <button class="btn br" onclick="qReset()">↺ 초기화</button>
+    </div>
+    <div class="sl">실행 로그</div>
+    <div class="log" id="qb-log"><span class="li2">▶ enqueue로 값을 넣어봐!</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 5: 퀴즈
+═══════════════════════════════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>두 스택 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 6: 도전
+═══════════════════════════════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">두 개의 스택을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   PAGE NAV
+════════════════════════════════════════ */
+const PM={concept:0,shared:1,queue:2,sim:3,quiz:4,challenge:5};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('on',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('on');
+}
+
+/* ════════════════════════════════════════
+   SHARED ARRAY STEPS
+════════════════════════════════════════ */
+const SHARED_STEPS=[
+{t:'① 구조 설계 — 양 끝에서 마주보는 두 스택',
+ b:`<div class="co ca2">
+  <strong>핵심 아이디어</strong>: 배열 하나를 두 스택이 <strong>반대 방향</strong>으로 공유해.<br>
+  Stack A는 인덱스 0에서 오른쪽(→)으로, Stack B는 MAX-1에서 왼쪽(←)으로 자라.<br>
+  두 top 포인터가 만나기 전까지 서로의 공간을 침범하지 않아!
+</div>
+<div style="background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:18px;margin-bottom:18px;overflow-x:auto;">
+  <div style="font-family:var(--mono);font-size:14px;margin-bottom:10px;color:var(--t3);">배열 상태 예시 (MAX=8)</div>
+  <div style="display:flex;gap:0;min-width:400px;">
+    ${[0,1,2,3,4,5,6,7].map((i)=>{
+      let bg='var(--s1)',txt='',col='var(--t4)',lbl='';
+      if(i<=1){bg='var(--a-l)';txt=i===0?'A1':i===1?'A2':'';col='var(--a)';lbl=i===1?'top1':'';}
+      else if(i>=5){bg='var(--b-l)';txt=i===5?'B2':i===6?'B1':'B0?';col='var(--b)';lbl=i===5?'top2':'';}
+      return `<div style="width:52px;height:56px;border:2px solid var(--bd);border-left:${i===0?'2px':'0px'} solid var(--bd);background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:${col};font-size:14px;font-family:var(--mono);border-radius:${i===0?'8px 0 0 8px':i===7?'0 8px 8px 0':'0'};position:relative;">
+      <span>${txt||i}</span>
+      <span style="font-size:10px;color:var(--t4);position:absolute;bottom:3px;">[${i}]</span>
+      ${lbl?`<span style="font-size:9px;font-weight:700;color:${i<=1?'var(--a)':'var(--b)'};position:absolute;top:-18px;">${lbl}</span>`:''}
+    </div>`;}).join('')}
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;font-family:var(--mono);">
+    <span style="color:var(--a);">← Stack A (top1=1)</span>
+    <span style="color:var(--b);">Stack B (top2=5) →</span>
+  </div>
+</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_two_stacks_declare.c</span></div>
+<pre><span class="kw">#define</span> <span class="nm">MAX 100</span>          <span class="cm">// 배열 전체 크기</span>
+
+<span class="tp">int</span> arr[<span class="nm">MAX</span>];           <span class="cm">// 두 스택이 공유하는 배열</span>
+<span class="hla"><span class="tp">int</span> top1 = <span class="nm">-1</span>;          <span class="cm">// Stack A: 인덱스 0에서 시작, 오른쪽으로 성장</span></span>
+<span class="hlb"><span class="tp">int</span> top2 = <span class="nm">MAX</span>;         <span class="cm">// Stack B: 인덱스 MAX-1에서 시작, 왼쪽으로 성장</span></span>
+
+<span class="cm">// 오버플로우 조건: top1 + 1 == top2 (두 포인터가 만남)</span>
+<span class="cm">// Stack A 언더플로우: top1 == -1</span>
+<span class="cm">// Stack B 언더플로우: top2 == MAX</span></pre></div>
+<div class="card"><h4>포인터 초기값의 의미</h4>
+<table style="margin-bottom:0;">
+<tr><th>포인터</th><th>초기값</th><th>의미</th><th>push 방향</th></tr>
+<tr><td style="color:var(--a);font-family:var(--mono);font-weight:700;">top1</td><td><code>-1</code></td><td>A가 비어있음 (arr[0] 아직 없음)</td><td>top1++ 후 저장</td></tr>
+<tr><td style="color:var(--b);font-family:var(--mono);font-weight:700;">top2</td><td><code>MAX</code></td><td>B가 비어있음 (arr[MAX-1] 아직 없음)</td><td>top2-- 후 저장</td></tr>
+</table></div>`},
+
+{t:'② push 구현 — A는 우↑, B는 좌↑',
+ b:`<div class="co ca2">오버플로우 조건이 핵심이야! <code>top1 + 1 == top2</code>이면 두 스택이 만난 것 — 더 이상 공간 없음.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_push.c</span></div>
+<pre><span class="cm">// Stack A에 push (오른쪽으로)</span>
+<span class="tp">void</span> <span class="fn">pushA</span>(<span class="tp">int</span> x) {
+<span class="hlc">    <span class="kw">if</span> (top1 + <span class="nm">1</span> == top2) {       <span class="cm">// 두 스택이 만남 → 오버플로우!</span></span>
+<span class="hlc">        <span class="fn">printf</span>(<span class="st">"Overflow!\n"</span>); <span class="kw">return</span>;</span>
+<span class="hlc">    }</span>
+<span class="hla">    arr[++top1] = x;               <span class="cm">// top1 증가 후 저장</span></span>
+}
+
+<span class="cm">// Stack B에 push (왼쪽으로)</span>
+<span class="tp">void</span> <span class="fn">pushB</span>(<span class="tp">int</span> x) {
+<span class="hlc">    <span class="kw">if</span> (top1 + <span class="nm">1</span> == top2) {       <span class="cm">// 동일한 오버플로우 조건!</span></span>
+<span class="hlc">        <span class="fn">printf</span>(<span class="st">"Overflow!\n"</span>); <span class="kw">return</span>;</span>
+<span class="hlc">    }</span>
+<span class="hlb">    arr[--top2] = x;               <span class="cm">// top2 감소 후 저장</span></span>
+}
+</pre></div>
+<div class="card"><h4>A와 B push의 대칭 아름다움</h4>
+<table style="margin-bottom:0;">
+<tr><th></th><th>Stack A (pushA)</th><th>Stack B (pushB)</th></tr>
+<tr><td style="font-weight:700;">포인터 이동</td><td><code>arr[++top1] = x</code></td><td><code>arr[--top2] = x</code></td></tr>
+<tr><td style="font-weight:700;">방향</td><td>오른쪽 →</td><td>← 왼쪽</td></tr>
+<tr><td style="font-weight:700;">오버플로우</td><td colspan="2">두 조건 동일: <code>top1 + 1 == top2</code></td></tr>
+</table></div>`},
+
+{t:'③ pop 구현 — 각 방향으로 후퇴',
+ b:`<div class="co cb2">pop은 push의 반대 방향이야. A는 top1을 감소, B는 top2를 증가시키면서 값을 반환해.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_pop.c</span></div>
+<pre><span class="cm">// Stack A에서 pop</span>
+<span class="tp">int</span> <span class="fn">popA</span>() {
+    <span class="kw">if</span> (top1 == <span class="nm">-1</span>) {            <span class="cm">// A가 비었는지 확인</span>
+        <span class="fn">printf</span>(<span class="st">"Underflow A!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+<span class="hla">    <span class="kw">return</span> arr[top1--];           <span class="cm">// 반환 후 top1 감소</span></span>
+}
+
+<span class="cm">// Stack B에서 pop</span>
+<span class="tp">int</span> <span class="fn">popB</span>() {
+    <span class="kw">if</span> (top2 == <span class="nm">MAX</span>) {           <span class="cm">// B가 비었는지 확인</span>
+        <span class="fn">printf</span>(<span class="st">"Underflow B!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+<span class="hlb">    <span class="kw">return</span> arr[top2++];           <span class="cm">// 반환 후 top2 증가 (왼쪽 방향 복귀)</span></span>
+}
+
+<span class="cm">// peekA, peekB, isEmptyA, isEmptyB</span>
+<span class="tp">int</span> <span class="fn">peekA</span>() { <span class="kw">return</span> top1==-<span class="nm">1</span> ? -<span class="nm">1</span> : arr[top1]; }
+<span class="tp">int</span> <span class="fn">peekB</span>() { <span class="kw">return</span> top2==<span class="nm">MAX</span> ? -<span class="nm">1</span> : arr[top2]; }
+<span class="tp">int</span> <span class="fn">isEmptyA</span>() { <span class="kw">return</span> top1 == -<span class="nm">1</span>; }
+<span class="tp">int</span> <span class="fn">isEmptyB</span>() { <span class="kw">return</span> top2 == <span class="nm">MAX</span>; }
+<span class="tp">int</span> <span class="fn">sizeA</span>()    { <span class="kw">return</span> top1 + <span class="nm">1</span>; }
+<span class="tp">int</span> <span class="fn">sizeB</span>()    { <span class="kw">return</span> <span class="nm">MAX</span> - top2; }</pre></div>`},
+
+{t:'④ 완성 코드',
+ b:`<div class="co ca2">두 스택 공유 배열 완전 구현 코드야. 전체 흐름을 한 번에 확인해봐!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>two_stacks_shared.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100</span>
+
+<span class="tp">int</span> arr[<span class="nm">MAX</span>];
+<span class="tp">int</span> top1 = <span class="nm">-1</span>, top2 = <span class="nm">MAX</span>;
+
+<span class="tp">int</span> <span class="fn">isFull</span>()  { <span class="kw">return</span> top1 + <span class="nm">1</span> == top2; }
+<span class="tp">int</span> <span class="fn">isEmptyA</span>() { <span class="kw">return</span> top1 == <span class="nm">-1</span>; }
+<span class="tp">int</span> <span class="fn">isEmptyB</span>() { <span class="kw">return</span> top2 == <span class="nm">MAX</span>; }
+
+<span class="tp">void</span> <span class="fn">pushA</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (<span class="fn">isFull</span>()) { <span class="fn">printf</span>(<span class="st">"Overflow\n"</span>); <span class="kw">return</span>; }
+<span class="hla">    arr[++top1] = x;</span>
+}
+<span class="tp">void</span> <span class="fn">pushB</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (<span class="fn">isFull</span>()) { <span class="fn">printf</span>(<span class="st">"Overflow\n"</span>); <span class="kw">return</span>; }
+<span class="hlb">    arr[--top2] = x;</span>
+}
+<span class="tp">int</span> <span class="fn">popA</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmptyA</span>()) { <span class="fn">printf</span>(<span class="st">"Underflow\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>; }
+<span class="hla">    <span class="kw">return</span> arr[top1--];</span>
+}
+<span class="tp">int</span> <span class="fn">popB</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmptyB</span>()) { <span class="fn">printf</span>(<span class="st">"Underflow\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>; }
+<span class="hlb">    <span class="kw">return</span> arr[top2++];</span>
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">pushA</span>(<span class="nm">1</span>); <span class="fn">pushA</span>(<span class="nm">2</span>); <span class="fn">pushB</span>(<span class="nm">10</span>); <span class="fn">pushB</span>(<span class="nm">20</span>);
+    <span class="fn">printf</span>(<span class="st">"popA=%d\n"</span>, <span class="fn">popA</span>()); <span class="cm">// 2</span>
+    <span class="fn">printf</span>(<span class="st">"popB=%d\n"</span>, <span class="fn">popB</span>()); <span class="cm">// 20</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+<div class="co cgd" style="margin-bottom:0;"><strong>활용 예시</strong>: 두 플레이어의 패(카드)를 하나의 배열에 저장하거나, 좌우 양방향에서 탐색하는 알고리즘에서 유용해!</div>`}
+];
+
+let sharedIdx=0;
+function goShared(n){
+  sharedIdx=n;
+  document.getElementById('panel-shared').innerHTML=
+    `<div class="card"><h3>${SHARED_STEPS[n].t}</h3>${SHARED_STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-shared .sbt').forEach((b,i)=>{
+    b.classList.toggle('on',i===n); b.classList.toggle('dn',i<n);
+  });
+}
+goShared(0);
+
+/* ════════════════════════════════════════
+   QUEUE STEPS
+════════════════════════════════════════ */
+const QUEUE_STEPS=[
+{t:'① 핵심 아이디어 — inbox ↔ outbox',
+ b:`<div class="co cb2">
+  <strong>두 스택으로 큐를 만드는 마법!</strong><br>
+  스택은 LIFO, 큐는 FIFO야. 스택 두 개를 겹치면 LIFO + LIFO = FIFO가 돼!<br>
+  왜냐면 뒤집으면 원래 순서로 돌아오거든. 1→2→3을 inbox에 넣고 outbox로 옮기면 3→2→1 → pop하면 1,2,3 순서!
+</div>
+<div class="card">
+  <h4>동작 흐름 — enqueue(1,2,3) 후 dequeue() 세 번</h4>
+  <div style="overflow-x:auto;"><table style="min-width:500px;font-family:var(--mono);font-size:14px;margin-bottom:0;">
+    <tr><th>연산</th><th style="color:var(--a);">inbox (bottom→top)</th><th style="color:var(--b);">outbox (bottom→top)</th><th>반환값</th></tr>
+    <tr><td>enqueue(1)</td><td style="color:var(--a);">[1]</td><td>[]</td><td>-</td></tr>
+    <tr><td>enqueue(2)</td><td style="color:var(--a);">[1,2]</td><td>[]</td><td>-</td></tr>
+    <tr><td>enqueue(3)</td><td style="color:var(--a);">[1,2,3]</td><td>[]</td><td>-</td></tr>
+    <tr style="background:var(--ac-l);"><td>dequeue() ★이동!</td><td style="color:var(--a);">[]</td><td style="color:var(--b);">[3,2,1]</td><td style="color:var(--gd);font-weight:700;">1 ✓</td></tr>
+    <tr><td>dequeue()</td><td>[]</td><td style="color:var(--b);">[3,2]</td><td style="color:var(--gd);font-weight:700;">2 ✓</td></tr>
+    <tr><td>dequeue()</td><td>[]</td><td style="color:var(--b);">[3]</td><td style="color:var(--gd);font-weight:700;">3 ✓</td></tr>
+  </table></div>
+</div>
+<div class="co cgd"><strong>FIFO가 보장되는 이유</strong>: inbox에서 outbox로 옮길 때 순서가 뒤집혀. 그 상태에서 pop하면 원래 들어온 순서(1→2→3)가 나와!</div>`},
+
+{t:'② enqueue — inbox에 push',
+ b:`<div class="co ca2">enqueue는 단순해! 항상 <strong>inbox 스택에 push</strong>만 하면 돼. O(1)이야.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_enqueue.c</span></div>
+<pre><span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span> inbox[<span class="nm">MAX</span>],  inTop  = <span class="nm">-1</span>;  <span class="cm">// 받아들이는 스택</span>
+<span class="tp">int</span> outbox[<span class="nm">MAX</span>], outTop = <span class="nm">-1</span>;  <span class="cm">// 내보내는 스택</span>
+
+<span class="tp">void</span> <span class="fn">enqueue</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (inTop == <span class="nm">MAX</span> - <span class="nm">1</span>) {
+        <span class="fn">printf</span>(<span class="st">"Queue Full!\n"</span>); <span class="kw">return</span>;
+    }
+<span class="hla">    inbox[++inTop] = x;          <span class="cm">// inbox에 push — 항상 O(1)</span></span>
+}
+</pre></div>
+<div class="co csk"><strong>enqueue 시 outbox를 건드리지 않는 게 포인트!</strong><br>
+항상 inbox에만 쌓아두고, dequeue가 필요할 때만 outbox로 이동해. 이게 비용을 분산시키는 핵심이야.</div>`},
+
+{t:'③ dequeue — outbox에서 pop, 비면 이동',
+ b:`<div class="co cb2">dequeue의 핵심 로직! <strong>outbox가 비어있을 때만</strong> inbox의 모든 원소를 outbox로 옮겨. 그 다음 outbox에서 pop!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_dequeue.c</span></div>
+<pre><span class="tp">int</span> <span class="fn">dequeue</span>() {
+    <span class="cm">// 큐 전체가 비어있으면 에러</span>
+    <span class="kw">if</span> (inTop == <span class="nm">-1</span> &amp;&amp; outTop == <span class="nm">-1</span>) {
+        <span class="fn">printf</span>(<span class="st">"Queue Empty!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>;
+    }
+
+    <span class="cm">// outbox가 비었을 때만 inbox → outbox로 전부 이동</span>
+<span class="hlc">    <span class="kw">if</span> (outTop == <span class="nm">-1</span>) {</span>
+<span class="hlc">        <span class="kw">while</span> (inTop != <span class="nm">-1</span>)            <span class="cm">// inbox가 빌 때까지</span></span>
+<span class="hlc">            outbox[++outTop] = inbox[inTop--]; <span class="cm">// pop inbox → push outbox</span></span>
+<span class="hlc">    }</span>
+
+<span class="hlb">    <span class="kw">return</span> outbox[outTop--];           <span class="cm">// outbox에서 pop — FIFO 보장!</span></span>
+}
+
+<span class="cm">// front 확인 (꺼내지 않음)</span>
+<span class="tp">int</span> <span class="fn">getFront</span>() {
+    <span class="kw">if</span> (outTop != <span class="nm">-1</span>) <span class="kw">return</span> outbox[outTop]; <span class="cm">// outbox top이 front</span>
+    <span class="kw">if</span> (inTop  != <span class="nm">-1</span>) <span class="kw">return</span> inbox[<span class="nm">0</span>];       <span class="cm">// inbox bottom이 front</span>
+    <span class="kw">return</span> <span class="nm">-1</span>;
+}</pre></div>
+<div class="card"><h4>이동이 일어나는 조건</h4>
+<table style="margin-bottom:0;">
+<tr><th>outbox 상태</th><th>dequeue 동작</th><th>비용</th></tr>
+<tr><td>비어있지 않음</td><td>outbox에서 바로 pop</td><td style="color:var(--a);font-weight:700;">O(1)</td></tr>
+<tr><td style="color:var(--ac);">비어있음</td><td>inbox 전부 이동 후 pop</td><td style="color:var(--ac);font-weight:700;">O(n) — 가끔</td></tr>
+<tr><td colspan="2">분할 상환 평균</td><td style="color:var(--gd);font-weight:700;">O(1) ★</td></tr>
+</table></div>`},
+
+{t:'④ 전체 코드',
+ b:`<div class="co cb2">입출력 포함 완성 코드야. 연산 문자열을 파싱해서 enqueue/dequeue를 처리하는 정올 스타일이야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>queue_two_stacks.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span> inbox[<span class="nm">MAX</span>],  inTop  = <span class="nm">-1</span>;
+<span class="tp">int</span> outbox[<span class="nm">MAX</span>], outTop = <span class="nm">-1</span>;
+
+<span class="tp">void</span> <span class="fn">enqueue</span>(<span class="tp">int</span> x) { inbox[++inTop] = x; }
+
+<span class="tp">int</span> <span class="fn">dequeue</span>() {
+    <span class="kw">if</span> (inTop == <span class="nm">-1</span> &amp;&amp; outTop == <span class="nm">-1</span>)
+        <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="hlc">    <span class="kw">if</span> (outTop == <span class="nm">-1</span>)                   <span class="cm">// outbox 비었을 때만 이동</span></span>
+<span class="hlc">        <span class="kw">while</span> (inTop != <span class="nm">-1</span>)</span>
+<span class="hlc">            outbox[++outTop] = inbox[inTop--];</span>
+<span class="hlb">    <span class="kw">return</span> outbox[outTop--];</span>
+}
+
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> inTop == <span class="nm">-1</span> &amp;&amp; outTop == <span class="nm">-1</span>; }
+<span class="tp">int</span> <span class="fn">size</span>()    { <span class="kw">return</span> inTop + <span class="nm">1</span> + outTop + <span class="nm">1</span>; }
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> q; <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;q);
+    <span class="kw">while</span> (q--) {
+        <span class="tp">char</span> op[<span class="nm">20</span>]; <span class="fn">scanf</span>(<span class="st">"%s"</span>, op);
+        <span class="kw">if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"enqueue"</span>)) {
+            <span class="tp">int</span> x; <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;x); <span class="fn">enqueue</span>(x);
+        } <span class="kw">else if</span> (!<span class="fn">strcmp</span>(op, <span class="st">"dequeue"</span>)) {
+            <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="fn">dequeue</span>());
+        }
+    }
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+<span class="cm">/* 입력: 6 / enqueue 1 / enqueue 2 / enqueue 3
+         dequeue / dequeue / dequeue
+   출력: 1 / 2 / 3  ← FIFO 보장! */</span></pre></div>`}
+];
+
+let queueIdx=0;
+function goQueue(n){
+  queueIdx=n;
+  document.getElementById('panel-queue').innerHTML=
+    `<div class="card"><h3>${QUEUE_STEPS[n].t}</h3>${QUEUE_STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-queue .sbt').forEach((b,i)=>{
+    b.classList.toggle('on',i===n); b.classList.toggle('dn',i<n);
+  });
+}
+goQueue(0);
+
+/* ════════════════════════════════════════
+   SIM A: SHARED ARRAY
+════════════════════════════════════════ */
+const SA_MAX=10;
+let saArr=new Array(SA_MAX).fill(null);
+let saTop1=-1, saTop2=SA_MAX;
+
+function saLog(msg,cls){
+  const log=document.getElementById('sa-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderShared(){
+  const track=document.getElementById('shared-arr');
+  track.innerHTML=saArr.map((v,i)=>{
+    let cls='', sv='', isTop1=(i===saTop1), isTop2=(i===saTop2);
+    if(i<=saTop1){cls='sa';sv=saArr[i]??'';}
+    else if(i>=saTop2){cls='sb';sv=saArr[i]??'';}
+    let top='';
+    if(isTop1&&saTop1>=0) top+=' top1';
+    if(isTop2&&saTop2<SA_MAX) top+=' top2';
+    return `<div class="arr-slot ${cls}${top}">
+      <span class="sv">${sv}</span>
+      <span class="si">[${i}]</span>
+    </div>`;
+  }).join('');
+  document.getElementById('s-top1').textContent=saTop1;
+  document.getElementById('s-top2').textContent=saTop2;
+  const free=saTop2-saTop1-1;
+  document.getElementById('s-free').textContent=free;
+  const emA=document.getElementById('s-emA');
+  const emB=document.getElementById('s-emB');
+  emA.textContent=saTop1===-1?'true':'false';
+  emA.style.color=saTop1===-1?'var(--ac)':'var(--a)';
+  emB.textContent=saTop2===SA_MAX?'true':'false';
+  emB.style.color=saTop2===SA_MAX?'var(--ac)':'var(--b)';
+}
+
+function sharedPushA(){
+  const v=parseInt(document.getElementById('sa-val').value);
+  if(isNaN(v)){saLog('숫자를 입력해줘!','li2');return;}
+  if(saTop1+1===saTop2){
+    saLog('Overflow! 두 스택이 만났어. 더 이상 공간 없음.','lac');
+    // clash animation
+    if(saTop1>=0) document.querySelectorAll('.arr-slot')[saTop1]?.classList.add('clash');
+    if(saTop2<SA_MAX) document.querySelectorAll('.arr-slot')[saTop2]?.classList.add('clash');
+    setTimeout(()=>document.querySelectorAll('.clash').forEach(e=>e.classList.remove('clash')),700);
+    return;
+  }
+  saTop1++; saArr[saTop1]=v;
+  renderShared();
+  setTimeout(()=>document.querySelectorAll('.arr-slot')[saTop1]?.classList.add('push-anim'),10);
+  saLog(`pushA(${v}) → arr[${saTop1}]=${v}, top1=${saTop1}`,'la2');
+}
+
+function sharedPushB(){
+  const v=parseInt(document.getElementById('sa-val').value);
+  if(isNaN(v)){saLog('숫자를 입력해줘!','li2');return;}
+  if(saTop1+1===saTop2){
+    saLog('Overflow! 두 스택이 만났어.','lac');return;
+  }
+  saTop2--; saArr[saTop2]=v;
+  renderShared();
+  setTimeout(()=>document.querySelectorAll('.arr-slot')[saTop2]?.classList.add('push-anim'),10);
+  saLog(`pushB(${v}) → arr[${saTop2}]=${v}, top2=${saTop2}`,'lb2');
+}
+
+function sharedPopA(){
+  if(saTop1===-1){saLog('Underflow A! 스택 A가 비어있어.','lac');return;}
+  const v=saArr[saTop1]; saArr[saTop1]=null; saTop1--;
+  renderShared();
+  saLog(`popA() → ${v} 반환, top1=${saTop1}`,'la2');
+}
+
+function sharedPopB(){
+  if(saTop2===SA_MAX){saLog('Underflow B! 스택 B가 비어있어.','lac');return;}
+  const v=saArr[saTop2]; saArr[saTop2]=null; saTop2++;
+  renderShared();
+  saLog(`popB() → ${v} 반환, top2=${saTop2}`,'lb2');
+}
+
+function sharedReset(){
+  saArr=new Array(SA_MAX).fill(null); saTop1=-1; saTop2=SA_MAX;
+  renderShared();
+  document.getElementById('sa-log').innerHTML='<span class="li2">↺ 초기화됨!</span>';
+}
+renderShared();
+
+/* ════════════════════════════════════════
+   SIM B: QUEUE VIA TWO STACKS
+════════════════════════════════════════ */
+let qInbox=[], qOutbox=[];
+const QB_MAX=10;
+
+function qLog(msg,cls){
+  const log=document.getElementById('qb-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderQ(){
+  // inbox
+  const ib=document.getElementById('q-inbox');
+  if(!qInbox.length){ib.innerHTML='<div class="stk-empty-msg">비어 있음</div>';}
+  else ib.innerHTML=qInbox.map((v,i)=>{
+    const isTop=i===qInbox.length-1;
+    return `<div class="stk-item ia ${isTop?'i-top-a':''}">${v}</div>`;
+  }).join('');
+  // outbox
+  const ob=document.getElementById('q-outbox');
+  if(!qOutbox.length){ob.innerHTML='<div class="stk-empty-msg">비어 있음</div>';}
+  else ob.innerHTML=qOutbox.map((v,i)=>{
+    const isTop=i===qOutbox.length-1;
+    return `<div class="stk-item ib ${isTop?'i-top-b':''}">${v}</div>`;
+  }).join('');
+  // stats
+  document.getElementById('q-ins').textContent=qInbox.length;
+  document.getElementById('q-outs').textContent=qOutbox.length;
+  document.getElementById('q-total').textContent=qInbox.length+qOutbox.length;
+  const front=qOutbox.length?qOutbox[qOutbox.length-1]:(qInbox.length?qInbox[0]:'-');
+  document.getElementById('q-front').textContent=front;
+}
+
+function qEnqueue(){
+  const v=parseInt(document.getElementById('qb-val').value);
+  if(isNaN(v)){qLog('숫자를 입력해줘!','li2');return;}
+  if(qInbox.length+qOutbox.length>=QB_MAX){qLog('Queue Full!','lac');return;}
+  qInbox.push(v);
+  renderQ();
+  // animate newest in inbox
+  setTimeout(()=>{
+    const items=document.querySelectorAll('#q-inbox .stk-item');
+    if(items.length) items[items.length-1].classList.add('i-in');
+  },10);
+  qLog(`enqueue(${v}) → inbox에 push, inbox=[${qInbox.join(',')}]`,'la2');
+}
+
+function qDequeue(){
+  if(!qInbox.length&&!qOutbox.length){qLog('Queue Empty!','lac');return;}
+  if(!qOutbox.length){
+    // transfer
+    qLog(`outbox 비어있음 → inbox 전부 outbox로 이동! (${qInbox.length}개)`,'lac');
+    while(qInbox.length) qOutbox.push(qInbox.pop());
+    renderQ();
+    qLog(`이동 완료 → outbox=[${qOutbox.join(',')}]`,'lac');
+  }
+  const v=qOutbox.pop();
+  renderQ();
+  qLog(`dequeue() → ${v} 반환 (FIFO ✓), outbox=[${qOutbox.join(',')}]`,'lb2');
+}
+
+function qPeek(){
+  if(!qInbox.length&&!qOutbox.length){qLog('Queue Empty!','lac');return;}
+  const front=qOutbox.length?qOutbox[qOutbox.length-1]:qInbox[0];
+  qLog(`front() → ${front} (변화 없음)`,'lgd2');
+}
+
+function qReset(){
+  qInbox=[]; qOutbox=[];
+  renderQ();
+  document.getElementById('qb-log').innerHTML='<span class="li2">↺ 초기화됨!</span>';
+}
+renderQ();
+
+/* ════════════════════════════════════════
+   SIM TAB SWITCHER
+════════════════════════════════════════ */
+function switchSim(idx){
+  document.querySelectorAll('.tab-btns .tbtn').forEach((t,i)=>{
+    t.classList.toggle('on',i===idx&&idx===0);
+    t.classList.toggle('onb',i===idx&&idx===1);
+  });
+  document.getElementById('sim-a').classList.toggle('on',idx===0);
+  document.getElementById('sim-b').classList.toggle('on',idx===1);
+}
+
+/* ════════════════════════════════════════
+   QUIZ
+════════════════════════════════════════ */
+const QUIZ=[
+  {q:'MAX=10인 공유 배열에서 top1=-1, top2=10일 때의 상태는?',
+   opts:['두 스택이 가득 참','두 스택 모두 비어있음','Stack A만 비어있음','오버플로우'],ans:1,
+   fb:'top1=-1은 Stack A 비어있음, top2=MAX(=10)은 Stack B 비어있음. 둘 다 빈 초기 상태야!'},
+  {q:'공유 배열 두 스택의 오버플로우 조건은?',
+   opts:['top1 == MAX','top2 == -1','top1 + 1 == top2','top1 == top2'],ans:2,
+   fb:'두 포인터가 인접하면 (top1+1==top2) 사이 공간이 없어 더 push 불가! 이게 두 스택이 만나는 순간이야.'},
+  {q:'Stack B에 push할 때 포인터 변화는?',
+   opts:['top2 증가 후 저장','top2 감소 후 저장','top1 증가 후 저장','top2 저장 후 감소'],ans:1,
+   fb:'Stack B는 오른쪽에서 왼쪽으로 자라. arr[--top2]=x — top2를 먼저 줄이고(왼쪽 이동) 저장!'},
+  {q:'두 스택으로 큐를 구현할 때 dequeue()에서 이동(transfer)이 발생하는 조건은?',
+   opts:['inbox가 꽉 찰 때','outbox가 비어있을 때','inbox가 비어있을 때','항상 발생'],ans:1,
+   fb:'outbox가 비어있을 때만! outbox에 원소가 있으면 바로 pop해. 이동은 꼭 필요할 때만 해서 비용을 아껴.'},
+  {q:'enqueue(1,2,3) → dequeue() → dequeue() 시 두 번째 반환값은?',
+   opts:['1','2','3','에러'],ans:1,
+   fb:'enqueue 3개 후 dequeue: inbox[1,2,3] → outbox로 이동 → outbox[3,2,1]. pop 순서: 1, 2, 3. 두 번째는 2!'},
+  {q:'두 스택 큐의 분할 상환 복잡도는?',
+   opts:['O(n)','O(log n)','O(1)','O(n²)'],ans:2,
+   fb:'각 원소는 inbox push 1번 + outbox push 1번 + outbox pop 1번 = 최대 3번. n개 연산 → 3n번 = O(n). 평균 O(1)!'},
+  {q:'공유 배열 두 스택에서 Stack A의 크기(원소 수)는?',
+   opts:['top1','top1 + 1','MAX - top1','top2 - top1'],ans:1,
+   fb:'top1이 현재 A의 top 인덱스야. 인덱스 0~top1까지 top1+1개!'},
+  {q:'두 스택 큐에서 front(앞 원소)는 어디에 있나?',
+   opts:['inbox의 top','inbox의 bottom (인덱스 0)','outbox의 top','outbox의 bottom'],ans:2,
+   fb:'outbox에 있을 때는 outbox의 top(가장 나중에 push된 곳, 가장 먼저 들어온 값). outbox가 비면 inbox의 bottom!'},
+  {q:'공유 배열 두 스택에서 Stack B popB()의 포인터 변화는?',
+   opts:['return arr[top2--]','return arr[top2++]','return arr[--top2]','return arr[++top2]'],ans:1,
+   fb:'B는 오른쪽에서 왼쪽으로 자랐으니 pop은 왼쪽에서 오른쪽으로! arr[top2++] — 현재 top2 값 반환 후 top2 증가.'},
+  {q:'두 스택 큐가 비어있는 조건은?',
+   opts:['inTop == -1','outTop == -1','inTop == -1 && outTop == -1','inTop == outTop'],ans:2,
+   fb:'inbox와 outbox 모두 비어있어야 큐가 비어있어. 하나라도 원소가 있으면 dequeue 가능!'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans) document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplbl').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ════════════════════════════════════════
+   CHALLENGES
+════════════════════════════════════════ */
+const CHS=[
+{title:'도전 1 — 공유 배열 두 스택 완성',
+ tags:['ta:정올 필수','tsk:중급'],
+ desc:'빈칸을 채워서 하나의 배열로 두 스택을 완성해봐!<br><br><strong>조건</strong>: MAX=10, Stack A는 왼쪽에서, Stack B는 오른쪽에서 성장<br><strong>오버플로우</strong>: top1+1==top2 일 때',
+ hint:'pushA: arr[++top1]=x / pushB: arr[--top2]=x / popA: return arr[top1--] / popB: return arr[top2++] / isFull: top1+1==top2',
+ start:`#include <stdio.h>
+#define MAX 10
+
+int arr[MAX];
+int top1 = -1;   // Stack A: 왼쪽에서 오른쪽으로
+int top2 = MAX;  // Stack B: 오른쪽에서 왼쪽으로
+
+int isFull()   { return /* 오버플로우 조건 */; }
+int isEmptyA() { return top1 == -1; }
+int isEmptyB() { return top2 == MAX; }
+
+void pushA(int x) {
+    if (isFull()) { printf("Overflow!\\n"); return; }
+    // TODO: top1 증가 후 저장
+    
+}
+
+void pushB(int x) {
+    if (isFull()) { printf("Overflow!\\n"); return; }
+    // TODO: top2 감소 후 저장
+    
+}
+
+int popA() {
+    if (isEmptyA()) { printf("Underflow A!\\n"); return -1; }
+    // TODO: 반환 후 top1 감소
+    
+}
+
+int popB() {
+    if (isEmptyB()) { printf("Underflow B!\\n"); return -1; }
+    // TODO: 반환 후 top2 증가
+    
+}
+
+int main() {
+    pushA(1); pushA(2); pushA(3);
+    pushB(10); pushB(20);
+    printf("popA=%d\\n", popA()); // 3
+    printf("popA=%d\\n", popA()); // 2
+    printf("popB=%d\\n", popB()); // 20
+    printf("popB=%d\\n", popB()); // 10
+    return 0;
+}`},
+{title:'도전 2 — 두 스택으로 큐 구현',
+ tags:['tb:정올 실버','tgd:분할상환 O(1)'],
+ desc:'inbox + outbox 패턴으로 큐를 구현해봐!<br><br><strong>입력:</strong> <code>6 / enqueue 1 / enqueue 2 / enqueue 3 / dequeue / dequeue / dequeue</code><br><strong>출력:</strong> <code style="color:var(--a);">1 2 3</code>',
+ hint:'dequeue: if(outTop==-1) while(inTop!=-1) outbox[++outTop]=inbox[inTop--]; return outbox[outTop--]; / 이동은 outbox가 비었을 때만!',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 100001
+
+int inbox[MAX],  inTop  = -1;
+int outbox[MAX], outTop = -1;
+
+void enqueue(int x) {
+    // TODO: inbox에 push
+    
+}
+
+int dequeue() {
+    if (inTop == -1 && outTop == -1) {
+        printf("Empty!\\n"); return -1;
+    }
+    // TODO: outbox가 비었으면 inbox 전부 이동
+    if (outTop == -1) {
+        // while (inTop != -1) { ... }
+        
+    }
+    // TODO: outbox에서 pop
+    
+}
+
+int getFront() {
+    if (outTop != -1) return outbox[outTop];
+    if (inTop  != -1) return inbox[0];
+    return -1;
+}
+
+int main() {
+    int q; scanf("%d", &q);
+    while (q--) {
+        char op[20]; scanf("%s", op);
+        if (!strcmp(op, "enqueue")) {
+            int x; scanf("%d", &x); enqueue(x);
+        } else if (!strcmp(op, "dequeue")) {
+            printf("%d\\n", dequeue());
+        } else {
+            printf("front=%d\\n", getFront());
+        }
+    }
+    return 0;
+}`},
+{title:'도전 3 — 두 스택 큐로 회문 검사',
+ tags:['tac:응용','tb:실버+'],
+ desc:'두 스택으로 큐를 구현한 후, 문자열이 <strong>회문(palindrome)</strong>인지 검사해봐!<br>큐에 문자를 넣고 스택과 비교해서 앞뒤가 같은지 확인해.<br><br><strong>입력:</strong> <code>racecar</code><br><strong>출력:</strong> <code style="color:var(--a);">YES</code>',
+ hint:'스택에 문자를 push, 큐에 문자를 enqueue. 그 다음 스택 pop과 큐 dequeue를 비교해서 모두 같으면 회문!',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 10001
+
+// ── 두 스택 큐 ──
+int inbox[MAX], inTop=-1;
+int outbox[MAX], outTop=-1;
+void enqueue(char c){ inbox[++inTop]=c; }
+char dequeue(){
+    if(outTop==-1) while(inTop!=-1) outbox[++outTop]=inbox[inTop--];
+    return outbox[outTop--];
+}
+
+// ── 일반 스택 ──
+char stk[MAX]; int top=-1;
+void push(char c){ stk[++top]=c; }
+char pop(){ return stk[top--]; }
+
+int main(){
+    char s[MAX];
+    scanf("%s", s);
+    int n = strlen(s);
+    
+    // TODO: 문자열을 큐에 enqueue하고 스택에 push
+    for(int i=0; i<n; i++){
+        // enqueue(s[i]);
+        // push(s[i]);
+        
+    }
+    
+    // TODO: 큐 dequeue와 스택 pop을 비교
+    // 모두 같으면 YES, 하나라도 다르면 NO
+    int isPalin = 1;
+    for(int i=0; i<n; i++){
+        // if(dequeue() != pop()) isPalin = 0;
+        
+    }
+    
+    printf(isPalin ? "YES\\n" : "NO\\n");
+    return 0;
+}`}
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="27" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+
+  if(ci===0){
+    const hasFull   = /top1\s*\+\s*1\s*==\s*top2/.test(code)||/top1\+1==top2/.test(code);
+    const hasPushA  = /arr\[.*\+\+top1.*\]\s*=/.test(code)||/arr\[top1\+\+\]\s*=/.test(code)||code.includes('arr[++top1]');
+    const hasPushB  = /arr\[.*--top2.*\]\s*=/.test(code)||code.includes('arr[--top2]');
+    const hasPopA   = code.includes('arr[top1--]')||code.includes('arr[top1]');
+    const hasPopB   = code.includes('arr[top2++]')||code.includes('arr[top2]');
+    if(!hasFull) {r+='❌ isFull: top1+1==top2 조건이 없어!\n';ok=false;}
+    else if(!hasPushA){r+='❌ pushA: arr[++top1]=x 가 없어!\n';ok=false;}
+    else if(!hasPushB){r+='❌ pushB: arr[--top2]=x 가 없어!\n';ok=false;}
+    else if(!hasPopA) {r+='❌ popA: arr[top1--] 반환이 없어!\n';ok=false;}
+    else if(!hasPopB) {r+='❌ popB: arr[top2++] 반환이 없어!\n';ok=false;}
+    if(ok) r=`✅ 공유 배열 두 스택 완성!
+
+isFull():  top1+1==top2            ✓
+pushA():   arr[++top1]=x           ✓
+pushB():   arr[--top2]=x           ✓
+popA():    return arr[top1--]      ✓
+popB():    return arr[top2++]      ✓
+
+시뮬 (MAX=10):
+pushA(1): arr[0]=1, top1=0
+pushA(2): arr[1]=2, top1=1
+pushA(3): arr[2]=3, top1=2
+pushB(10): arr[9]=10, top2=9
+pushB(20): arr[8]=20, top2=8
+배열: [1,2,3,_,_,_,_,_,20,10]
+
+popA() → 3 ✓
+popA() → 2 ✓
+popB() → 20 ✓
+popB() → 10 ✓`;
+  } else if(ci===1){
+    const hasEnq    = code.includes('inbox[++inTop]')||code.includes('inTop')&&code.includes('inbox');
+    const hasTransfer = code.includes('outTop == -1')&&code.includes('while')&&(code.includes('inTop--')||code.includes('inTop'));
+    const hasDeqPop = code.includes('outbox[outTop--]')||code.includes('outTop--');
+    if(!hasEnq){r+='❌ enqueue: inbox[++inTop]=x 가 없어!\n';ok=false;}
+    else if(!hasTransfer){r+='❌ dequeue: outTop==-1 체크 후 inbox→outbox 이동 while 루프가 없어!\n';ok=false;}
+    else if(!hasDeqPop){r+='❌ dequeue: return outbox[outTop--] 이 없어!\n';ok=false;}
+    if(ok) r=`✅ 두 스택 큐 완성!
+
+enqueue():  inbox[++inTop]=x      ✓
+transfer:   outTop==-1 체크+이동  ✓
+dequeue():  outbox[outTop--]      ✓
+
+시뮬 [enqueue 1,2,3 → dequeue 3번]:
+enqueue(1): inbox=[1]
+enqueue(2): inbox=[1,2]
+enqueue(3): inbox=[1,2,3]
+dequeue():  outbox 비어있음!
+  이동: inbox[3→2→1] → outbox=[3,2,1]
+  pop outbox → 1 반환 ✓
+dequeue():  outbox=[3,2], pop → 2 ✓
+dequeue():  outbox=[3], pop → 3 ✓
+
+출력: 1 2 3  FIFO 보장 ✓`;
+  } else {
+    const hasEnqChar = code.includes('enqueue(s[i])')||code.includes('enqueue(c)');
+    const hasPushChar= code.includes('push(s[i])')||code.includes('push(c)');
+    const hasCmp     = code.includes('dequeue()')&&code.includes('pop()')&&code.includes('!=');
+    if(!hasEnqChar){r+='❌ 문자를 enqueue(s[i])로 넣는 코드가 없어!\n';ok=false;}
+    else if(!hasPushChar){r+='❌ 문자를 push(s[i])로 스택에 넣는 코드가 없어!\n';ok=false;}
+    else if(!hasCmp){r+='❌ dequeue()!=pop() 비교 코드가 없어!\n';ok=false;}
+    if(ok) r=`✅ 회문 검사 완성!
+
+enqueue 문자열:       ✓
+push 문자열:          ✓
+dequeue vs pop 비교:  ✓
+
+"racecar" 시뮬:
+큐:  r→a→c→e→c→a→r (FIFO 순)
+스택: r→a→c→e→c→a→r (LIFO: r먼저 pop)
+
+dequeue: r, pop: r → 같음
+dequeue: a, pop: a → 같음
+dequeue: c, pop: c → 같음
+dequeue: e, pop: e → 같음 (중앙)
+dequeue: c, pop: c → 같음
+dequeue: a, pop: a → 같음
+dequeue: r, pop: r → 같음
+→ YES ✓
+
+"hello" → dequeue:h, pop:o → 다름 → NO ✓`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+</script>
+</body>
+</html>

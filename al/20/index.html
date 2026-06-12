@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>연결 리스트(Linked List) | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --bg:#f4f6ff;--wh:#fff;--s1:#eef0fa;--s2:#e5e8f5;
+  --bd:#cdd4ee;--bd2:#b4bede;
+  --t1:#151828;--t2:#2e3460;--t3:#5c6394;--t4:#9aa0c8;
+  --vi:#2563eb;--vi-l:#dbeafe;--vi-m:#93c5fd;
+  --gn:#0d7b5e;--gn-l:#d1faf2;--gn-m:#5eead4;
+  --rd:#b91c1c;--rd-l:#fee2e2;--rd-m:#fca5a5;
+  --am:#92400e;--am-l:#fef3c7;--am-m:#fcd34d;
+  --pu:#5b21b6;--pu-l:#ede9fe;--pu-m:#c4b5fd;
+  --or:#c2410c;--or-l:#ffedd5;--or-m:#fdba74;
+  --mono:'JetBrains Mono',monospace;--sans:'Noto Sans KR',sans-serif;
+  --r:10px;--r2:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* HEADER */
+.hdr{background:var(--wh);border-bottom:2px solid var(--bd);padding:16px 32px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.hdr-logo{font-size:13px;font-weight:700;color:var(--t3);letter-spacing:.04em;}
+.hdr-title{font-size:21px;font-weight:900;color:var(--t1);}
+.hdr-badge{background:var(--pu-l);color:var(--pu);border:1px solid var(--pu-m);padding:3px 13px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* NAV */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:14px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.active{color:var(--pu);border-bottom-color:var(--pu);font-weight:700;}
+
+/* PAGES */
+.pg{display:none;max-width:980px;margin:0 auto;padding:36px 28px 70px;}
+.pg.active{display:block;animation:fu .22s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* TYPE */
+h2{font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+
+/* CALLOUT */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cb{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cg{background:var(--gn-l);color:var(--t2);border-color:var(--gn);}
+.cr{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.ca{background:var(--am-l);color:var(--t2);border-color:var(--am);}
+.cp{background:var(--pu-l);color:var(--t2);border-color:var(--pu);}
+.co2{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+
+/* CARD */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:620px){.card2{grid-template-columns:1fr;}}
+
+/* STEP BAR */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;flex-wrap:wrap;}
+.sbt{flex:1;min-width:80px;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.45;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.active{background:var(--pu-l);color:var(--pu);font-weight:700;}
+.sbt.done{background:var(--vi-l);color:var(--vi);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* CODE */
+.cw{background:#1a1e30;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #262c42;}
+.cbr{background:#20253d;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#7a88cc;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #262c42;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2;color:#c8d0f0;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#4b5683;font-style:italic;}.st{color:#86efac;}
+.hl {background:rgba(91,33,182,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #a78bfa;}
+.hl2{background:rgba(13,123,94,.15);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+.hl3{background:rgba(185,28,28,.13);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #f87171;}
+
+/* TAGS */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.tv{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tg{background:var(--gn-l);color:var(--gn);border:1px solid var(--gn-m);}
+.tr{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.ta{background:var(--am-l);color:var(--am);border:1px solid var(--am-m);}
+.tp2{background:var(--pu-l);color:var(--pu);border:1px solid var(--pu-m);}
+.to{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ── NODE SVG DIAGRAM ── */
+.node-row{display:flex;align-items:center;gap:0;overflow-x:auto;padding:16px 0 8px;flex-wrap:nowrap;}
+.node-box{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.node{display:flex;border-radius:var(--r);overflow:hidden;border:2.5px solid var(--bd2);height:54px;flex-shrink:0;}
+.n-data{width:54px;display:flex;align-items:center;justify-content:center;background:var(--wh);font-family:var(--mono);font-size:18px;font-weight:700;color:var(--t1);border-right:2px solid var(--bd2);}
+.n-next{width:38px;display:flex;align-items:center;justify-content:center;background:var(--s1);font-size:11px;font-weight:700;color:var(--t3);}
+.node.head .n-data{background:var(--pu-l);color:var(--pu);}
+.node.head .n-next{background:var(--pu-l);}
+.node.tail .n-next{background:var(--rd-l);color:var(--rd);}
+.node.highlight .n-data{background:var(--gn-l);color:var(--gn);}
+.node.highlight{border-color:var(--gn);}
+.node.newnode .n-data{background:var(--am-l);color:var(--am);}
+.node.newnode{border-color:var(--am);}
+.node.delnode{opacity:.4;}
+.node-lbl{font-size:11px;font-weight:700;color:var(--t4);margin-top:5px;font-family:var(--mono);}
+.node-lbl.lh{color:var(--pu);}.node-lbl.lt{color:var(--rd);}
+.arr{font-size:24px;color:var(--vi);padding:0 4px;line-height:54px;flex-shrink:0;align-self:flex-start;margin-top:8px;}
+.null-box{background:var(--rd-l);border:2px solid var(--rd-m);border-radius:var(--r);padding:6px 12px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--rd);margin-top:0;align-self:center;}
+.node-anim{animation:nodeIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes nodeIn{from{opacity:0;transform:scale(.6)translateY(14px);}to{opacity:1;transform:none;}}
+
+/* ── SIM CONTROLS ── */
+.sim-panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 22px;margin-bottom:18px;}
+.sim-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.sbtn2{padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.sbtn2:disabled{opacity:.38;cursor:default;}
+.bpp{background:var(--pu);color:#fff;border-color:var(--pu);}      .bpp:hover:not(:disabled){background:#4c1d95;}
+.bpf{background:var(--gn);color:#fff;border-color:var(--gn);}      .bpf:hover:not(:disabled){background:#065f46;}
+.bpa{background:var(--vi-l);color:var(--vi);border-color:var(--vi-m);}.bpa:hover:not(:disabled){background:var(--vi);color:#fff;}
+.brd{background:var(--rd-l);color:var(--rd);border-color:var(--rd-m);}.brd:hover:not(:disabled){background:var(--rd);color:#fff;}
+.brs{background:var(--s1);color:var(--t2);border-color:var(--bd2);}  .brs:hover{border-color:var(--t2);}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:14px;color:var(--t1);background:var(--wh);outline:none;width:75px;}
+.inp:focus{border-color:var(--pu);}
+.inp-wide{width:110px;}
+
+/* LOG */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:150px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.9;}
+.lp{color:var(--pu);font-weight:600;}.lg{color:var(--gn);font-weight:600;}.lr{color:var(--rd);font-weight:600;}.li{color:var(--t4);}.la{color:var(--vi);font-weight:600;}
+
+/* STAT */
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:14px;color:var(--t2);}
+.stat span{font-weight:700;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--pu);color:var(--pu);background:var(--pu-l);}
+.qopt.correct{background:var(--gn-l);border-color:var(--gn);color:var(--gn);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--gn-l);color:var(--gn);border:1px solid var(--gn-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.sw{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sb{font-size:38px;font-weight:900;color:var(--pu);font-family:var(--mono);}
+.pb{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.pf{height:8px;background:var(--pu);border-radius:4px;transition:width .4s;}
+.pl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#1a1e30;border:1.5px solid #262c42;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d0f0;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--pu);}
+.rbtn{margin-top:10px;padding:11px 24px;background:var(--pu);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:#4c1d95;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--gn);}.oe{color:var(--rd);}
+.ht{font-size:14px;color:var(--vi);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--am-l);border-radius:var(--r);font-size:14px;color:var(--am);border:1px solid var(--am-m);}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+  <span style="color:var(--bd2)">|</span>
+  <span class="hdr-title">연결 리스트 (Linked List)</span>
+  <span class="hdr-badge">정올 실버~골드</span>
+</header>
+
+<nav class="nav">
+  <div class="nt active" onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"        onclick="goPage('single')">🔗 단순 연결</div>
+  <div class="nt"        onclick="goPage('double')">↔️ 이중 연결</div>
+  <div class="nt"        onclick="goPage('sim')">🎮 시뮬레이터</div>
+  <div class="nt"        onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"        onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════ PAGE 1: 개념 ═══════════ -->
+<div class="pg active" id="page-concept">
+  <h2>연결 리스트(Linked List)란?</h2>
+  <p class="psub">세영코딩연구소 | 정올 준비 · 자료구조 4단원</p>
+
+  <div class="co cp">
+    <strong>핵심 아이디어</strong><br>
+    데이터를 메모리에 <strong>연속으로 저장하는 배열</strong>과 달리,
+    연결 리스트는 각 데이터가 <strong>다음 데이터의 주소(포인터)</strong>를 함께 들고 있어.<br>
+    마치 보물찾기처럼 — 현재 노드가 다음 노드의 위치를 알려줘!
+  </div>
+
+  <h3 style="margin-bottom:12px;">노드(Node) 구조</h3>
+  <div class="card">
+    <div style="margin-bottom:16px;">
+      <div class="node-row">
+        <div class="node-box">
+          <div class="node head">
+            <div class="n-data">10</div>
+            <div class="n-next">next</div>
+          </div>
+          <div class="node-lbl lh">head</div>
+        </div>
+        <span class="arr">→</span>
+        <div class="node-box">
+          <div class="node">
+            <div class="n-data">25</div>
+            <div class="n-next">next</div>
+          </div>
+          <div class="node-lbl">&nbsp;</div>
+        </div>
+        <span class="arr">→</span>
+        <div class="node-box">
+          <div class="node">
+            <div class="n-data">37</div>
+            <div class="n-next">next</div>
+          </div>
+          <div class="node-lbl">&nbsp;</div>
+        </div>
+        <span class="arr">→</span>
+        <div class="node-box">
+          <div class="node tail">
+            <div class="n-data">42</div>
+            <div class="n-next">NULL</div>
+          </div>
+          <div class="node-lbl lt">tail</div>
+        </div>
+      </div>
+    </div>
+    <div class="co cb" style="margin-bottom:0;">
+      각 <strong>노드(Node)</strong>는 두 칸으로 구성돼:<br>
+      <span style="color:var(--pu);font-weight:700;">■ data</span> — 실제 저장값 &nbsp;&nbsp;
+      <span style="color:var(--vi);font-weight:700;">■ next</span> — 다음 노드를 가리키는 포인터 (마지막은 NULL)
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>배열 vs 연결 리스트</h3>
+      <table style="margin-bottom:0;">
+        <tr><th></th><th>배열</th><th>연결 리스트</th></tr>
+        <tr><td style="font-weight:700;">저장 방식</td><td>연속 메모리</td><td>포인터로 연결</td></tr>
+        <tr><td style="font-weight:700;">접근 속도</td><td style="color:var(--gn);font-weight:700;">O(1) 빠름</td><td style="color:var(--am);font-weight:700;">O(n) 느림</td></tr>
+        <tr><td style="font-weight:700;">삽입·삭제</td><td style="color:var(--rd);font-weight:700;">O(n) 느림</td><td style="color:var(--gn);font-weight:700;">O(1) 빠름*</td></tr>
+        <tr><td style="font-weight:700;">크기 변경</td><td>고정 (정적)</td><td>유연 (동적)</td></tr>
+        <tr><td style="font-weight:700;">메모리</td><td>효율적</td><td>포인터 추가</td></tr>
+      </table>
+      <p style="font-size:13px;color:var(--t4);margin-top:8px;margin-bottom:0;">* 삽입·삭제 위치를 이미 알고 있을 때</p>
+    </div>
+    <div class="card">
+      <h3>연결 리스트 종류</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:var(--pu-l);border:1.5px solid var(--pu-m);border-radius:var(--r);padding:12px 16px;">
+          <div style="font-weight:700;color:var(--pu);margin-bottom:4px;">단순 연결 리스트 (Singly)</div>
+          <div style="font-size:14px;color:var(--t2);">next 포인터만 → 한 방향으로만 이동</div>
+        </div>
+        <div style="background:var(--vi-l);border:1.5px solid var(--vi-m);border-radius:var(--r);padding:12px 16px;">
+          <div style="font-weight:700;color:var(--vi);margin-bottom:4px;">이중 연결 리스트 (Doubly)</div>
+          <div style="font-size:14px;color:var(--t2);">prev + next 포인터 → 양방향 이동</div>
+        </div>
+        <div style="background:var(--gn-l);border:1.5px solid var(--gn-m);border-radius:var(--r);padding:12px 16px;">
+          <div style="font-weight:700;color:var(--gn);margin-bottom:4px;">원형 연결 리스트 (Circular)</div>
+          <div style="font-size:14px;color:var(--t2);">마지막 노드의 next가 head를 가리킴</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">C에서 구현하는 방법 — 두 가지</h3>
+  <table>
+    <tr><th>방법</th><th>개념</th><th>장점</th><th>단점</th><th>정올 추천</th></tr>
+    <tr>
+      <td><span class="tag tp2">포인터 방식</span></td>
+      <td><code style="font-family:var(--mono);">malloc</code>으로 노드 동적 생성</td>
+      <td>교과서적, 진짜 연결리스트</td>
+      <td>포인터 개념 필요</td>
+      <td>중학교 심화</td>
+    </tr>
+    <tr>
+      <td><span class="tag tv">배열 시뮬레이션</span></td>
+      <td>배열로 data[], next[] 흉내</td>
+      <td>포인터 없이 구현 가능</td>
+      <td>크기 미리 정해야 함</td>
+      <td style="color:var(--gn);font-weight:700;">★ 정올 핵심</td>
+    </tr>
+  </table>
+  <div class="co ca">
+    <strong>정올 시험 팁!</strong> 실제 정올에서는 <strong>배열 시뮬레이션 방식</strong>이 훨씬 실용적이야.
+    포인터 개념 없이도 연결 리스트의 삽입·삭제를 구현할 수 있어서 실수도 적어.
+    두 방법 모두 배워두되 시험장에서는 배열 시뮬이 안전해!
+  </div>
+</div>
+
+<!-- ═══════════ PAGE 2: 단순 연결 리스트 ═══════════ -->
+<div class="pg" id="page-single">
+  <h2>단순 연결 리스트 (Singly Linked List)</h2>
+  <p class="psub">한 방향으로만 이동하는 가장 기본적인 연결 리스트</p>
+
+  <div class="sbar" id="sbar-single">
+    <div class="sbt active" onclick="goSingle(0)"><span class="snum">01</span>노드 구조</div>
+    <div class="sbt"        onclick="goSingle(1)"><span class="snum">02</span>맨앞 삽입</div>
+    <div class="sbt"        onclick="goSingle(2)"><span class="snum">03</span>맨뒤 삽입</div>
+    <div class="sbt"        onclick="goSingle(3)"><span class="snum">04</span>삭제</div>
+    <div class="sbt"        onclick="goSingle(4)"><span class="snum">05</span>탐색·출력</div>
+    <div class="sbt"        onclick="goSingle(5)"><span class="snum">06</span>배열 시뮬</div>
+  </div>
+  <div id="panel-single"></div>
+</div>
+
+<!-- ═══════════ PAGE 3: 이중 연결 리스트 ═══════════ -->
+<div class="pg" id="page-double">
+  <h2>이중 연결 리스트 (Doubly Linked List)</h2>
+  <p class="psub">앞뒤 양방향으로 이동 가능 — prev 포인터가 추가돼!</p>
+
+  <div class="sbar" id="sbar-double">
+    <div class="sbt active" onclick="goDouble(0)"><span class="snum">01</span>구조 비교</div>
+    <div class="sbt"        onclick="goDouble(1)"><span class="snum">02</span>삽입</div>
+    <div class="sbt"        onclick="goDouble(2)"><span class="snum">03</span>삭제</div>
+    <div class="sbt"        onclick="goDouble(3)"><span class="snum">04</span>전체 코드</div>
+  </div>
+  <div id="panel-double"></div>
+</div>
+
+<!-- ═══════════ PAGE 4: 시뮬레이터 ═══════════ -->
+<div class="pg" id="page-sim">
+  <h2>연결 리스트 시뮬레이터</h2>
+  <p class="psub">버튼으로 직접 조작하면서 노드가 어떻게 연결되는지 눈으로 확인해봐!</p>
+
+  <div class="sim-panel">
+    <div class="sl">리스트 타입 선택</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="sbtn2 bpp" id="btn-singly" onclick="setType('singly')">단순 연결 리스트</button>
+      <button class="sbtn2 bpa" id="btn-doubly" onclick="setType('doubly')">이중 연결 리스트</button>
+    </div>
+    <div class="sl">현재 리스트</div>
+    <div id="sim-vis" style="min-height:90px;overflow-x:auto;padding:8px 0 12px;"></div>
+    <div class="stats" style="margin-top:8px;">
+      <div class="stat">노드 수: <span id="s-size" style="color:var(--pu);">0</span></div>
+      <div class="stat">head: <span id="s-head" style="color:var(--pu);">NULL</span></div>
+      <div class="stat">tail: <span id="s-tail" style="color:var(--rd);">NULL</span></div>
+    </div>
+  </div>
+
+  <div class="sim-panel">
+    <div class="sl">연산</div>
+    <div class="sim-row">
+      <input class="inp" type="number" id="sim-val" value="10" placeholder="값">
+      <button class="sbtn2 bpp" onclick="simPrepend()">맨앞 삽입</button>
+      <button class="sbtn2 bpf" onclick="simAppend()">맨뒤 삽입</button>
+      <button class="sbtn2 bpa" onclick="simInsertAt()">
+        <input class="inp" type="number" id="sim-pos" value="1" style="width:46px;margin-right:4px;" placeholder="위치">번째 뒤 삽입
+      </button>
+    </div>
+    <div class="sim-row">
+      <button class="sbtn2 brd" onclick="simDeleteHead()">head 삭제</button>
+      <button class="sbtn2 brd" onclick="simDeleteTail()">tail 삭제</button>
+      <input class="inp" type="number" id="sim-del-val" value="10" placeholder="값">
+      <button class="sbtn2 brd" onclick="simDeleteVal()">값으로 삭제</button>
+      <button class="sbtn2 brs" onclick="simReset()">↺ 초기화</button>
+    </div>
+  </div>
+
+  <div class="sl">실행 로그</div>
+  <div class="log" id="sim-log"><span class="li">▶ 맨앞/맨뒤 삽입 버튼으로 시작해봐!</span></div>
+</div>
+
+<!-- ═══════════ PAGE 5: 퀴즈 ═══════════ -->
+<div class="pg" id="page-quiz">
+  <h2>연결 리스트 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제! 포인터 추적부터 개념까지!</p>
+  <div class="sw">
+    <span class="sb" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="pb"><div class="pf" id="qprog" style="width:0%"></div></div>
+      <div class="pl" id="qplabel">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════ PAGE 6: 도전 ═══════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">빈칸을 채워서 연결 리스트 코드를 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<script>
+/* ── PAGE NAV ── */
+const PM={concept:0,single:1,double:2,sim:3,quiz:4,challenge:5};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('active',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('active');
+}
+
+/* ═══════════════════════════════════════
+   SINGLE LINKED LIST CODE STEPS
+═══════════════════════════════════════ */
+const SINGLE_STEPS=[
+{t:'노드 구조 선언 (포인터 방식)',
+ b:`<div class="co cp">C에서 노드는 <strong>struct</strong>로 만들어. data(값)와 next(다음 노드 포인터) 두 멤버로 구성돼.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_node_struct.c</span></div>
+<pre><span class="cm">// 노드 구조체 정의</span>
+<span class="kw">typedef struct</span> Node {
+<span class="hl">    <span class="tp">int</span> data;            <span class="cm">// 저장할 값</span></span>
+<span class="hl2">    <span class="kw">struct</span> Node* next;   <span class="cm">// 다음 노드의 주소 (포인터)</span></span>
+} Node;
+
+<span class="cm">// head: 리스트의 첫 번째 노드를 가리킴</span>
+Node* head = <span class="nm">NULL</span>;  <span class="cm">// 처음엔 아무것도 없음</span>
+
+<span class="cm">// 새 노드 만들기</span>
+Node* <span class="fn">createNode</span>(<span class="tp">int</span> val) {
+    Node* n = (Node*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(Node)); <span class="cm">// 메모리 할당</span>
+    n-&gt;data = val;     <span class="cm">// 값 저장</span>
+    n-&gt;next = <span class="nm">NULL</span>;   <span class="cm">// 다음은 일단 NULL</span>
+    <span class="kw">return</span> n;
+}</pre></div>
+<div class="card"><h4>→ 연산자 이해</h4>
+<table style="margin-bottom:0;">
+<tr><th>표현</th><th>의미</th></tr>
+<tr><td style="font-family:var(--mono);">n->data</td><td>포인터 n이 가리키는 노드의 data 멤버</td></tr>
+<tr><td style="font-family:var(--mono);">n->next</td><td>포인터 n이 가리키는 노드의 next 포인터</td></tr>
+<tr><td style="font-family:var(--mono);">(*n).data</td><td>n->data와 완전히 같은 표현</td></tr>
+</table></div>`
+},
+{t:'맨 앞에 삽입 (Prepend)',
+ b:`<div class="co cp"><strong>가장 빠른 삽입!</strong> 새 노드의 next를 현재 head로 연결하고, head를 새 노드로 업데이트해. O(1)!</div>
+<div class="node-row" style="margin-bottom:16px;">
+  <div class="node-box"><div class="node newnode"><div class="n-data">5</div><div class="n-next">next</div></div><div class="node-lbl" style="color:var(--am);">새 노드</div></div>
+  <span class="arr" style="color:var(--am);">→</span>
+  <div class="node-box"><div class="node head"><div class="n-data">10</div><div class="n-next">next</div></div><div class="node-lbl lh">head (이전)</div></div>
+  <span class="arr">→</span>
+  <div class="node-box"><div class="node tail"><div class="n-data">25</div><div class="n-next">NULL</div></div><div class="node-lbl lt">tail</div></div>
+</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_prepend.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">prepend</span>(<span class="tp">int</span> val) {
+    Node* n = <span class="fn">createNode</span>(val);  <span class="cm">// 새 노드 생성</span>
+<span class="hl">    n-&gt;next = head;               <span class="cm">// ① 새 노드 → 기존 head</span></span>
+<span class="hl2">    head = n;                     <span class="cm">// ② head를 새 노드로 업데이트</span></span>
+}
+
+<span class="cm">// 순서가 중요해! ①을 먼저 해야 기존 head를 잃지 않아.</span>
+<span class="cm">// ②를 먼저 하면 기존 리스트로 가는 포인터를 잃게 돼!</span></pre></div>
+<div class="co ca">
+<strong>실수 주의!</strong> 반드시 <strong>새 노드의 next 연결(①)을 먼저</strong> 하고, 그 다음 head를 이동(②)해야 해.<br>
+순서를 바꾸면 기존 리스트에 접근할 수 없게 돼. 메모리 누수 발생!
+</div>`
+},
+{t:'맨 뒤에 삽입 (Append)',
+ b:`<div class="co cg"><strong>Append</strong>는 리스트의 끝까지 이동해야 해서 O(n)이야. tail 포인터를 따로 관리하면 O(1)로 만들 수 있어!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_append.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">append</span>(<span class="tp">int</span> val) {
+    Node* n = <span class="fn">createNode</span>(val);
+
+    <span class="kw">if</span> (head == <span class="nm">NULL</span>) {   <span class="cm">// 리스트가 비었으면</span>
+        head = n;          <span class="cm">// 새 노드가 바로 head</span>
+        <span class="kw">return</span>;
+    }
+
+    <span class="cm">// 리스트 끝까지 이동</span>
+<span class="hl">    Node* cur = head;</span>
+<span class="hl">    <span class="kw">while</span> (cur-&gt;next != <span class="nm">NULL</span>)  <span class="cm">// next가 NULL인 노드 = 마지막 노드</span></span>
+<span class="hl">        cur = cur-&gt;next;</span>
+
+<span class="hl2">    cur-&gt;next = n;  <span class="cm">// 마지막 노드의 next를 새 노드로</span></span>
+}
+
+<span class="cm">// cur 포인터로 리스트를 순회하는 패턴 꼭 기억해!</span>
+<span class="cm">// while(cur->next != NULL) cur = cur->next;</span></pre></div>
+<div class="card"><h4>cur 순회 패턴</h4>
+<table style="margin-bottom:0;">
+<tr><th>코드</th><th>의미</th></tr>
+<tr><td style="font-family:var(--mono);">Node* cur = head;</td><td>cur를 head에서 시작</td></tr>
+<tr><td style="font-family:var(--mono);">cur->next != NULL</td><td>아직 다음 노드가 있음 (끝이 아님)</td></tr>
+<tr><td style="font-family:var(--mono);">cur = cur->next;</td><td>cur를 한 칸 앞으로 이동</td></tr>
+</table></div>`
+},
+{t:'노드 삭제',
+ b:`<div class="co cr">삭제는 <strong>삭제할 노드의 이전 노드(prev)</strong>를 찾아서 prev->next를 건너뛰는 게 핵심이야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_delete.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">deleteVal</span>(<span class="tp">int</span> val) {
+    <span class="kw">if</span> (head == <span class="nm">NULL</span>) <span class="kw">return</span>;   <span class="cm">// 빈 리스트</span>
+
+    <span class="cm">// head 노드가 삭제 대상이면</span>
+    <span class="kw">if</span> (head-&gt;data == val) {
+<span class="hl">        Node* tmp = head;          <span class="cm">// 잠깐 저장</span></span>
+<span class="hl">        head = head-&gt;next;         <span class="cm">// head를 다음 노드로 이동</span></span>
+        <span class="fn">free</span>(tmp);                 <span class="cm">// 메모리 해제</span>
+        <span class="kw">return</span>;
+    }
+
+    <span class="cm">// 중간 / 끝 노드 삭제: prev를 찾아야 해</span>
+    Node* prev = head;
+    Node* cur  = head-&gt;next;
+    <span class="kw">while</span> (cur != <span class="nm">NULL</span>) {
+        <span class="kw">if</span> (cur-&gt;data == val) {
+<span class="hl2">            prev-&gt;next = cur-&gt;next;  <span class="cm">// prev → cur 다음 노드 (건너뛰기!)</span></span>
+            <span class="fn">free</span>(cur);
+            <span class="kw">return</span>;
+        }
+        prev = cur; cur = cur-&gt;next;
+    }
+}
+<span class="cm">// [10] → [25] → [37] 에서 25 삭제:
+// prev=10 노드, cur=25 노드
+// prev->next = cur->next(37 노드) → [10] → [37]</span></pre></div>`
+},
+{t:'탐색·출력',
+ b:`<div class="co cb">연결 리스트 순회는 항상 <strong>head에서 시작해서 NULL까지</strong> cur = cur->next 로 이동!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>05_traverse.c</span></div>
+<pre><span class="cm">// 리스트 전체 출력</span>
+<span class="tp">void</span> <span class="fn">printList</span>() {
+<span class="hl">    Node* cur = head;</span>
+<span class="hl">    <span class="kw">while</span> (cur != <span class="nm">NULL</span>) {        <span class="cm">// NULL이면 끝</span></span>
+        <span class="fn">printf</span>(<span class="st">"%d"</span>, cur-&gt;data);
+        <span class="kw">if</span> (cur-&gt;next) <span class="fn">printf</span>(<span class="st">" → "</span>);
+<span class="hl">        cur = cur-&gt;next;          <span class="cm">// 다음 노드로 이동</span></span>
+    }
+    <span class="fn">printf</span>(<span class="st">" → NULL\n"</span>);
+}
+
+<span class="cm">// 특정 값 탐색</span>
+Node* <span class="fn">search</span>(<span class="tp">int</span> val) {
+    Node* cur = head;
+    <span class="kw">while</span> (cur != <span class="nm">NULL</span>) {
+<span class="hl2">        <span class="kw">if</span> (cur-&gt;data == val) <span class="kw">return</span> cur; <span class="cm">// 찾음!</span></span>
+        cur = cur-&gt;next;
+    }
+    <span class="kw">return</span> <span class="nm">NULL</span>;  <span class="cm">// 없음</span>
+}
+
+<span class="cm">// 리스트 길이</span>
+<span class="tp">int</span> <span class="fn">length</span>() {
+    <span class="tp">int</span> cnt = <span class="nm">0</span>;
+    Node* cur = head;
+    <span class="kw">while</span> (cur != <span class="nm">NULL</span>) { cnt++; cur = cur-&gt;next; }
+    <span class="kw">return</span> cnt;
+}</pre></div>`
+},
+{t:'배열 시뮬레이션 방식 (정올 핵심!)',
+ b:`<div class="co ca"><strong>★ 정올 시험에서 가장 많이 쓰는 방법!</strong><br>
+malloc 없이 배열 두 개(data[], nxt[])로 연결 리스트를 흉내내. 포인터 대신 배열 인덱스를 "포인터"처럼 써!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>06_array_sim.c — 배열로 연결 리스트 구현 (정올 스타일)</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+<span class="kw">#define</span> <span class="nm">NIL 0</span>       <span class="cm">// NULL 역할 (인덱스 0은 sentinel)</span>
+
+<span class="tp">int</span> data[<span class="nm">MAX</span>];      <span class="cm">// 각 노드의 값</span>
+<span class="tp">int</span> nxt[<span class="nm">MAX</span>];       <span class="cm">// 각 노드의 next 인덱스 (0=NIL)</span>
+<span class="tp">int</span> head = <span class="nm">NIL</span>;     <span class="cm">// 첫 노드 인덱스</span>
+<span class="tp">int</span> cnt  = <span class="nm">1</span>;       <span class="cm">// 다음 빈 슬롯 (1부터 사용)</span>
+
+<span class="cm">// "노드 생성" = 배열의 다음 슬롯 사용</span>
+<span class="tp">int</span> <span class="fn">newNode</span>(<span class="tp">int</span> val) {
+<span class="hl">    data[cnt] = val;</span>
+<span class="hl">    nxt[cnt]  = <span class="nm">NIL</span>;  <span class="cm">// next = NULL</span></span>
+    <span class="kw">return</span> cnt++;      <span class="cm">// 인덱스 반환 후 cnt 증가</span>
+}
+
+<span class="cm">// 맨 앞 삽입</span>
+<span class="tp">void</span> <span class="fn">prepend</span>(<span class="tp">int</span> val) {
+    <span class="tp">int</span> n = <span class="fn">newNode</span>(val);
+<span class="hl2">    nxt[n] = head;   <span class="cm">// 새 노드의 next = 기존 head</span></span>
+<span class="hl2">    head   = n;      <span class="cm">// head를 새 노드로</span></span>
+}
+
+<span class="cm">// 순회 출력</span>
+<span class="tp">void</span> <span class="fn">printList</span>() {
+    <span class="tp">int</span> cur = head;
+    <span class="kw">while</span> (cur != <span class="nm">NIL</span>) {
+        <span class="fn">printf</span>(<span class="st">"%d "</span>, data[cur]);
+        cur = nxt[cur];   <span class="cm">// 다음 인덱스로 이동</span>
+    }
+    <span class="fn">printf</span>(<span class="st">"\n"</span>);
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">prepend</span>(<span class="nm">30</span>); <span class="fn">prepend</span>(<span class="nm">20</span>); <span class="fn">prepend</span>(<span class="nm">10</span>);
+    <span class="fn">printList</span>();  <span class="cm">// 10 20 30</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+<div class="card"><h4>배열 시뮬 상태 예시</h4>
+<table style="margin-bottom:0;font-family:var(--mono);font-size:14px;">
+<tr><th>인덱스</th><th>1</th><th>2</th><th>3</th></tr>
+<tr><td style="font-weight:700;">data[]</td><td style="color:var(--rd);">30</td><td style="color:var(--gn);">20</td><td style="color:var(--pu);">10</td></tr>
+<tr><td style="font-weight:700;">nxt[]</td><td style="color:var(--t4);">0(NIL)</td><td style="color:var(--rd);">1</td><td style="color:var(--gn);">2</td></tr>
+</table>
+<p style="margin-top:10px;font-size:14px;color:var(--t3);">head=3 → 10 → (nxt[3]=2) → 20 → (nxt[2]=1) → 30 → (nxt[1]=0=NIL) 끝</p>
+</div>`
+}
+];
+
+let sIdx=0;
+function goSingle(n){
+  sIdx=n;
+  document.getElementById('panel-single').innerHTML=`<div class="card"><h3>${SINGLE_STEPS[n].t}</h3>${SINGLE_STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-single .sbt').forEach((b,i)=>{b.classList.toggle('active',i===n);b.classList.toggle('done',i<n);});
+}
+goSingle(0);
+
+/* ═══════════════════════════════════════
+   DOUBLY LINKED LIST CODE STEPS
+═══════════════════════════════════════ */
+const DOUBLE_STEPS=[
+{t:'단순 vs 이중 연결 리스트 비교',
+ b:`<div class="co cb">이중 연결 리스트는 <strong>prev 포인터가 추가</strong>돼. 양방향 이동이 가능하고, 삭제가 더 쉬워지는 게 가장 큰 장점이야!</div>
+<div class="card"><h4>단순 연결 리스트 (next만)</h4>
+<div class="node-row">
+  <div class="node-box"><div class="node head"><div class="n-data">10</div><div class="n-next">next</div></div><div class="node-lbl lh">head</div></div>
+  <span class="arr">→</span>
+  <div class="node-box"><div class="node"><div class="n-data">25</div><div class="n-next">next</div></div></div>
+  <span class="arr">→</span>
+  <div class="node-box"><div class="node tail"><div class="n-data">37</div><div class="n-next">NULL</div></div><div class="node-lbl lt">tail</div></div>
+</div></div>
+<div class="card"><h4>이중 연결 리스트 (prev + next)</h4>
+<div style="overflow-x:auto;padding:10px 0;">
+<div style="display:flex;align-items:center;gap:4px;min-width:500px;">
+  <div style="background:var(--pu-l);border:2.5px solid var(--pu);border-radius:var(--r);padding:8px 10px;text-align:center;">
+    <div style="font-size:11px;color:var(--pu);font-weight:700;">head</div>
+    <div style="display:flex;border:1.5px solid var(--pu-m);border-radius:6px;overflow:hidden;margin-top:4px;">
+      <div style="background:var(--s1);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--t4);">NULL</div>
+      <div style="background:var(--wh);padding:6px 10px;font-family:var(--mono);font-size:16px;font-weight:700;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);">10</div>
+      <div style="background:var(--s1);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--vi);">next</div>
+    </div>
+  </div>
+  <span style="font-size:18px;color:var(--vi);">⇄</span>
+  <div style="border:2.5px solid var(--bd2);border-radius:var(--r);padding:8px 10px;">
+    <div style="display:flex;border:1.5px solid var(--bd);border-radius:6px;overflow:hidden;">
+      <div style="background:var(--s1);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--am);">prev</div>
+      <div style="background:var(--wh);padding:6px 10px;font-family:var(--mono);font-size:16px;font-weight:700;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);">25</div>
+      <div style="background:var(--s1);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--vi);">next</div>
+    </div>
+  </div>
+  <span style="font-size:18px;color:var(--vi);">⇄</span>
+  <div style="background:var(--rd-l);border:2.5px solid var(--rd);border-radius:var(--r);padding:8px 10px;text-align:center;">
+    <div style="font-size:11px;color:var(--rd);font-weight:700;">tail</div>
+    <div style="display:flex;border:1.5px solid var(--rd-m);border-radius:6px;overflow:hidden;margin-top:4px;">
+      <div style="background:var(--s1);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--am);">prev</div>
+      <div style="background:var(--wh);padding:6px 10px;font-family:var(--mono);font-size:16px;font-weight:700;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);">37</div>
+      <div style="background:var(--rd-l);padding:6px 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--rd);">NULL</div>
+    </div>
+  </div>
+</div></div>
+</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>doubly_struct.c</span></div>
+<pre><span class="kw">typedef struct</span> DNode {
+<span class="hl">    <span class="tp">int</span>   data;             <span class="cm">// 값</span></span>
+<span class="hl2">    <span class="kw">struct</span> DNode* prev;     <span class="cm">// 이전 노드 포인터 (추가!)</span></span>
+<span class="hl">    <span class="kw">struct</span> DNode* next;     <span class="cm">// 다음 노드 포인터</span></span>
+} DNode;
+
+DNode* head = <span class="nm">NULL</span>;
+DNode* tail = <span class="nm">NULL</span>;  <span class="cm">// tail 포인터도 관리!</span></pre></div>`
+},
+{t:'이중 연결 리스트 삽입',
+ b:`<div class="co cp">삽입 시 <strong>4개의 포인터</strong>를 연결해야 해. 순서가 매우 중요하니 한 줄씩 이해해봐!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>doubly_insert.c</span></div>
+<pre><span class="cm">// 맨 앞에 삽입</span>
+<span class="tp">void</span> <span class="fn">prepend</span>(<span class="tp">int</span> val) {
+    DNode* n = <span class="fn">createDNode</span>(val);
+    <span class="kw">if</span> (head == <span class="nm">NULL</span>) {   <span class="cm">// 빈 리스트</span>
+        head = tail = n;
+        <span class="kw">return</span>;
+    }
+<span class="hl">    n-&gt;next    = head;     <span class="cm">// ① 새 노드의 next → 기존 head</span></span>
+<span class="hl2">    head-&gt;prev = n;        <span class="cm">// ② 기존 head의 prev → 새 노드</span></span>
+    head = n;              <span class="cm">// ③ head 업데이트</span>
+}
+
+<span class="cm">// 맨 뒤에 삽입</span>
+<span class="tp">void</span> <span class="fn">append</span>(<span class="tp">int</span> val) {
+    DNode* n = <span class="fn">createDNode</span>(val);
+    <span class="kw">if</span> (tail == <span class="nm">NULL</span>) { head = tail = n; <span class="kw">return</span>; }
+<span class="hl">    n-&gt;prev    = tail;     <span class="cm">// ① 새 노드의 prev → 기존 tail</span></span>
+<span class="hl2">    tail-&gt;next = n;        <span class="cm">// ② 기존 tail의 next → 새 노드</span></span>
+    tail = n;              <span class="cm">// ③ tail 업데이트</span>
+}</pre></div>
+<div class="co ca"><strong>핵심 패턴:</strong> 연결할 때는 항상 <strong>새 노드의 포인터를 먼저</strong> 설정하고, 그 다음 기존 노드의 포인터를 수정해. 순서를 바꾸면 기존 노드를 잃게 돼!</div>`
+},
+{t:'이중 연결 리스트 삭제',
+ b:`<div class="co cg">이중 연결 리스트의 가장 큰 장점 — <strong>삭제할 노드만 알면 O(1)에 삭제 가능!</strong> 단순 연결 리스트처럼 prev를 탐색할 필요가 없어.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>doubly_delete.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">deleteNode</span>(DNode* target) {
+    <span class="kw">if</span> (target == <span class="nm">NULL</span>) <span class="kw">return</span>;
+
+    <span class="cm">// target의 이전 노드와 다음 노드를 직접 연결</span>
+    <span class="kw">if</span> (target-&gt;prev)
+<span class="hl">        target-&gt;prev-&gt;next = target-&gt;next;  <span class="cm">// prev의 next → target 다음</span></span>
+    <span class="kw">else</span>
+        head = target-&gt;next;              <span class="cm">// target이 head였으면 head 업데이트</span>
+
+    <span class="kw">if</span> (target-&gt;next)
+<span class="hl2">        target-&gt;next-&gt;prev = target-&gt;prev;  <span class="cm">// next의 prev → target 이전</span></span>
+    <span class="kw">else</span>
+        tail = target-&gt;prev;              <span class="cm">// target이 tail이었으면 tail 업데이트</span>
+
+    <span class="fn">free</span>(target);
+}
+
+<span class="cm">// [10] ⇄ [25] ⇄ [37] 에서 25 삭제:
+// 25->prev->next = 25->next  →  10->next = 37
+// 25->next->prev = 25->prev  →  37->prev = 10
+// 결과: [10] ⇄ [37]</span></pre></div>`
+},
+{t:'이중 연결 리스트 전체 코드',
+ b:`<div class="co cp">완성 코드를 보면서 전체 흐름을 다시 확인해봐!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>doubly_full.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="kw">typedef struct</span> DNode {
+    <span class="tp">int</span> data; <span class="kw">struct</span> DNode* prev; <span class="kw">struct</span> DNode* next;
+} DNode;
+
+DNode* head = <span class="nm">NULL</span>, *tail = <span class="nm">NULL</span>;
+
+DNode* <span class="fn">createDNode</span>(<span class="tp">int</span> v){
+    DNode* n=(DNode*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(DNode));
+    n-&gt;data=v; n-&gt;prev=n-&gt;next=<span class="nm">NULL</span>;
+    <span class="kw">return</span> n;
+}
+<span class="tp">void</span> <span class="fn">append</span>(<span class="tp">int</span> v){
+    DNode* n=<span class="fn">createDNode</span>(v);
+    <span class="kw">if</span>(!tail){head=tail=n;<span class="kw">return</span>;}
+<span class="hl">    n-&gt;prev=tail; tail-&gt;next=n; tail=n;</span>
+}
+<span class="tp">void</span> <span class="fn">deleteNode</span>(DNode* t){
+    <span class="kw">if</span>(!t)<span class="kw">return</span>;
+    <span class="kw">if</span>(t-&gt;prev) t-&gt;prev-&gt;next=t-&gt;next; <span class="kw">else</span> head=t-&gt;next;
+    <span class="kw">if</span>(t-&gt;next) t-&gt;next-&gt;prev=t-&gt;prev; <span class="kw">else</span> tail=t-&gt;prev;
+    <span class="fn">free</span>(t);
+}
+<span class="tp">void</span> <span class="fn">printFwd</span>(){
+    DNode* c=head;
+    <span class="kw">while</span>(c){<span class="fn">printf</span>(<span class="st">"%d "</span>,c-&gt;data);c=c-&gt;next;}<span class="fn">printf</span>(<span class="st">"\n"</span>);
+}
+<span class="tp">void</span> <span class="fn">printBwd</span>(){   <span class="cm">// 역방향 출력 (이중 연결만 가능!)</span>
+    DNode* c=tail;
+<span class="hl2">    <span class="kw">while</span>(c){<span class="fn">printf</span>(<span class="st">"%d "</span>,c-&gt;data);c=c-&gt;prev;}<span class="fn">printf</span>(<span class="st">"\n"</span>);</span>
+}
+<span class="tp">int</span> <span class="fn">main</span>(){
+    <span class="fn">append</span>(<span class="nm">10</span>);<span class="fn">append</span>(<span class="nm">20</span>);<span class="fn">append</span>(<span class="nm">30</span>);
+    <span class="fn">printFwd</span>(); <span class="cm">// 10 20 30</span>
+    <span class="fn">printBwd</span>(); <span class="cm">// 30 20 10  ← 역방향!</span>
+    <span class="fn">deleteNode</span>(head-&gt;next); <span class="cm">// 20 삭제</span>
+    <span class="fn">printFwd</span>(); <span class="cm">// 10 30</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>`
+}
+];
+
+let dIdx=0;
+function goDouble(n){
+  dIdx=n;
+  document.getElementById('panel-double').innerHTML=`<div class="card"><h3>${DOUBLE_STEPS[n].t}</h3>${DOUBLE_STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-double .sbt').forEach((b,i)=>{b.classList.toggle('active',i===n);b.classList.toggle('done',i<n);});
+}
+goDouble(0);
+
+/* ═══════════════════════════════════════
+   SIMULATOR
+═══════════════════════════════════════ */
+let simType='singly';
+let simList=[]; // [{val, id}]
+let simIdCtr=1;
+
+function setType(t){
+  simType=t;
+  document.getElementById('btn-singly').className='sbtn2 '+(t==='singly'?'bpp':'bpa');
+  document.getElementById('btn-doubly').className='sbtn2 '+(t==='doubly'?'bpp':'bpa');
+  simReset();
+}
+
+function addLog(msg,cls){
+  const log=document.getElementById('sim-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderSim(){
+  const vis=document.getElementById('sim-vis');
+  if(simList.length===0){
+    vis.innerHTML='<span style="color:var(--t4);font-size:14px;">리스트가 비어있어. 노드를 추가해봐!</span>';
+    document.getElementById('s-size').textContent='0';
+    document.getElementById('s-head').textContent='NULL';
+    document.getElementById('s-tail').textContent='NULL';
+    return;
+  }
+  let html='<div class="node-row">';
+  simList.forEach((item,i)=>{
+    const isHead=i===0, isTail=i===simList.length-1;
+    let cls=isHead&&isTail?'head tail':isHead?'head':isTail?'tail':'';
+    const nextLabel=simType==='singly'?(isTail?'NULL':'next'):(isTail?'NULL':'next');
+    const prevLabel=simType==='doubly'?(isHead?'NULL':'prev'):'';
+    html+=`<div class="node-box">`;
+    if(simType==='doubly'){
+      html+=`<div class="node ${cls}" id="nd-${item.id}">`;
+      html+=`<div class="n-next" style="font-size:10px;">${isHead?'NULL':'←'}</div>`;
+      html+=`<div class="n-data">${item.val}</div>`;
+      html+=`<div class="n-next" style="font-size:10px;">${isTail?'NULL':'→'}</div>`;
+      html+=`</div>`;
+    } else {
+      html+=`<div class="node ${cls}" id="nd-${item.id}"><div class="n-data">${item.val}</div><div class="n-next">${isTail?'NULL':'next'}</div></div>`;
+    }
+    html+=`<div class="node-lbl ${isHead?'lh':''} ${isTail?'lt':''}">${isHead&&isTail?'head/tail':isHead?'head':isTail?'tail':''}</div>`;
+    html+=`</div>`;
+    if(!isTail) html+=`<span class="arr">${simType==='doubly'?'⇄':'→'}</span>`;
+  });
+  html+='</div>';
+  vis.innerHTML=html;
+  document.getElementById('s-size').textContent=simList.length;
+  document.getElementById('s-head').textContent=simList[0].val;
+  document.getElementById('s-tail').textContent=simList[simList.length-1].val;
+  // animate newest
+  setTimeout(()=>{
+    const last=document.getElementById('nd-'+(simIdCtr-1));
+    if(last)last.classList.add('node-anim');
+  },10);
+}
+
+function simPrepend(){
+  const v=parseInt(document.getElementById('sim-val').value);
+  if(isNaN(v)){addLog('값을 입력해봐!','li');return;}
+  if(simList.length>=10){addLog('최대 10개까지 추가 가능해!','lr');return;}
+  simList.unshift({val:v,id:simIdCtr++});
+  renderSim();
+  addLog(`맨앞 삽입: ${v} → head가 됨, 리스트 크기=${simList.length}`,'lp');
+}
+function simAppend(){
+  const v=parseInt(document.getElementById('sim-val').value);
+  if(isNaN(v)){addLog('값을 입력해봐!','li');return;}
+  if(simList.length>=10){addLog('최대 10개까지 추가 가능해!','lr');return;}
+  simList.push({val:v,id:simIdCtr++});
+  renderSim();
+  addLog(`맨뒤 삽입: ${v} → tail이 됨, 리스트 크기=${simList.length}`,'lg');
+}
+function simInsertAt(){
+  const v=parseInt(document.getElementById('sim-val').value);
+  const pos=parseInt(document.getElementById('sim-pos').value);
+  if(isNaN(v)||isNaN(pos)){addLog('값과 위치를 입력해봐!','li');return;}
+  if(simList.length>=10){addLog('최대 10개까지!','lr');return;}
+  const idx=Math.min(Math.max(pos,0),simList.length);
+  simList.splice(idx,0,{val:v,id:simIdCtr++});
+  renderSim();
+  addLog(`${idx}번째 뒤 삽입: ${v} → 리스트 크기=${simList.length}`,'la');
+}
+function simDeleteHead(){
+  if(!simList.length){addLog('리스트가 비어있어!','lr');return;}
+  const v=simList[0].val;
+  simList.shift();
+  renderSim();
+  addLog(`head 삭제: ${v} 제거, 리스트 크기=${simList.length}`,'lr');
+}
+function simDeleteTail(){
+  if(!simList.length){addLog('리스트가 비어있어!','lr');return;}
+  const v=simList[simList.length-1].val;
+  simList.pop();
+  renderSim();
+  addLog(`tail 삭제: ${v} 제거, 리스트 크기=${simList.length}`,'lr');
+}
+function simDeleteVal(){
+  const v=parseInt(document.getElementById('sim-del-val').value);
+  if(isNaN(v)){addLog('삭제할 값을 입력해봐!','li');return;}
+  const idx=simList.findIndex(n=>n.val===v);
+  if(idx===-1){addLog(`${v}는 리스트에 없어!`,'lr');return;}
+  simList.splice(idx,1);
+  renderSim();
+  addLog(`값 ${v} 삭제 완료, 리스트 크기=${simList.length}`,'lr');
+}
+function simReset(){
+  simList=[];simIdCtr=1;
+  renderSim();
+  document.getElementById('sim-log').innerHTML='<span class="li">↺ 초기화됨!</span>';
+}
+renderSim();
+
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+const QUIZ=[
+  {q:'연결 리스트에서 각 노드가 반드시 가지는 것은?',
+   opts:['인덱스 번호','다음 노드의 주소(포인터)','정렬된 값','고정된 크기'],ans:1,
+   fb:'노드는 data(값)와 next(다음 노드 주소) 두 부분으로 구성돼. next가 연결의 핵심!'},
+  {q:'단순 연결 리스트에서 맨 앞 삽입(prepend)의 시간복잡도는?',
+   opts:['O(n)','O(log n)','O(1)','O(n²)'],ans:2,
+   fb:'맨 앞 삽입은 head만 업데이트하면 돼! 리스트 크기에 관계없이 O(1)이야.'},
+  {q:'맨 앞 삽입 시 올바른 포인터 연결 순서는?',
+   opts:['head = 새노드 → 새노드->next = head','새노드->next = head → head = 새노드','head->next = 새노드 → head = 새노드','새노드->next = NULL → head = 새노드'],ans:1,
+   fb:'반드시 새노드->next = head 를 먼저 해야 기존 리스트를 잃지 않아! 그 다음 head를 업데이트해.'},
+  {q:'연결 리스트 순회 종료 조건은?',
+   opts:['cur == head','cur == 0','cur->next == head','cur == NULL'],ans:3,
+   fb:'마지막 노드의 next가 NULL이야. cur이 NULL이 되면 리스트 끝에 도달한 거야!'},
+  {q:'배열과 비교할 때 연결 리스트의 단점은?',
+   opts:['삽입이 느리다','임의 접근(index)이 O(n)으로 느리다','크기를 못 바꾼다','정렬이 불가능하다'],ans:1,
+   fb:'배열은 arr[3]처럼 O(1) 랜덤 접근이 가능하지만, 연결 리스트는 head부터 n번 이동해야 해서 O(n)!'},
+  {q:'이중 연결 리스트가 단순 연결 리스트보다 유리한 점은?',
+   opts:['메모리를 적게 쓴다','맨앞 삽입이 빠르다','삭제할 노드만 알면 O(1) 삭제 가능','순회가 빠르다'],ans:2,
+   fb:'단순 연결 리스트는 삭제 시 prev 노드를 탐색(O(n))해야 하지만, 이중은 target->prev로 바로 접근 가능해서 O(1)!'},
+  {q:'정올 배열 시뮬레이션 방식에서 NIL(NULL)을 표현하는 방법은?',
+   opts:['-1','NULL 포인터','0 (인덱스 0을 sentinel로)','MAX_INT'],ans:2,
+   fb:'배열 인덱스 0을 사용 안 하고 NIL(=0)로 예약해. nxt[i]=0이면 다음 노드 없음을 의미해!'},
+  {q:'head→10→25→37→NULL 리스트에서 25를 삭제하는 핵심 코드는?',
+   opts:['head = head->next','25노드->next = NULL','prev->next = 25노드->next','25노드->prev = head'],ans:2,
+   fb:'삭제는 이전 노드(prev=10 노드)의 next를 삭제 대상(25)의 next(37 노드)로 연결해서 25를 건너뛰게 해!'},
+  {q:'연결 리스트에서 마지막 노드(tail)의 next 값은?',
+   opts:['head를 가리킴 (원형이면 제외)','0','NULL','이전 노드를 가리킴'],ans:2,
+   fb:'단순/이중 연결 리스트의 마지막 노드 next는 NULL이야. 원형 연결 리스트만 head를 가리켜!'},
+  {q:'리스트 [5→10→15→20], head에서 세 번째 노드의 data는?',
+   opts:['5','10','15','20'],ans:2,
+   fb:'head=5(1번째)→10(2번째)→15(3번째). cur=head; cur=cur->next; cur=cur->next; → cur->data=15!'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans) document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplabel').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ═══════════════════════════════════════
+   CHALLENGES
+═══════════════════════════════════════ */
+const CHS=[
+  {title:'도전 1 — 배열 시뮬레이션으로 연결 리스트 구현',
+   tags:['tv:정올 핵심','ta:브론즈~실버'],
+   desc:'배열(data[], nxt[])로 연결 리스트를 구현하고 n개의 연산을 처리해라.<br><br><strong>연산 종류:</strong> <code style="font-family:var(--mono);">push_front x</code> (맨앞 삽입) / <code style="font-family:var(--mono);">push_back x</code> (맨뒤 삽입) / <code style="font-family:var(--mono);">print</code> (전체 출력)<br><strong>출력:</strong> print 시 리스트 내용을 공백으로 구분해 출력',
+   hint:'push_front: nxt[n]=head; head=n; / push_back: 마지막 노드까지 이동(cur=head;while(nxt[cur]!=NIL))후 nxt[cur]=n; / print: cur=head; while(cur!=NIL) { printf data; cur=nxt[cur]; }',
+   start:`#include <stdio.h>
+#define MAX 100001
+#define NIL 0
+
+int data[MAX];
+int nxt[MAX];
+int head = NIL;
+int cnt = 1;  // 1부터 사용 (0은 NIL)
+int tail = NIL; // tail 포인터 (push_back 최적화용)
+
+int newNode(int val) {
+    data[cnt] = val;
+    nxt[cnt] = NIL;
+    return cnt++;
+}
+
+void push_front(int val) {
+    int n = newNode(val);
+    // TODO: 맨앞 삽입
+    // nxt[n] = ____;
+    // head = ____;
+    // if(tail == NIL) tail = n;
+    
+}
+
+void push_back(int val) {
+    int n = newNode(val);
+    if (head == NIL) {
+        head = tail = n;
+        return;
+    }
+    // TODO: tail의 next를 n으로, tail을 n으로 업데이트
+    
+    
+}
+
+void printList() {
+    // TODO: head부터 NIL까지 순회하며 출력
+    
+    printf("\\n");
+}
+
+int main() {
+    int q;
+    scanf("%d", &q);
+    while (q--) {
+        char op[20];
+        scanf("%s", op);
+        if (op[6] == 'f') { // push_front
+            int x; scanf("%d", &x);
+            push_front(x);
+        } else if (op[6] == 'b') { // push_back
+            int x; scanf("%d", &x);
+            push_back(x);
+        } else {
+            printList();
+        }
+    }
+    return 0;
+}`
+  },
+  {title:'도전 2 — 연결 리스트 역순 출력',
+   tags:['tv:중급','tp2:실버'],
+   desc:'단순 연결 리스트를 역순으로 출력해라. 리스트를 직접 뒤집거나 재귀로 출력해봐!<br><br><strong>입력:</strong> <code style="font-family:var(--mono);">5 / 1 2 3 4 5</code> (n개 숫자를 push_back)<br><strong>출력:</strong> <code style="font-family:var(--mono);color:var(--gn);">5 4 3 2 1</code>',
+   hint:'방법 1: 재귀로 printReverse(cur->next) 먼저 호출 후 printf. 방법 2: 스택에 담아서 꺼내기. 방법 3: nxt[] 배열을 역순으로 재연결.',
+   start:`#include <stdio.h>
+#define MAX 100001
+#define NIL 0
+
+int data[MAX], nxt[MAX];
+int head = NIL, cnt = 1;
+
+int newNode(int val){
+    data[cnt]=val; nxt[cnt]=NIL;
+    return cnt++;
+}
+void push_back(int val){
+    int n=newNode(val);
+    if(head==NIL){head=n;return;}
+    int cur=head;
+    while(nxt[cur]!=NIL) cur=nxt[cur];
+    nxt[cur]=n;
+}
+
+// TODO: 재귀로 역순 출력하는 함수 작성
+// void printReverse(int cur) {
+//     if(cur == NIL) return;
+//     // 힌트: 재귀 호출을 먼저 하고, 그 다음에 출력!
+//     
+// }
+
+int main(){
+    int n; scanf("%d",&n);
+    for(int i=0;i<n;i++){int x;scanf("%d",&x);push_back(x);}
+    // TODO: printReverse(head) 호출
+    printf("\\n");
+    return 0;
+}`
+  },
+  {title:'도전 3 — 연결 리스트로 큐 구현 (정올 응용)',
+   tags:['tr:고급','tp2:실버~골드'],
+   desc:'배열 시뮬레이션 방식으로 연결 리스트 기반 큐를 구현해라.<br>enqueue는 맨뒤 삽입, dequeue는 맨앞 삭제야.<br><br><strong>입력 예시:</strong><br><code style="font-family:var(--mono);">6<br>enqueue 10<br>enqueue 20<br>dequeue<br>enqueue 30<br>dequeue<br>front</code><br><strong>출력:</strong> <code style="font-family:var(--mono);color:var(--gn);">10<br>20<br>30</code>',
+   hint:'enqueue = push_back (tail에 추가) / dequeue = head를 head=nxt[head]로 이동 / front = data[head] 반환. tail 포인터를 유지해야 enqueue가 O(1)이야!',
+   start:`#include <stdio.h>
+#define MAX 100001
+#define NIL 0
+
+int data[MAX], nxt[MAX];
+int head=NIL, tail=NIL, cnt=1;
+
+int newNode(int val){
+    data[cnt]=val; nxt[cnt]=NIL; return cnt++;
+}
+
+void enqueue(int val){
+    int n=newNode(val);
+    // TODO: tail에 추가 (push_back)
+    
+}
+
+int dequeue(){
+    // TODO: head에서 꺼내기 (isEmpty 체크 포함)
+    // head = nxt[head] 로 이동하고 이전 head의 data 반환
+    
+}
+
+int getFront(){
+    // TODO: head의 data 반환
+    
+}
+
+int main(){
+    int q; scanf("%d",&q);
+    while(q--){
+        char op[10]; scanf("%s",op);
+        if(op[0]=='e'){int x;scanf("%d",&x);enqueue(x);}
+        else if(op[0]=='d') printf("%d\\n",dequeue());
+        else printf("%d\\n",getFront());
+    }
+    return 0;
+}`
+  }
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="26" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+
+  if(ci===0){
+    const hasFront = code.includes('nxt[n]') && code.includes('head');
+    const hasBack  = code.includes('nxt[tail]') || (code.includes('nxt[cur]') && code.includes('NIL'));
+    const hasPrint = code.includes('while') && code.includes('nxt[cur]') && code.includes('data[cur]');
+    const hasNew   = code.includes('newNode') || code.includes('cnt++');
+    if(!hasNew){r+='❌ newNode 함수 또는 cnt++ 로 새 노드를 만드는 코드가 없어!\n';ok=false;}
+    else if(!hasFront){r+='❌ push_front에서 nxt[n]=head; head=n; 패턴이 없어!\n';ok=false;}
+    else if(!hasBack){r+='❌ push_back에서 tail->next 또는 마지막 노드 탐색 코드가 없어!\n';ok=false;}
+    else if(!hasPrint){r+='❌ printList에서 while 순회 + data 출력 코드가 없어!\n';ok=false;}
+    if(ok) r=`✅ 배열 시뮬레이션 코드 분석 완료!
+
+newNode():   ✓ 새 노드 슬롯 할당
+push_front(): ✓ nxt[n]=head; head=n 패턴
+push_back():  ✓ tail 또는 마지막 노드 탐색
+printList():  ✓ while(cur!=NIL) 순회
+
+예시 시뮬:
+push_front(30): data[1]=30, head=1
+push_front(20): data[2]=20, nxt[2]=1, head=2
+push_back(40):  data[3]=40, nxt[1]=3, tail=3
+print: cur=2→20, cur=1→30, cur=3→40
+출력: 20 30 40  ✓`;
+  } else if(ci===1){
+    const hasRecursive = code.includes('printReverse') && code.includes('NIL') &&
+                         (code.includes('return') || code.includes('if'));
+    const hasCallAfter = /printReverse\s*\(\s*(cur->next|nxt\[cur\])\s*\)[\s\S]*printf/.test(code) ||
+                         /printReverse[\s\S]{0,80}printf/.test(code);
+    if(!code.includes('printReverse')){r+='❌ printReverse 함수가 없어! 재귀 함수를 작성해봐.\n';ok=false;}
+    else if(!hasRecursive){r+='❌ 기저 조건(cur==NIL이면 return)이 없어!\n';ok=false;}
+    if(ok) r=`✅ 역순 출력 코드 분석 완료!
+
+재귀 기저 조건: ✓ (cur==NIL return)
+재귀 호출:      ✓
+출력 위치:      재귀 호출 후 printf면 역순!
+
+재귀 실행 흐름 [1→2→3→4→5]:
+printReverse(1)
+  printReverse(2)
+    printReverse(3)
+      printReverse(4)
+        printReverse(5)
+          printReverse(NIL) → return
+        printf 5
+      printf 4
+    printf 3
+  printf 2
+printf 1
+출력: 5 4 3 2 1  ✓`;
+  } else {
+    const hasEnq  = code.includes('enqueue') && (code.includes('tail') || code.includes('nxt['));
+    const hasDeq  = code.includes('dequeue') && code.includes('head') && (code.includes('nxt[head]') || code.includes('head->next'));
+    const hasFront= code.includes('getFront') && (code.includes('data[head]') || code.includes('head->data'));
+    if(!hasEnq){r+='❌ enqueue에서 tail에 추가하는 코드가 없어!\n';ok=false;}
+    else if(!hasDeq){r+='❌ dequeue에서 head를 nxt[head]로 이동하는 코드가 없어!\n';ok=false;}
+    else if(!hasFront){r+='❌ getFront에서 data[head] 반환 코드가 없어!\n';ok=false;}
+    if(ok) r=`✅ 연결 리스트 큐 분석 완료!
+
+enqueue(): tail에 노드 추가 ✓
+dequeue(): head=nxt[head] 이동 ✓
+getFront(): data[head] 반환 ✓
+
+입력 시뮬:
+enqueue(10): head=tail=1, data[1]=10
+enqueue(20): nxt[1]=2, tail=2, data[2]=20
+dequeue():   반환=10, head=nxt[1]=2
+enqueue(30): nxt[2]=3, tail=3, data[3]=30
+dequeue():   반환=20, head=nxt[2]=3
+front():     data[3]=30
+
+출력:
+10
+20
+30  ✓`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+</script>
+</body>
+</html>

@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>덱(Deque) 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --bg:#f4f7fc; --wh:#fff; --s1:#edf1f9; --s2:#e1e8f5;
+  --bd:#ccd4ea; --bd2:#b3bedd;
+  --t1:#101627; --t2:#243060; --t3:#586092; --t4:#9aa2c6;
+
+  /* FRONT ops → teal */
+  --tl:  #0d7c6a; --tl-l:#d0faf0; --tl-m:#5ee4ca;
+  /* BACK ops  → tangerine */
+  --tg:  #c2410c; --tg-l:#fff0e4; --tg-m:#fdb99a;
+  /* Highlight: indigo */
+  --ind: #3730a3; --ind-l:#e0e7ff; --ind-m:#a5b4fc;
+  /* Gold: answer/best */
+  --gld: #b07800; --gld-l:#fff8d4; --gld-m:#ffd966;
+  /* Sky: info */
+  --sky: #0369a1; --sky-l:#e0f2fe; --sky-m:#7dd3fc;
+  /* Plum: circular */
+  --plm: #7c3aed; --plm-l:#ede9fe; --plm-m:#c4b5fd;
+
+  --mono:'JetBrains Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  --r:10px; --r2:16px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+/* ── HEADER ── */
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-lr{width:10px;flex-shrink:0;background:linear-gradient(180deg,var(--tl) 0%,var(--tg) 100%);}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 28px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.05em;}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.hdr-b1{background:var(--tl-l);color:var(--tl);border:1.5px solid var(--tl-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.hdr-b2{background:var(--tg-l);color:var(--tg);border:1.5px solid var(--tg-m);padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+/* ── NAV ── */
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--tl);border-bottom-color:var(--tl);font-weight:700;}
+
+/* ── PAGES ── */
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+/* ── TYPE ── */
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--ind);}
+
+/* ── CALLOUT ── */
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.ctl{background:var(--tl-l);color:var(--t2);border-color:var(--tl);}
+.ctg{background:var(--tg-l);color:var(--t2);border-color:var(--tg);}
+.cid{background:var(--ind-l);color:var(--t2);border-color:var(--ind);}
+.cgd{background:var(--gld-l);color:var(--t2);border-color:var(--gld);}
+.csk{background:var(--sky-l);color:var(--t2);border-color:var(--sky);}
+.cpl{background:var(--plm-l);color:var(--t2);border-color:var(--plm);}
+
+/* ── CARD ── */
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+/* ── STEP BAR ── */
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;}
+.sbt{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);color:var(--t2);}
+.sbt.on{background:var(--tl-l);color:var(--tl);font-weight:700;}
+.sbt.dn{background:var(--sky-l);color:var(--sky);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+/* ── CODE ── */
+.cw{background:#131c2c;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;border:1.5px solid #1c2840;}
+.cbr{background:#192236;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#5878b8;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1c2840;}
+.dots{display:flex;gap:6px;}.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}
+.htl{background:rgba(13,124,106,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+.htg{background:rgba(194,65,12,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fb923c;}
+.hid{background:rgba(55,48,163,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #818cf8;}
+.hgd{background:rgba(176,120,0,.15);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fbbf24;}
+
+/* ── TAGS ── */
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 4px 2px 0;}
+.ttl{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.ttg{background:var(--tg-l);color:var(--tg);border:1px solid var(--tg-m);}
+.tid{background:var(--ind-l);color:var(--ind);border:1px solid var(--ind-m);}
+.tgd{background:var(--gld-l);color:var(--gld);border:1px solid var(--gld-m);}
+.tsk{background:var(--sky-l);color:var(--sky);border:1px solid var(--sky-m);}
+.tpl{background:var(--plm-l);color:var(--plm);border:1px solid var(--plm-m);}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* ════════════════════════════════
+   DEQUE VISUAL
+════════════════════════════════ */
+.dq-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 20px;margin-bottom:18px;}
+
+/* arrow labels */
+.dq-labels{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.dq-label{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.dq-label-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+
+/* slots row */
+.dq-track{display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 0 10px;}
+.dq-end-label{font-size:13px;font-weight:700;white-space:nowrap;padding:0 10px;flex-shrink:0;}
+.dq-front-lbl{color:var(--tl);}
+.dq-back-lbl {color:var(--tg);}
+.dq-slot{
+  width:58px;height:60px;
+  border:2px solid var(--bd2);
+  background:var(--wh);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0;position:relative;
+}
+.dq-slot:first-of-type{border-radius:var(--r) 0 0 var(--r);border-left:2px solid var(--bd2);}
+.dq-slot:last-of-type{border-radius:0 var(--r) var(--r) 0;}
+.dq-slot+.dq-slot{border-left:none;}
+.dq-slot .dv{font-size:20px;color:var(--t1);}
+.dq-slot .di{font-size:10px;color:var(--t4);position:absolute;bottom:3px;}
+
+/* State classes */
+.dq-slot.sf{background:var(--tl-l);border-color:var(--tl);border-left:2px solid var(--tl)!important;}
+.dq-slot.sf .dv{color:var(--tl);}
+.dq-slot.sb{background:var(--tg-l);border-color:var(--tg);}
+.dq-slot.sb .dv{color:var(--tg);}
+.dq-slot.sf.sb{background:linear-gradient(135deg,var(--tl-l),var(--tg-l));border-color:var(--plm);}
+.dq-slot.sf.sb .dv{color:var(--plm);}
+.dq-slot.si{background:var(--s1);}     /* inside but not front/back */
+.dq-slot.si .dv{color:var(--t2);font-size:18px;}
+.dq-slot.push-f{animation:pfIn .35s cubic-bezier(.34,1.56,.64,1);}
+.dq-slot.push-b{animation:pbIn .35s cubic-bezier(.34,1.56,.64,1);}
+.dq-slot.pop-f{animation:pfOut .28s ease forwards;}
+.dq-slot.pop-b{animation:pbOut .28s ease forwards;}
+@keyframes pfIn{from{opacity:0;transform:scaleX(.5)translateX(-20px);}to{opacity:1;transform:none;}}
+@keyframes pbIn{from{opacity:0;transform:scaleX(.5)translateX(20px);}to{opacity:1;transform:none;}}
+@keyframes pfOut{from{opacity:1;}to{opacity:0;transform:scaleX(.5)translateX(-20px);}}
+@keyframes pbOut{from{opacity:1;}to{opacity:0;transform:scaleX(.5)translateX(20px);}}
+
+/* ptr row */
+.dq-ptrs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.dq-ptr{background:var(--s1);border:1.5px solid var(--bd);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.dq-ptr span{font-weight:700;}
+
+/* circular ring visual */
+.ring-wrap{display:flex;justify-content:center;margin:10px 0;}
+
+/* ── CONTROLS ── */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.btn{padding:10px 20px;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--sans);}
+.btn:disabled{opacity:.38;cursor:default;}
+.bpf{background:var(--tl);color:#fff;border-color:var(--tl);}      .bpf:hover:not(:disabled){background:#0a5f50;}
+.bpb{background:var(--tg);color:#fff;border-color:var(--tg);}      .bpb:hover:not(:disabled){background:#9a3209;}
+.bof{background:var(--tl-l);color:var(--tl);border-color:var(--tl-m);}.bof:hover:not(:disabled){background:var(--tl);color:#fff;}
+.bob{background:var(--tg-l);color:var(--tg);border-color:var(--tg-m);}.bob:hover:not(:disabled){background:var(--tg);color:#fff;}
+.bgd{background:var(--gld-l);color:var(--gld);border-color:var(--gld-m);}.bgd:hover:not(:disabled){background:var(--gld);color:#fff;}
+.br{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.br:hover{border-color:var(--t2);}
+.bauto{background:var(--plm-l);color:var(--plm);border-color:var(--plm-m);}.bauto:hover{background:var(--plm);color:#fff;}
+.inp{padding:9px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;width:80px;}
+.inp:focus{border-color:var(--tl);}
+
+/* sim tab switcher */
+.stab-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.stab{padding:9px 18px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.stab:hover{border-color:var(--tl);color:var(--tl);}
+.stab.on{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.scon{display:none;}.scon.on{display:block;}
+
+/* ── LOG ── */
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:12px 16px;min-height:90px;max-height:148px;overflow-y:auto;font-family:var(--mono);font-size:14px;line-height:1.95;}
+.lpf{color:var(--tl);font-weight:600;}.lpb{color:var(--tg);font-weight:600;}
+.lof{color:#0e7490;font-weight:600;}.lob{color:#9a3400;font-weight:600;}
+.lgd{color:var(--gld);font-weight:700;}.li{color:var(--t4);}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;font-family:var(--mono);}
+.qopt:hover:not(.locked){border-color:var(--tl);color:var(--tl);background:var(--tl-l);}
+.qopt.correct{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.qopt.wrong{background:var(--tg-l);border-color:var(--tg);color:var(--tg);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.qfb.bad{background:var(--tg-l);color:var(--tg);border:1px solid var(--tg-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--tl);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:linear-gradient(90deg,var(--tl),var(--tg));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+textarea{width:100%;background:#131c2c;border:1.5px solid #1c2840;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d4f5;resize:vertical;outline:none;line-height:1.85;transition:border .2s;}
+textarea:focus{border-color:var(--tl);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--tl);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;}
+.rbtn:hover{background:#0a5f50;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--tl);}.oe{color:var(--tg);}
+.ht{font-size:14px;color:var(--ind);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--gld-l);border-radius:var(--r);font-size:14px;color:var(--gld);border:1px solid var(--gld-m);line-height:1.7;}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+.prog-wrap{height:6px;background:var(--bd);border-radius:3px;margin-bottom:12px;}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--tl),var(--tg));border-radius:3px;transition:width .4s;}
+.prog-lbl{font-size:13px;color:var(--t3);margin-bottom:5px;}
+
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-lr"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">덱 (Deque: Double-Ended Queue)</span>
+    <span class="hdr-b1">← front</span>
+    <span class="hdr-b2">back →</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on"  onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"     onclick="goPage('code')">💻 코드 단계</div>
+  <div class="nt"     onclick="goPage('circular')">🔄 원형 덱</div>
+  <div class="nt"     onclick="goPage('sim')">🎮 시뮬레이터</div>
+  <div class="nt"     onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"     onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═══════════════════════════ PAGE 1: 개념 ═══════════════════════════ -->
+<div class="pg on" id="page-concept">
+  <h2>덱 (Deque) 이란?</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 | Double-Ended Queue — 양쪽 끝에서 삽입·삭제!</p>
+
+  <div class="co ctl">
+    <strong>핵심 아이디어</strong><br>
+    덱은 <strong>앞(front)과 뒤(back) 양쪽 끝</strong>에서 원소를 넣고 뺄 수 있는 자료구조야.<br>
+    스택(LIFO)과 큐(FIFO)의 기능을 <strong>동시에</strong> 갖고 있어서 매우 유연해!
+  </div>
+
+  <!-- deque concept diagram -->
+  <div class="card" style="overflow-x:auto;">
+    <h4 style="margin-bottom:14px;">덱의 구조</h4>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;min-width:460px;margin-bottom:14px;">
+      <div style="background:var(--tl-l);border:2px solid var(--tl);border-radius:var(--r) 0 0 var(--r);padding:14px 18px;font-size:15px;font-weight:700;color:var(--tl);white-space:nowrap;">pushFront<br>↓ / ↑ popFront</div>
+      <div style="display:flex;border-top:2px solid var(--bd2);border-bottom:2px solid var(--bd2);gap:0;">
+        <div style="width:58px;height:56px;border-right:2px solid var(--bd2);background:var(--tl-l);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--tl);">A</div>
+        <div style="width:58px;height:56px;border-right:2px solid var(--bd2);background:var(--s1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--t2);">B</div>
+        <div style="width:58px;height:56px;border-right:2px solid var(--bd2);background:var(--s1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--t2);">C</div>
+        <div style="width:58px;height:56px;background:var(--tg-l);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--tg);">D</div>
+      </div>
+      <div style="background:var(--tg-l);border:2px solid var(--tg);border-radius:0 var(--r) var(--r) 0;padding:14px 18px;font-size:15px;font-weight:700;color:var(--tg);white-space:nowrap;">pushBack<br>↑ / ↓ popBack</div>
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;font-size:13px;flex-wrap:wrap;">
+      <span><span style="color:var(--tl);font-weight:700;">■ front</span> = A (인덱스 0)</span>
+      <span><span style="color:var(--tg);font-weight:700;">■ back</span>  = D (인덱스 3)</span>
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>덱의 6가지 연산</h3>
+      <table style="margin-bottom:0;font-size:14px;">
+        <tr><th>연산</th><th>설명</th><th>방향</th></tr>
+        <tr><td style="color:var(--tl);font-family:var(--mono);font-weight:700;">pushFront(x)</td><td>앞에 삽입</td><td style="color:var(--tl);">← front</td></tr>
+        <tr><td style="color:var(--tg);font-family:var(--mono);font-weight:700;">pushBack(x)</td><td>뒤에 삽입</td><td style="color:var(--tg);">back →</td></tr>
+        <tr><td style="color:var(--tl);font-family:var(--mono);font-weight:700;">popFront()</td><td>앞에서 제거</td><td style="color:var(--tl);">front →</td></tr>
+        <tr><td style="color:var(--tg);font-family:var(--mono);font-weight:700;">popBack()</td><td>뒤에서 제거</td><td style="color:var(--tg);">← back</td></tr>
+        <tr><td style="color:var(--ind);font-family:var(--mono);font-weight:700;">peekFront()</td><td>앞 확인(제거X)</td><td>-</td></tr>
+        <tr><td style="color:var(--ind);font-family:var(--mono);font-weight:700;">peekBack()</td><td>뒤 확인(제거X)</td><td>-</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>스택·큐 vs 덱</h3>
+      <table style="margin-bottom:0;font-size:14px;">
+        <tr><th></th><th>스택</th><th>큐</th><th style="color:var(--tl);">덱 ★</th></tr>
+        <tr><td style="font-weight:700;">원리</td><td>LIFO</td><td>FIFO</td><td>양방향</td></tr>
+        <tr><td style="font-weight:700;">삽입</td><td>top만</td><td>rear만</td><td style="color:var(--tl);font-weight:700;">앞·뒤 모두</td></tr>
+        <tr><td style="font-weight:700;">삭제</td><td>top만</td><td>front만</td><td style="color:var(--tl);font-weight:700;">앞·뒤 모두</td></tr>
+        <tr><td style="font-weight:700;">포인터</td><td>1개</td><td>2개</td><td>2개</td></tr>
+        <tr><td style="font-weight:700;">모든 O(1)</td><td>✅</td><td>✅</td><td>✅</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">덱이 쓰이는 곳</h3>
+  <table>
+    <tr><th>응용</th><th>설명</th><th>난이도</th></tr>
+    <tr><td><span class="tag ttl">슬라이딩 윈도우 최솟값</span></td><td>크기 k의 창이 움직이며 최솟값 유지 — 단조 덱</td><td><span class="tag tid">실버~골드</span></td></tr>
+    <tr><td><span class="tag ttg">0-1 BFS</span></td><td>가중치 0·1 그래프 최단경로 — 덱으로 우선순위 BFS</td><td><span class="tag tgd">골드</span></td></tr>
+    <tr><td><span class="tag tpl">회문(Palindrome) 검사</span></td><td>앞뒤에서 동시에 꺼내 비교</td><td><span class="tag ttl">브론즈</span></td></tr>
+    <tr><td><span class="tag tsk">히스토그램 최대 넓이</span></td><td>단조 덱으로 좌·우 경계 한 번에</td><td><span class="tag tgd">골드</span></td></tr>
+    <tr><td><span class="tag tid">작업 큐 시뮬레이션</span></td><td>앞뒤에서 우선 처리 가능한 큐</td><td><span class="tag ttl">실버</span></td></tr>
+  </table>
+
+  <div class="co cgd">
+    <strong>구현 방법 두 가지</strong><br>
+    ① <strong>선형 배열 덱</strong>: front·back 인덱스 두 개로 관리. 구현 간단하지만 앞 공간 낭비.<br>
+    ② <strong>원형 배열 덱</strong>: 나머지 연산(%)으로 인덱스를 순환. 공간 효율적 → 정올 추천!
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 2: 코드 ═══════════════════════════ -->
+<div class="pg" id="page-code">
+  <h2>선형 배열 덱 — 코드 단계</h2>
+  <p class="psub">front·back 두 인덱스로 양방향 연산을 구현하는 방법을 6단계로!</p>
+
+  <div class="sbar" id="sbar-code">
+    <div class="sbt on"  onclick="goStep(0)"><span class="snum">01</span>구조 선언</div>
+    <div class="sbt"     onclick="goStep(1)"><span class="snum">02</span>pushFront·Back</div>
+    <div class="sbt"     onclick="goStep(2)"><span class="snum">03</span>popFront·Back</div>
+    <div class="sbt"     onclick="goStep(3)"><span class="snum">04</span>peek·isEmpty</div>
+    <div class="sbt"     onclick="goStep(4)"><span class="snum">05</span>완성 코드</div>
+    <div class="sbt"     onclick="goStep(5)"><span class="snum">06</span>STL deque</div>
+  </div>
+  <div id="code-panel"></div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 3: 원형 덱 ═══════════════════════════ -->
+<div class="pg" id="page-circular">
+  <h2>원형 배열 덱 (Circular Deque)</h2>
+  <p class="psub">나머지(%) 연산으로 앞 공간 낭비 없이 순환하는 덱!</p>
+
+  <div class="co cpl">
+    <strong>핵심 아이디어</strong><br>
+    선형 덱은 pushFront를 하면 앞 공간이 낭비돼. 원형 덱은 <code>(front - 1 + MAX) % MAX</code>로
+    인덱스를 순환시켜서 앞·뒤 공간을 모두 재활용해!
+  </div>
+
+  <div class="sbar" id="sbar-circ">
+    <div class="sbt on"  onclick="goCirc(0)"><span class="snum">01</span>구조와 포인터</div>
+    <div class="sbt"     onclick="goCirc(1)"><span class="snum">02</span>원형 pushFront</div>
+    <div class="sbt"     onclick="goCirc(2)"><span class="snum">03</span>원형 pushBack</div>
+    <div class="sbt"     onclick="goCirc(3)"><span class="snum">04</span>원형 pop</div>
+    <div class="sbt"     onclick="goCirc(4)"><span class="snum">05</span>완성 코드</div>
+  </div>
+  <div id="circ-panel"></div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 4: 시뮬레이터 ═══════════════════════════ -->
+<div class="pg" id="page-sim">
+  <h2>덱 시뮬레이터</h2>
+  <p class="psub">앞/뒤 버튼으로 직접 조작하면서 덱의 동작을 눈으로 확인해봐!</p>
+
+  <div class="stab-row">
+    <div class="stab on" id="stab0" onclick="switchSim(0)">📏 선형 덱</div>
+    <div class="stab"    id="stab1" onclick="switchSim(1)">🔄 원형 덱</div>
+    <div class="stab"    id="stab2" onclick="switchSim(2)">🌊 슬라이딩 윈도우 최솟값</div>
+  </div>
+
+  <!-- SIM 0: Linear Deque -->
+  <div class="scon on" id="sim0">
+    <div class="dq-wrap">
+      <div class="dq-labels">
+        <div class="dq-label"><div class="dq-label-dot" style="background:var(--tl);"></div><span style="color:var(--tl);">front</span></div>
+        <div class="dq-label" style="margin-left:10px;"><div class="dq-label-dot" style="background:var(--tg);"></div><span style="color:var(--tg);">back</span></div>
+        <div class="dq-label" style="margin-left:10px;"><div class="dq-label-dot" style="background:var(--plm);"></div><span style="color:var(--plm);">front=back (원소 1개)</span></div>
+      </div>
+      <div class="dq-track">
+        <div class="dq-end-label dq-front-lbl">← front</div>
+        <div id="ld-track" style="display:flex;gap:0;"></div>
+        <div class="dq-end-label dq-back-lbl">back →</div>
+      </div>
+      <div class="dq-ptrs">
+        <div class="dq-ptr">front = <span id="ld-f" style="color:var(--tl);">0</span></div>
+        <div class="dq-ptr">back  = <span id="ld-b" style="color:var(--tg);">-1</span></div>
+        <div class="dq-ptr">size  = <span id="ld-s" style="color:var(--ind);">0</span></div>
+        <div class="dq-ptr">isEmpty = <span id="ld-e" style="color:var(--tg);">true</span></div>
+      </div>
+    </div>
+    <div class="ctrl">
+      <input class="inp" type="number" id="ld-val" value="10" placeholder="값">
+      <button class="btn bpf" onclick="ldPushFront()">pushFront(x)</button>
+      <button class="btn bpb" onclick="ldPushBack()">pushBack(x)</button>
+      <button class="btn bof" onclick="ldPopFront()">popFront()</button>
+      <button class="btn bob" onclick="ldPopBack()">popBack()</button>
+      <button class="btn bgd" onclick="ldPeek()">peek 양쪽</button>
+      <button class="btn br"  onclick="ldReset()">↺ 초기화</button>
+    </div>
+    <div class="sl">실행 로그</div>
+    <div class="log" id="ld-log"><span class="li">▶ pushFront 또는 pushBack 버튼을 눌러봐!</span></div>
+  </div>
+
+  <!-- SIM 1: Circular Deque -->
+  <div class="scon" id="sim1">
+    <div class="dq-wrap">
+      <div class="sl">원형 덱 (MAX = 8, 공간 1칸 비워두는 방식)</div>
+      <div class="ring-wrap">
+        <svg id="circ-svg" width="320" height="320" viewBox="0 0 320 320"></svg>
+      </div>
+      <div class="dq-ptrs">
+        <div class="dq-ptr">front = <span id="cd-f" style="color:var(--tl);">0</span></div>
+        <div class="dq-ptr">back  = <span id="cd-b" style="color:var(--tg);">0</span></div>
+        <div class="dq-ptr">size  = <span id="cd-s" style="color:var(--ind);">0</span></div>
+        <div class="dq-ptr">isEmpty: <span id="cd-e" style="color:var(--tg);">front==back</span></div>
+      </div>
+    </div>
+    <div class="ctrl">
+      <input class="inp" type="number" id="cd-val" value="5" placeholder="값">
+      <button class="btn bpf" onclick="cdPushFront()">pushFront(x)</button>
+      <button class="btn bpb" onclick="cdPushBack()">pushBack(x)</button>
+      <button class="btn bof" onclick="cdPopFront()">popFront()</button>
+      <button class="btn bob" onclick="cdPopBack()">popBack()</button>
+      <button class="btn br"  onclick="cdReset()">↺ 초기화</button>
+    </div>
+    <div class="sl">실행 로그</div>
+    <div class="log" id="cd-log"><span class="li">▶ 원형 덱에 값을 넣어봐!</span></div>
+  </div>
+
+  <!-- SIM 2: Sliding Window Minimum -->
+  <div class="scon" id="sim2">
+    <div class="co ctl" style="margin-bottom:14px;">
+      <strong>슬라이딩 윈도우 최솟값</strong>: 배열을 k 크기 창으로 훑으면서 각 창의 최솟값을 O(n)에 구해!<br>
+      덱에 <strong>인덱스</strong>를 저장하고, 단조 증가를 유지해 (앞이 항상 현재 창의 최솟값 인덱스).
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="sl">설정</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div>배열: <input class="inp" id="sw-arr" value="3 1 2 5 4 2 6 3" style="width:200px;" placeholder="숫자 공백구분"></div>
+        <div>k(창 크기): <input class="inp" id="sw-k" value="3" style="width:60px;" type="number" min="1"></div>
+        <button class="btn bpf" onclick="swRun()">▶ 실행</button>
+        <button class="btn br"  onclick="swReset()">↺ 초기화</button>
+      </div>
+    </div>
+    <div id="sw-visual"></div>
+    <div class="sl" style="margin-top:14px;">단계별 덱 로그</div>
+    <div class="log" id="sw-log"><span class="li">▶ 실행 버튼을 눌러봐!</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 5: 퀴즈 ═══════════════════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>덱 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 6: 도전 ═══════════════════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">덱을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+
+<script>
+/* ═══════════════════════════════════════
+   PAGE NAV
+═══════════════════════════════════════ */
+const PM={concept:0,code:1,circular:2,sim:3,quiz:4,challenge:5};
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('on',i===PM[id]));
+  document.getElementById('page-'+id).classList.add('on');
+  if(id==='sim'){drawCirc();}
+}
+
+/* ═══════════════════════════════════════
+   CODE STEPS
+═══════════════════════════════════════ */
+const STEPS=[
+{t:'① 구조 선언 — 선형 배열 덱',
+ b:`<div class="co ctl"><strong>선형 덱</strong>: 배열의 인덱스 <code>front</code>(앞 포인터)와 <code>back</code>(뒤 포인터) 두 개로 관리해.<br>초기값: <code>front = MAX/2</code>, <code>back = MAX/2 - 1</code> (가운데에서 시작하면 양방향으로 확장 가능!)</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 200002</span>   <span class="cm">// 넉넉하게 2배로!</span>
+
+<span class="tp">int</span> dq[<span class="nm">MAX</span>];
+<span class="htl"><span class="tp">int</span> front = <span class="nm">MAX</span> / <span class="nm">2</span>;      <span class="cm">// 앞 포인터 (가운데에서 시작)</span></span>
+<span class="htg"><span class="tp">int</span> back  = <span class="nm">MAX</span> / <span class="nm">2</span> - <span class="nm">1</span>; <span class="cm">// 뒤 포인터 (front-1에서 시작)</span></span>
+
+<span class="cm">// isEmpty: front > back
+// size   : back - front + 1
+// 앞방향:  front를 줄이면서 확장 (pushFront: front--)
+// 뒤방향:  back를 늘리면서 확장  (pushBack:  back++)</span>
+</pre></div>
+<div class="card"><h4>포인터 초기값 시각화</h4>
+<div style="font-family:var(--mono);font-size:14px;background:var(--s1);padding:14px;border-radius:var(--r);line-height:2.2;">
+  초기: front=10, back=9 (MAX/2=10 기준)<br>
+  <span style="color:var(--tl);">pushFront(A)</span>: dq[--front]=A → front=9, back=9<br>
+  <span style="color:var(--tg);">pushBack(B)</span>:  dq[++back]=B → front=9, back=10<br>
+  <span style="color:var(--t2);">상태: front=9 [A, B] back=10</span>
+</div></div>`},
+{t:'② pushFront / pushBack',
+ b:`<div class="co ctl">pushFront는 front를 <strong>감소</strong>시킨 후 저장, pushBack은 back을 <strong>증가</strong>시킨 후 저장!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_push.c</span></div>
+<pre><span class="cm">// 앞에 삽입 — front를 줄이고 저장</span>
+<span class="tp">void</span> <span class="fn">pushFront</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (front == <span class="nm">0</span>) { <span class="fn">printf</span>(<span class="st">"Overflow!\n"</span>); <span class="kw">return</span>; }
+<span class="htl">    dq[--front] = x;   <span class="cm">// ① front 감소 ② dq[front] = x</span></span>
+}
+
+<span class="cm">// 뒤에 삽입 — back을 늘리고 저장</span>
+<span class="tp">void</span> <span class="fn">pushBack</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (back == <span class="nm">MAX</span> - <span class="nm">1</span>) { <span class="fn">printf</span>(<span class="st">"Overflow!\n"</span>); <span class="kw">return</span>; }
+<span class="htg">    dq[++back] = x;    <span class="cm">// ① back 증가 ② dq[back] = x</span></span>
+}
+</pre></div>
+<div class="card"><h4>push 방향 기억법</h4>
+<table style="margin-bottom:0;">
+<tr><th></th><th>포인터 이동</th><th>코드</th><th>비유</th></tr>
+<tr><td style="color:var(--tl);font-weight:700;">pushFront</td><td>front ← (감소)</td><td><code>dq[--front]=x</code></td><td>줄 앞에 끼어들기</td></tr>
+<tr><td style="color:var(--tg);font-weight:700;">pushBack</td><td>back → (증가)</td><td><code>dq[++back]=x</code></td><td>줄 뒤에 서기</td></tr>
+</table></div>`},
+{t:'③ popFront / popBack',
+ b:`<div class="co ctg">popFront는 front를 <strong>증가</strong>, popBack은 back을 <strong>감소</strong>. push와 정반대 방향이야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_pop.c</span></div>
+<pre><span class="cm">// 빈 덱 체크 — 공통</span>
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> front > back; }
+
+<span class="cm">// 앞에서 제거</span>
+<span class="tp">int</span> <span class="fn">popFront</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) { <span class="fn">printf</span>(<span class="st">"Underflow!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>; }
+<span class="htl">    <span class="kw">return</span> dq[front++]; <span class="cm">// 반환 후 front 증가 (앞이 줄어듦)</span></span>
+}
+
+<span class="cm">// 뒤에서 제거</span>
+<span class="tp">int</span> <span class="fn">popBack</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) { <span class="fn">printf</span>(<span class="st">"Underflow!\n"</span>); <span class="kw">return</span> <span class="nm">-1</span>; }
+<span class="htg">    <span class="kw">return</span> dq[back--];  <span class="cm">// 반환 후 back 감소 (뒤가 줄어듦)</span></span>
+}
+
+<span class="tp">int</span> <span class="fn">size</span>() { <span class="kw">return</span> back - front + <span class="nm">1</span>; }
+</pre></div>
+<div class="card"><h4>push/pop 대칭 정리</h4>
+<table style="margin-bottom:0;">
+<tr><th>연산</th><th>포인터</th><th>코드</th></tr>
+<tr><td style="color:var(--tl);">pushFront</td><td>front--</td><td><code>dq[--front]=x</code></td></tr>
+<tr><td style="color:var(--tl);">popFront</td><td>front++</td><td><code>return dq[front++]</code></td></tr>
+<tr><td style="color:var(--tg);">pushBack</td><td>back++</td><td><code>dq[++back]=x</code></td></tr>
+<tr><td style="color:var(--tg);">popBack</td><td>back--</td><td><code>return dq[back--]</code></td></tr>
+</table></div>`},
+{t:'④ peekFront / peekBack / isEmpty',
+ b:`<div class="co cid">peek은 꺼내지 않고 보기만 해. front/back 포인터를 바꾸지 않아서 O(1)이야!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_peek_empty.c</span></div>
+<pre><span class="cm">// 앞 확인 (꺼내지 않음)</span>
+<span class="tp">int</span> <span class="fn">peekFront</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="htl">    <span class="kw">return</span> dq[front];    <span class="cm">// front 변화 없음!</span></span>
+}
+
+<span class="cm">// 뒤 확인 (꺼내지 않음)</span>
+<span class="tp">int</span> <span class="fn">peekBack</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="htg">    <span class="kw">return</span> dq[back];     <span class="cm">// back 변화 없음!</span></span>
+}
+
+<span class="cm">// isEmpty: front > back (front가 back을 추월하면 빈 덱)</span>
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> front > back; }
+
+<span class="cm">// 원소 개수</span>
+<span class="tp">int</span> <span class="fn">size</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">0</span>;
+    <span class="kw">return</span> back - front + <span class="nm">1</span>;
+}
+</pre></div>`},
+{t:'⑤ 완성 코드 — 정올 스타일',
+ b:`<div class="co ctl">입출력 포함 완전한 선형 덱 구현이야. 정올 연산 명령 파싱 포함!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>deque_complete.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 200002</span>
+
+<span class="tp">int</span> dq[<span class="nm">MAX</span>];
+<span class="tp">int</span> front = <span class="nm">MAX</span>/<span class="nm">2</span>, back = <span class="nm">MAX</span>/<span class="nm">2</span>-<span class="nm">1</span>;
+
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> front > back; }
+<span class="tp">int</span> <span class="fn">size</span>()    { <span class="kw">return</span> <span class="fn">isEmpty</span>() ? <span class="nm">0</span> : back-front+<span class="nm">1</span>; }
+
+<span class="tp">void</span> <span class="fn">pushFront</span>(<span class="tp">int</span> x){ dq[--front]=x; }
+<span class="tp">void</span> <span class="fn">pushBack</span> (<span class="tp">int</span> x){ dq[++back ]=x; }
+
+<span class="tp">int</span>  <span class="fn">popFront</span> (){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[front++]; }
+<span class="tp">int</span>  <span class="fn">popBack</span>  (){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[back-- ]; }
+
+<span class="tp">int</span>  <span class="fn">peekFront</span>(){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[front]; }
+<span class="tp">int</span>  <span class="fn">peekBack</span> (){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[back ]; }
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> q; <span class="fn">scanf</span>(<span class="st">"%d"</span>,&amp;q);
+    <span class="kw">while</span>(q--){
+        <span class="tp">char</span> op[<span class="nm">20</span>]; <span class="fn">scanf</span>(<span class="st">"%s"</span>,op);
+        <span class="kw">if</span>     (!<span class="fn">strcmp</span>(op,<span class="st">"push_front"</span>)){ <span class="tp">int</span> x;<span class="fn">scanf</span>(<span class="st">"%d"</span>,&amp;x);<span class="fn">pushFront</span>(x); }
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"push_back"</span>)) { <span class="tp">int</span> x;<span class="fn">scanf</span>(<span class="st">"%d"</span>,&amp;x);<span class="fn">pushBack</span>(x);  }
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"pop_front"</span>)) <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">popFront</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"pop_back"</span>))  <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">popBack</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"front"</span>))     <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">peekFront</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"back"</span>))      <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">peekBack</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"size"</span>))      <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">size</span>());
+        <span class="kw">else if</span>(!<span class="fn">strcmp</span>(op,<span class="st">"empty"</span>))     <span class="fn">printf</span>(<span class="st">"%d\n"</span>,<span class="fn">isEmpty</span>());
+    }
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>`},
+{t:'⑥ C++ STL deque',
+ b:`<div class="co cid">C++에서는 <code>deque</code> 헤더 하나로 모든 연산을 O(1)에 사용 가능해!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>stl_deque.cpp</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;deque&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    deque&lt;<span class="tp">int</span>&gt; dq;
+
+<span class="htl">    dq.<span class="fn">push_front</span>(<span class="nm">1</span>);  <span class="cm">// 앞에 삽입</span></span>
+<span class="htg">    dq.<span class="fn">push_back</span>(<span class="nm">2</span>);   <span class="cm">// 뒤에 삽입</span></span>
+<span class="htl">    dq.<span class="fn">push_front</span>(<span class="nm">0</span>);  <span class="cm">// 앞에 삽입 → [0, 1, 2]</span></span>
+
+    cout &lt;&lt; dq.<span class="fn">front</span>() &lt;&lt; endl;  <span class="cm">// 0 (앞 확인)</span>
+    cout &lt;&lt; dq.<span class="fn">back</span>()  &lt;&lt; endl;  <span class="cm">// 2 (뒤 확인)</span>
+
+<span class="htl">    dq.<span class="fn">pop_front</span>();  <span class="cm">// 앞 제거 → [1, 2]</span></span>
+<span class="htg">    dq.<span class="fn">pop_back</span>();   <span class="cm">// 뒤 제거 → [1]</span></span>
+
+    cout &lt;&lt; dq.<span class="fn">size</span>()  &lt;&lt; endl;  <span class="cm">// 1</span>
+    cout &lt;&lt; dq.<span class="fn">empty</span>() &lt;&lt; endl;  <span class="cm">// 0(false)</span>
+    cout &lt;&lt; dq[<span class="nm">0</span>] &lt;&lt; endl;        <span class="cm">// 1 (인덱스 접근도 가능!)</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+<div class="co cgd" style="margin-bottom:0;"><strong>STL deque 특징</strong>: vector처럼 인덱스 접근(<code>dq[i]</code>)도 O(1)이야. 내부적으로 청크(chunk) 단위로 메모리를 관리해서 앞뒤 삽입이 모두 빨라.</div>`}
+];
+
+let curStep=0;
+function goStep(n){
+  curStep=n;
+  document.getElementById('code-panel').innerHTML=`<div class="card"><h3>${STEPS[n].t}</h3>${STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-code .sbt').forEach((b,i)=>{b.classList.toggle('on',i===n);b.classList.toggle('dn',i<n);});
+}
+goStep(0);
+
+/* ═══════════════════════════════════════
+   CIRCULAR STEPS
+═══════════════════════════════════════ */
+const CSTEPS=[
+{t:'① 원형 구조와 포인터 초기화',
+ b:`<div class="co cpl">원형 덱은 <code>front</code>와 <code>back</code> 모두 같은 위치에서 시작해. <code>front == back</code>이 빈 덱 조건이야. 공간 한 칸은 비워둬서 꽉 찬 것과 빈 것을 구별해!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circ_declare.c</span></div>
+<pre><span class="kw">#define</span> <span class="nm">MAX 8</span>   <span class="cm">// 실제로는 100001 등 크게</span>
+
+<span class="tp">int</span> dq[<span class="nm">MAX</span>];
+<span class="htl"><span class="tp">int</span> front = <span class="nm">0</span>;  <span class="cm">// front: 첫 원소 바로 앞 위치</span></span>
+<span class="htg"><span class="tp">int</span> back  = <span class="nm">0</span>;  <span class="cm">// back:  마지막 원소 다음 위치</span></span>
+<span class="cm">// (front==back) → 빈 덱
+// ((back+1)%MAX == front) → 꽉 찬 덱
+// 실제 데이터: dq[(front+1)%MAX] ... dq[back]</span>
+
+<span class="cm">// 빈 덱 확인</span>
+<span class="tp">int</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> front == back; }
+
+<span class="cm">// 꽉 찼는지 확인 (한 칸 비워두기)</span>
+<span class="tp">int</span> <span class="fn">isFull</span>() { <span class="kw">return</span> (back + <span class="nm">1</span>) % <span class="nm">MAX</span> == front; }
+</pre></div>`},
+{t:'② 원형 pushFront',
+ b:`<div class="co ctl">원형 pushFront: front를 왼쪽으로 이동(감소), 나머지 연산으로 순환!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circ_pushFront.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">pushFront</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (<span class="fn">isFull</span>()) { <span class="fn">printf</span>(<span class="st">"Full!\n"</span>); <span class="kw">return</span>; }
+<span class="htl">    dq[front] = x;                  <span class="cm">// front 위치에 값 저장</span></span>
+<span class="htl">    front = (front - <span class="nm">1</span> + <span class="nm">MAX</span>) % <span class="nm">MAX</span>; <span class="cm">// front를 왼쪽으로 (순환)</span></span>
+}
+<span class="cm">// 예: MAX=8, front=0 → front=(0-1+8)%8=7
+// 배열 끝에서 다시 처음으로 돌아가!</span>
+</pre></div>
+<div class="co cpl"><strong>왜 +MAX를 하나?</strong>: C언어에서 음수 % 양수가 음수가 나올 수 있어. <code>(front - 1 + MAX) % MAX</code>로 항상 양수를 보장!</div>`},
+{t:'③ 원형 pushBack',
+ b:`<div class="co ctg">원형 pushBack: back이 가리키는 위치에 저장하고, back을 오른쪽으로 이동!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circ_pushBack.c</span></div>
+<pre><span class="tp">void</span> <span class="fn">pushBack</span>(<span class="tp">int</span> x) {
+    <span class="kw">if</span> (<span class="fn">isFull</span>()) { <span class="fn">printf</span>(<span class="st">"Full!\n"</span>); <span class="kw">return</span>; }
+<span class="htg">    dq[back] = x;            <span class="cm">// back 위치에 값 저장</span></span>
+<span class="htg">    back = (back + <span class="nm">1</span>) % <span class="nm">MAX</span>; <span class="cm">// back을 오른쪽으로 (순환)</span></span>
+}
+<span class="cm">// 예: MAX=8, back=7 → back=(7+1)%8=0
+// 배열 끝에서 처음으로 순환!</span>
+</pre></div>
+<div class="card"><h4>front·back 포인터 의미</h4>
+<table style="margin-bottom:0;"><tr><th>포인터</th><th>가리키는 것</th><th>pushFront</th><th>pushBack</th></tr>
+<tr><td style="color:var(--tl);font-weight:700;">front</td><td>첫 원소 바로 앞</td><td>여기에 저장→감소</td><td>변화 없음</td></tr>
+<tr><td style="color:var(--tg);font-weight:700;">back</td><td>마지막 원소 다음</td><td>변화 없음</td><td>여기에 저장→증가</td></tr>
+</table></div>`},
+{t:'④ 원형 pop',
+ b:`<div class="co cpl">원형 pop: 반대 방향으로 포인터를 이동하면서 값 반환!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circ_pop.c</span></div>
+<pre><span class="cm">// 앞에서 꺼내기</span>
+<span class="tp">int</span> <span class="fn">popFront</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="htl">    front = (front + <span class="nm">1</span>) % <span class="nm">MAX</span>;  <span class="cm">// front 오른쪽 이동</span></span>
+<span class="htl">    <span class="kw">return</span> dq[front];              <span class="cm">// 이동 후 위치 값</span></span>
+}
+
+<span class="cm">// 뒤에서 꺼내기</span>
+<span class="tp">int</span> <span class="fn">popBack</span>() {
+    <span class="kw">if</span> (<span class="fn">isEmpty</span>()) <span class="kw">return</span> <span class="nm">-1</span>;
+<span class="htg">    back = (back - <span class="nm">1</span> + <span class="nm">MAX</span>) % <span class="nm">MAX</span>; <span class="cm">// back 왼쪽 이동</span></span>
+<span class="htg">    <span class="kw">return</span> dq[back];               <span class="cm">// 이동 후 위치 값</span></span>
+}
+
+<span class="tp">int</span> <span class="fn">peekFront</span>(){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[(front+<span class="nm">1</span>)%<span class="nm">MAX</span>]; }
+<span class="tp">int</span> <span class="fn">peekBack</span> (){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[(back-<span class="nm">1</span>+<span class="nm">MAX</span>)%<span class="nm">MAX</span>]; }
+</pre></div>`},
+{t:'⑤ 원형 덱 완성 코드',
+ b:`<div class="co cpl">원형 덱 전체 구현이야. 슬라이딩 윈도우 문제에서 이 패턴이 그대로 쓰여!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>circ_deque_complete.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 100001</span>
+
+<span class="tp">int</span> dq[<span class="nm">MAX</span>];
+<span class="tp">int</span> front=<span class="nm">0</span>, back=<span class="nm">0</span>;
+
+<span class="tp">int</span>  <span class="fn">isEmpty</span>() { <span class="kw">return</span> front==back; }
+<span class="tp">int</span>  <span class="fn">isFull</span> () { <span class="kw">return</span> (back+<span class="nm">1</span>)%<span class="nm">MAX</span>==front; }
+<span class="tp">void</span> <span class="fn">pushFront</span>(<span class="tp">int</span> x){ <span class="kw">if</span>(!<span class="fn">isFull</span>()){dq[front]=x;front=(front-<span class="nm">1</span>+<span class="nm">MAX</span>)%<span class="nm">MAX</span>;} }
+<span class="tp">void</span> <span class="fn">pushBack</span> (<span class="tp">int</span> x){ <span class="kw">if</span>(!<span class="fn">isFull</span>()){dq[back]=x; back=(back+<span class="nm">1</span>)%<span class="nm">MAX</span>;} }
+<span class="tp">int</span>  <span class="fn">popFront</span> (){ <span class="kw">if</span>(<span class="fn">isEmpty</span>())<span class="kw">return</span> -<span class="nm">1</span>; front=(front+<span class="nm">1</span>)%<span class="nm">MAX</span>;<span class="kw">return</span> dq[front]; }
+<span class="tp">int</span>  <span class="fn">popBack</span>  (){ <span class="kw">if</span>(<span class="fn">isEmpty</span>())<span class="kw">return</span> -<span class="nm">1</span>; back=(back-<span class="nm">1</span>+<span class="nm">MAX</span>)%<span class="nm">MAX</span>;<span class="kw">return</span> dq[back]; }
+<span class="tp">int</span>  <span class="fn">peekFront</span>(){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[(front+<span class="nm">1</span>)%<span class="nm">MAX</span>]; }
+<span class="tp">int</span>  <span class="fn">peekBack</span> (){ <span class="kw">return</span> <span class="fn">isEmpty</span>()?-<span class="nm">1</span>:dq[(back-<span class="nm">1</span>+<span class="nm">MAX</span>)%<span class="nm">MAX</span>]; }
+</pre></div>`}
+];
+
+let curCirc=0;
+function goCirc(n){
+  curCirc=n;
+  document.getElementById('circ-panel').innerHTML=`<div class="card"><h3>${CSTEPS[n].t}</h3>${CSTEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-circ .sbt').forEach((b,i)=>{b.classList.toggle('on',i===n);b.classList.toggle('dn',i<n);});
+}
+goCirc(0);
+
+/* ═══════════════════════════════════════
+   SIM TAB
+═══════════════════════════════════════ */
+function switchSim(n){
+  [0,1,2].forEach(i=>{
+    document.getElementById('stab'+i).classList.toggle('on',i===n);
+    document.getElementById('sim'+i).classList.toggle('on',i===n);
+  });
+  if(n===1) drawCirc();
+}
+
+/* ═══════════════════════════════════════
+   SIM 0: LINEAR DEQUE
+═══════════════════════════════════════ */
+const LD_MAX=12;
+let ldArr=[], ldFront=0, ldBack=-1;
+
+function ldLog(msg,cls){
+  const log=document.getElementById('ld-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function renderLD(){
+  const track=document.getElementById('ld-track');
+  if(ldArr.length===0){
+    track.innerHTML=`<div class="dq-slot" style="width:120px;color:var(--t4);font-size:13px;border-radius:var(--r);border:2px solid var(--bd);">비어 있음</div>`;
+  } else {
+    track.innerHTML=ldArr.map((v,i)=>{
+      const isF=i===0, isB=i===ldArr.length-1;
+      let cls='dq-slot';
+      if(isF&&isB) cls+=' sf sb';
+      else if(isF) cls+=' sf';
+      else if(isB) cls+=' sb';
+      else cls+=' si';
+      return `<div class="${cls}"><span class="dv">${v}</span><span class="di">[${i}]</span></div>`;
+    }).join('');
+  }
+  document.getElementById('ld-f').textContent=ldFront;
+  document.getElementById('ld-b').textContent=ldBack;
+  document.getElementById('ld-s').textContent=ldArr.length;
+  const e=document.getElementById('ld-e');
+  e.textContent=ldArr.length===0?'true':'false';
+  e.style.color=ldArr.length===0?'var(--tg)':'var(--tl)';
+}
+
+function ldPushFront(){
+  const v=parseInt(document.getElementById('ld-val').value);
+  if(isNaN(v)){ldLog('숫자를 입력해줘!','li');return;}
+  if(ldArr.length>=LD_MAX){ldLog('덱이 가득 찼어! (최대 '+LD_MAX+'개)','li');return;}
+  ldArr.unshift(v);
+  if(ldArr.length===1){ldFront=0;ldBack=0;}else{ldFront=0;ldBack=ldArr.length-1;}
+  renderLD();
+  setTimeout(()=>document.querySelector('#ld-track .dq-slot')?.classList.add('push-f'),10);
+  ldLog(`pushFront(${v}) → 앞에 삽입, front=0, size=${ldArr.length}`,'lpf');
+}
+function ldPushBack(){
+  const v=parseInt(document.getElementById('ld-val').value);
+  if(isNaN(v)){ldLog('숫자를 입력해줘!','li');return;}
+  if(ldArr.length>=LD_MAX){ldLog('덱이 가득 찼어!','li');return;}
+  ldArr.push(v);
+  ldBack=ldArr.length-1;
+  renderLD();
+  const slots=document.querySelectorAll('#ld-track .dq-slot');
+  setTimeout(()=>slots[slots.length-1]?.classList.add('push-b'),10);
+  ldLog(`pushBack(${v}) → 뒤에 삽입, back=${ldBack}, size=${ldArr.length}`,'lpb');
+}
+function ldPopFront(){
+  if(!ldArr.length){ldLog('Underflow! 덱이 비어있어.','li');return;}
+  const v=ldArr.shift();
+  ldFront=0; ldBack=Math.max(-1,ldArr.length-1);
+  renderLD();
+  ldLog(`popFront() → ${v} 반환, size=${ldArr.length}`,'lof');
+}
+function ldPopBack(){
+  if(!ldArr.length){ldLog('Underflow! 덱이 비어있어.','li');return;}
+  const v=ldArr.pop();
+  ldBack=Math.max(-1,ldArr.length-1);
+  renderLD();
+  ldLog(`popBack() → ${v} 반환, size=${ldArr.length}`,'lob');
+}
+function ldPeek(){
+  if(!ldArr.length){ldLog('덱이 비어있어!','li');return;}
+  ldLog(`peekFront()=${ldArr[0]}, peekBack()=${ldArr[ldArr.length-1]}`,'lgd');
+}
+function ldReset(){
+  ldArr=[]; ldFront=0; ldBack=-1;
+  renderLD();
+  document.getElementById('ld-log').innerHTML='<span class="li">↺ 초기화됨!</span>';
+}
+renderLD();
+
+/* ═══════════════════════════════════════
+   SIM 1: CIRCULAR DEQUE
+═══════════════════════════════════════ */
+const CD_MAX=8;
+let cdArr=new Array(CD_MAX).fill(null);
+let cdFront=0, cdBack=0;
+
+function cdLog(msg,cls){
+  const log=document.getElementById('cd-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+function cdIsEmpty(){return cdFront===cdBack;}
+function cdIsFull(){return (cdBack+1)%CD_MAX===cdFront;}
+
+function drawCirc(){
+  const svg=document.getElementById('circ-svg');
+  if(!svg)return;
+  const W=320,H=320,cx=160,cy=160,R=108,r=28;
+  svg.innerHTML='';
+  for(let i=0;i<CD_MAX;i++){
+    const angle=(2*Math.PI*i/CD_MAX)-Math.PI/2;
+    const x=cx+R*Math.cos(angle), y=cy+R*Math.sin(angle);
+    const isFront=i===cdFront, isBack=(i+1)%CD_MAX===cdBack||i===cdBack;
+    const hasVal=cdArr[i]!==null;
+    let fill=hasVal?'var(--s1)':'#f8f9fc';
+    let stroke='var(--bd2)';
+    if(isFront&&cdFront===cdBack){fill='#e8ecf8';stroke='var(--bd)';}
+    else if(hasVal){fill='var(--wh)';stroke='var(--bd2)';}
+
+    // determine role in deque
+    // front ptr: shows "front" slot (first real element is (front+1)%MAX)
+    const firstSlot=(cdFront+1)%CD_MAX;
+    const lastSlot=(cdBack-1+CD_MAX)%CD_MAX;
+    const isEmpty=cdIsEmpty();
+
+    if(!isEmpty&&i===firstSlot&&i===lastSlot){fill='#f3e8ff';stroke='var(--plm)';}
+    else if(!isEmpty&&i===firstSlot){fill='var(--tl-l)';stroke='var(--tl)';}
+    else if(!isEmpty&&i===lastSlot){fill='var(--tg-l)';stroke='var(--tg)';}
+    else if(!isEmpty&&cdArr[i]!==null){fill='var(--s1)';stroke='var(--bd2)';}
+
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',r);
+    c.setAttribute('fill',fill);c.setAttribute('stroke',stroke);c.setAttribute('stroke-width','2.5');
+    svg.appendChild(c);
+
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',x);t.setAttribute('y',y+1);t.setAttribute('text-anchor','middle');
+    t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('font-size','14');t.setAttribute('font-weight','700');
+    t.setAttribute('font-family','JetBrains Mono,monospace');
+    let textCol='var(--t4)';
+    if(!isEmpty&&i===firstSlot&&i===lastSlot) textCol='var(--plm)';
+    else if(!isEmpty&&i===firstSlot) textCol='var(--tl)';
+    else if(!isEmpty&&i===lastSlot) textCol='var(--tg)';
+    else if(cdArr[i]!==null) textCol='var(--t2)';
+    t.setAttribute('fill',textCol);
+    t.textContent=cdArr[i]!==null?cdArr[i]:i;
+    svg.appendChild(t);
+
+    // pointer labels
+    const lx=cx+(R+46)*Math.cos(angle), ly=cy+(R+46)*Math.sin(angle);
+    if(i===cdFront){
+      const lt=document.createElementNS('http://www.w3.org/2000/svg','text');
+      lt.setAttribute('x',lx);lt.setAttribute('y',ly);lt.setAttribute('text-anchor','middle');
+      lt.setAttribute('dominant-baseline','middle');
+      lt.setAttribute('font-size','11');lt.setAttribute('font-weight','700');
+      lt.setAttribute('fill','var(--tl)');lt.setAttribute('font-family','JetBrains Mono,monospace');
+      lt.textContent='F'; svg.appendChild(lt);
+    }
+    if(i===cdBack){
+      const lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+      lb.setAttribute('x',lx);lb.setAttribute('y',ly);lb.setAttribute('text-anchor','middle');
+      lb.setAttribute('dominant-baseline','middle');
+      lb.setAttribute('font-size','11');lb.setAttribute('font-weight','700');
+      lb.setAttribute('fill','var(--tg)');lb.setAttribute('font-family','JetBrains Mono,monospace');
+      lb.textContent=i===cdFront?'F/B':'B'; svg.appendChild(lb);
+    }
+  }
+  document.getElementById('cd-f').textContent=cdFront;
+  document.getElementById('cd-b').textContent=cdBack;
+  let sz=0;
+  for(let i=0;i<CD_MAX;i++) if(cdArr[i]!==null) sz++;
+  document.getElementById('cd-s').textContent=sz;
+  document.getElementById('cd-e').textContent=cdIsEmpty()?'true(front==back)':'false';
+}
+
+function cdPushFront(){
+  const v=parseInt(document.getElementById('cd-val').value);
+  if(isNaN(v)){cdLog('숫자를 입력해줘!','li');return;}
+  if(cdIsFull()){cdLog('원형 덱이 가득 찼어!','li');return;}
+  cdArr[cdFront]=v;
+  cdFront=(cdFront-1+CD_MAX)%CD_MAX;
+  drawCirc();
+  cdLog(`pushFront(${v}) → 슬롯[${(cdFront+1)%CD_MAX}]에 저장, front=${cdFront}`,'lpf');
+}
+function cdPushBack(){
+  const v=parseInt(document.getElementById('cd-val').value);
+  if(isNaN(v)){cdLog('숫자를 입력해줘!','li');return;}
+  if(cdIsFull()){cdLog('원형 덱이 가득 찼어!','li');return;}
+  cdArr[cdBack]=v;
+  cdBack=(cdBack+1)%CD_MAX;
+  drawCirc();
+  cdLog(`pushBack(${v}) → 슬롯[${(cdBack-1+CD_MAX)%CD_MAX}]에 저장, back=${cdBack}`,'lpb');
+}
+function cdPopFront(){
+  if(cdIsEmpty()){cdLog('원형 덱이 비어있어!','li');return;}
+  cdFront=(cdFront+1)%CD_MAX;
+  const v=cdArr[cdFront];
+  cdArr[cdFront]=null;
+  drawCirc();
+  cdLog(`popFront() → ${v} 반환, front=${cdFront}`,'lof');
+}
+function cdPopBack(){
+  if(cdIsEmpty()){cdLog('원형 덱이 비어있어!','li');return;}
+  cdBack=(cdBack-1+CD_MAX)%CD_MAX;
+  const v=cdArr[cdBack];
+  cdArr[cdBack]=null;
+  drawCirc();
+  cdLog(`popBack() → ${v} 반환, back=${cdBack}`,'lob');
+}
+function cdReset(){
+  cdArr=new Array(CD_MAX).fill(null); cdFront=0; cdBack=0;
+  drawCirc();
+  document.getElementById('cd-log').innerHTML='<span class="li">↺ 초기화됨!</span>';
+}
+
+/* ═══════════════════════════════════════
+   SIM 2: SLIDING WINDOW MIN
+═══════════════════════════════════════ */
+function swLog(msg,cls){
+  const log=document.getElementById('sw-log');
+  const d=document.createElement('div');d.className=cls;d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+function swReset(){
+  document.getElementById('sw-visual').innerHTML='';
+  document.getElementById('sw-log').innerHTML='<span class="li">↺ 초기화됨!</span>';
+}
+
+function swRun(){
+  const arrStr=document.getElementById('sw-arr').value.trim().split(/\s+/).map(Number).filter(n=>!isNaN(n));
+  const k=parseInt(document.getElementById('sw-k').value);
+  if(arrStr.length<k||k<1){alert('배열 크기 >= k ≥ 1 이어야 해!');return;}
+  swReset();
+  const A=arrStr, n=A.length;
+  const dq=[], res=[];
+  const steps=[];
+
+  for(let i=0;i<n;i++){
+    // remove out-of-window from front
+    while(dq.length&&dq[0]<=i-k) dq.shift();
+    // maintain increasing order from back
+    while(dq.length&&A[dq[dq.length-1]]>=A[i]) dq.pop();
+    dq.push(i);
+    if(i>=k-1) res.push(A[dq[0]]);
+    steps.push({i,dqSnap:[...dq],res:[...res],winStart:Math.max(0,i-k+1),winEnd:i});
+  }
+
+  // render
+  const vis=document.getElementById('sw-visual');
+  // array row
+  let html=`<div class="dq-wrap"><div class="sl">배열 A[] (k=${k})</div>`;
+  html+=`<div class="dq-track">`;
+  A.forEach((v,i)=>{
+    html+=`<div class="dq-slot si" id="sw-slot-${i}"><span class="dv" style="font-size:17px;">${v}</span><span class="di">[${i}]</span></div>`;
+  });
+  html+=`</div>`;
+  // result row
+  html+=`<div style="margin-top:10px;"><div class="sl">결과 (각 창의 최솟값)</div><div style="display:flex;gap:4px;flex-wrap:wrap;" id="sw-result">`;
+  res.forEach((v,i)=>{
+    html+=`<div style="padding:6px 14px;border-radius:var(--r);background:var(--tl-l);border:1.5px solid var(--tl-m);font-family:var(--mono);font-size:16px;font-weight:700;color:var(--tl);">${v}</div>`;
+  });
+  html+=`</div></div>`;
+  html+=`<div style="margin-top:12px;font-size:14px;color:var(--t2);">`;
+  html+=`전체 결과: <strong style="font-family:var(--mono);color:var(--tl);">[${res.join(', ')}]</strong></div>`;
+  html+=`</div>`;
+  vis.innerHTML=html;
+
+  // animate steps
+  let si=0;
+  const tick=()=>{
+    if(si>=steps.length)return;
+    const st=steps[si];
+    // highlight window
+    A.forEach((_,i)=>{
+      const el=document.getElementById('sw-slot-'+i);
+      if(!el)return;
+      el.className='dq-slot';
+      if(i>=st.winStart&&i<=st.winEnd) el.classList.add('si');
+      if(i===st.winStart) el.style.background='var(--tl-l)',el.style.borderColor='var(--tl)';
+      else if(i===st.winEnd) el.style.background='var(--tg-l)',el.style.borderColor='var(--tg)';
+      else if(i>st.winStart&&i<st.winEnd) el.style.background='var(--s1)',el.style.borderColor='var(--bd2)';
+      else el.style.background='',el.style.borderColor='';
+    });
+    // find min in window
+    const minIdx=st.dqSnap[0];
+    if(document.getElementById('sw-slot-'+minIdx)){
+      document.getElementById('sw-slot-'+minIdx).style.background='var(--gld-l)';
+      document.getElementById('sw-slot-'+minIdx).style.borderColor='var(--gld)';
+    }
+    swLog(`i=${st.i}, A[i]=${A[st.i]}, 창[${st.winStart}~${st.winEnd}], 덱=${JSON.stringify(st.dqSnap.map(x=>`${x}(${A[x]})`))}, min=${A[st.dqSnap[0]]}`,'lpf');
+    si++;
+    setTimeout(tick,600);
+  };
+  tick();
+}
+
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+const QUIZ=[
+  {q:'덱(Deque)의 풀 이름은?',opts:['Double-Entry Queue','Double-Ended Queue','Duplicate Queue','Dual Queue'],ans:1,
+   fb:'Double-Ended Queue! 양쪽 끝(front·back)에서 삽입·삭제가 모두 가능한 자료구조야.'},
+  {q:'선형 덱에서 pushFront(x)의 포인터 변화는?',opts:['front++','back--','front--','back++'],ans:2,
+   fb:'pushFront는 앞에 삽입하므로 front를 1 줄여(--front) 공간을 확보 후 저장해!'},
+  {q:'선형 덱에서 isEmpty() 조건은?',opts:['front == back','front > back','front == 0','back == -1'],ans:1,
+   fb:'front가 back보다 커지면 사이에 원소가 없어 빈 덱! (front가 back을 추월한 상태)'},
+  {q:'원형 덱에서 front=3, MAX=8 일 때 pushFront 후 front는?',opts:['2','4','7','(3-1+8)%8=2'],ans:3,
+   fb:'(front-1+MAX)%MAX = (3-1+8)%8 = 10%8 = 2! 음수 방지를 위해 +MAX를 꼭 해야 해.'},
+  {q:'원형 덱의 isEmpty 조건은?',opts:['front > back','front == back','(back+1)%MAX==front','size==0'],ans:1,
+   fb:'원형 덱은 front와 back이 같은 위치를 가리키면 빈 덱이야. (공간 1칸 비워두는 방식)'},
+  {q:'pushFront(1), pushBack(2), pushFront(3), popBack() 순서 실행 후 front 원소는?',opts:['1','2','3','없음'],ans:2,
+   fb:'pushFront(1)→[1], pushBack(2)→[1,2], pushFront(3)→[3,1,2], popBack()→2 제거→[3,1]. front=3!'},
+  {q:'슬라이딩 윈도우 최솟값 알고리즘에서 덱에 저장하는 것은?',opts:['값','인덱스','최솟값','크기'],ans:1,
+   fb:'인덱스를 저장해! pop 시 창 밖으로 벗어난 인덱스를 제거하고, front의 인덱스가 현재 창의 최솟값 위치야.'},
+  {q:'덱으로 회문(palindrome) 검사 시 사용하는 연산은?',opts:['pushFront+popBack','popFront+popBack를 비교','pushBack+popFront','pushFront+pushBack'],ans:1,
+   fb:'문자열을 덱에 넣고(pushBack), popFront()와 popBack()을 동시에 꺼내 비교해! 모두 같으면 회문.'},
+  {q:'원형 덱의 isFull() 조건은?',opts:['front==back','back==MAX-1','(back+1)%MAX==front','size==MAX'],ans:2,
+   fb:'back의 다음 위치가 front와 같으면 꽉 찬 거야. 한 칸을 비워두기 때문에 MAX-1개까지만 저장 가능!'},
+  {q:'선형 덱에서 popBack()의 코드는?',opts:['return dq[front++]','return dq[back--]','return dq[--back]','return dq[++front]'],ans:1,
+   fb:'popBack: 현재 back 위치의 값을 반환하고 back을 1 줄여. return dq[back--] — 후위 감소!'}
+];
+
+let qScore=0,qDone=0;
+function renderQuiz(){
+  document.getElementById('quiz-box').innerHTML=QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi){
+  if(document.getElementById(`qo-${qi}-0`).classList.contains('locked'))return;
+  const q=QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if(oi!==q.ans)document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if(oi===q.ans){qScore++;document.getElementById('qscore').textContent=qScore;}
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.className='qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML=(oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width=(qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplbl').textContent=`${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ═══════════════════════════════════════
+   CHALLENGES
+═══════════════════════════════════════ */
+const CHS=[
+{title:'도전 1 — 선형 덱 완성',tags:['ttl:정올 필수','tsk:실버'],
+ desc:'빈칸을 채워서 선형 덱을 완성해봐!<br><br><strong>입력:</strong> <code>8 / push_front 1 / push_back 2 / push_front 3 / front / back / pop_front / pop_back / size</code><br><strong>출력:</strong> <code style="color:var(--tl);">3<br>2<br>3<br>2<br>1</code>',
+ hint:'pushFront: dq[--front]=x / pushBack: dq[++back]=x / popFront: return dq[front++] / popBack: return dq[back--] / isEmpty: front>back',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 200002
+
+int dq[MAX];
+int front = MAX/2, back = MAX/2 - 1;
+
+int isEmpty() { return front > back; }
+int size()    { return isEmpty() ? 0 : back - front + 1; }
+
+void pushFront(int x) {
+    // TODO: front 감소 후 저장
+    
+}
+void pushBack(int x) {
+    // TODO: back 증가 후 저장
+    
+}
+int popFront() {
+    if (isEmpty()) return -1;
+    // TODO: 반환 후 front 증가
+    
+}
+int popBack() {
+    if (isEmpty()) return -1;
+    // TODO: 반환 후 back 감소
+    
+}
+int peekFront() { return isEmpty() ? -1 : dq[front]; }
+int peekBack()  { return isEmpty() ? -1 : dq[back]; }
+
+int main() {
+    int q; scanf("%d", &q);
+    while (q--) {
+        char op[20]; scanf("%s", op);
+        if (!strcmp(op,"push_front")){ int x;scanf("%d",&x);pushFront(x); }
+        else if(!strcmp(op,"push_back")) { int x;scanf("%d",&x);pushBack(x);  }
+        else if(!strcmp(op,"pop_front"))  printf("%d\\n",popFront());
+        else if(!strcmp(op,"pop_back"))   printf("%d\\n",popBack());
+        else if(!strcmp(op,"front"))      printf("%d\\n",peekFront());
+        else if(!strcmp(op,"back"))       printf("%d\\n",peekBack());
+        else if(!strcmp(op,"size"))       printf("%d\\n",size());
+        else if(!strcmp(op,"empty"))      printf("%d\\n",isEmpty());
+    }
+    return 0;
+}`},
+{title:'도전 2 — 덱으로 회문 검사',tags:['ttl:중급','tgd:응용'],
+ desc:'덱에 문자를 넣고, 앞뒤에서 동시에 꺼내 비교해서 회문인지 확인해봐!<br><br><strong>입력:</strong> <code>racecar</code><br><strong>출력:</strong> <code style="color:var(--tl);">YES</code>',
+ hint:'문자를 pushBack으로 덱에 전부 넣고, 앞뒤에서 동시에 popFront()와 popBack()을 비교. 모두 같으면 YES, 하나라도 다르면 NO.',
+ start:`#include <stdio.h>
+#include <string.h>
+#define MAX 200002
+
+char dq[MAX];
+int front = MAX/2, back = MAX/2 - 1;
+int isEmpty(){ return front > back; }
+void pushBack(char c){ dq[++back]=c; }
+char popFront(){ return isEmpty()?0:dq[front++]; }
+char popBack() { return isEmpty()?0:dq[back--]; }
+int size(){ return isEmpty()?0:back-front+1; }
+
+int main() {
+    char s[MAX];
+    scanf("%s", s);
+    int n = strlen(s);
+
+    // TODO: 문자열의 각 문자를 덱에 pushBack
+    for (int i = 0; i < n; i++) {
+        // pushBack(s[i]);
+        
+    }
+
+    // TODO: 앞뒤에서 동시에 꺼내 비교
+    int isPalin = 1;
+    while (size() > 1) {
+        // if (popFront() != popBack()) isPalin = 0;
+        
+    }
+
+    printf(isPalin ? "YES\\n" : "NO\\n");
+    return 0;
+}`},
+{title:'도전 3 — 슬라이딩 윈도우 최솟값',tags:['ttg:정올 골드','tpl:단조 덱'],
+ desc:'크기 k의 슬라이딩 윈도우를 이동하면서 각 창의 최솟값을 O(n)에 출력해봐!<br><br><strong>입력:</strong> <code>8 3 / 3 1 2 5 4 2 6 3</code> (n=8, k=3)<br><strong>출력:</strong> <code style="color:var(--tl);">1 1 2 2 2 2 3</code>',
+ hint:'덱에 인덱스를 저장. ① front가 창 밖이면 popFront ② back의 값이 현재보다 크면 popBack (단조 증가 유지) ③ 현재 인덱스 pushBack ④ i>=k-1이면 A[peekFront()]가 정답',
+ start:`#include <stdio.h>
+#define MAX 100001
+
+int A[MAX];
+int dq[MAX];  // 인덱스 저장
+int front = MAX/2, back = MAX/2 - 1;
+
+int isEmpty(){ return front > back; }
+void pushBack(int x){ dq[++back]=x; }
+void pushFront(int x){ dq[--front]=x; }
+int popFront(){ return isEmpty()?-1:dq[front++]; }
+int popBack() { return isEmpty()?-1:dq[back--]; }
+int peekFront(){ return isEmpty()?-1:dq[front]; }
+int peekBack() { return isEmpty()?-1:dq[back]; }
+
+int main() {
+    int n, k;
+    scanf("%d %d", &n, &k);
+    for (int i = 0; i < n; i++) scanf("%d", &A[i]);
+
+    for (int i = 0; i < n; i++) {
+        // TODO: ① 창 밖으로 벗어난 인덱스 front에서 제거
+        // while (!isEmpty() && peekFront() <= i - k) popFront();
+        
+        // TODO: ② back의 값이 현재보다 크거나 같으면 제거 (단조 증가 유지)
+        // while (!isEmpty() && A[peekBack()] >= A[i]) popBack();
+        
+        // TODO: ③ 현재 인덱스 push
+        // pushBack(i);
+        
+        // TODO: ④ i >= k-1 이면 창의 최솟값 출력
+        // if (i >= k - 1) printf(...)
+        
+    }
+    printf("\\n");
+    return 0;
+}`}
+];
+
+function renderCH(){
+  document.getElementById('ch-box').innerHTML=CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="27" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci){
+  const code=document.getElementById('cht-'+ci).value;
+  const out=document.getElementById('cho-'+ci);
+  let r='',ok=true;
+  if(ci===0){
+    const hpf=code.includes('dq[--front]')||code.includes('--front');
+    const hpb=code.includes('dq[++back]') ||code.includes('++back');
+    const hof=code.includes('dq[front++]')||code.includes('front++');
+    const hob=code.includes('dq[back--]') ||code.includes('back--');
+    if(!hpf){r+='❌ pushFront: dq[--front]=x 패턴이 없어!\n';ok=false;}
+    else if(!hpb){r+='❌ pushBack: dq[++back]=x 패턴이 없어!\n';ok=false;}
+    else if(!hof){r+='❌ popFront: return dq[front++] 패턴이 없어!\n';ok=false;}
+    else if(!hob){r+='❌ popBack: return dq[back--] 패턴이 없어!\n';ok=false;}
+    if(ok) r=`✅ 선형 덱 완성!
+
+pushFront: dq[--front]=x   ✓
+pushBack:  dq[++back]=x    ✓
+popFront:  return dq[front++] ✓
+popBack:   return dq[back--]  ✓
+
+시뮬 [push_front 1, push_back 2, push_front 3]:
+pushFront(1): dq[MAX/2-1]=1, front=MAX/2-1
+pushBack(2):  dq[MAX/2]=2,   back=MAX/2
+pushFront(3): dq[MAX/2-2]=3, front=MAX/2-2
+덱: [3, 1, 2]
+front()=3 ✓  back()=2 ✓
+pop_front()=3, pop_back()=2
+size()=1 ✓`;
+  } else if(ci===1){
+    const hpb=code.includes('pushBack(s[i])')||code.includes('pushBack(s[');
+    const hpop=code.includes('popFront()')&&code.includes('popBack()');
+    const hcmp=code.includes('!=')||code.includes('==');
+    if(!hpb){r+='❌ pushBack(s[i])로 문자를 덱에 넣어야 해!\n';ok=false;}
+    else if(!hpop){r+='❌ popFront()와 popBack() 둘 다 써야 해!\n';ok=false;}
+    else if(!hcmp){r+='❌ popFront()!=popBack() 비교가 없어!\n';ok=false;}
+    if(ok) r=`✅ 회문 검사 완성!
+
+pushBack 루프:      ✓
+popFront vs popBack: ✓
+비교 로직:          ✓
+
+"racecar" 시뮬:
+덱: [r,a,c,e,c,a,r]
+popF=r, popB=r → 같음
+popF=a, popB=a → 같음
+popF=c, popB=c → 같음
+size=1 → 중앙 → 종료
+→ YES ✓
+
+"hello":
+popF=h, popB=o → 다름 → NO ✓`;
+  } else {
+    const h1=code.includes('peekFront()')&&code.includes('i - k');
+    const h2=code.includes('peekBack()')&&code.includes('A[')&&code.includes('>=');
+    const h3=code.includes('pushBack(i)');
+    const h4=code.includes('i >= k')&&code.includes('peekFront()');
+    if(!h1){r+='❌ ① 창 밖 인덱스 제거: while(!isEmpty()&&peekFront()<=i-k) popFront();\n';ok=false;}
+    else if(!h2){r+='❌ ② 단조 증가 유지: while(!isEmpty()&&A[peekBack()]>=A[i]) popBack();\n';ok=false;}
+    else if(!h3){r+='❌ ③ 현재 인덱스 push: pushBack(i);\n';ok=false;}
+    else if(!h4){r+='❌ ④ 결과 출력: if(i>=k-1) printf("%d",A[peekFront()]);\n';ok=false;}
+    if(ok) r=`✅ 슬라이딩 윈도우 최솟값 완성!
+
+① 창 밖 제거:    peekFront()<=i-k → popFront ✓
+② 단조 증가:     A[peekBack()]>=A[i] → popBack ✓
+③ 현재 push:     pushBack(i) ✓
+④ 결과 출력:     i>=k-1 → A[peekFront()] ✓
+
+입력 [3,1,2,5,4,2,6,3], k=3:
+i=0: dq=[0]
+i=1: A[0]=3>=A[1]=1 → popBack, dq=[1]
+i=2: dq=[1,2], min=A[1]=1 → 출력 1
+i=3: dq=[1,2,3], min=A[1]=1 → 출력 1
+i=4: A[3]=5>=4 pop, dq=[1,2,4], min=A[1]=1→출력... 아 i=4: 1 밖? no, 1>=4-3+1=2 OK → min=A[2]=2 ✓
+... 최종: 1 1 2 2 2 2 3 ✓`;
+  }
+  out.className='ob '+(ok?'oo':'oe');
+  out.textContent=r;
+}
+renderCH();
+</script>
+</body>
+</html>

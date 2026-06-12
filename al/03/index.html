@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오큰수(NGE) 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  /* ── Palette: bright warm white + deep navy + vivid coral + jade ── */
+  --bg:       #f6f7fc;
+  --white:    #ffffff;
+  --surf:     #eef0f8;
+  --surf2:    #e4e8f4;
+  --bd:       #cdd4eb;
+  --bd2:      #b5bedd;
+
+  --t1: #121528;  /* near-black */
+  --t2: #2a2f52;
+  --t3: #5a628e;
+  --t4: #9aa0c4;
+
+  /* accent: vivid coral for "오큰수 found!" moments */
+  --coral:    #e8420d;
+  --coral-l:  #fdeee8;
+  --coral-m:  #f9b59c;
+
+  /* main action: deep indigo */
+  --indigo:   #3730a3;
+  --indigo-l: #e0e7ff;
+  --indigo-m: #a5b4fc;
+
+  /* success: jade green */
+  --jade:     #0e7c61;
+  --jade-l:   #d0faf0;
+  --jade-m:   #6ee7cf;
+
+  /* stack pop highlight: amber */
+  --amber:    #92400e;
+  --amber-l:  #fef3c7;
+  --amber-m:  #fcd34d;
+
+  /* push: sky */
+  --sky:      #0369a1;
+  --sky-l:    #e0f2fe;
+  --sky-m:    #7dd3fc;
+
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+  --r: 10px; --r2: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 17px; }
+body { background: var(--bg); color: var(--t1); font-family: var(--sans); line-height: 1.75; }
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--white);
+  border-bottom: 2.5px solid var(--bd);
+  padding: 0 32px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 62px;
+}
+.hdr-accent {
+  width: 8px;
+  background: linear-gradient(180deg, var(--coral) 0%, var(--indigo) 100%);
+  flex-shrink: 0;
+  margin-right: 20px;
+}
+.hdr-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+.hdr-logo { font-size: 12px; font-weight: 700; color: var(--t4); letter-spacing: .05em; }
+.hdr-sep  { color: var(--bd2); font-size: 18px; }
+.hdr-title { font-size: 22px; font-weight: 900; color: var(--t1); letter-spacing: -.01em; }
+.hdr-badge {
+  background: var(--coral-l);
+  color: var(--coral);
+  border: 1.5px solid var(--coral-m);
+  padding: 3px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── NAV ── */
+.nav {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--bd);
+  display: flex;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
+  gap: 0;
+}
+.nt {
+  padding: 15px 22px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--t3);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all .17s;
+  user-select: none;
+}
+.nt:hover { color: var(--t2); border-bottom-color: var(--bd2); }
+.nt.active { color: var(--coral); border-bottom-color: var(--coral); font-weight: 700; }
+
+/* ── PAGES ── */
+.pg { display: none; max-width: 1000px; margin: 0 auto; padding: 36px 28px 80px; }
+.pg.active { display: block; animation: pgIn .22s ease; }
+@keyframes pgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ── TYPOGRAPHY ── */
+h2 { font-size: 27px; font-weight: 900; color: var(--t1); margin-bottom: 6px; }
+h3 { font-size: 19px; font-weight: 700; color: var(--t1); margin-bottom: 10px; }
+h4 { font-size: 16px; font-weight: 700; color: var(--t2); margin-bottom: 8px; }
+.psub { font-size: 15px; color: var(--t3); margin-bottom: 30px; }
+p { font-size: 16px; color: var(--t2); margin-bottom: 12px; line-height: 1.8; }
+strong { color: var(--t1); font-weight: 700; }
+code { font-family: var(--mono); font-size: .9em; background: var(--surf2); padding: 1px 6px; border-radius: 5px; color: var(--indigo); }
+
+/* ── CALLOUT ── */
+.co {
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  line-height: 1.8;
+  border-left: 4px solid;
+}
+.co strong { color: var(--t1); }
+.ci { background: var(--indigo-l); color: var(--t2); border-color: var(--indigo); }
+.cj { background: var(--jade-l);   color: var(--t2); border-color: var(--jade); }
+.cc { background: var(--coral-l);  color: var(--t2); border-color: var(--coral); }
+.ca { background: var(--amber-l);  color: var(--t2); border-color: var(--amber); }
+.cs { background: var(--sky-l);    color: var(--t2); border-color: var(--sky); }
+
+/* ── CARD ── */
+.card { background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 22px 26px; margin-bottom: 20px; }
+.card2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+@media(max-width:640px){ .card2{grid-template-columns:1fr;} }
+
+/* ── STEP BAR ── */
+.sbar { display: flex; border: 1.5px solid var(--bd); border-radius: var(--r2); overflow: hidden; margin-bottom: 26px; }
+.sbt {
+  flex: 1;
+  padding: 13px 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t3);
+  background: var(--white);
+  cursor: pointer;
+  border-right: 1.5px solid var(--bd);
+  transition: all .17s;
+  user-select: none;
+  line-height: 1.4;
+}
+.sbt:last-child { border-right: none; }
+.sbt:hover { background: var(--surf); color: var(--t2); }
+.sbt.active { background: var(--coral-l); color: var(--coral); font-weight: 700; }
+.sbt.done   { background: var(--jade-l);  color: var(--jade); }
+.snum { display: block; font-size: 20px; font-weight: 900; font-family: var(--mono); }
+
+/* ── CODE BLOCK ── */
+.cw { background: #15192e; border-radius: var(--r2); overflow: hidden; margin-bottom: 20px; border: 1.5px solid #1f2540; }
+.cbr { background: #1c2138; padding: 10px 18px; font-family: var(--mono); font-size: 12px; color: #6a7ab8; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1f2540; }
+.dots { display: flex; gap: 6px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.dr{background:#ff5f57;} .dy{background:#febc2e;} .dg{background:#28c840;}
+pre { padding: 20px 22px; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 2.05; color: #ccd4f0; }
+.kw { color: #f472b6; } .tp { color: #7dd3fc; } .fn { color: #6ee7b7; }
+.nm { color: #fbbf24; } .cm { color: #3e4a72; font-style: italic; } .st { color: #86efac; }
+.hl  { background: rgba(232,66,13,.18); display:block; margin:0 -22px; padding:0 22px; border-left:3px solid #e8420d; }
+.hl2 { background: rgba(55,48,163,.22); display:block; margin:0 -22px; padding:0 22px; border-left:3px solid #818cf8; }
+.hl3 { background: rgba(14,124,97,.18); display:block; margin:0 -22px; padding:0 22px; border-left:3px solid #34d399; }
+
+/* ── TAGS ── */
+.tag { display:inline-block; padding:3px 12px; border-radius:20px; font-size:13px; font-weight:700; margin:2px 4px 2px 0; }
+.ti { background:var(--indigo-l); color:var(--indigo); border:1px solid var(--indigo-m); }
+.tj { background:var(--jade-l);   color:var(--jade);   border:1px solid var(--jade-m); }
+.tc { background:var(--coral-l);  color:var(--coral);  border:1px solid var(--coral-m); }
+.ta { background:var(--amber-l);  color:var(--amber);  border:1px solid var(--amber-m); }
+.ts { background:var(--sky-l);    color:var(--sky);    border:1px solid var(--sky-m); }
+
+/* ── TABLE ── */
+table { width:100%; border-collapse:collapse; font-size:15px; margin-bottom:18px; }
+th { background:var(--surf); color:var(--t2); font-weight:700; padding:11px 14px; text-align:left; border:1.5px solid var(--bd); }
+td { padding:10px 14px; border:1.5px solid var(--bd); color:var(--t2); background:var(--white); }
+tr:hover td { background:var(--surf); }
+
+/* ════════════════════════════════════
+   SIMULATOR — MAIN VISUALIZER
+════════════════════════════════════ */
+.sim-wrap {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: start;
+}
+@media(max-width:700px){ .sim-wrap{grid-template-columns:1fr;} }
+
+/* Array display */
+.arr-section { background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 20px 22px; }
+.arr-label { font-size: 12px; font-weight: 700; color: var(--t4); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; }
+.arr-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.arr-cell {
+  width: 52px; height: 58px;
+  border: 2px solid var(--bd2);
+  border-radius: 9px;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  transition: all .28s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink: 0;
+  position: relative;
+}
+.arr-cell .cv { font-size: 20px; color: var(--t1); }
+.arr-cell .ci2 { font-size: 10px; color: var(--t4); margin-top: 2px; }
+/* States */
+.arr-cell.state-current {
+  background: var(--amber-l);
+  border-color: var(--amber);
+  transform: scale(1.12) translateY(-4px);
+  box-shadow: 0 6px 18px rgba(146,64,14,.18);
+  z-index: 2;
+}
+.arr-cell.state-current .cv { color: var(--amber); }
+.arr-cell.state-instack {
+  background: var(--sky-l);
+  border-color: var(--sky);
+}
+.arr-cell.state-instack .cv { color: var(--sky); }
+.arr-cell.state-answered {
+  background: var(--jade-l);
+  border-color: var(--jade);
+}
+.arr-cell.state-answered .cv { color: var(--jade); }
+.arr-cell.state-popped {
+  background: var(--coral-l);
+  border-color: var(--coral);
+  animation: popFlash .4s ease;
+}
+.arr-cell.state-popped .cv { color: var(--coral); }
+@keyframes popFlash { 0%,100%{transform:none;} 40%{transform:scale(1.15);} }
+
+/* Answer row */
+.ans-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+.ans-cell {
+  width: 52px; height: 42px;
+  border: 2px solid var(--bd);
+  border-radius: 8px;
+  background: var(--surf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--t4);
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ans-cell.filled {
+  background: var(--jade-l);
+  border-color: var(--jade);
+  color: var(--jade);
+  animation: fillIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+.ans-cell.filled-neg {
+  background: var(--surf2);
+  border-color: var(--bd2);
+  color: var(--t4);
+}
+@keyframes fillIn { from{opacity:0;transform:scale(.7);} to{opacity:1;transform:none;} }
+
+/* Stack panel */
+.stk-panel {
+  background: var(--white);
+  border: 1.5px solid var(--bd);
+  border-radius: var(--r2);
+  padding: 18px 16px;
+}
+.stk-title { font-size: 12px; font-weight: 700; color: var(--t4); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 12px; }
+.stk-box {
+  min-height: 240px;
+  background: var(--surf);
+  border: 1.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 10px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+  position: relative;
+  margin-bottom: 12px;
+}
+.stk-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--indigo);
+  border-radius: 0 0 var(--r) var(--r);
+}
+.stk-cell {
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--white);
+  border: 1.5px solid var(--bd2);
+  color: var(--t2);
+  text-align: center;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.stk-cell.stk-top {
+  background: var(--sky-l);
+  border-color: var(--sky);
+  color: var(--sky);
+}
+.stk-cell.stk-pop {
+  animation: stkPop .3s ease forwards;
+}
+.stk-cell.stk-push {
+  animation: stkPush .32s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes stkPush { from{opacity:0;transform:scale(.8) translateY(10px);} to{opacity:1;transform:none;} }
+@keyframes stkPop  { from{opacity:1;transform:scale(1);} to{opacity:0;transform:scale(.7) translateX(20px);} }
+.stk-empty { color: var(--t4); font-size: 13px; text-align: center; padding: 20px 0; }
+
+/* Stat pills */
+.stk-stats { display: flex; flex-direction: column; gap: 6px; font-family: var(--mono); font-size: 13px; }
+.stk-stat { background: var(--surf); border: 1.5px solid var(--bd); border-radius: 8px; padding: 6px 12px; color: var(--t2); }
+.stk-stat span { font-weight: 700; }
+
+/* Controls */
+.ctrl-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--r);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all .15s;
+  font-family: var(--sans);
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .38; cursor: default; }
+.b-next  { background: var(--coral);   color: #fff; border-color: var(--coral); }
+.b-next:hover:not(:disabled)  { background: #c23609; }
+.b-auto  { background: var(--amber-l); color: var(--amber); border-color: var(--amber-m); }
+.b-auto:hover:not(:disabled)  { background: var(--amber); color: #fff; }
+.b-reset { background: var(--white);   color: var(--t2); border-color: var(--bd2); }
+.b-reset:hover { border-color: var(--t2); }
+.b-edit  { background: var(--indigo-l); color: var(--indigo); border-color: var(--indigo-m); }
+.b-edit:hover  { background: var(--indigo); color: #fff; }
+
+/* Log */
+.log {
+  background: var(--surf);
+  border: 1.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  min-height: 96px;
+  max-height: 156px;
+  overflow-y: auto;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.l-step  { color: var(--t3); }
+.l-push  { color: var(--sky);    font-weight: 600; }
+.l-pop   { color: var(--coral);  font-weight: 600; }
+.l-ans   { color: var(--jade);   font-weight: 600; }
+.l-done  { color: var(--indigo); font-weight: 700; }
+.l-info  { color: var(--t4); }
+
+/* Custom input */
+.arr-input {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.arr-input.show { display: flex; }
+.arr-text-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 9px 14px;
+  border: 2px solid var(--bd);
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--t1);
+  background: var(--white);
+  outline: none;
+}
+.arr-text-input:focus { border-color: var(--coral); }
+
+/* Progress bar */
+.pg-bar-wrap { height: 6px; background: var(--bd); border-radius: 3px; margin: 10px 0 16px; }
+.pg-bar-fill { height: 6px; background: linear-gradient(90deg, var(--coral), var(--indigo)); border-radius: 3px; transition: width .4s; }
+.pg-label { font-size: 13px; color: var(--t3); margin-bottom: 6px; }
+
+/* Legend */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--t2); }
+.leg-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+/* ── QUIZ ── */
+.qcard { background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 22px 26px; margin-bottom: 18px; }
+.qtext { font-size: 17px; font-weight: 700; color: var(--t1); margin-bottom: 16px; line-height: 1.6; }
+.qopts { display: flex; flex-direction: column; gap: 8px; }
+.qopt {
+  padding: 12px 18px; border-radius: var(--r);
+  background: var(--surf); border: 2px solid var(--bd);
+  cursor: pointer; font-size: 15px; color: var(--t2);
+  transition: all .15s; user-select: none; font-family: var(--mono);
+}
+.qopt:hover:not(.locked) { border-color: var(--coral); color: var(--coral); background: var(--coral-l); }
+.qopt.correct { background: var(--jade-l); border-color: var(--jade); color: var(--jade); }
+.qopt.wrong   { background: var(--coral-l); border-color: var(--coral); color: var(--coral); }
+.qopt.locked  { cursor: default; }
+.qfb { display: none; margin-top: 12px; padding: 12px 16px; border-radius: var(--r); font-size: 15px; line-height: 1.7; }
+.qfb.show { display: block; }
+.qfb.ok  { background: var(--jade-l);  color: var(--jade);  border: 1px solid var(--jade-m); }
+.qfb.bad { background: var(--coral-l); color: var(--coral); border: 1px solid var(--coral-m); }
+
+.score-bar {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+  background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 16px 22px;
+}
+.score-big { font-size: 40px; font-weight: 900; color: var(--coral); font-family: var(--mono); }
+.q-prog { flex: 1; }
+.q-prog-bar { height: 8px; background: var(--bd); border-radius: 4px; overflow: hidden; }
+.q-prog-fill { height: 8px; background: var(--coral); border-radius: 4px; transition: width .4s; }
+.q-prog-label { font-size: 13px; color: var(--t3); margin-top: 5px; }
+
+/* ── CHALLENGE ── */
+.chc { background: var(--white); border: 1.5px solid var(--bd); border-radius: var(--r2); padding: 24px 28px; margin-bottom: 28px; }
+.chg { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:660px){ .chg{grid-template-columns:1fr;} }
+textarea {
+  width: 100%; background: #15192e; border: 1.5px solid #1f2540;
+  border-radius: var(--r); padding: 14px 16px;
+  font-family: var(--mono); font-size: 13px; color: #ccd4f0;
+  resize: vertical; outline: none; line-height: 1.85; transition: border .2s;
+}
+textarea:focus { border-color: var(--coral); }
+.rbtn {
+  margin-top: 10px; padding: 11px 26px; background: var(--coral); border: none;
+  border-radius: var(--r); color: #fff; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: var(--sans); transition: background .15s;
+}
+.rbtn:hover { background: #c23609; }
+.ob {
+  background: var(--surf); border: 1.5px solid var(--bd); border-radius: var(--r);
+  padding: 14px 16px; font-family: var(--mono); font-size: 13px;
+  min-height: 120px; color: var(--t2); white-space: pre-wrap; line-height: 1.85;
+}
+.oo { color: var(--jade); } .oe { color: var(--coral); }
+.ht { font-size: 14px; color: var(--indigo); cursor: pointer; margin-top: 8px; display: inline-block; font-weight: 700; }
+.hb { display:none; margin-top:8px; padding:12px 16px; background:var(--amber-l); border-radius:var(--r); font-size:14px; color:var(--amber); border:1px solid var(--amber-m); line-height:1.7; }
+.hb.show { display:block; }
+.sl { font-size: 12px; font-weight: 700; color: var(--t4); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 8px; }
+
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--surf); }
+::-webkit-scrollbar-thumb { background: var(--bd2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="hdr">
+  <div class="hdr-accent"></div>
+  <div class="hdr-inner">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">오큰수 (Next Greater Element)</span>
+    <span class="hdr-badge">정올 실버 단골 문제</span>
+  </div>
+</header>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nt active" onclick="goPage('concept')">📖 개념</div>
+  <div class="nt"        onclick="goPage('code')">💻 코드 단계</div>
+  <div class="nt"        onclick="goPage('sim')">🎬 단계 시뮬레이터</div>
+  <div class="nt"        onclick="goPage('trace')">🔍 손 추적 연습</div>
+  <div class="nt"        onclick="goPage('quiz')">🧠 퀴즈</div>
+  <div class="nt"        onclick="goPage('challenge')">🏆 도전</div>
+</nav>
+
+<!-- ═════════════════════════════════════════
+     PAGE 1: 개념
+═════════════════════════════════════════ -->
+<div class="pg active" id="page-concept">
+  <h2>오큰수란?</h2>
+  <p class="psub">세영코딩연구소 · 정올 자료구조 실전 | 단조 감소 스택 응용</p>
+
+  <div class="co cc">
+    <strong>문제 정의</strong><br>
+    크기 N인 수열 A에서 각 원소 A[i]에 대해, <strong>i보다 오른쪽에 있으면서</strong> A[i]보다 <strong>처음으로 큰 수</strong>를 오큰수라 한다.<br>
+    오큰수가 없으면 <strong>-1</strong>을 출력한다.
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;">예시로 이해하기</h3>
+    <div style="overflow-x:auto;margin-bottom:16px;">
+      <table style="min-width:480px;text-align:center;">
+        <tr>
+          <th>인덱스</th>
+          <td style="background:var(--surf);">0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td>
+        </tr>
+        <tr>
+          <th>A[ ]</th>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">3</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">1</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">4</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">1</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">5</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">9</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">2</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:17px;">6</td>
+        </tr>
+        <tr>
+          <th>오큰수</th>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">4</td>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">4</td>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">5</td>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">5</td>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">9</td>
+          <td style="color:var(--t4);font-family:var(--mono);font-weight:700;">-1</td>
+          <td style="color:var(--jade);font-family:var(--mono);font-weight:700;">6</td>
+          <td style="color:var(--t4);font-family:var(--mono);font-weight:700;">-1</td>
+        </tr>
+      </table>
+    </div>
+    <div class="co ci" style="margin-bottom:0;">
+      A[0]=3의 오큰수: 오른쪽에서 처음으로 3보다 큰 수 → A[2]=4 ✓<br>
+      A[5]=9의 오큰수: 오른쪽에 9보다 큰 수가 없음 → -1<br>
+      A[7]=6의 오큰수: 맨 마지막 원소라 오른쪽이 없음 → -1
+    </div>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>왜 스택이 필요할까?</h3>
+      <p>이중 for문으로 O(n²)에 해결할 수 있지만,<br>
+      N이 100만이면 <strong>1조 번</strong>의 연산이 필요해!</p>
+      <div style="display:flex;gap:12px;margin-top:10px;">
+        <div style="flex:1;background:var(--coral-l);border:1.5px solid var(--coral-m);border-radius:var(--r);padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--coral);font-weight:700;margin-bottom:4px;">이중 for문</div>
+          <div style="font-size:22px;font-weight:900;color:var(--coral);font-family:var(--mono);">O(n²)</div>
+          <div style="font-size:12px;color:var(--t3);">100만 → 1조 번</div>
+        </div>
+        <div style="flex:1;background:var(--jade-l);border:1.5px solid var(--jade-m);border-radius:var(--r);padding:12px;text-align:center;">
+          <div style="font-size:12px;color:var(--jade);font-weight:700;margin-bottom:4px;">단조 스택</div>
+          <div style="font-size:22px;font-weight:900;color:var(--jade);font-family:var(--mono);">O(n)</div>
+          <div style="font-size:12px;color:var(--t3);">100만 → 200만 번</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>단조 감소 스택이란?</h3>
+      <p>스택 안의 값이 <strong>아래 → 위로 갈수록 작아지는</strong> 스택이야.</p>
+      <div style="background:var(--surf);border-radius:var(--r);padding:12px 16px;font-family:var(--mono);font-size:14px;line-height:2.2;">
+        bottom → <span style="color:var(--indigo);font-weight:700;">9</span> &nbsp;
+                  <span style="color:var(--indigo);font-weight:700;">5</span> &nbsp;
+                  <span style="color:var(--sky);font-weight:700;">3</span> &nbsp;
+                  <span style="color:var(--sky);font-weight:700;">1</span> → top<br>
+        <span style="font-size:11px;color:var(--t4);">↑ 위로 갈수록 값이 작거나 같음</span>
+      </div>
+      <p style="margin-top:10px;font-size:14px;">새 원소가 top보다 <strong>크면</strong> top을 pop해서 단조성 유지!</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">핵심 아이디어 3줄 요약</h3>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:flex-start;gap:14px;padding:12px 16px;background:var(--sky-l);border-radius:var(--r);border:1.5px solid var(--sky-m);">
+        <span style="font-size:22px;font-weight:900;color:var(--sky);font-family:var(--mono);flex-shrink:0;">①</span>
+        <div style="font-size:15px;color:var(--t2);">왼→오른쪽 순회하면서, <strong>현재 값(A[i])이 스택 top의 값보다 크면</strong> 계속 pop한다.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:14px;padding:12px 16px;background:var(--coral-l);border-radius:var(--r);border:1.5px solid var(--coral-m);">
+        <span style="font-size:22px;font-weight:900;color:var(--coral);font-family:var(--mono);flex-shrink:0;">②</span>
+        <div style="font-size:15px;color:var(--t2);"><strong>pop될 때</strong>: 꺼낸 인덱스의 오큰수 = 현재 A[i]! <code>ans[idx] = A[i]</code></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:14px;padding:12px 16px;background:var(--jade-l);border-radius:var(--r);border:1.5px solid var(--jade-m);">
+        <span style="font-size:22px;font-weight:900;color:var(--jade);font-family:var(--mono);flex-shrink:0;">③</span>
+        <div style="font-size:15px;color:var(--t2);">순회 후 스택에 남은 인덱스들의 오큰수 = <strong>-1</strong> (오른쪽에 큰 수 없음)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════
+     PAGE 2: 코드 단계
+═════════════════════════════════════════ -->
+<div class="pg" id="page-code">
+  <h2>코드 단계별 이해</h2>
+  <p class="psub">선언 → 초기화 → 핵심 루프 → 남은 처리 → 완성 코드 순서로!</p>
+
+  <div class="sbar" id="sbar-code">
+    <div class="sbt active" onclick="goStep(0)"><span class="snum">01</span>변수 선언</div>
+    <div class="sbt"        onclick="goStep(1)"><span class="snum">02</span>ans 초기화</div>
+    <div class="sbt"        onclick="goStep(2)"><span class="snum">03</span>핵심 while</div>
+    <div class="sbt"        onclick="goStep(3)"><span class="snum">04</span>push & 남은처리</div>
+    <div class="sbt"        onclick="goStep(4)"><span class="snum">05</span>전체 완성 코드</div>
+    <div class="sbt"        onclick="goStep(5)"><span class="snum">06</span>C++ STL 버전</div>
+  </div>
+  <div id="code-panel"></div>
+</div>
+
+<!-- ═════════════════════════════════════════
+     PAGE 3: 시뮬레이터
+═════════════════════════════════════════ -->
+<div class="pg" id="page-sim">
+  <h2>단계별 시뮬레이터</h2>
+  <p class="psub">▶ 다음 단계 버튼을 눌러 오큰수 알고리즘이 어떻게 동작하는지 직접 확인해봐!</p>
+
+  <!-- custom input -->
+  <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <button class="btn b-edit" onclick="toggleInput()">✏️ 배열 직접 입력</button>
+    <div class="arr-input" id="arr-input-wrap">
+      <input class="arr-text-input" id="arr-text" placeholder="숫자를 공백으로 구분 (예: 3 1 4 1 5 9 2 6)" />
+      <button class="btn b-next" onclick="applyCustomArr()">적용</button>
+    </div>
+  </div>
+
+  <!-- legend -->
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--amber-l);border:2px solid var(--amber);"></div> 현재 처리 중 (i)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--sky-l);border:2px solid var(--sky);"></div> 스택 안에 있음</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--coral-l);border:2px solid var(--coral);"></div> 방금 pop됨</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--jade-l);border:2px solid var(--jade);"></div> 오큰수 확정</div>
+  </div>
+
+  <div class="pg-label" id="sim-progress-label">진행: 0 / 0 단계</div>
+  <div class="pg-bar-wrap"><div class="pg-bar-fill" id="sim-prog" style="width:0%"></div></div>
+
+  <div class="sim-wrap">
+    <div class="arr-section">
+      <div class="arr-label">입력 배열 A[ ]</div>
+      <div class="arr-row" id="sim-arr"></div>
+      <div class="arr-label" style="margin-top:14px;">오큰수 ans[ ]</div>
+      <div class="ans-row" id="sim-ans"></div>
+
+      <div class="ctrl-row" style="margin-top:18px;">
+        <button class="btn b-next" id="btn-next" onclick="simNext()">▶ 다음 단계</button>
+        <button class="btn b-auto" id="btn-auto" onclick="simAuto()">⏩ 자동 실행</button>
+        <button class="btn b-reset" onclick="simReset()">↺ 초기화</button>
+      </div>
+
+      <div class="sl">실행 로그</div>
+      <div class="log" id="sim-log"><span class="l-info">▶ "다음 단계" 버튼을 눌러서 시작!</span></div>
+    </div>
+
+    <div>
+      <div class="stk-panel">
+        <div class="stk-title">스택 (인덱스 저장)</div>
+        <div class="stk-box" id="sim-stk">
+          <div class="stk-empty">비어 있음</div>
+        </div>
+        <div class="stk-stats">
+          <div class="stk-stat">top = <span id="s-top" style="color:var(--sky);">-1</span></div>
+          <div class="stk-stat">size = <span id="s-size" style="color:var(--indigo);">0</span></div>
+          <div class="stk-stat" id="s-cond-box">현재 조건:<br><span id="s-cond" style="color:var(--t4);font-size:12px;">대기 중</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════
+     PAGE 4: 손 추적 연습
+═════════════════════════════════════════ -->
+<div class="pg" id="page-trace">
+  <h2>손 추적 연습</h2>
+  <p class="psub">알고리즘을 손으로 따라가 보는 게 가장 빠른 이해법이야. 단계별로 표를 채워봐!</p>
+
+  <div class="co ca">
+    <strong>추적 방법</strong><br>
+    배열 A = [2, 4, 3, 1, 5] 를 오큰수 알고리즘으로 처리할 때, 각 단계에서 스택 상태와 ans 배열이 어떻게 변하는지 따라가봐!
+  </div>
+
+  <div id="trace-container"></div>
+</div>
+
+<!-- ═════════════════════════════════════════
+     PAGE 5: 퀴즈
+═════════════════════════════════════════ -->
+<div class="pg" id="page-quiz">
+  <h2>오큰수 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+
+  <div class="score-bar">
+    <span class="score-big" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div class="q-prog">
+      <div class="q-prog-bar"><div class="q-prog-fill" id="qprog" style="width:0%"></div></div>
+      <div class="q-prog-label" id="qplabel">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- ═════════════════════════════════════════
+     PAGE 6: 도전
+═════════════════════════════════════════ -->
+<div class="pg" id="page-challenge">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">오큰수 알고리즘을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════════ -->
+<script>
+/* ── PAGE NAV ── */
+const PM = {concept:0, code:1, sim:2, trace:3, quiz:4, challenge:5};
+function goPage(id) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach((t,i)=>t.classList.toggle('active', i===PM[id]));
+  document.getElementById('page-'+id).classList.add('active');
+  if (id==='trace') renderTrace();
+}
+
+/* ═══════════════════════════════════════
+   CODE STEPS
+═══════════════════════════════════════ */
+const STEPS = [
+{t:'① 배열·스택 변수 선언',
+ b:`<div class="co ci"><strong>핵심 포인트</strong>: 스택에는 <strong>값이 아닌 인덱스</strong>를 저장해!<br>
+pop할 때 꺼낸 인덱스로 <code>ans[idx] = A[i]</code> 처럼 정답을 직접 채울 수 있어.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>01_declare.c</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 1000001</span>
+
+<span class="tp">int</span> A[<span class="nm">MAX</span>];       <span class="cm">// 입력 수열</span>
+<span class="tp">int</span> ans[<span class="nm">MAX</span>];     <span class="cm">// 오큰수 결과 배열</span>
+<span class="hl"><span class="tp">int</span> stk[<span class="nm">MAX</span>];     <span class="cm">// 스택 — 인덱스를 저장!</span></span>
+<span class="tp">int</span> top = <span class="nm">-1</span>;    <span class="cm">// 스택 포인터 (빈 스택 = -1)</span>
+<span class="tp">int</span> n;            <span class="cm">// 수열 크기</span>
+</pre></div>
+<div class="card"><h4>왜 인덱스를 저장할까?</h4>
+<table style="margin-bottom:0;">
+<tr><th>저장 방식</th><th>pop 시 할 수 있는 것</th></tr>
+<tr><td>값을 저장</td><td>꺼낸 값의 오큰수를 알 수 있지만 <strong>어느 위치인지 모름</strong></td></tr>
+<tr><td style="color:var(--coral);font-weight:700;">인덱스를 저장 ★</td><td><code>ans[꺼낸인덱스] = A[i]</code> → 위치와 값을 동시에 처리!</td></tr>
+</table></div>`},
+
+{t:'② ans 배열 -1로 초기화',
+ b:`<div class="co cj"><strong>오큰수가 없는 원소는 -1</strong>이 기본값이야. 루프 전에 미리 -1로 세팅해두면, 루프 후 스택에 남은 인덱스를 따로 처리하지 않아도 돼!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>02_init.c</span></div>
+<pre><span class="cm">// 방법 1: for 루프로 초기화</span>
+<span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++)
+<span class="hl">    ans[i] = <span class="nm">-1</span>;   <span class="cm">// 기본값: 오큰수 없음</span></span>
+
+<span class="cm">// 방법 2: memset (헤더 string.h 필요, 비추천 — -1은 0xFF로)</span>
+<span class="cm">// memset(ans, -1, sizeof(ans)); // 1바이트 단위라 주의 필요</span>
+
+<span class="cm">// 방법 1이 안전하고 직관적이야!</span>
+</pre></div>
+<div class="co ca"><strong>왜 미리 -1로 초기화하나?</strong><br>
+루프가 끝난 후 스택에 남은 인덱스들은 "끝까지 순회했는데 오큰수를 못 만난" 원소들이야.
+이미 -1로 초기화했으니 스택에 남은 것들을 추가로 처리할 필요가 없어 코드가 깔끔해!</div>`},
+
+{t:'③ 핵심 while 루프 — pop 조건',
+ b:`<div class="co cc"><strong>이게 오큰수 알고리즘의 전부야!</strong><br>
+현재 A[i]가 스택 top에 저장된 인덱스의 값보다 크면 → pop → 오큰수 기록!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>03_while_loop.c</span></div>
+<pre><span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) {
+
+    <span class="cm">// 조건 ①: 스택이 비어있지 않음</span>
+    <span class="cm">// 조건 ②: 현재 값이 스택 top의 값보다 크다</span>
+<span class="hl">    <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; A[stk[top]] &lt; A[i]) {</span>
+<span class="hl">        <span class="tp">int</span> idx = stk[top--];   <span class="cm">// pop: 인덱스 꺼내기</span></span>
+<span class="hl2">        ans[idx] = A[i];         <span class="cm">// ★ 오큰수 기록!</span></span>
+<span class="hl">    }</span>
+    <span class="cm">// 현재 인덱스를 스택에 push</span>
+    stk[++top] = i;
+}
+</pre></div>
+<div class="card"><h4>while 조건 한 줄씩</h4>
+<table style="margin-bottom:0;">
+<tr><th>조건</th><th>의미</th></tr>
+<tr><td style="font-family:var(--mono);color:var(--sky);">top != -1</td><td>스택이 비어있지 않아야 pop 가능</td></tr>
+<tr><td style="font-family:var(--mono);color:var(--coral);">A[stk[top]] &lt; A[i]</td><td>스택 top의 원소값 &lt; 현재값 → pop!<br><span style="font-size:13px;color:var(--t3);">→ 이 순간이 바로 top의 오큰수를 찾은 순간!</span></td></tr>
+<tr><td style="font-family:var(--mono);color:var(--jade);">stk[top--]</td><td>스택에서 인덱스 꺼내기 (후위 감소)</td></tr>
+<tr><td style="font-family:var(--mono);color:var(--indigo);">ans[idx]=A[i]</td><td>꺼낸 인덱스 위치에 오큰수 기록</td></tr>
+</table></div>`},
+
+{t:'④ push & 루프 후 남은 원소 처리',
+ b:`<div class="co cs"><strong>push</strong>는 while 조건이 더 이상 안 될 때 현재 인덱스를 스택에 넣는 것이고,<br>
+루프 후 스택에 남은 원소들은 <strong>이미 -1로 초기화</strong>되어 있으니 추가 처리 불필요!</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>04_push_remain.c</span></div>
+<pre><span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) {
+    <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; A[stk[top]] &lt; A[i]) {
+        ans[stk[top--]] = A[i];
+    }
+<span class="hl3">    stk[++top] = i;   <span class="cm">// ← 현재 인덱스 push</span></span>
+    <span class="cm">// "나중에 나보다 큰 게 오면 그때 pop되면서 처리될 거야"</span>
+}
+
+<span class="cm">// ── 루프 종료 후 스택에 남은 것들 ──</span>
+<span class="cm">// 이미 ans[] = -1로 초기화해서 따로 처리 불필요!</span>
+<span class="cm">// (명시적으로 처리하고 싶다면:)</span>
+<span class="cm">// while (top != -1) ans[stk[top--]] = -1;</span>
+</pre></div>
+<div class="co ca"><strong>각 원소는 정확히 한 번 push, 한 번 pop</strong>돼.<br>
+n개 원소 → 총 push n번 + pop 최대 n번 = <strong>O(2n) = O(n)</strong>!</div>`},
+
+{t:'⑤ 전체 완성 코드',
+ b:`<div class="co cc"><strong>완성 코드!</strong> 입출력 포함 전체를 보면서 다시 흐름을 확인해봐.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>nge_complete.c — 오큰수 완전 구현</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAX 1000001</span>
+
+<span class="tp">int</span> A[<span class="nm">MAX</span>], ans[<span class="nm">MAX</span>], stk[<span class="nm">MAX</span>];
+<span class="tp">int</span> top = <span class="nm">-1</span>;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n;
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) {
+        <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;A[i]);
+        ans[i] = <span class="nm">-1</span>;   <span class="cm">// 기본값 초기화</span>
+    }
+
+    <span class="cm">// ── 오큰수 단조 감소 스택 ──</span>
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) {
+<span class="hl">        <span class="kw">while</span> (top != <span class="nm">-1</span> &amp;&amp; A[stk[top]] &lt; A[i])</span>
+<span class="hl">            ans[stk[top--]] = A[i];   <span class="cm">// 오큰수 기록 + pop</span></span>
+<span class="hl2">        stk[++top] = i;               <span class="cm">// 현재 인덱스 push</span></span>
+    }
+    <span class="cm">// 스택 잔여분은 ans = -1 (초기화됨)</span>
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++)
+        <span class="fn">printf</span>(<span class="st">"%d%c"</span>, ans[i], i&lt;n-<span class="nm">1</span>?<span class="st">' '</span>:<span class="st">'\n'</span>);
+
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+</pre></div>
+<div class="card"><h4>실행 예시</h4>
+<p>입력: <code>8 / 3 1 4 1 5 9 2 6</code></p>
+<p>출력: <code style="color:var(--jade);">4 4 5 5 9 -1 6 -1</code></p>
+<p>시간복잡도: <strong style="color:var(--coral);">O(n)</strong> &nbsp;|&nbsp; 공간복잡도: <strong style="color:var(--coral);">O(n)</strong></p>
+</div>`},
+
+{t:'⑥ C++ STL stack 버전',
+ b:`<div class="co cp" style="background:var(--indigo-l);border-color:var(--indigo);"><strong>C++에서는 STL stack을 쓰면 더 간결해!</strong> 정올 C++ 응시자라면 이 버전도 알아두자.</div>
+<div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div><span>nge_stl.cpp — C++ STL stack 버전</span></div>
+<pre><span class="kw">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stack&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n; cin &gt;&gt; n;
+    vector&lt;<span class="tp">int</span>&gt; A(n), ans(n, <span class="nm">-1</span>);  <span class="cm">// ans를 -1로 초기화</span>
+    <span class="kw">for</span> (<span class="tp">int</span>&amp; x : A) cin &gt;&gt; x;
+
+    stack&lt;<span class="tp">int</span>&gt; stk;              <span class="cm">// 인덱스 저장 스택</span>
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++) {
+<span class="hl">        <span class="kw">while</span> (!stk.<span class="fn">empty</span>() &amp;&amp; A[stk.<span class="fn">top</span>()] &lt; A[i]) {</span>
+<span class="hl">            ans[stk.<span class="fn">top</span>()] = A[i];  <span class="cm">// 오큰수 기록</span></span>
+<span class="hl">            stk.<span class="fn">pop</span>();              <span class="cm">// pop (반환값 없음!)</span></span>
+<span class="hl">        }</span>
+<span class="hl2">        stk.<span class="fn">push</span>(i);               <span class="cm">// 현재 인덱스 push</span></span>
+    }
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; n; i++)
+        cout &lt;&lt; ans[i] &lt;&lt; <span class="st">" \n"</span>[i==n-<span class="nm">1</span>];
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+</pre></div>
+<div class="co ca"><strong>C vs C++ 비교:</strong> C는 배열+top 직접 관리, C++은 STL stack 사용.<br>
+STL <code>pop()</code>은 값을 반환하지 않으니 반드시 <code>top()</code>으로 읽고 <code>pop()</code>으로 제거!</div>`}
+];
+
+let curStep = 0;
+function goStep(n) {
+  curStep = n;
+  document.getElementById('code-panel').innerHTML =
+    `<div class="card"><h3>${STEPS[n].t}</h3>${STEPS[n].b}</div>`;
+  document.querySelectorAll('#sbar-code .sbt').forEach((b,i)=>{
+    b.classList.toggle('active', i===n);
+    b.classList.toggle('done',   i<n);
+  });
+}
+goStep(0);
+
+/* ═══════════════════════════════════════
+   SIMULATOR
+═══════════════════════════════════════ */
+let simArr = [3,1,4,1,5,9,2,6];
+let simAns, simStk, simI, simDone, autoTimer;
+
+function toggleInput() {
+  const w = document.getElementById('arr-input-wrap');
+  w.classList.toggle('show');
+  if (w.classList.contains('show'))
+    document.getElementById('arr-text').value = simArr.join(' ');
+}
+function applyCustomArr() {
+  const raw = document.getElementById('arr-text').value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x));
+  if (raw.length < 2 || raw.length > 15) { alert('2~15개 숫자를 입력해줘!'); return; }
+  simArr = raw;
+  document.getElementById('arr-input-wrap').classList.remove('show');
+  simReset();
+}
+
+function simReset() {
+  clearTimeout(autoTimer);
+  simAns = simArr.map(()=>null);
+  simStk = [];  // stores indices
+  simI   = 0;
+  simDone = false;
+  document.getElementById('btn-next').disabled = false;
+  document.getElementById('btn-auto').disabled = false;
+  renderSimAll();
+  const log = document.getElementById('sim-log');
+  log.innerHTML = '<span class="l-info">▶ "다음 단계" 버튼을 눌러서 시작!</span>';
+  document.getElementById('s-cond').textContent = '대기 중';
+  document.getElementById('sim-prog').style.width = '0%';
+  document.getElementById('sim-progress-label').textContent = `진행: 0 / ${simArr.length} 원소 처리`;
+}
+
+function renderSimArr() {
+  const n = simArr.length;
+  const box = document.getElementById('sim-arr');
+  box.innerHTML = simArr.map((v,i)=>{
+    let cls = '';
+    if (i === simI && !simDone)      cls = 'state-current';
+    else if (simAns[i] !== null)     cls = 'state-answered';
+    else if (simStk.includes(i))     cls = 'state-instack';
+    return `<div class="arr-cell ${cls}"><span class="cv">${v}</span><span class="ci2">[${i}]</span></div>`;
+  }).join('');
+}
+function renderSimAns() {
+  const box = document.getElementById('sim-ans');
+  box.innerHTML = simArr.map((_,i)=>{
+    if (simAns[i] === null) return `<div class="ans-cell">?</div>`;
+    if (simAns[i] === -1)   return `<div class="ans-cell filled-neg">-1</div>`;
+    return `<div class="ans-cell filled">${simAns[i]}</div>`;
+  }).join('');
+}
+function renderSimStk() {
+  const box = document.getElementById('sim-stk');
+  if (simStk.length === 0) {
+    box.innerHTML = '<div class="stk-empty">비어 있음</div>';
+  } else {
+    box.innerHTML = simStk.map((idx,pos)=>{
+      const isTop = pos === simStk.length-1;
+      return `<div class="stk-cell ${isTop?'stk-top':''}">i=${idx} &nbsp; A=${simArr[idx]}</div>`;
+    }).join('');
+  }
+  document.getElementById('s-top').textContent  = simStk.length > 0 ? simStk[simStk.length-1] : '-1';
+  document.getElementById('s-size').textContent = simStk.length;
+}
+function renderSimAll() { renderSimArr(); renderSimAns(); renderSimStk(); }
+
+function addLog(msg, cls) {
+  const log = document.getElementById('sim-log');
+  const d = document.createElement('div');
+  d.className = cls; d.innerHTML = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function simNext() {
+  if (simDone) return;
+  const n = simArr.length;
+
+  if (simI >= n) {
+    // finalize: mark remaining stack as -1
+    while (simStk.length) {
+      const idx = simStk.pop();
+      simAns[idx] = -1;
+    }
+    simDone = true;
+    document.getElementById('btn-next').disabled = true;
+    document.getElementById('btn-auto').disabled = true;
+    renderSimAll();
+    addLog(`✅ 완료! 결과: [ ${simAns.join(', ')} ]`, 'l-done');
+    document.getElementById('sim-prog').style.width = '100%';
+    document.getElementById('sim-progress-label').textContent = `진행: ${n} / ${n} 원소 처리 완료`;
+    document.getElementById('s-cond').textContent = '완료';
+    return;
+  }
+
+  const i = simI;
+  addLog(`── i=${i}, A[i]=${simArr[i]} 처리 시작 ──`, 'l-step');
+
+  // pop phase
+  let popped = false;
+  while (simStk.length && simArr[simStk[simStk.length-1]] < simArr[i]) {
+    const idx = simStk.pop();
+    simAns[idx] = simArr[i];
+    addLog(`  ▼ pop  i=${idx} (A=${simArr[idx]}) → 오큰수 = ${simArr[i]}`, 'l-pop');
+    popped = true;
+  }
+  if (!popped) {
+    if (simStk.length)
+      addLog(`  스택 top A[${simStk[simStk.length-1]}]=${simArr[simStk[simStk.length-1]]} ≥ ${simArr[i]} → pop 안 함`, 'l-info');
+    else
+      addLog(`  스택 비어있음 → pop 없음`, 'l-info');
+  }
+
+  // push
+  simStk.push(i);
+  addLog(`  ▲ push i=${i} (A[${i}]=${simArr[i]}) → 스택에 추가`, 'l-push');
+
+  simI++;
+  renderSimAll();
+  const condEl = document.getElementById('s-cond');
+  if (simI < n) {
+    if (simStk.length) {
+      const topV = simArr[simStk[simStk.length-1]];
+      condEl.innerHTML = `다음: A[${simI}]=${simArr[simI]}<br>top A=${topV}<br>${simArr[simI]>topV?'<span style="color:var(--coral);font-weight:700;">→ pop 조건 성립!</span>':'→ pop 없음'}`;
+    }
+  }
+  document.getElementById('sim-prog').style.width = (simI/n*100)+'%';
+  document.getElementById('sim-progress-label').textContent = `진행: ${simI} / ${n} 원소 처리`;
+}
+
+function simAuto() {
+  simReset();
+  const n = simArr.length + 1;
+  let cnt = 0;
+  function tick() { simNext(); cnt++; if (cnt <= n) autoTimer = setTimeout(tick, 700); }
+  tick();
+}
+
+simReset();
+
+/* ═══════════════════════════════════════
+   TRACE PAGE
+═══════════════════════════════════════ */
+const TRACE_ARR = [2,4,3,1,5];
+const TRACE_STEPS = [
+  { i:0, action:'push',   stk:[0],     ans:[-1,-1,-1,-1,-1], desc:'A[0]=2 → 스택 비어있음 → push(0)', pop:null },
+  { i:1, action:'pop+push', stk:[1],   ans:[-1,-1,-1,-1,-1], desc:'A[1]=4 > A[stk[top]]=A[0]=2 → pop(0), ans[0]=4 → push(1)', pop:{idx:0,nge:4} },
+  { i:2, action:'push',   stk:[1,2],   ans:[4,-1,-1,-1,-1],  desc:'A[2]=3 < A[stk[top]]=A[1]=4 → pop 없음 → push(2)', pop:null },
+  { i:3, action:'push',   stk:[1,2,3], ans:[4,-1,-1,-1,-1],  desc:'A[3]=1 < A[stk[top]]=A[2]=3 → pop 없음 → push(3)', pop:null },
+  { i:4, action:'pop+push', stk:[],    ans:[4,-1,-1,-1,-1],  desc:'A[4]=5 > 1,3,4 → pop(3)→ans[3]=5, pop(2)→ans[2]=5, pop(1)→ans[1]=5 → push(4)', pop:{idx:'1,2,3',nge:5} },
+  { i:'끝', action:'finalize', stk:[], ans:[4,5,5,5,-1], desc:'루프 종료 → 스택 남은 인덱스 4 → ans[4]=-1 (이미 초기화됨)', pop:null }
+];
+
+function renderTrace() {
+  const c = document.getElementById('trace-container');
+  if (c.dataset.rendered) return;
+  c.dataset.rendered = '1';
+
+  let html = `<div class="card" style="margin-bottom:18px;">
+    <h4 style="margin-bottom:12px;">A = [ ${TRACE_ARR.map((v,i)=>`<span style="font-family:var(--mono);font-weight:700;">${v}</span>`).join(', ')} ]</h4>`;
+
+  TRACE_STEPS.forEach((s,si) => {
+    const ansStr = s.ans.map((v,i)=>`<span style="font-family:var(--mono);font-weight:700;color:${v===-1?'var(--t4)':'var(--jade)'};">${v}</span>`).join(', ');
+    const stkStr = s.stk.map(idx=>`<span style="font-family:var(--mono);font-weight:700;color:var(--sky);">i=${idx}(${TRACE_ARR[idx]})</span>`).join(', ') || '<span style="color:var(--t4);">비어있음</span>';
+    const iColor = s.action==='finalize' ? 'var(--t4)' : 'var(--amber)';
+    const aColor = s.action.includes('pop') ? 'var(--coral)' : s.action==='finalize' ? 'var(--t4)' : 'var(--sky)';
+    const aLabel = s.action==='pop+push' ? '<span style="color:var(--coral);">pop+</span><span style="color:var(--sky);">push</span>'
+                 : s.action==='push' ? '<span style="color:var(--sky);">push</span>'
+                 : '<span style="color:var(--indigo);">finalize</span>';
+
+    html += `<div style="display:flex;gap:0;margin-bottom:8px;border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;">
+      <div style="background:var(--surf);padding:12px 14px;width:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:${iColor};">${s.i}</div>
+      <div style="padding:10px 14px;width:110px;flex-shrink:0;display:flex;align-items:center;font-size:13px;">${aLabel}</div>
+      <div style="padding:10px 14px;flex:1;font-size:13px;color:var(--t2);border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);">${s.desc}</div>
+      <div style="padding:10px 14px;min-width:130px;font-size:13px;border-right:1.5px solid var(--bd);">스택: [${stkStr}]</div>
+      <div style="padding:10px 14px;min-width:160px;font-size:13px;">ans: [${ansStr}]</div>
+    </div>`;
+  });
+
+  html += `</div>
+  <div class="co cj">
+    <strong>최종 결과</strong>: ans = [ <span style="font-family:var(--mono);color:var(--jade);font-weight:700;">4, 5, 5, 5, -1</span> ]<br>
+    A[0]=2의 오큰수=4, A[1..3]의 오큰수=5, A[4]=5의 오큰수=-1 (없음)
+  </div>`;
+  c.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+const QUIZ = [
+  {q:'A=[5,3,8,4,6]에서 A[0]=5의 오큰수는?',
+   opts:['3','8','4','없음(-1)'],ans:1,
+   fb:'5보다 오른쪽에서 처음 큰 수는 A[2]=8이야!'},
+  {q:'단조 감소 스택의 pop 조건은? (현재 원소 A[i]가 스택 top보다 클 때)',
+   opts:['A[stk[top]] > A[i]','A[stk[top]] < A[i]','stk[top] > i','A[i] == 0'],ans:1,
+   fb:'스택 top의 값이 현재 A[i]보다 작으면 pop! 그 순간이 오큰수를 찾은 순간이야.'},
+  {q:'오큰수 알고리즘의 시간복잡도는?',
+   opts:['O(1)','O(log n)','O(n)','O(n²)'],ans:2,
+   fb:'각 원소는 정확히 1번 push, 1번 pop → 총 2n번 = O(n)!'},
+  {q:'스택에 인덱스를 저장하는 이유는?',
+   opts:['값이 크기 때문에','ans[index]에 오큰수를 기록하기 위해','속도가 빠르기 때문에','정렬이 필요해서'],ans:1,
+   fb:'pop 시 꺼낸 인덱스로 ans[idx]=A[i] 처럼 정답 배열에 바로 기록할 수 있어!'},
+  {q:'A=[1,2,3,4,5]의 오큰수 결과는?',
+   opts:['[2,3,4,5,-1]','[-1,-1,-1,-1,-1]','[5,5,5,5,-1]','[2,3,4,5,1]'],ans:0,
+   fb:'오름차순이라 각 원소의 오큰수가 바로 다음 원소야. A[4]=5만 오른쪽이 없어서 -1!'},
+  {q:'A=[5,4,3,2,1]의 오큰수 결과는?',
+   opts:['[4,3,2,1,-1]','[-1,-1,-1,-1,-1]','[5,5,5,5,5]','오류'],ans:1,
+   fb:'내림차순이라 어떤 원소도 오른쪽에 자신보다 큰 수가 없어 → 전부 -1!'},
+  {q:'루프 종료 후 스택에 남은 인덱스들의 오큰수는?',
+   opts:['0','마지막 원소 값','가장 큰 값','-1'],ans:3,
+   fb:'스택에 남은 = 끝까지 가도 오큰수를 못 만난 원소들 → 오큰수 없음 → -1!'},
+  {q:'다음 코드에서 잘못된 부분은?\nwhile(top != -1 && A[stk[top]] > A[i]) ans[stk[top--]] = A[i];',
+   opts:['top != -1 조건 오류','stk[top--] 오류','> 를 < 로 바꿔야 함','ans 배열 오류'],ans:2,
+   fb:'오큰수는 현재 값이 top보다 클 때(>) pop해야 해. > 를 쓰면 현재 값이 더 작을 때 pop하게 돼!'},
+  {q:'A=[3,1,4,1,5,9,2,6], i=4(A[4]=5) 처리 시 pop되는 인덱스는?',
+   opts:['0번만','1,3번','2,3번','없음'],ans:1,
+   fb:'i=4 처리 전 스택: [0→3, 1→1, 3→1]. A[3]=1<5 pop, A[1]=1<5 pop. A[0]=3<5 pop. 전부 pop돼! 실제론 0,1,3 모두 pop.'},
+  {q:'오큰수 알고리즘에서 ans 배열을 -1로 초기화하는 이유는?',
+   opts:['0이 기본값이면 오류 나서','루프 후 스택 잔여 처리를 생략하기 위해','메모리 절약을 위해','C 언어 규칙'],ans:1,
+   fb:'초기화 덕분에 루프 후 스택에 남은 인덱스들을 따로 처리하지 않아도 돼. 이미 -1이 설정되어 있거든!'}
+];
+
+let qScore=0, qDone=0;
+function renderQuiz() {
+  document.getElementById('quiz-box').innerHTML = QUIZ.map((q,qi)=>`
+    <div class="qcard" id="qc-${qi}">
+      <div class="qtext">Q${qi+1}. ${q.q.replace(/\n/g,'<br>')}</div>
+      <div class="qopts">${q.opts.map((o,oi)=>
+        `<div class="qopt" id="qo-${qi}-${oi}" onclick="ansQ(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</div>`
+      ).join('')}</div>
+      <div class="qfb" id="qfb-${qi}"></div>
+    </div>`).join('');
+}
+function ansQ(qi,oi) {
+  if (document.getElementById(`qo-${qi}-0`).classList.contains('locked')) return;
+  const q = QUIZ[qi];
+  document.querySelectorAll(`#qc-${qi} .qopt`).forEach(e=>e.classList.add('locked'));
+  document.getElementById(`qo-${qi}-${oi}`).classList.add(oi===q.ans?'correct':'wrong');
+  if (oi!==q.ans) document.getElementById(`qo-${qi}-${q.ans}`).classList.add('correct');
+  if (oi===q.ans) { qScore++; document.getElementById('qscore').textContent=qScore; }
+  const fb = document.getElementById(`qfb-${qi}`);
+  fb.className = 'qfb show '+(oi===q.ans?'ok':'bad');
+  fb.innerHTML = (oi===q.ans?'✓ 정답! ':'✗ 오답. ')+q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width = (qDone/QUIZ.length*100)+'%';
+  document.getElementById('qplabel').textContent = `${qDone} / ${QUIZ.length} 풀이`;
+}
+renderQuiz();
+
+/* ═══════════════════════════════════════
+   CHALLENGES
+═══════════════════════════════════════ */
+const CHS = [
+  {
+    title:'도전 1 — 오큰수 완성하기',
+    tags:['tc:정올 필수','tj:실버'],
+    desc:'아래 코드의 빈칸을 채워서 오큰수 알고리즘을 완성해봐!<br><br><strong>입력:</strong> <code>8 / 3 1 4 1 5 9 2 6</code><br><strong>출력:</strong> <code style="color:var(--jade);">4 4 5 5 9 -1 6 -1</code>',
+    hint:'while 조건: top != -1 && A[stk[top]] < A[i] / pop 시: ans[stk[top--]] = A[i] / push: stk[++top] = i',
+    start:`#include <stdio.h>
+#define MAX 1000001
+
+int A[MAX], ans[MAX], stk[MAX];
+int top = -1;
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &A[i]);
+        ans[i] = -1;  // 기본값: 오큰수 없음
+    }
+
+    for (int i = 0; i < n; i++) {
+        // TODO: while 조건 작성
+        // 스택이 비어있지 않고 AND 스택 top의 값이 현재보다 작으면
+        while ( /* 조건을 작성해봐! */ ) {
+            // TODO: pop하고 오큰수 기록
+            
+        }
+        // TODO: 현재 인덱스 push
+        
+    }
+
+    for (int i = 0; i < n; i++)
+        printf("%d%c", ans[i], i < n-1 ? ' ' : '\\n');
+    return 0;
+}`
+  },
+  {
+    title:'도전 2 — 오큰수 인덱스 버전',
+    tags:['tc:중급','ti:실버+'],
+    desc:'값 대신 <strong>오큰수의 인덱스</strong>를 출력해라. 오큰수가 없으면 -1.<br><br><strong>입력:</strong> <code>5 / 2 4 3 1 5</code><br><strong>출력:</strong> <code style="color:var(--jade);">1 4 4 4 -1</code><br><span style="font-size:14px;color:var(--t3);">(A[0]=2의 오큰수 A[1]=4 → 인덱스 1 출력)</span>',
+    hint:'ans에 값 대신 인덱스를 저장해. pop 시 ans[stk[top--]] = i; (A[i]가 아니라 i를 저장!)',
+    start:`#include <stdio.h>
+#define MAX 1000001
+
+int A[MAX], ans[MAX], stk[MAX];
+int top = -1;
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &A[i]);
+        ans[i] = -1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        while (top != -1 && A[stk[top]] < A[i]) {
+            // TODO: 값이 아닌 인덱스 i를 저장!
+            ans[stk[top--]] = /* ??? */;
+        }
+        stk[++top] = i;
+    }
+
+    for (int i = 0; i < n; i++)
+        printf("%d%c", ans[i], i < n-1 ? ' ' : '\\n');
+    return 0;
+}`
+  },
+  {
+    title:'도전 3 — 오큰수 개수 세기',
+    tags:['tc:고급','ta:골드 입문'],
+    desc:'각 원소에 대해 <strong>자신보다 오른쪽에 있는 오큰수의 개수</strong>를 구해라.<br><br><strong>입력:</strong> <code>5 / 2 4 3 1 5</code><br><strong>출력:</strong> <code style="color:var(--jade);">3 1 1 1 0</code><br><span style="font-size:14px;color:var(--t3);">(A[0]=2: 오른쪽에서 2보다 큰 수 4,3... 아니 4,5만! 직접 구해봐 😄)</span>',
+    hint:'이중 for문 O(n²)으로 먼저 구현해보자. 각 i에 대해 j=i+1부터 n-1까지 A[j]>A[i]이면 cnt++. 단조 스택 O(n) 도전은 보너스!',
+    start:`#include <stdio.h>
+#define MAX 100001
+
+int A[MAX], ans[MAX];
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+        scanf("%d", &A[i]);
+
+    // O(n²) 이중 for문으로 먼저 구현해봐!
+    for (int i = 0; i < n; i++) {
+        int cnt = 0;
+        // TODO: j = i+1 부터 n-1까지
+        // A[j] > A[i] 이면 cnt++
+        
+        ans[i] = cnt;
+    }
+
+    for (int i = 0; i < n; i++)
+        printf("%d%c", ans[i], i < n-1 ? ' ' : '\\n');
+    return 0;
+}`
+  }
+];
+
+function renderCH() {
+  document.getElementById('ch-box').innerHTML = CHS.map((c,ci)=>`
+    <div class="chc">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <h3 style="margin:0;">${c.title}</h3>
+        ${c.tags.map(t=>{const[cls,lbl]=t.split(':');return`<span class="tag ${cls}">${lbl}</span>`;}).join('')}
+      </div>
+      <p style="font-size:16px;margin-bottom:18px;">${c.desc}</p>
+      <div class="chg">
+        <div>
+          <div class="sl">코드 작성</div>
+          <textarea id="cht-${ci}" rows="24" spellcheck="false">${c.start}</textarea>
+          <button class="rbtn" onclick="runCH(${ci})">▶ 제출 & 분석</button>
+          <div class="ht" onclick="document.getElementById('chh-${ci}').classList.toggle('show')">💡 힌트 보기</div>
+          <div class="hb" id="chh-${ci}">${c.hint}</div>
+        </div>
+        <div>
+          <div class="sl">분석 결과</div>
+          <div class="ob" id="cho-${ci}">▶ 코드를 작성하고 제출 버튼을 눌러봐!</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function runCH(ci) {
+  const code = document.getElementById('cht-'+ci).value;
+  const out  = document.getElementById('cho-'+ci);
+  let r='', ok=true;
+
+  if (ci===0) {
+    const hasWhile    = code.includes('while') && code.includes('top');
+    const hasLT       = /A\[stk\[top\]\]\s*<\s*A\[i\]/.test(code) || /A\[stk\[top\]\]<A\[i\]/.test(code);
+    const hasPop      = code.includes('top--') || code.includes('top -');
+    const hasAns      = code.includes('ans[') && code.includes('A[i]');
+    const hasPush     = code.includes('++top') || code.includes('top+1');
+    if (!hasWhile) { r+='❌ while 루프가 없어! 단조 스택의 핵심이야.\n'; ok=false; }
+    else if (!hasLT)  { r+='❌ 조건이 틀렸어! A[stk[top]] < A[i] 로 작성해야 해.\n'; ok=false; }
+    else if (!hasPop) { r+='❌ pop 로직(top--)이 없어!\n'; ok=false; }
+    else if (!hasAns) { r+='❌ ans[idx] = A[i] 로 오큰수를 기록해야 해!\n'; ok=false; }
+    else if (!hasPush){ r+='❌ push(++top) 로직이 없어!\n'; ok=false; }
+    if (ok) r=`✅ 오큰수 코드 완성!
+
+while 조건: A[stk[top]] < A[i]  ✓
+pop + 오큰수 기록:               ✓
+push (++top):                    ✓
+
+입력 [3,1,4,1,5,9,2,6] 시뮬:
+i=0, A=3: push → stk=[0]
+i=1, A=1: 3>1, 조건 불만족 → push → stk=[0,1]
+i=2, A=4: pop(1)→ans[1]=4, pop(0)→ans[0]=4 → push → stk=[2]
+i=3, A=1: 4>1, 불만족 → push → stk=[2,3]
+i=4, A=5: pop(3)→ans[3]=5, pop(2)→ans[2]=5 → push → stk=[4]
+i=5, A=9: pop(4)→ans[4]=9 → push → stk=[5]
+i=6, A=2: 9>2, 불만족 → push → stk=[5,6]
+i=7, A=6: pop(6)→ans[6]=6 → push → stk=[5,7]
+남은[5,7]→ ans=-1 (초기화됨)
+
+출력: 4 4 5 5 9 -1 6 -1  ✓`;
+  } else if (ci===1) {
+    const hasI = /ans\[stk\[top--\]\]\s*=\s*i/.test(code) || /ans\[stk\[top\]\]\s*=\s*i/.test(code);
+    if (!hasI) { r+='❌ ans[stk[top--]] = i 로 인덱스를 저장해야 해! A[i]가 아니라 i야.\n'; ok=false; }
+    if (ok) r=`✅ 인덱스 버전 완성!
+
+핵심 변경: ans[stk[top--]] = i (인덱스 저장)  ✓
+
+입력 [2,4,3,1,5] 시뮬:
+i=0, A=2: push → stk=[0]
+i=1, A=4: pop(0)→ans[0]=1(인덱스!) → push → stk=[1]
+i=2, A=3: 4>3, 불만족 → push → stk=[1,2]
+i=3, A=1: 불만족 → push → stk=[1,2,3]
+i=4, A=5: pop(3)→ans[3]=4, pop(2)→ans[2]=4, pop(1)→ans[1]=4 → push → stk=[4]
+남은[4]→ ans=-1
+
+출력: 1 4 4 4 -1  ✓`;
+  } else {
+    const hasOuter = (code.includes('for') && code.includes('i')) ;
+    const hasInner = code.split('for').length >= 3 || (code.includes('for') && code.includes('j') && code.includes('i+1'));
+    const hasCnt   = code.includes('cnt') || code.includes('count');
+    const hasCmp   = code.includes('A[j]') && (code.includes('> A[i]') || code.includes('>A[i]'));
+    if (!hasOuter) { r+='❌ 외부 for 루프(i)가 없어!\n'; ok=false; }
+    else if (!hasInner) { r+='❌ 내부 for 루프(j = i+1부터)가 없어!\n'; ok=false; }
+    else if (!hasCnt)   { r+='❌ cnt 카운터 변수가 없어!\n'; ok=false; }
+    else if (!hasCmp)   { r+='❌ A[j] > A[i] 비교가 없어!\n'; ok=false; }
+    if (ok) r=`✅ 오큰수 개수 세기 완성!
+
+이중 for문 O(n²) 구현:
+외부 for i:   ✓
+내부 for j:   ✓
+비교 A[j]>A[i]: ✓
+카운터 cnt:   ✓
+
+입력 [2,4,3,1,5] 시뮬:
+i=0, A=2: j=1→4>2✓, j=2→3>2✓, j=3→1>2✗, j=4→5>2✓ → cnt=3
+i=1, A=4: j=2→3>4✗, j=3→1>4✗, j=4→5>4✓ → cnt=1
+i=2, A=3: j=3→1>3✗, j=4→5>3✓ → cnt=1
+i=3, A=1: j=4→5>1✓ → cnt=1
+i=4, A=5: j 없음 → cnt=0
+
+출력: 3 1 1 1 0  ✓
+
+보너스: 단조 스택 O(n) 버전으로도 구현해봐!`;
+  }
+  out.className = 'ob '+(ok?'oo':'oe');
+  out.textContent = r;
+}
+renderCH();
+</script>
+</body>
+</html>
