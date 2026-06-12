@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 #8607 상자 보관 - 인터랙티브 C언어 해설</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+        background: #f4f7fb;
+        color: #111827;
+        font-size: 18px;
+        line-height: 1.75;
+    }
+    header {
+        background: linear-gradient(135deg, #1e293b, #2563eb);
+        color: white;
+        text-align: center;
+        padding: 34px 20px;
+    }
+    header h1 { margin: 0; font-size: 34px; }
+    header p { margin: 10px 0 0; font-size: 19px; }
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+    section {
+        background: white;
+        border-radius: 18px;
+        padding: 26px;
+        margin: 22px 0;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #dbe4f0;
+    }
+    h2 {
+        margin-top: 0;
+        color: #1e3a8a;
+        border-left: 8px solid #2563eb;
+        padding-left: 14px;
+        font-size: 28px;
+    }
+    h3 {
+        color: #0f172a;
+        font-size: 23px;
+        margin-top: 26px;
+    }
+    .box {
+        background: #eff6ff;
+        border: 2px solid #bfdbfe;
+        padding: 18px;
+        border-radius: 14px;
+        margin: 16px 0;
+    }
+    .good {
+        background: #ecfdf5;
+        border-color: #bbf7d0;
+    }
+    .warn {
+        background: #fff7ed;
+        border-color: #fed7aa;
+    }
+    .formula {
+        background: #111827;
+        color: #f9fafb;
+        padding: 16px;
+        border-radius: 12px;
+        font-family: Consolas, monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-size: 17px;
+    }
+    pre {
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 18px;
+        border-radius: 14px;
+        overflow-x: auto;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+    code { font-family: Consolas, monospace; }
+    input, textarea, button {
+        font-size: 17px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #94a3b8;
+    }
+    textarea {
+        width: 100%;
+        min-height: 130px;
+        font-family: Consolas, monospace;
+    }
+    button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 6px 4px 6px 0;
+    }
+    button:hover { background: #1d4ed8; }
+    .smallbtn { background: #475569; }
+    .smallbtn:hover { background: #334155; }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 14px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 9px;
+        text-align: center;
+    }
+    th {
+        background: #dbeafe;
+        color: #111827;
+    }
+    .result {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 12px;
+        white-space: pre-wrap;
+        font-family: Consolas, monospace;
+        overflow-x: auto;
+    }
+    .step {
+        border-left: 6px solid #60a5fa;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin: 15px 0;
+    }
+    .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1e3a8a;
+        font-weight: bold;
+        margin: 2px;
+    }
+    .axis {
+        margin: 24px 0;
+        padding: 18px;
+        background: #f8fafc;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        overflow-x: auto;
+    }
+    .segments {
+        min-width: 760px;
+    }
+    .bar-row {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+        height: 34px;
+    }
+    .bar-label {
+        width: 90px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+    .bar-track {
+        position: relative;
+        height: 26px;
+        flex: 1;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid #cbd5e1;
+    }
+    .bar {
+        position: absolute;
+        height: 100%;
+        background: #60a5fa;
+        border-radius: 999px;
+    }
+    .overlap-row {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+    }
+    .cell {
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+        background: white;
+        min-width: 70px;
+        text-align: center;
+        font-family: Consolas, monospace;
+    }
+    .cell.hot1 { background: #dbeafe; }
+    .cell.hot2 { background: #bfdbfe; }
+    .cell.hot3 { background: #93c5fd; }
+    .cell.hot4 { background: #60a5fa; color: white; }
+    .cell.hot5 { background: #2563eb; color: white; }
+    details {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 14px;
+        margin: 12px 0;
+    }
+    summary {
+        cursor: pointer;
+        color: #1d4ed8;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>정올 #8607 상자 보관</h1>
+    <p>구간 [c, s) 변환 + 좌표 압축 + Lazy Segment Tree 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+    <h2>1. 문제 핵심 이해</h2>
+    <p>
+        상자 A를 상자 B 안에 넣으려면 A의 크기가 B의 보관 용량보다 작거나 같아야 합니다.
+    </p>
+
+    <div class="formula">상자 A가 상자 B 안에 들어갈 조건
+
+s_A ≤ c_B</div>
+
+    <p>
+        한 상자 안에는 직접적으로 최대 한 개의 상자만 넣을 수 있으므로,
+        상자들은 여러 개의 체인으로 나누어집니다.
+    </p>
+
+    <div class="formula">작은 상자 → 더 큰 상자 → 더 큰 상자 → ...
+
+보관 비용 = 다른 상자에 들어가지 않은 상자의 개수
+          = 필요한 체인 개수</div>
+</section>
+
+<section>
+    <h2>2. 상자를 구간으로 바꾸기</h2>
+
+    <p>
+        i번 상자의 크기가 s_i, 보관 용량이 c_i라면 이 상자를 다음 구간으로 바꿉니다.
+    </p>
+
+    <div class="formula">상자 i  →  구간 [c_i, s_i)</div>
+
+    <div class="good box">
+        <p>
+            1번부터 i번 상자까지의 최소 보관 비용은
+            지금까지 나온 구간들의 <b>최대 겹침 개수</b>와 같습니다.
+        </p>
+    </div>
+
+    <p>
+        따라서 문제는 다음처럼 바뀝니다.
+    </p>
+
+    <div class="formula">상자가 하나씩 추가된다.
+각 상자마다 구간 [c_i, s_i)에 1을 더한다.
+매번 전체 구간의 최댓값을 출력한다.</div>
+</section>
+
+<section>
+    <h2>3. 예제 1 이해하기</h2>
+
+    <div class="formula">4
+6 4
+5 1
+9 8
+2 1</div>
+
+    <table>
+        <tr>
+            <th>상자</th>
+            <th>크기 s</th>
+            <th>용량 c</th>
+            <th>구간 [c, s)</th>
+        </tr>
+        <tr><td>1</td><td>6</td><td>4</td><td>[4, 6)</td></tr>
+        <tr><td>2</td><td>5</td><td>1</td><td>[1, 5)</td></tr>
+        <tr><td>3</td><td>9</td><td>8</td><td>[8, 9)</td></tr>
+        <tr><td>4</td><td>2</td><td>1</td><td>[1, 2)</td></tr>
+    </table>
+
+    <p>
+        1번과 2번 구간은 [4, 5)에서 겹치므로 최대 겹침이 2가 됩니다.
+        그래서 2번 상자까지의 답은 2입니다.
+    </p>
+</section>
+
+<section>
+    <h2>4. 인터랙티브 계산기</h2>
+    <p>
+        상자 정보를 입력하면 각 단계마다 구간 최대 겹침 개수와 정답을 보여줍니다.
+    </p>
+
+    <div class="grid">
+        <div>
+            <label><b>N</b></label><br>
+            <input id="nInput" value="4">
+        </div>
+    </div>
+
+    <p><b>상자 정보: s c 형식으로 한 줄에 하나씩 입력</b></p>
+    <textarea id="boxInput">6 4
+5 1
+9 8
+2 1</textarea>
+
+    <button onclick="solveBoxes()">계산하기</button>
+    <button class="smallbtn" onclick="loadExample(1)">예제 1</button>
+    <button class="smallbtn" onclick="loadExample(2)">예제 2</button>
+    <button class="smallbtn" onclick="loadExample(3)">예제 3</button>
+
+    <div id="tableResult"></div>
+    <div id="visualResult" class="axis"></div>
+    <div id="textResult" class="result"></div>
+</section>
+
+<section>
+    <h2>5. 좌표 압축이 필요한 이유</h2>
+    <p>
+        s_i와 c_i는 최대 10억입니다.
+        따라서 실제 좌표를 배열 인덱스로 쓰면 메모리가 너무 커집니다.
+    </p>
+
+    <div class="warn box">
+        <p>
+            등장하는 c_i와 s_i만 모아서 정렬한 뒤 작은 번호로 바꾸면 됩니다.
+        </p>
+    </div>
+
+    <div class="formula">예: 좌표가 1, 2, 4, 5, 6, 8, 9라면
+
+1 → 0
+2 → 1
+4 → 2
+5 → 3
+6 → 4
+8 → 5
+9 → 6</div>
+</section>
+
+<section>
+    <h2>6. 코드 작성 단계</h2>
+
+    <div class="step">
+        <h3>1단계. 배열 선언</h3>
+<pre><code>#define MAXN 200000
+#define MAXC 400005
+
+int s[MAXN + 1];
+int c[MAXN + 1];
+
+int coord[MAXC];
+int tree[MAXC * 4];
+int lazy[MAXC * 4];</code></pre>
+        <p>
+            각 상자마다 c와 s를 좌표 압축에 넣으므로 좌표는 최대 2N개입니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>2단계. 좌표 압축</h3>
+<pre><code>coord[idx++] = c[i];
+coord[idx++] = s[i];
+
+qsort(coord, idx, sizeof(int), compare_int);
+
+int M = 0;
+
+for (int i = 0; i &lt; idx; i++) {
+    if (i == 0 || coord[i] != coord[i - 1]) {
+        coord[M++] = coord[i];
+    }
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>3단계. 구간 [c, s)를 세그먼트 트리 인덱스로 바꾸기</h3>
+<pre><code>int left = lower_bound_coord(c[i], M);
+int right = lower_bound_coord(s[i], M) - 1;</code></pre>
+        <p>
+            구간은 [c, s)이므로 s는 포함하지 않습니다.
+            그래서 오른쪽 끝은 s의 위치에서 1을 뺍니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>4단계. 구간에 1 더하기</h3>
+<pre><code>update(1, 0, M - 2, left, right, 1);</code></pre>
+        <p>
+            좌표가 M개라면 실제 관리할 구간 칸은 M-1개입니다.
+            그래서 세그먼트 트리는 0부터 M-2까지 관리합니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>5단계. 정답 출력</h3>
+<pre><code>printf("%d\n", tree[1]);</code></pre>
+        <p>
+            tree[1]은 전체 구간의 최댓값입니다.
+            이것이 현재까지 상자들의 최소 보관 비용입니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>7. 정답 C 코드</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MAXN 200000
+#define MAXC 400005
+
+int N;
+int s[MAXN + 1];
+int c[MAXN + 1];
+
+int coord[MAXC];
+int tree[MAXC * 4];
+int lazy[MAXC * 4];
+
+int compare_int(const void *a, const void *b) {
+    int x = *(int *)a;
+    int y = *(int *)b;
+
+    if (x &lt; y) return -1;
+    if (x &gt; y) return 1;
+    return 0;
+}
+
+int lower_bound_coord(int value, int M) {
+    int left = 0;
+    int right = M - 1;
+    int answer = M;
+
+    while (left &lt;= right) {
+        int mid = (left + right) / 2;
+
+        if (coord[mid] &gt;= value) {
+            answer = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return answer;
+}
+
+void push(int node) {
+    if (lazy[node] != 0) {
+        int value = lazy[node];
+
+        tree[node * 2] += value;
+        lazy[node * 2] += value;
+
+        tree[node * 2 + 1] += value;
+        lazy[node * 2 + 1] += value;
+
+        lazy[node] = 0;
+    }
+}
+
+void update(int node, int start, int end, int left, int right, int value) {
+    if (right &lt; start || end &lt; left) {
+        return;
+    }
+
+    if (left &lt;= start &amp;&amp; end &lt;= right) {
+        tree[node] += value;
+        lazy[node] += value;
+        return;
+    }
+
+    push(node);
+
+    int mid = (start + end) / 2;
+
+    update(node * 2, start, mid, left, right, value);
+    update(node * 2 + 1, mid + 1, end, left, right, value);
+
+    if (tree[node * 2] &gt; tree[node * 2 + 1]) {
+        tree[node] = tree[node * 2];
+    } else {
+        tree[node] = tree[node * 2 + 1];
+    }
+}
+
+int main() {
+    scanf("%d", &amp;N);
+
+    int idx = 0;
+
+    for (int i = 1; i &lt;= N; i++) {
+        scanf("%d %d", &amp;s[i], &amp;c[i]);
+
+        coord[idx++] = c[i];
+        coord[idx++] = s[i];
+    }
+
+    qsort(coord, idx, sizeof(int), compare_int);
+
+    int M = 0;
+
+    for (int i = 0; i &lt; idx; i++) {
+        if (i == 0 || coord[i] != coord[i - 1]) {
+            coord[M++] = coord[i];
+        }
+    }
+
+    for (int i = 1; i &lt;= N; i++) {
+        int left = lower_bound_coord(c[i], M);
+        int right = lower_bound_coord(s[i], M) - 1;
+
+        if (left &lt;= right) {
+            update(1, 0, M - 2, left, right, 1);
+        }
+
+        printf("%d\n", tree[1]);
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+    <h2>8. 정답 코드 해설</h2>
+
+    <details open>
+        <summary>1. 구간 [c, s)를 사용하는 이유</summary>
+        <p>
+            상자의 용량 c와 크기 s 사이의 구간이 이 상자가 체인을 하나 필요로 하는 영역입니다.
+            여러 상자의 구간이 같은 위치에서 겹치면, 그만큼 동시에 다른 체인이 필요합니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>2. M - 2까지 업데이트하는 이유</summary>
+        <p>
+            좌표가 M개라면 실제 구간은 좌표와 좌표 사이이므로 M-1개입니다.
+            인덱스는 0부터 M-2까지입니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>3. lazy 배열의 역할</summary>
+        <p>
+            넓은 구간에 1을 더할 때 모든 칸을 직접 바꾸면 느립니다.
+            lazy 배열은 나중에 필요할 때 자식에게 값을 전달하기 위한 배열입니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>4. tree[1]이 답인 이유</summary>
+        <p>
+            tree[1]은 세그먼트 트리 전체 구간의 최댓값입니다.
+            즉, 현재까지 추가한 모든 [c, s) 구간의 최대 겹침 개수입니다.
+            이것이 최소 보관 비용입니다.
+        </p>
+    </details>
+</section>
+
+<section>
+    <h2>9. 시간복잡도</h2>
+    <table>
+        <tr><th>작업</th><th>복잡도</th></tr>
+        <tr><td>좌표 압축 정렬</td><td>O(N log N)</td></tr>
+        <tr><td>각 상자 구간 업데이트</td><td>O(log N)</td></tr>
+        <tr><td>전체</td><td>O(N log N)</td></tr>
+    </table>
+
+    <div class="good box">
+        <p>
+            N ≤ 200000이므로 Lazy Segment Tree를 사용하면 충분히 통과할 수 있습니다.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<script>
+function loadExample(num) {
+    if (num === 1) {
+        document.getElementById("nInput").value = "4";
+        document.getElementById("boxInput").value = "6 4\n5 1\n9 8\n2 1";
+    } else if (num === 2) {
+        document.getElementById("nInput").value = "6";
+        document.getElementById("boxInput").value = "3 2\n5 4\n3 2\n4 3\n4 3\n3 2";
+    } else {
+        document.getElementById("nInput").value = "8";
+        document.getElementById("boxInput").value = "13 6\n7 5\n9 4\n11 10\n4 2\n15 5\n16 7\n8 3";
+    }
+    solveBoxes();
+}
+
+function parseBoxes() {
+    const N = parseInt(document.getElementById("nInput").value.trim(), 10);
+    const lines = document.getElementById("boxInput").value.trim().split(/\n+/);
+    let boxes = [];
+
+    for (let line of lines) {
+        const parts = line.trim().split(/\s+/).map(Number);
+        if (parts.length >= 2) {
+            boxes.push({s: parts[0], c: parts[1]});
+        }
+    }
+
+    if (boxes.length !== N) {
+        throw new Error("N과 상자 개수가 다릅니다. 현재 상자 개수: " + boxes.length);
+    }
+
+    for (let i = 0; i < boxes.length; i++) {
+        if (!(boxes[i].c < boxes[i].s)) {
+            throw new Error((i + 1) + "번 상자는 c < s 조건을 만족하지 않습니다.");
+        }
+    }
+
+    return boxes;
+}
+
+function solveBoxes() {
+    const tableResult = document.getElementById("tableResult");
+    const visualResult = document.getElementById("visualResult");
+    const textResult = document.getElementById("textResult");
+
+    try {
+        const boxes = parseBoxes();
+        let coords = [];
+
+        boxes.forEach(b => {
+            coords.push(b.c);
+            coords.push(b.s);
+        });
+
+        coords = [...new Set(coords)].sort((a, b) => a - b);
+
+        let counts = new Array(coords.length - 1).fill(0);
+        let rows = [];
+        let text = "";
+
+        text += "좌표 압축 결과\n";
+        coords.forEach((v, i) => {
+            text += v + " → " + i + "\n";
+        });
+        text += "\n";
+
+        for (let i = 0; i < boxes.length; i++) {
+            const b = boxes[i];
+            const left = coords.indexOf(b.c);
+            const right = coords.indexOf(b.s) - 1;
+
+            for (let j = left; j <= right; j++) {
+                counts[j]++;
+            }
+
+            const answer = counts.length ? Math.max(...counts) : 1;
+
+            rows.push({
+                idx: i + 1,
+                s: b.s,
+                c: b.c,
+                interval: "[" + b.c + ", " + b.s + ")",
+                left,
+                right,
+                answer,
+                counts: counts.slice()
+            });
+
+            text += (i + 1) + "번 상자 추가: [" + b.c + ", " + b.s + ")\n";
+            text += "업데이트 인덱스: " + left + " ~ " + right + "\n";
+            text += "현재 구간별 겹침: " + counts.join(" ") + "\n";
+            text += "정답: " + answer + "\n\n";
+        }
+
+        let html = "<h3>단계별 결과표</h3>";
+        html += "<table><tr><th>i</th><th>s</th><th>c</th><th>구간</th><th>압축 left</th><th>압축 right</th><th>출력 답</th></tr>";
+        rows.forEach(r => {
+            html += `<tr><td>${r.idx}</td><td>${r.s}</td><td>${r.c}</td><td>${r.interval}</td><td>${r.left}</td><td>${r.right}</td><td><b>${r.answer}</b></td></tr>`;
+        });
+        html += "</table>";
+        tableResult.innerHTML = html;
+
+        textResult.textContent = text;
+
+        drawVisual(boxes, coords, rows);
+    } catch (e) {
+        tableResult.innerHTML = "";
+        visualResult.innerHTML = "";
+        textResult.textContent = "오류: " + e.message;
+    }
+}
+
+function drawVisual(boxes, coords, rows) {
+    const visual = document.getElementById("visualResult");
+
+    if (coords.length < 2) {
+        visual.innerHTML = "좌표가 부족합니다.";
+        return;
+    }
+
+    const minV = coords[0];
+    const maxV = coords[coords.length - 1];
+    const width = maxV - minV || 1;
+
+    let html = "<h3>구간 시각화</h3>";
+    html += "<div class='segments'>";
+
+    boxes.forEach((b, i) => {
+        const left = ((b.c - minV) / width) * 100;
+        const w = ((b.s - b.c) / width) * 100;
+        html += "<div class='bar-row'>";
+        html += `<div class='bar-label'>상자 ${i + 1}</div>`;
+        html += "<div class='bar-track'>";
+        html += `<div class='bar' style='left:${left}%; width:${w}%;'></div>`;
+        html += "</div>";
+        html += `<div style='width:110px; text-align:right;'>[${b.c}, ${b.s})</div>`;
+        html += "</div>";
+    });
+
+    const last = rows[rows.length - 1];
+    html += "<h3>마지막 단계의 좌표 구간별 겹침</h3>";
+    html += "<div class='overlap-row'>";
+    for (let i = 0; i < coords.length - 1; i++) {
+        const val = last.counts[i];
+        const hot = Math.min(val, 5);
+        html += `<div class='cell hot${hot}'>[${coords[i]},${coords[i+1]})<br><b>${val}</b></div>`;
+    }
+    html += "</div>";
+
+    html += "<p><b>마지막 출력 답:</b> " + last.answer + "</p>";
+    html += "</div>";
+
+    visual.innerHTML = html;
+}
+
+solveBoxes();
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Binary Lifting 인터렉티브 강의자료</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#f8fafc,#ecfdf5);color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#111827,#15803d);color:white;text-align:center;padding:40px 20px}
+header h1{margin:0;font-size:34px}
+main{max-width:1120px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:22px;padding:28px;margin-bottom:24px;box-shadow:0 12px 30px rgba(21,128,61,.12)}
+h2{color:#15803d;border-left:8px solid #22c55e;padding-left:12px;margin-top:0}
+h3{color:#4338ca}
+.box{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:16px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:16px 0}
+pre{background:#111827;color:#f9fafb;padding:22px;border-radius:16px;overflow-x:auto;font-size:14px;line-height:1.6}
+button{border:0;border-radius:12px;padding:12px 18px;background:#15803d;color:white;font-weight:800;cursor:pointer;font-size:15px;margin:6px 4px 6px 0}
+button:hover{background:#166534}
+input{padding:10px;border-radius:12px;border:2px solid #86efac;font-size:16px;width:100px}
+textarea{width:100%;min-height:120px;border:2px solid #86efac;border-radius:14px;padding:14px;font-family:Consolas,monospace;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.tree{position:relative;height:390px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;margin-top:16px}
+.node{position:absolute;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;border:3px solid #3b82f6;background:#dbeafe;color:#1e3a8a;z-index:2}
+.mark{background:#fef3c7!important;border-color:#f59e0b!important;color:#92400e!important}
+.lca{background:#dcfce7!important;border-color:#22c55e!important;color:#14532d!important}
+svg{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:9px;text-align:center;vertical-align:top}
+th{background:#dcfce7;color:#14532d}
+tr:nth-child(even){background:#f9fafb}
+.result{font-size:18px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:16px;padding:18px;margin-top:18px;white-space:pre-wrap}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>Binary Lifting</h1>
+<p>2의 거듭제곱 점프로 k번째 조상과 LCA를 빠르게 찾는 기법</p>
+</header>
+<main>
+
+<section>
+<h2>1. Binary Lifting이란?</h2>
+<p>Binary Lifting은 트리에서 부모를 한 칸씩 올라가는 대신, 1칸, 2칸, 4칸, 8칸처럼 <b>2의 거듭제곱 단위로 점프</b>하는 기법입니다.</p>
+<div class="box">
+<p>1. parent[0][v] = v의 1번째 조상입니다.</p>
+<p>2. parent[1][v] = v의 2번째 조상입니다.</p>
+<p>3. parent[2][v] = v의 4번째 조상입니다.</p>
+<p>4. parent[k][v] = v의 2^k번째 조상입니다.</p>
+</div>
+<pre><code>parent[k][v] = parent[k - 1][ parent[k - 1][v] ];</code></pre>
+</section>
+
+<section>
+<h2>2. 예제 트리 인터렉티브</h2>
+<p>기본 예제 트리에서 parent 테이블, k번째 조상, LCA를 직접 확인합니다.</p>
+<div class="tree" id="treeView"></div>
+<div class="grid2">
+<div>
+<h3>k번째 조상 찾기</h3>
+<label>정점 v</label>
+<input id="ancestorV" type="number" value="8">
+<label>k</label>
+<input id="ancestorK" type="number" value="3">
+<button onclick="showAncestor()">k번째 조상 찾기</button>
+<div id="ancestorResult" class="result"></div>
+</div>
+<div>
+<h3>LCA 찾기</h3>
+<label>a</label>
+<input id="lcaA" type="number" value="4">
+<label>b</label>
+<input id="lcaB" type="number" value="8">
+<button onclick="showLCA()">LCA 찾기</button>
+<div id="lcaResult" class="result"></div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>3. parent 테이블 확인</h2>
+<div id="parentTable"></div>
+</section>
+
+<section>
+<h2>4. 직접 트리 입력해서 실행하기</h2>
+<p>작은 트리를 입력하면 Binary Lifting 테이블과 LCA를 계산합니다.</p>
+<label>N</label>
+<input id="customN" type="number" value="8">
+<button onclick="loadDefault()">기본 예제</button>
+<button onclick="runCustom()">테이블 만들기</button>
+<textarea id="customEdges">1 2
+1 3
+2 4
+2 5
+3 6
+3 7
+5 8</textarea>
+<div id="customResult"></div>
+</section>
+
+<section>
+<h2>5. k번째 조상 코드</h2>
+<pre><code>int getKthAncestor(int v, int k) {
+    for (int i = 0; i &lt;= LOG; i++) {
+        if (k &amp; (1 &lt;&lt; i)) {
+            v = parent[i][v];
+        }
+    }
+
+    return v;
+}</code></pre>
+<div class="warn"><p>예를 들어 k=13이면 13=8+4+1이므로 8칸, 4칸, 1칸 점프합니다.</p></div>
+</section>
+
+<section>
+<h2>6. LCA 계산 과정</h2>
+<div class="box">
+<p>1. 두 정점 중 더 깊은 정점을 위로 올려 깊이를 맞춥니다.</p>
+<p>2. 두 정점이 같아졌으면 그 정점이 LCA입니다.</p>
+<p>3. 같지 않으면 큰 점프부터 동시에 올립니다.</p>
+<p>4. 마지막에 parent[0][a]가 LCA입니다.</p>
+</div>
+<pre><code>for (int i = LOG; i &gt;= 0; i--) {
+    if (parent[i][a] != parent[i][b]) {
+        a = parent[i][a];
+        b = parent[i][b];
+    }
+}
+
+return parent[0][a];</code></pre>
+</section>
+
+<section>
+<h2>7. 전체 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 100005
+#define LOG 17
+
+typedef struct {
+    int to;
+    int next;
+} Edge;
+
+Edge edges[MAXN * 2];
+int head[MAXN];
+int edgeCount = 0;
+
+int parent[LOG + 1][MAXN];
+int depth[MAXN];
+
+void addEdge(int a, int b) {
+    edges[edgeCount].to = b;
+    edges[edgeCount].next = head[a];
+    head[a] = edgeCount++;
+}
+
+void dfs(int now, int par) {
+    parent[0][now] = par;
+
+    for (int e = head[now]; e != -1; e = edges[e].next) {
+        int next = edges[e].to;
+
+        if (next == par) continue;
+
+        depth[next] = depth[now] + 1;
+        dfs(next, now);
+    }
+}
+
+void buildTable(int N) {
+    for (int k = 1; k &lt;= LOG; k++) {
+        for (int v = 1; v &lt;= N; v++) {
+            parent[k][v] = parent[k - 1][ parent[k - 1][v] ];
+        }
+    }
+}
+
+int lca(int a, int b) {
+    if (depth[a] &lt; depth[b]) {
+        int temp = a;
+        a = b;
+        b = temp;
+    }
+
+    int diff = depth[a] - depth[b];
+
+    for (int i = 0; i &lt;= LOG; i++) {
+        if (diff &amp; (1 &lt;&lt; i)) {
+            a = parent[i][a];
+        }
+    }
+
+    if (a == b) return a;
+
+    for (int i = LOG; i &gt;= 0; i--) {
+        if (parent[i][a] != parent[i][b]) {
+            a = parent[i][a];
+            b = parent[i][b];
+        }
+    }
+
+    return parent[0][a];
+}</code></pre>
+</section>
+
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. parent[0]을 채우기 전에 buildTable을 하는 경우</h3>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">parent[k]는 parent[k-1]을 이용해서 만들기 때문에 parent[0]이 먼저 완성되어야 합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 2. 깊이를 맞추지 않고 동시에 올리는 경우</h3>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">깊이가 다르면 같은 높이의 조상을 비교할 수 없으므로 더 깊은 정점을 먼저 올려야 합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 3. LOG를 너무 작게 잡는 경우</h3>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">100000보다 큰 2의 거듭제곱은 131072=2^17입니다. LOG는 17 이상이어야 합니다.</div>
+</div>
+</section>
+
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. Binary Lifting은 2의 거듭제곱 점프로 조상을 빠르게 찾습니다.</p>
+<p>2. parent[k][v]는 v의 2^k번째 조상입니다.</p>
+<p>3. parent[k][v] = parent[k-1][parent[k-1][v]]입니다.</p>
+<p>4. k번째 조상은 k의 이진수 비트를 보고 점프합니다.</p>
+<p>5. LCA는 깊이를 맞춘 뒤 동시에 위로 올려 찾습니다.</p>
+</section>
+</main>
+
+<script>
+const defaultN=8;
+const defaultEdges=[[1,2],[1,3],[2,4],[2,5],[3,6],[3,7],[5,8]];
+const pos={1:[280,30],2:[150,115],3:[410,115],4:[80,205],5:[220,205],6:[350,205],7:[480,205],8:[220,300]};
+let N,edges,graph,parent,depth,LOG;
+
+function build(n, edgeList){
+  N=n; edges=edgeList;
+  LOG=1;
+  while((1<<LOG)<=N) LOG++;
+  graph=Array.from({length:N+1},()=>[]);
+  for(const e of edges){graph[e[0]].push(e[1]);graph[e[1]].push(e[0]);}
+  parent=Array.from({length:LOG+1},()=>Array(N+1).fill(0));
+  depth=Array(N+1).fill(0);
+  dfsBuild(1,0);
+  for(let k=1;k<=LOG;k++){
+    for(let v=1;v<=N;v++){
+      parent[k][v]=parent[k-1][parent[k-1][v]];
+    }
+  }
+}
+function dfsBuild(now,par){
+  parent[0][now]=par;
+  for(const next of graph[now]){
+    if(next===par) continue;
+    depth[next]=depth[now]+1;
+    dfsBuild(next,now);
+  }
+}
+function getKth(v,k){
+  let steps=[];
+  for(let i=0;i<=LOG;i++){
+    if(k & (1<<i)){
+      steps.push(v+"에서 "+(1<<i)+"칸 점프 → "+parent[i][v]);
+      v=parent[i][v];
+    }
+  }
+  return {node:v,steps};
+}
+function getLCA(a,b){
+  let steps=[];
+  if(depth[a]<depth[b]){let t=a;a=b;b=t;}
+  steps.push("깊이: a="+a+"("+depth[a]+"), b="+b+"("+depth[b]+")");
+  let diff=depth[a]-depth[b];
+  for(let i=0;i<=LOG;i++){
+    if(diff & (1<<i)){
+      steps.push("a를 "+(1<<i)+"칸 올림: "+a+" → "+parent[i][a]);
+      a=parent[i][a];
+    }
+  }
+  if(a===b){steps.push("깊이를 맞추니 두 정점이 같음");return {lca:a,steps};}
+  for(let i=LOG;i>=0;i--){
+    if(parent[i][a]!==parent[i][b]){
+      steps.push((1<<i)+"칸 점프: a "+a+"→"+parent[i][a]+", b "+b+"→"+parent[i][b]);
+      a=parent[i][a];b=parent[i][b];
+    }
+  }
+  steps.push("parent[0]["+a+"] = "+parent[0][a]+"가 LCA");
+  return {lca:parent[0][a],steps};
+}
+function renderTree(markNodes=[],lcaNode=0){
+  const view=document.getElementById("treeView");
+  let svg="<svg>";
+  for(const e of edges){
+    const p1=pos[e[0]]||[60+70*e[0],80],p2=pos[e[1]]||[60+70*e[1],200];
+    svg+='<line x1="'+(p1[0]+27)+'" y1="'+(p1[1]+27)+'" x2="'+(p2[0]+27)+'" y2="'+(p2[1]+27)+'" stroke="#64748b" stroke-width="3"/>';
+  }
+  svg+="</svg>";
+  let html=svg;
+  for(let v=1;v<=N;v++){
+    const p=pos[v]||[60+(v%8)*80,60+Math.floor(v/8)*90];
+    let cls="node";
+    if(markNodes.includes(v)) cls+=" mark";
+    if(v===lcaNode) cls+=" lca";
+    html+='<div class="'+cls+'" style="left:'+p[0]+'px;top:'+p[1]+'px">'+v+'</div>';
+  }
+  view.innerHTML=html;
+}
+function renderParentTable(){
+  let html="<table><tr><th>정점</th><th>depth</th>";
+  for(let k=0;k<=LOG;k++) html+="<th>2^"+k+" 조상<br>parent["+k+"]</th>";
+  html+="</tr>";
+  for(let v=1;v<=N;v++){
+    html+="<tr><td>"+v+"</td><td>"+depth[v]+"</td>";
+    for(let k=0;k<=LOG;k++) html+="<td>"+parent[k][v]+"</td>";
+    html+="</tr>";
+  }
+  document.getElementById("parentTable").innerHTML=html+"</table>";
+}
+function showAncestor(){
+  const v=Number(document.getElementById("ancestorV").value);
+  const k=Number(document.getElementById("ancestorK").value);
+  if(v<1||v>N||k<0){document.getElementById("ancestorResult").textContent="입력을 확인하세요.";return;}
+  const r=getKth(v,k);
+  renderTree([v,r.node],r.node);
+  document.getElementById("ancestorResult").textContent="결과: "+v+"의 "+k+"번째 조상 = "+r.node+"\n\n과정\n"+r.steps.join("\n");
+}
+function showLCA(){
+  const a=Number(document.getElementById("lcaA").value);
+  const b=Number(document.getElementById("lcaB").value);
+  if(a<1||a>N||b<1||b>N){document.getElementById("lcaResult").textContent="입력을 확인하세요.";return;}
+  const r=getLCA(a,b);
+  renderTree([a,b],r.lca);
+  document.getElementById("lcaResult").textContent="결과: LCA("+a+", "+b+") = "+r.lca+"\n\n과정\n"+r.steps.join("\n");
+}
+function parseCustomEdges(){
+  const text=document.getElementById("customEdges").value.trim();
+  if(!text)return [];
+  return text.split(/\n+/).map(line=>line.trim().split(/\s+/).map(Number)).filter(a=>a.length>=2);
+}
+function runCustom(){
+  const n=Number(document.getElementById("customN").value);
+  const es=parseCustomEdges();
+  if(!n||n<1||n>20||es.length!==n-1){
+    document.getElementById("customResult").innerHTML='<div class="warn">N은 1~20, 간선은 N-1개로 입력해주세요.</div>';
+    return;
+  }
+  build(n,es);
+  renderTree();
+  renderParentTable();
+  document.getElementById("customResult").innerHTML='<div class="result">테이블 생성 완료! 위 parent 테이블을 확인하세요.</div>';
+}
+function loadDefault(){
+  document.getElementById("customN").value=8;
+  document.getElementById("customEdges").value="1 2\n1 3\n2 4\n2 5\n3 6\n3 7\n5 8";
+  build(defaultN,defaultEdges);
+  renderTree();
+  renderParentTable();
+  document.getElementById("customResult").innerHTML='<div class="result">기본 예제를 불러왔습니다.</div>';
+}
+function toggleAnswer(id){
+  const el=document.getElementById(id);
+  el.style.display=el.style.display==="block"?"none":"block";
+}
+
+build(defaultN,defaultEdges);
+renderTree();
+renderParentTable();
+showAncestor();
+showLCA();
+</script>
+</body>
+</html>

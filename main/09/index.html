@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 8140 에너지 교환 - 인터랙티브 해설</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f4f7fb;color:#111827;font-size:18px;line-height:1.7}
+header{background:linear-gradient(135deg,#064e3b,#2563eb);color:white;text-align:center;padding:34px 20px}
+header h1{margin:0;font-size:34px}
+header p{margin:10px 0 0;font-size:19px}
+main{max-width:1200px;margin:0 auto;padding:24px}
+section{background:white;border-radius:18px;padding:26px;margin:22px 0;box-shadow:0 8px 24px rgba(15,23,42,.08);border:1px solid #dbe4f0}
+h2{margin-top:0;color:#1e3a8a;border-left:8px solid #2563eb;padding-left:14px;font-size:28px}
+h3{color:#0f172a;font-size:23px;margin-top:26px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;padding:18px;border-radius:14px;margin:16px 0}
+.good{background:#ecfdf5;border-color:#bbf7d0}.warn{background:#fff7ed;border-color:#fed7aa}
+.formula{background:#111827;color:#f9fafb;padding:16px;border-radius:12px;font-family:Consolas,monospace;white-space:pre-wrap;overflow-x:auto;font-size:17px}
+pre{background:#0f172a;color:#e5e7eb;padding:18px;border-radius:14px;overflow-x:auto;font-size:16px;line-height:1.55}
+code{font-family:Consolas,monospace}
+input,textarea,button{font-size:17px;padding:10px;border-radius:10px;border:1px solid #94a3b8}
+textarea{width:100%;min-height:70px;font-family:Consolas,monospace}
+button{border:none;background:#2563eb;color:white;font-weight:bold;cursor:pointer;margin:6px 4px 6px 0}
+button:hover{background:#1d4ed8}.smallbtn{background:#475569}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:white}
+th,td{border:1px solid #cbd5e1;padding:9px;text-align:center}
+th{background:#dbeafe;color:#111827}
+.result{background:#f8fafc;border:1px solid #cbd5e1;padding:16px;border-radius:12px;margin-top:12px;white-space:pre-wrap;font-family:Consolas,monospace;overflow-x:auto}
+.step{border-left:6px solid #60a5fa;padding:14px 18px;background:#f8fafc;border-radius:12px;margin:15px 0}
+.turtle-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.turtle{min-width:82px;padding:10px;border-radius:14px;text-align:center;border:2px solid #0284c7;background:#e0f2fe;font-family:Consolas,monospace;font-weight:bold}
+.turtle .idx{display:block;font-size:12px;color:#475569;font-weight:normal}
+.groupR{background:#dbeafe;border-color:#2563eb}
+.groupL{background:#dcfce7;border-color:#16a34a}
+.lost{background:#fee2e2;border-color:#dc2626}
+.safe{background:#fef3c7;border-color:#f59e0b}
+details{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:14px;margin:12px 0}
+summary{cursor:pointer;color:#1d4ed8;font-weight:bold}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 8140 에너지 교환</h1>
+<p>같은 방향 구간 분석으로 M분 후 남은 에너지 합을 구하는 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+<h2>1. 문제 핵심</h2>
+<p>거북이는 매 분 자신의 방향에 따라 에너지를 1씩 보냅니다.</p>
+<div class="formula">'L' : 왼쪽 거북이에게 1 전달
+'R' : 오른쪽 거북이에게 1 전달
+
+에너지가 용량 a_i를 넘으면 초과분은 사라진다.</div>
+
+<div class="warn box">
+<p>N은 최대 200000, M은 최대 10억입니다. 1분씩 시뮬레이션하면 시간초과가 납니다.</p>
+</div>
+</section>
+
+<section>
+<h2>2. 핵심 관찰</h2>
+<p>방향이 모두 같으면 에너지는 원형으로 계속 돌기만 하므로 사라지지 않습니다.</p>
+<div class="formula">LLLLL 또는 RRRRR
+
+모든 거북이가 동시에 1을 주고 1을 받는다.
+전체 에너지 합은 그대로 유지된다.</div>
+
+<p>에너지가 사라지는 곳은 방향이 바뀌는 주변입니다.</p>
+<div class="good box">
+<p>같은 방향으로 연속된 구간을 찾아서, 각 구간에서 사라질 수 있는 에너지를 계산하면 됩니다.</p>
+</div>
+</section>
+
+<section>
+<h2>3. R 구간과 L 구간의 손실 공식</h2>
+
+<h3>1. R 구간</h3>
+<div class="formula">R R R R
+
+에너지는 오른쪽으로 흐른다.
+마지막 R은 경계 역할을 하므로 제외한다.
+
+canLose = 구간 전체 에너지 합 - 마지막 R의 에너지
+loss = min(M, canLose)</div>
+
+<h3>2. L 구간</h3>
+<div class="formula">L L L L
+
+에너지는 왼쪽으로 흐른다.
+첫 번째 L은 경계 역할을 하므로 제외한다.
+
+canLose = 구간 전체 에너지 합 - 첫 번째 L의 에너지
+loss = min(M, canLose)</div>
+</section>
+
+<section>
+<h2>4. 인터랙티브 계산기</h2>
+<p>방향 문자열과 에너지 배열을 입력하면 같은 방향 구간, 구간별 손실, 최종 정답을 계산합니다.</p>
+
+<div class="grid">
+<div><label><b>N</b></label><br><input id="nInput" value="9"></div>
+<div><label><b>M</b></label><br><input id="mInput" value="5"></div>
+</div>
+
+<p><b>방향 문자열 s</b></p>
+<input id="sInput" style="width:100%" value="RRRLRRLLR">
+
+<p><b>에너지 용량 a</b></p>
+<textarea id="aInput">5 8 4 9 3 4 9 5 4</textarea>
+
+<button onclick="solve()">계산하기</button>
+<button class="smallbtn" onclick="loadExample(1)">예제 1</button>
+<button class="smallbtn" onclick="loadExample(2)">예제 2</button>
+<button class="smallbtn" onclick="loadExample(3)">예제 3</button>
+
+<h3>원형을 구간 처리 순서로 펼친 모습</h3>
+<div id="turtleView" class="turtle-row"></div>
+
+<h3>구간별 계산표</h3>
+<div id="tableView"></div>
+
+<h3>계산 과정</h3>
+<div id="resultView" class="result"></div>
+</section>
+
+<section>
+<h2>5. 코드 작성 방법</h2>
+
+<div class="step">
+<h3>1단계. 입력 저장</h3>
+<pre><code>scanf("%d %lld", &amp;N, &amp;M);
+scanf("%s", s);
+
+for (int i = 0; i &lt; N; i++) {
+    scanf("%lld", &amp;a[i]);
+    total += a[i];
+}</code></pre>
+<p>M과 전체 에너지 합은 클 수 있으므로 long long을 사용합니다.</p>
+</div>
+
+<div class="step">
+<h3>2단계. 모든 방향이 같은지 확인</h3>
+<pre><code>int same = 1;
+
+for (int i = 1; i &lt; N; i++) {
+    if (s[i] != s[0]) {
+        same = 0;
+        break;
+    }
+}
+
+if (same) {
+    printf("%lld\n", total);
+    return 0;
+}</code></pre>
+</div>
+
+<div class="step">
+<h3>3단계. 원형을 선형처럼 처리할 시작점 찾기</h3>
+<pre><code>for (int i = 0; i &lt; N; i++) {
+    int prev = (i - 1 + N) % N;
+
+    if (s[i] != s[prev]) {
+        start = i;
+        break;
+    }
+}</code></pre>
+<p>방향이 바뀌는 곳을 시작점으로 잡으면 같은 방향 구간을 순서대로 처리할 수 있습니다.</p>
+</div>
+
+<div class="step">
+<h3>4단계. 같은 방향 구간 찾기</h3>
+<pre><code>while (idx &lt; N) {
+    char dir = s[(start + idx) % N];
+
+    int begin = idx;
+    long long sum = 0;
+
+    while (idx &lt; N &amp;&amp; s[(start + idx) % N] == dir) {
+        int real = (start + idx) % N;
+        sum += a[real];
+        idx++;
+    }
+
+    int end = idx - 1;
+}</code></pre>
+</div>
+
+<div class="step">
+<h3>5단계. 구간별 손실 계산</h3>
+<pre><code>if (dir == 'R') {
+    int last = (start + end) % N;
+    canLose = sum - a[last];
+} else {
+    int first = (start + begin) % N;
+    canLose = sum - a[first];
+}
+
+loss += min_ll(M, canLose);</code></pre>
+</div>
+</section>
+
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 200000
+
+int N;
+long long M;
+char s[MAXN + 5];
+long long a[MAXN + 5];
+
+long long min_ll(long long x, long long y) {
+    return x &lt; y ? x : y;
+}
+
+int main() {
+    scanf("%d %lld", &amp;N, &amp;M);
+    scanf("%s", s);
+
+    long long total = 0;
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf("%lld", &amp;a[i]);
+        total += a[i];
+    }
+
+    int same = 1;
+
+    for (int i = 1; i &lt; N; i++) {
+        if (s[i] != s[0]) {
+            same = 0;
+            break;
+        }
+    }
+
+    if (same) {
+        printf("%lld\n", total);
+        return 0;
+    }
+
+    int start = 0;
+
+    for (int i = 0; i &lt; N; i++) {
+        int prev = (i - 1 + N) % N;
+
+        if (s[i] != s[prev]) {
+            start = i;
+            break;
+        }
+    }
+
+    long long loss = 0;
+    int idx = 0;
+
+    while (idx &lt; N) {
+        char dir = s[(start + idx) % N];
+
+        int begin = idx;
+        long long sum = 0;
+
+        while (idx &lt; N &amp;&amp; s[(start + idx) % N] == dir) {
+            int real = (start + idx) % N;
+            sum += a[real];
+            idx++;
+        }
+
+        int end = idx - 1;
+        long long canLose = 0;
+
+        if (dir == 'R') {
+            int last = (start + end) % N;
+            canLose = sum - a[last];
+        } else {
+            int first = (start + begin) % N;
+            canLose = sum - a[first];
+        }
+
+        loss += min_ll(M, canLose);
+    }
+
+    printf("%lld\n", total - loss);
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>7. 시간복잡도</h2>
+<div class="formula">각 거북이는 같은 방향 구간 처리에서 정확히 한 번만 포함된다.
+
+전체 시간복잡도 = O(N)</div>
+</section>
+</main>
+
+<script>
+function loadExample(num){
+    if(num===1){
+        nInput.value="3"; mInput.value="1"; sInput.value="RRL"; aInput.value="1 1 1";
+    }else if(num===2){
+        nInput.value="5"; mInput.value="20"; sInput.value="LLLLL"; aInput.value="3 3 2 3 3";
+    }else{
+        nInput.value="9"; mInput.value="5"; sInput.value="RRRLRRLLR"; aInput.value="5 8 4 9 3 4 9 5 4";
+    }
+    solve();
+}
+
+function parseInput(){
+    const N = parseInt(nInput.value.trim(), 10);
+    const M = BigInt(mInput.value.trim());
+    const s = sInput.value.trim();
+    const a = aInput.value.trim().split(/\s+/).filter(x=>x.length>0).map(BigInt);
+
+    if(s.length !== N) throw new Error("방향 문자열 길이가 N과 다릅니다.");
+    if(a.length !== N) throw new Error("에너지 개수가 N과 다릅니다. 현재 개수: " + a.length);
+    for(const ch of s){
+        if(ch !== "L" && ch !== "R") throw new Error("방향은 L 또는 R만 가능합니다.");
+    }
+    return {N,M,s,a};
+}
+
+function solve(){
+    const turtleView = document.getElementById("turtleView");
+    const tableView = document.getElementById("tableView");
+    const resultView = document.getElementById("resultView");
+
+    try{
+        const {N,M,s,a} = parseInput();
+
+        let total = 0n;
+        for(const v of a) total += v;
+
+        let same = true;
+        for(let i=1;i<N;i++){
+            if(s[i] !== s[0]){
+                same = false;
+                break;
+            }
+        }
+
+        if(same){
+            drawTurtles(N,s,a,0,[]);
+            tableView.innerHTML = "<p><b>모든 방향이 같습니다.</b> 에너지가 사라지지 않습니다.</p>";
+            resultView.textContent = "초기 전체 에너지 = " + total + "\n모든 방향이 같으므로 손실 = 0\n정답 = " + total;
+            return;
+        }
+
+        let start = 0;
+        for(let i=0;i<N;i++){
+            const prev = (i - 1 + N) % N;
+            if(s[i] !== s[prev]){
+                start = i;
+                break;
+            }
+        }
+
+        let groups = [];
+        let idx = 0;
+        let loss = 0n;
+
+        while(idx < N){
+            const dir = s[(start + idx) % N];
+            const begin = idx;
+            let sum = 0n;
+            let members = [];
+
+            while(idx < N && s[(start + idx) % N] === dir){
+                const real = (start + idx) % N;
+                sum += a[real];
+                members.push(real);
+                idx++;
+            }
+
+            const end = idx - 1;
+            let canLose = 0n;
+            let protectedIndex = -1;
+
+            if(dir === "R"){
+                const last = (start + end) % N;
+                protectedIndex = last;
+                canLose = sum - a[last];
+            }else{
+                const first = (start + begin) % N;
+                protectedIndex = first;
+                canLose = sum - a[first];
+            }
+
+            const groupLoss = canLose < M ? canLose : M;
+            loss += groupLoss;
+
+            groups.push({dir, begin, end, members, sum, protectedIndex, canLose, groupLoss});
+        }
+
+        drawTurtles(N,s,a,start,groups);
+        drawTable(groups,a);
+
+        let text = "";
+        text += "초기 전체 에너지 = " + total + "\n";
+        text += "방향이 바뀌는 시작점 = " + (start + 1) + "번 거북이\n\n";
+
+        groups.forEach((g, k)=>{
+            text += (k+1) + "번째 구간: " + g.dir + " 구간\n";
+            text += "포함 거북이: " + g.members.map(x=>x+1).join(", ") + "\n";
+            text += "구간 에너지 합 = " + g.sum + "\n";
+            text += "보존 경계 거북이 = " + (g.protectedIndex+1) + "번\n";
+            text += "사라질 수 있는 에너지 = " + g.canLose + "\n";
+            text += "실제 손실 = min(M, canLose) = " + g.groupLoss + "\n\n";
+        });
+
+        text += "총 손실 = " + loss + "\n";
+        text += "정답 = 전체 에너지 - 손실 = " + (total - loss);
+
+        resultView.textContent = text;
+    }catch(e){
+        turtleView.innerHTML = "";
+        tableView.innerHTML = "";
+        resultView.textContent = "오류: " + e.message;
+    }
+}
+
+function drawTurtles(N,s,a,start,groups){
+    let html = "";
+    const groupMap = new Array(N).fill(-1);
+    const protectedMap = new Array(N).fill(false);
+    groups.forEach((g, gi)=>{
+        g.members.forEach(x=>groupMap[x]=gi);
+        protectedMap[g.protectedIndex]=true;
+    });
+
+    for(let order=0; order<N; order++){
+        const real = (start + order) % N;
+        const gi = groupMap[real];
+        let cls = "turtle ";
+        if(gi >= 0){
+            cls += groups[gi].dir === "R" ? "groupR " : "groupL ";
+        }
+        if(protectedMap[real]) cls += "safe ";
+        html += `<div class="${cls}">
+            <span class="idx">${real+1}번</span>
+            ${s[real]}<br>
+            a=${a[real]}
+            ${protectedMap[real] ? "<br>경계" : ""}
+        </div>`;
+    }
+    turtleView.innerHTML = html;
+}
+
+function drawTable(groups,a){
+    let html = "<table><tr><th>구간</th><th>방향</th><th>거북이 번호</th><th>구간 합</th><th>제외되는 경계</th><th>canLose</th><th>loss</th></tr>";
+    groups.forEach((g,i)=>{
+        html += `<tr>
+            <td>${i+1}</td>
+            <td>${g.dir}</td>
+            <td>${g.members.map(x=>x+1).join(", ")}</td>
+            <td>${g.sum}</td>
+            <td>${g.protectedIndex+1}번</td>
+            <td>${g.canLose}</td>
+            <td><b>${g.groupLoss}</b></td>
+        </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("tableView").innerHTML = html;
+}
+
+solve();
+</script>
+</body>
+</html>

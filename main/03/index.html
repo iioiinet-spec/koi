@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 #8608 가방 - 인터랙티브 C언어 해설</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+        background: #f4f7fb;
+        color: #111827;
+        font-size: 18px;
+        line-height: 1.75;
+    }
+    header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        text-align: center;
+        padding: 34px 20px;
+    }
+    header h1 {
+        margin: 0;
+        font-size: 34px;
+    }
+    header p {
+        margin: 10px 0 0;
+        font-size: 19px;
+    }
+    main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+    section {
+        background: white;
+        border-radius: 18px;
+        padding: 26px;
+        margin: 22px 0;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #dbe4f0;
+    }
+    h2 {
+        margin-top: 0;
+        color: #1e3a8a;
+        border-left: 8px solid #2563eb;
+        padding-left: 14px;
+        font-size: 28px;
+    }
+    h3 {
+        color: #0f172a;
+        font-size: 23px;
+        margin-top: 26px;
+    }
+    .box {
+        background: #eff6ff;
+        border: 2px solid #bfdbfe;
+        padding: 18px;
+        border-radius: 14px;
+        margin: 16px 0;
+    }
+    .good {
+        background: #ecfdf5;
+        border-color: #bbf7d0;
+    }
+    .warn {
+        background: #fff7ed;
+        border-color: #fed7aa;
+    }
+    .formula {
+        background: #111827;
+        color: #f9fafb;
+        padding: 16px;
+        border-radius: 12px;
+        font-family: Consolas, monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-size: 17px;
+    }
+    pre {
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 18px;
+        border-radius: 14px;
+        overflow-x: auto;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+    code { font-family: Consolas, monospace; }
+    input, textarea, button {
+        font-size: 17px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #94a3b8;
+    }
+    textarea {
+        width: 100%;
+        min-height: 90px;
+        font-family: Consolas, monospace;
+    }
+    button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 6px 4px 6px 0;
+    }
+    button:hover { background: #1d4ed8; }
+    .smallbtn { background: #475569; }
+    .smallbtn:hover { background: #334155; }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 14px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 9px;
+        text-align: center;
+    }
+    th {
+        background: #dbeafe;
+        color: #111827;
+    }
+    .result {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 12px;
+        white-space: pre-wrap;
+        font-family: Consolas, monospace;
+        overflow-x: auto;
+    }
+    .step {
+        border-left: 6px solid #60a5fa;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin: 15px 0;
+    }
+    .itemline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+    }
+    .item {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-weight: bold;
+        border: 2px solid #94a3b8;
+        background: #f8fafc;
+    }
+    .removed {
+        background: #fee2e2;
+        border-color: #dc2626;
+    }
+    .stolen {
+        background: #dcfce7;
+        border-color: #16a34a;
+    }
+    .safe {
+        background: #e0f2fe;
+        border-color: #0284c7;
+    }
+    details {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 14px;
+        margin: 12px 0;
+    }
+    summary {
+        cursor: pointer;
+        color: #1d4ed8;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>정올 #8608 가방</h1>
+    <p>정렬 + 누적합 + 용량별 최댓값 계산을 직접 확인하는 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+    <h2>1. 문제를 쉽게 이해하기</h2>
+    <p>
+        상훈이는 도둑이 오기 전에 몇 개의 물건을 가방에 담아 가져갈 수 있습니다.
+        이후 도둑은 남아 있는 물건 중에서 <b>무게 합이 가장 작게 되도록 K개</b>를 훔칩니다.
+    </p>
+
+    <div class="box">
+        <p>
+            도둑이 훔치는 K개의 무게 합을 크게 만들려면 어떻게 해야 할까요?
+        </p>
+        <p>
+            정답은 <b>가벼운 물건을 먼저 치우는 것</b>입니다.
+        </p>
+    </div>
+
+    <div class="formula">가벼운 물건을 가방에 담는다
+→ 남은 물건 중 가장 가벼운 K개가 더 무거워진다
+→ 도둑이 훔치는 무게 합이 커진다</div>
+</section>
+
+<section>
+    <h2>2. 왜 정렬이 필요한가?</h2>
+    <p>
+        도둑은 항상 남은 물건 중 <b>가장 가벼운 K개</b>를 훔칩니다.
+        그래서 물건을 무게 오름차순으로 정렬하면 생각이 쉬워집니다.
+    </p>
+
+    <div class="formula">예: 2 3 5 7 11, K = 2
+
+제거 없음:
+도둑 = 2 + 3 = 5
+
+2 제거:
+남은 물건 = 3 5 7 11
+도둑 = 3 + 5 = 8
+
+2, 3 제거:
+남은 물건 = 5 7 11
+도둑 = 5 + 7 = 12</div>
+
+    <div class="good box">
+        <p>
+            앞에서 r개의 가벼운 물건을 치우면,
+            도둑은 그 다음 K개의 물건을 훔칩니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>3. 공식 만들기</h2>
+
+    <p>정렬된 배열을 다음처럼 둡니다.</p>
+    <div class="formula">A[0], A[1], A[2], ..., A[N-1]</div>
+
+    <p>앞에서 r개를 가방에 담아 치웠다고 합시다.</p>
+
+    <div class="formula">가방에 담은 무게 = A[0] + A[1] + ... + A[r-1]
+
+도둑이 훔치는 무게 =
+A[r] + A[r+1] + ... + A[r+K-1]</div>
+
+    <p>누적합 prefix를 쓰면 빠르게 구할 수 있습니다.</p>
+
+    <div class="formula">prefix[i] = A[0] + A[1] + ... + A[i-1]
+
+제거 비용 = prefix[r]
+
+도둑이 훔치는 합 = prefix[r + K] - prefix[r]</div>
+</section>
+
+<section>
+    <h2>4. 인터랙티브 계산기</h2>
+    <p>
+        N, K, C와 물건 무게를 입력하면 x = 1부터 C까지의 답을 계산합니다.
+        각 용량에서 몇 개의 가벼운 물건을 제거하는지도 보여줍니다.
+    </p>
+
+    <div class="grid">
+        <div>
+            <label><b>N</b></label><br>
+            <input id="nInput" value="5">
+        </div>
+        <div>
+            <label><b>K</b></label><br>
+            <input id="kInput" value="2">
+        </div>
+        <div>
+            <label><b>C</b></label><br>
+            <input id="cInput" value="5">
+        </div>
+    </div>
+
+    <p><b>물건 무게</b></p>
+    <textarea id="arrInput">2 3 5 7 11</textarea>
+
+    <button onclick="solveBag()">계산하기</button>
+    <button class="smallbtn" onclick="loadExample(1)">예제 1</button>
+    <button class="smallbtn" onclick="loadExample(2)">예제 2</button>
+    <button class="smallbtn" onclick="loadExample(3)">예제 3</button>
+
+    <div id="visualResult"></div>
+    <div id="calcResult" class="result"></div>
+</section>
+
+<section>
+    <h2>5. 코드 작성 방법 단계별 설명</h2>
+
+    <div class="step">
+        <h3>1단계. 필요한 배열 만들기</h3>
+        <p>N은 최대 5000이므로 배열은 5000보다 조금 크게 잡으면 됩니다.</p>
+<pre><code>#define MAXN 5000
+
+long long A[MAXN + 1];
+long long prefix[MAXN + 1];</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>2단계. 입력 받기</h3>
+<pre><code>scanf("%d %d %d", &amp;N, &amp;K, &amp;C);
+
+for (int i = 0; i &lt; N; i++) {
+    scanf("%lld", &amp;A[i]);
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>3단계. 오름차순 정렬하기</h3>
+        <p>도둑은 가벼운 물건부터 훔치므로, 정렬이 필요합니다.</p>
+<pre><code>qsort(A, N, sizeof(long long), compare_ll);</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>4단계. 누적합 만들기</h3>
+        <p>구간 합을 빠르게 구하기 위해 prefix 배열을 만듭니다.</p>
+<pre><code>prefix[0] = 0;
+
+for (int i = 0; i &lt; N; i++) {
+    prefix[i + 1] = prefix[i] + A[i];
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>5단계. 용량 x마다 가능한 제거 개수 r 찾기</h3>
+        <p>
+            x가 1, 2, 3, ... 으로 증가하므로 r도 줄어들지 않습니다.
+            따라서 while문으로 계속 증가시키면 전체적으로 빠르게 처리됩니다.
+        </p>
+<pre><code>int r = 0;
+
+for (int x = 1; x &lt;= C; x++) {
+    while (r + 1 &lt;= N - K &amp;&amp; prefix[r + 1] &lt;= x) {
+        r++;
+    }
+
+    long long answer = prefix[r + K] - prefix[r];
+
+    printf("%lld\n", answer);
+}</code></pre>
+    </div>
+</section>
+
+<section>
+    <h2>6. 정답 C 코드</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MAXN 5000
+
+long long A[MAXN + 1];
+long long prefix[MAXN + 1];
+
+int compare_ll(const void *a, const void *b) {
+    long long x = *(long long *)a;
+    long long y = *(long long *)b;
+
+    if (x &lt; y) return -1;
+    if (x &gt; y) return 1;
+    return 0;
+}
+
+int main() {
+    int N, K;
+    int C;
+
+    scanf("%d %d %d", &amp;N, &amp;K, &amp;C);
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf("%lld", &amp;A[i]);
+    }
+
+    qsort(A, N, sizeof(long long), compare_ll);
+
+    prefix[0] = 0;
+
+    for (int i = 0; i &lt; N; i++) {
+        prefix[i + 1] = prefix[i] + A[i];
+    }
+
+    int r = 0;
+
+    for (int x = 1; x &lt;= C; x++) {
+        while (r + 1 &lt;= N - K &amp;&amp; prefix[r + 1] &lt;= x) {
+            r++;
+        }
+
+        long long answer = prefix[r + K] - prefix[r];
+
+        printf("%lld\n", answer);
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+    <h2>7. 정답 코드 해설</h2>
+
+    <details open>
+        <summary>1. compare_ll 함수</summary>
+<pre><code>int compare_ll(const void *a, const void *b) {
+    long long x = *(long long *)a;
+    long long y = *(long long *)b;
+
+    if (x &lt; y) return -1;
+    if (x &gt; y) return 1;
+    return 0;
+}</code></pre>
+        <p>
+            C언어의 qsort에서 사용하는 비교 함수입니다.
+            x가 y보다 작으면 앞에 오도록 -1을 반환합니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>2. 정렬</summary>
+<pre><code>qsort(A, N, sizeof(long long), compare_ll);</code></pre>
+        <p>
+            물건을 가벼운 순서대로 정렬합니다.
+            이 문제의 핵심은 앞쪽 가벼운 물건을 제거하는 것입니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>3. 누적합</summary>
+<pre><code>prefix[0] = 0;
+
+for (int i = 0; i &lt; N; i++) {
+    prefix[i + 1] = prefix[i] + A[i];
+}</code></pre>
+        <p>
+            prefix[i]는 앞에서 i개의 물건 무게 합입니다.
+            예를 들어 A = 2, 3, 5라면 prefix는 0, 2, 5, 10입니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>4. 제거 개수 r</summary>
+<pre><code>while (r + 1 &lt;= N - K &amp;&amp; prefix[r + 1] &lt;= x) {
+    r++;
+}</code></pre>
+        <p>
+            r은 가방에 담아서 제거할 수 있는 앞쪽 물건의 개수입니다.
+            단, 도둑이 훔칠 K개는 남아 있어야 하므로 r은 N-K를 넘을 수 없습니다.
+        </p>
+    </details>
+
+    <details>
+        <summary>5. 정답 계산</summary>
+<pre><code>long long answer = prefix[r + K] - prefix[r];</code></pre>
+        <p>
+            앞에서 r개를 제거하면 도둑은 A[r]부터 A[r+K-1]까지 훔칩니다.
+            이 합은 prefix[r+K] - prefix[r]입니다.
+        </p>
+    </details>
+</section>
+
+<section>
+    <h2>8. 시간복잡도</h2>
+
+    <table>
+        <tr>
+            <th>작업</th>
+            <th>복잡도</th>
+        </tr>
+        <tr>
+            <td>정렬</td>
+            <td>O(N log N)</td>
+        </tr>
+        <tr>
+            <td>누적합</td>
+            <td>O(N)</td>
+        </tr>
+        <tr>
+            <td>x = 1부터 C까지 출력</td>
+            <td>O(C)</td>
+        </tr>
+        <tr>
+            <td>전체</td>
+            <td>O(N log N + C)</td>
+        </tr>
+    </table>
+
+    <div class="warn box">
+        <p>
+            C는 최대 1,000,000입니다.
+            각 x마다 처음부터 다시 찾으면 느릴 수 있습니다.
+            하지만 r은 계속 증가만 하므로 전체 계산은 빠르게 끝납니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>9. 직접 확인 문제</h2>
+
+    <div class="box">
+        <p><b>문제 1</b></p>
+        <div class="formula">N = 4, K = 2, C = 4
+A = 1 2 10 20</div>
+        <button onclick="toggleAnswer('ans1')">정답 보기</button>
+        <div id="ans1" class="result" style="display:none;">x = 1 → 2 + 10 = 12
+x = 2 → 10 + 20 = 30
+x = 3 → 10 + 20 = 30
+x = 4 → 10 + 20 = 30</div>
+    </div>
+
+    <div class="box">
+        <p><b>문제 2</b></p>
+        <div class="formula">N = 3, K = 2, C = 3
+A = 1 1 7</div>
+        <button onclick="toggleAnswer('ans2')">정답 보기</button>
+        <div id="ans2" class="result" style="display:none;">x = 1 → 앞의 1 하나 제거 가능 → 1 + 7 = 8
+x = 2 → 앞의 1 하나 제거 가능, 두 개 제거하면 K개가 안 남음 → 8
+x = 3 → 마찬가지로 8</div>
+    </div>
+</section>
+
+</main>
+
+<script>
+function loadExample(num) {
+    const ex = {
+        1: {N: 5, K: 1, C: 6, A: "1 2 3 4 5"},
+        2: {N: 5, K: 2, C: 5, A: "2 3 5 7 11"},
+        3: {N: 3, K: 2, C: 3, A: "1 1 7"}
+    };
+
+    document.getElementById("nInput").value = ex[num].N;
+    document.getElementById("kInput").value = ex[num].K;
+    document.getElementById("cInput").value = ex[num].C;
+    document.getElementById("arrInput").value = ex[num].A;
+    solveBag();
+}
+
+function solveBag() {
+    const N = parseInt(document.getElementById("nInput").value.trim(), 10);
+    const K = parseInt(document.getElementById("kInput").value.trim(), 10);
+    const C = parseInt(document.getElementById("cInput").value.trim(), 10);
+    let A = document.getElementById("arrInput").value.trim().split(/\s+/).filter(v => v.length > 0).map(Number);
+
+    const result = document.getElementById("calcResult");
+    const visual = document.getElementById("visualResult");
+
+    if (A.length !== N) {
+        result.textContent = "입력 오류: N과 물건 개수가 다릅니다.\n현재 물건 개수: " + A.length;
+        visual.innerHTML = "";
+        return;
+    }
+
+    if (K > N) {
+        result.textContent = "입력 오류: K는 N보다 클 수 없습니다.";
+        visual.innerHTML = "";
+        return;
+    }
+
+    A.sort((a, b) => a - b);
+
+    let prefix = new Array(N + 1).fill(0);
+    for (let i = 0; i < N; i++) {
+        prefix[i + 1] = prefix[i] + A[i];
+    }
+
+    let r = 0;
+    let rows = [];
+    let text = "";
+
+    text += "정렬된 물건: " + A.join(" ") + "\n";
+    text += "누적합 prefix: " + prefix.join(" ") + "\n\n";
+
+    for (let x = 1; x <= C; x++) {
+        while (r + 1 <= N - K && prefix[r + 1] <= x) {
+            r++;
+        }
+
+        const answer = prefix[r + K] - prefix[r];
+
+        rows.push({
+            x: x,
+            r: r,
+            cost: prefix[r],
+            stolen: A.slice(r, r + K),
+            answer: answer
+        });
+
+        text += "x = " + x + " → 제거 개수 r = " + r +
+                ", 제거 비용 = " + prefix[r] +
+                ", 도둑 합 = " + answer + "\n";
+    }
+
+    result.textContent = text;
+
+    let html = "<h3>용량별 결과표</h3>";
+    html += "<table><tr><th>x</th><th>제거 개수 r</th><th>제거 비용</th><th>도둑이 훔치는 물건</th><th>정답</th></tr>";
+    rows.forEach(row => {
+        html += "<tr>";
+        html += "<td>" + row.x + "</td>";
+        html += "<td>" + row.r + "</td>";
+        html += "<td>" + row.cost + "</td>";
+        html += "<td>" + row.stolen.join(", ") + "</td>";
+        html += "<td><b>" + row.answer + "</b></td>";
+        html += "</tr>";
+    });
+    html += "</table>";
+
+    const last = rows[rows.length - 1];
+    html += "<h3>마지막 x = " + C + "일 때 물건 상태</h3>";
+    html += "<div class='itemline'>";
+    for (let i = 0; i < N; i++) {
+        let cls = "item safe";
+        let label = "남음";
+        if (i < last.r) {
+            cls = "item removed";
+            label = "가방";
+        } else if (i >= last.r && i < last.r + K) {
+            cls = "item stolen";
+            label = "도둑";
+        }
+        html += "<span class='" + cls + "'>" + A[i] + "<br><small>" + label + "</small></span>";
+    }
+    html += "</div>";
+
+    html += "<p><span class='item removed'>빨강: 상훈이가 가방에 담은 물건</span> ";
+    html += "<span class='item stolen'>초록: 도둑이 훔치는 물건</span> ";
+    html += "<span class='item safe'>파랑: 남는 물건</span></p>";
+
+    visual.innerHTML = html;
+}
+
+function toggleAnswer(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+solveBag();
+</script>
+</body>
+</html>

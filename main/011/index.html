@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 3163 정기권 인터렉티브 해설</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#f8fafc,#eef2ff);color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#1e293b,#4338ca);color:white;text-align:center;padding:40px 20px}
+header h1{margin:0;font-size:34px}
+main{max-width:1160px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:22px;padding:28px;margin-bottom:24px;box-shadow:0 12px 30px rgba(67,56,202,.12)}
+h2{color:#4338ca;border-left:8px solid #6366f1;padding-left:12px;margin-top:0}
+h3{color:#0f766e}
+.box{background:#eef2ff;border:2px solid #c7d2fe;border-radius:16px;padding:18px;margin:16px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:16px 0}
+pre{background:#111827;color:#f9fafb;padding:22px;border-radius:16px;overflow-x:auto;font-size:14px;line-height:1.6}
+textarea{width:100%;min-height:160px;padding:14px;border-radius:14px;border:2px solid #a5b4fc;font-size:15px;font-family:Consolas,monospace}
+input{padding:10px;border-radius:12px;border:2px solid #a5b4fc;font-size:16px;width:80px}
+button{border:0;border-radius:12px;padding:12px 18px;background:#4338ca;color:white;font-weight:800;cursor:pointer;margin:6px 4px 6px 0}
+button:hover{background:#312e81}
+.result{font-size:22px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:16px;padding:18px;margin-top:18px;text-align:center}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:8px;text-align:center;vertical-align:top}
+th{background:#e0e7ff;color:#312e81}
+tr:nth-child(even){background:#f9fafb}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#dbeafe;border:1px solid #93c5fd;margin:4px;font-weight:800}
+.ok{background:#dcfce7;color:#14532d;border-color:#22c55e}
+.no{background:#fee2e2;color:#991b1b;border-color:#ef4444}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:14px 0}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 3163 정기권</h1>
+<p>다익스트라 4번 + S-T 최단경로 DAG + 양방향 무료 DP</p>
+</header>
+<main>
+
+<section>
+<h2>1. 문제 핵심</h2>
+<p>조이는 S에서 T까지 가는 최단경로 하나를 정기권 경로로 선택합니다. 이 경로에 포함된 간선은 양방향 무료가 됩니다. 목표는 정기권 경로를 잘 선택해서 U에서 V로 가는 비용을 최소화하는 것입니다.</p>
+<div class="box">
+<p>1. 정기권 경로는 반드시 S-T 최단경로여야 합니다.</p>
+<p>2. S-T 최단경로가 여러 개면 U-V에 가장 유리한 경로를 고릅니다.</p>
+<p>3. 정기권 간선은 양방향 무료입니다.</p>
+<p>4. 답은 정기권 선택 후 U-V 최소 비용입니다.</p>
+</div>
+</section>
+
+<section>
+<h2>2. 작은 그래프 인터렉티브 시뮬레이터</h2>
+<div class="grid">
+<div>
+<h3>기본 정보</h3>
+<label>N</label> <input id="nInput" value="5" type="number">
+<label>S</label> <input id="sInput" value="1" type="number">
+<label>T</label> <input id="tInput" value="5" type="number">
+<label>U</label> <input id="uInput" value="2" type="number">
+<label>V</label> <input id="vInput" value="3" type="number">
+<br>
+<button onclick="runSim()">실행</button>
+<button onclick="loadEx4()">예제 4</button>
+<button onclick="loadEx1()">예제 1</button>
+</div>
+<div>
+<h3>간선 입력</h3>
+<p>한 줄에 a b cost</p>
+<textarea id="edgeInput">1 2 1
+2 3 10
+2 4 10
+3 5 10
+4 5 10</textarea>
+</div>
+</div>
+<div id="msg"></div>
+<div id="simResult"></div>
+<h3>최단거리 4종류</h3>
+<div id="distTable"></div>
+<h3>S-T 최단경로 위 정점</h3>
+<div id="pathNodes"></div>
+<h3>S→T 방향 DP</h3>
+<div id="dpST"></div>
+<h3>T→S 방향 DP</h3>
+<div id="dpTS"></div>
+</section>
+
+<section>
+<h2>3. 필요한 최단거리</h2>
+<p>이 문제는 다익스트라를 4번 실행합니다.</p>
+<pre><code>distS[x] = S에서 x까지 최단거리
+distT[x] = T에서 x까지 최단거리
+distU[x] = U에서 x까지 최단거리
+distV[x] = V에서 x까지 최단거리</code></pre>
+</section>
+
+<section>
+<h2>4. S-T 최단경로 위 정점과 간선</h2>
+<p>정점 x가 S-T 최단경로 위에 있으려면 다음 조건을 만족합니다.</p>
+<pre><code>distS[x] + distT[x] == distS[T]</code></pre>
+<p>간선 now → next가 A→B 방향의 최단경로 위에 있으려면 다음 조건을 만족합니다.</p>
+<pre><code>distA[now] + cost + distB[next] == shortest</code></pre>
+</section>
+
+<section>
+<h2>5. DP의 의미</h2>
+<div class="box">
+<p>1. bestU[x] : 무료 구간을 타고 x까지 올 수 있을 때, U에서 무료 구간 시작점까지 가는 비용의 최솟값입니다.</p>
+<p>2. bestV[x] : 무료 구간을 타고 x까지 올 수 있을 때, V에서 무료 구간 시작점까지 가는 비용의 최솟값입니다.</p>
+</div>
+<pre><code>answer = min(answer, bestU[x] + distV[x]);
+answer = min(answer, bestV[x] + distU[x]);</code></pre>
+</section>
+
+<section>
+<h2>6. 양방향 무료 처리</h2>
+<p>정기권에 포함된 간선은 양방향 무료입니다. 그래서 S→T 방향과 T→S 방향을 모두 처리해야 합니다.</p>
+<pre><code>answer = min(answer, solveDirection(distS, distT, shortestST));
+answer = min(answer, solveDirection(distT, distS, shortestST));</code></pre>
+</section>
+
+<section>
+<h2>7. 코드 작성 순서</h2>
+<p>1. 그래프를 인접 리스트로 저장합니다.</p>
+<p>2. long long으로 거리 배열을 만듭니다.</p>
+<p>3. S, T, U, V에서 다익스트라를 실행합니다.</p>
+<p>4. S-T 최단경로 위 정점과 간선을 판정합니다.</p>
+<p>5. dist 기준 정렬로 최단경로 DAG를 앞에서부터 처리합니다.</p>
+<p>6. bestU, bestV를 전파합니다.</p>
+<p>7. 두 방향의 결과와 distU[V] 중 최솟값을 출력합니다.</p>
+</section>
+
+<section>
+<h2>8. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define MAXN 100005
+#define MAXE 400005
+#define INF 4000000000000000000LL
+
+typedef long long ll;
+
+typedef struct {
+    int to;
+    int next;
+    ll cost;
+} Edge;
+
+typedef struct {
+    int node;
+    ll dist;
+} HeapNode;
+
+int N, M;
+int S, T, U, V;
+
+Edge edges[MAXE];
+int head[MAXN];
+int edgeCount = 0;
+
+ll distS[MAXN], distT[MAXN], distU[MAXN], distV[MAXN];
+ll bestU[MAXN], bestV[MAXN];
+
+int order[MAXN];
+
+HeapNode heap[MAXE];
+int heapSize;
+
+ll *sortDist;
+
+void addEdge(int a, int b, ll c) {
+    edges[edgeCount].to = b;
+    edges[edgeCount].cost = c;
+    edges[edgeCount].next = head[a];
+    head[a] = edgeCount++;
+}
+
+void heapPush(int node, ll dist) {
+    int idx = ++heapSize;
+
+    while (idx &gt; 1) {
+        int parent = idx / 2;
+
+        if (heap[parent].dist &lt;= dist) break;
+
+        heap[idx] = heap[parent];
+        idx = parent;
+    }
+
+    heap[idx].node = node;
+    heap[idx].dist = dist;
+}
+
+HeapNode heapPop() {
+    HeapNode ret = heap[1];
+    HeapNode last = heap[heapSize--];
+
+    int parent = 1;
+    int child = 2;
+
+    while (child &lt;= heapSize) {
+        if (child + 1 &lt;= heapSize && heap[child + 1].dist &lt; heap[child].dist) {
+            child++;
+        }
+
+        if (heap[child].dist &gt;= last.dist) break;
+
+        heap[parent] = heap[child];
+        parent = child;
+        child *= 2;
+    }
+
+    heap[parent] = last;
+
+    return ret;
+}
+
+void dijkstra(int start, ll dist[]) {
+    for (int i = 1; i &lt;= N; i++) {
+        dist[i] = INF;
+    }
+
+    heapSize = 0;
+    dist[start] = 0;
+    heapPush(start, 0);
+
+    while (heapSize &gt; 0) {
+        HeapNode cur = heapPop();
+        int now = cur.node;
+
+        if (cur.dist != dist[now]) continue;
+
+        for (int e = head[now]; e != -1; e = edges[e].next) {
+            int next = edges[e].to;
+            ll cost = edges[e].cost;
+
+            if (dist[next] &gt; dist[now] + cost) {
+                dist[next] = dist[now] + cost;
+                heapPush(next, dist[next]);
+            }
+        }
+    }
+}
+
+int cmpOrder(const void *a, const void *b) {
+    int x = *(int *)a;
+    int y = *(int *)b;
+
+    if (sortDist[x] &lt; sortDist[y]) return -1;
+    if (sortDist[x] &gt; sortDist[y]) return 1;
+    return x - y;
+}
+
+ll min(ll a, ll b) {
+    return a &lt; b ? a : b;
+}
+
+ll solveDirection(ll distA[], ll distB[], ll shortest) {
+    for (int i = 1; i &lt;= N; i++) {
+        order[i] = i;
+        bestU[i] = INF;
+        bestV[i] = INF;
+    }
+
+    sortDist = distA;
+    qsort(order + 1, N, sizeof(int), cmpOrder);
+
+    for (int i = 1; i &lt;= N; i++) {
+        int x = order[i];
+
+        if (distA[x] + distB[x] == shortest) {
+            bestU[x] = distU[x];
+            bestV[x] = distV[x];
+        }
+    }
+
+    ll answer = INF;
+
+    for (int idx = 1; idx &lt;= N; idx++) {
+        int now = order[idx];
+
+        if (distA[now] + distB[now] != shortest) continue;
+
+        answer = min(answer, bestU[now] + distV[now]);
+        answer = min(answer, bestV[now] + distU[now]);
+
+        for (int e = head[now]; e != -1; e = edges[e].next) {
+            int next = edges[e].to;
+            ll cost = edges[e].cost;
+
+            if (distA[now] + cost + distB[next] == shortest) {
+                if (bestU[next] &gt; bestU[now]) bestU[next] = bestU[now];
+                if (bestV[next] &gt; bestV[now]) bestV[next] = bestV[now];
+            }
+        }
+    }
+
+    return answer;
+}
+
+int main() {
+    scanf("%d %d", &amp;N, &amp;M);
+    scanf("%d %d", &amp;S, &amp;T);
+    scanf("%d %d", &amp;U, &amp;V);
+
+    for (int i = 1; i &lt;= N; i++) {
+        head[i] = -1;
+    }
+
+    for (int i = 0; i &lt; M; i++) {
+        int a, b;
+        ll c;
+
+        scanf("%d %d %lld", &amp;a, &amp;b, &amp;c);
+
+        addEdge(a, b, c);
+        addEdge(b, a, c);
+    }
+
+    dijkstra(S, distS);
+    dijkstra(T, distT);
+    dijkstra(U, distU);
+    dijkstra(V, distV);
+
+    ll shortestST = distS[T];
+
+    ll answer = distU[V];
+
+    answer = min(answer, solveDirection(distS, distT, shortestST));
+    answer = min(answer, solveDirection(distT, distS, shortestST));
+
+    printf("%lld\n", answer);
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>9. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. S→T 방향만 처리하는 경우</h3>
+<p>정기권 간선은 양방향 무료이므로 T→S 방향도 처리해야 합니다.</p>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">solveDirection(distT, distS, shortestST)를 추가해야 무료 구간을 반대로 타는 경우를 잡을 수 있습니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 2. int 사용</h3>
+<p>비용이 매우 커서 int 범위를 넘습니다.</p>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">예제 2의 답이 3000000000입니다. 반드시 long long을 사용해야 합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 3. 최단경로 위가 아닌 간선으로 DP 전파</h3>
+<p>정기권 경로는 S-T 최단경로여야 합니다.</p>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">distA[now] + cost + distB[next] == shortest 조건을 만족하는 간선만 전파해야 합니다.</div>
+</div>
+</section>
+
+<section>
+<h2>10. 핵심 정리</h2>
+<p>1. 다익스트라를 S, T, U, V에서 총 4번 실행합니다.</p>
+<p>2. S-T 최단경로 위 정점은 distS[x] + distT[x] == distS[T]입니다.</p>
+<p>3. 최단경로 위 간선으로만 DP를 전파합니다.</p>
+<p>4. bestU와 bestV로 무료 구간 진입 비용의 최솟값을 관리합니다.</p>
+<p>5. 양방향 무료이므로 S→T, T→S 두 방향을 모두 처리합니다.</p>
+<p>6. 모든 거리와 답은 long long을 사용합니다.</p>
+</section>
+</main>
+
+<script>
+const INF=10n**30n;
+function parseEdges(){
+  const text=document.getElementById('edgeInput').value.trim();
+  if(!text)return [];
+  return text.split(/\n+/).map(line=>line.trim().split(/\s+/).map(Number)).filter(a=>a.length>=3);
+}
+function dijkstra(n,g,start){
+  const dist=Array(n+1).fill(INF), used=Array(n+1).fill(false);
+  dist[start]=0n;
+  for(let k=1;k<=n;k++){
+    let u=-1;
+    for(let i=1;i<=n;i++) if(!used[i]&&(u===-1||dist[i]<dist[u])) u=i;
+    if(u===-1||dist[u]===INF)break;
+    used[u]=true;
+    for(const e of g[u]){
+      const nd=dist[u]+BigInt(e.c);
+      if(nd<dist[e.to])dist[e.to]=nd;
+    }
+  }
+  return dist;
+}
+function solveDirection(n,g,distA,distB,distU,distV,shortest){
+  const order=[];
+  for(let i=1;i<=n;i++)order.push(i);
+  order.sort((a,b)=>distA[a]<distA[b]?-1:distA[a]>distA[b]?1:a-b);
+  const bestU=Array(n+1).fill(INF),bestV=Array(n+1).fill(INF);
+  for(const x of order){
+    if(distA[x]+distB[x]===shortest){
+      bestU[x]=distU[x];
+      bestV[x]=distV[x];
+    }
+  }
+  let ans=INF, rows=[];
+  for(const now of order){
+    if(distA[now]+distB[now]!==shortest)continue;
+    const c1=bestU[now]+distV[now], c2=bestV[now]+distU[now];
+    if(c1<ans)ans=c1;
+    if(c2<ans)ans=c2;
+    let prop=[];
+    for(const e of g[now]){
+      const next=e.to, cost=BigInt(e.c);
+      if(distA[now]+cost+distB[next]===shortest){
+        let ch=false;
+        if(bestU[now]<bestU[next]){bestU[next]=bestU[now];ch=true;}
+        if(bestV[now]<bestV[next]){bestV[next]=bestV[now];ch=true;}
+        prop.push(now+'→'+next+(ch?' 갱신':''));
+      }
+    }
+    rows.push({now,bestU:bestU[now],bestV:bestV[now],c1,c2,ans,prop:prop.join('<br>')||'-'});
+  }
+  return {ans,rows};
+}
+function fmt(x){return x>=INF/2n?'INF':x.toString();}
+function runSim(){
+  const n=Number(document.getElementById('nInput').value);
+  const S=Number(document.getElementById('sInput').value);
+  const T=Number(document.getElementById('tInput').value);
+  const U=Number(document.getElementById('uInput').value);
+  const V=Number(document.getElementById('vInput').value);
+  const edges=parseEdges();
+  const msg=document.getElementById('msg');
+  if(!n||n<2||n>100){msg.innerHTML='<div class="warn">시뮬레이터에서는 N을 2~100으로 입력해주세요.</div>';return;}
+  const g=Array.from({length:n+1},()=>[]);
+  for(const [a,b,c] of edges){
+    if(a<1||a>n||b<1||b>n||c<1){msg.innerHTML='<div class="warn">간선 정보를 확인해주세요.</div>';return;}
+    g[a].push({to:b,c});g[b].push({to:a,c});
+  }
+  msg.innerHTML='';
+  const distS=dijkstra(n,g,S),distT=dijkstra(n,g,T),distU=dijkstra(n,g,U),distV=dijkstra(n,g,V);
+  const shortest=distS[T];
+  const st=solveDirection(n,g,distS,distT,distU,distV,shortest);
+  const ts=solveDirection(n,g,distT,distS,distU,distV,shortest);
+  let answer=distU[V]; if(st.ans<answer)answer=st.ans; if(ts.ans<answer)answer=ts.ans;
+  document.getElementById('simResult').innerHTML='<div class="result">S-T 최단거리: '+fmt(shortest)+'<br>정기권 선택 후 U-V 최소 비용: '+fmt(answer)+'</div>';
+  let rows='';
+  for(let i=1;i<=n;i++)rows+='<tr><td>'+i+'</td><td>'+fmt(distS[i])+'</td><td>'+fmt(distT[i])+'</td><td>'+fmt(distU[i])+'</td><td>'+fmt(distV[i])+'</td></tr>';
+  document.getElementById('distTable').innerHTML='<table><tr><th>정점</th><th>distS</th><th>distT</th><th>distU</th><th>distV</th></tr>'+rows+'</table>';
+  let nodeHtml='';
+  for(let i=1;i<=n;i++){const ok=distS[i]+distT[i]===shortest;nodeHtml+='<span class="badge '+(ok?'ok':'no')+'">'+i+' : '+(ok?'포함':'제외')+'</span>';}
+  document.getElementById('pathNodes').innerHTML=nodeHtml;
+  renderDP('dpST',st.rows,'S→T 방향');
+  renderDP('dpTS',ts.rows,'T→S 방향');
+}
+function renderDP(id,rows,title){
+  let html='<table><tr><th colspan="7">'+title+'</th></tr><tr><th>정점</th><th>bestU</th><th>bestV</th><th>bestU+distV</th><th>bestV+distU</th><th>현재 후보</th><th>전파</th></tr>';
+  for(const r of rows)html+='<tr><td>'+r.now+'</td><td>'+fmt(r.bestU)+'</td><td>'+fmt(r.bestV)+'</td><td>'+fmt(r.c1)+'</td><td>'+fmt(r.c2)+'</td><td>'+fmt(r.ans)+'</td><td>'+r.prop+'</td></tr>';
+  document.getElementById(id).innerHTML=html+'</table>';
+}
+function loadEx4(){
+  document.getElementById('nInput').value=5;document.getElementById('sInput').value=1;document.getElementById('tInput').value=5;document.getElementById('uInput').value=2;document.getElementById('vInput').value=3;
+  document.getElementById('edgeInput').value='1 2 1\n2 3 10\n2 4 10\n3 5 10\n4 5 10';runSim();
+}
+function loadEx1(){
+  document.getElementById('nInput').value=6;document.getElementById('sInput').value=1;document.getElementById('tInput').value=6;document.getElementById('uInput').value=1;document.getElementById('vInput').value=4;
+  document.getElementById('edgeInput').value='1 2 1\n2 3 1\n3 5 1\n2 4 3\n4 5 2\n5 6 1';runSim();
+}
+function toggleAnswer(id){const el=document.getElementById(id);el.style.display=el.style.display==='block'?'none':'block';}
+runSim();
+</script>
+</body>
+</html>

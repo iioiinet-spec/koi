@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Lazy Segment Tree 인터랙티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+    background:#f4f7fb;
+    color:#111827;
+    font-size:18px;
+    line-height:1.75;
+}
+header{
+    background:linear-gradient(135deg,#0f172a,#2563eb);
+    color:white;
+    text-align:center;
+    padding:34px 20px;
+}
+header h1{margin:0;font-size:34px}
+header p{margin:10px 0 0;font-size:19px}
+main{max-width:1200px;margin:0 auto;padding:24px}
+section{
+    background:white;
+    border-radius:18px;
+    padding:26px;
+    margin:22px 0;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    border:1px solid #dbe4f0;
+}
+h2{
+    margin-top:0;
+    color:#1e3a8a;
+    border-left:8px solid #2563eb;
+    padding-left:14px;
+    font-size:28px;
+}
+h3{color:#0f172a;font-size:23px;margin-top:26px}
+.box{
+    background:#eff6ff;
+    border:2px solid #bfdbfe;
+    padding:18px;
+    border-radius:14px;
+    margin:16px 0;
+}
+.good{background:#ecfdf5;border-color:#bbf7d0}
+.warn{background:#fff7ed;border-color:#fed7aa}
+.formula{
+    background:#111827;
+    color:#f9fafb;
+    padding:16px;
+    border-radius:12px;
+    font-family:Consolas,monospace;
+    white-space:pre-wrap;
+    overflow-x:auto;
+    font-size:17px;
+}
+pre{
+    background:#0f172a;
+    color:#e5e7eb;
+    padding:18px;
+    border-radius:14px;
+    overflow-x:auto;
+    font-size:16px;
+    line-height:1.55;
+}
+code{font-family:Consolas,monospace}
+input,textarea,button{
+    font-size:17px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #94a3b8;
+}
+textarea{
+    width:100%;
+    min-height:110px;
+    font-family:Consolas,monospace;
+}
+button{
+    border:none;
+    background:#2563eb;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    margin:6px 4px 6px 0;
+}
+button:hover{background:#1d4ed8}
+.smallbtn{background:#475569}
+.smallbtn:hover{background:#334155}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:14px;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin:16px 0;
+    background:white;
+}
+th,td{
+    border:1px solid #cbd5e1;
+    padding:9px;
+    text-align:center;
+}
+th{background:#dbeafe;color:#111827}
+.result{
+    background:#f8fafc;
+    border:1px solid #cbd5e1;
+    padding:16px;
+    border-radius:12px;
+    margin-top:12px;
+    white-space:pre-wrap;
+    font-family:Consolas,monospace;
+    overflow-x:auto;
+}
+.step{
+    border-left:6px solid #60a5fa;
+    padding:14px 18px;
+    background:#f8fafc;
+    border-radius:12px;
+    margin:15px 0;
+}
+.array-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:16px 0;
+}
+.cell{
+    min-width:64px;
+    padding:10px;
+    border-radius:12px;
+    background:#e0f2fe;
+    border:2px solid #0284c7;
+    text-align:center;
+    font-family:Consolas,monospace;
+    font-weight:bold;
+}
+.idx{
+    display:block;
+    font-size:13px;
+    color:#475569;
+    font-weight:normal;
+}
+.hot{background:#dcfce7;border-color:#16a34a}
+.treebox{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;
+}
+.node{
+    background:#f8fafc;
+    border:2px solid #cbd5e1;
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+    font-family:Consolas,monospace;
+}
+.node b{color:#1d4ed8}
+.lazy{color:#dc2626;font-weight:bold}
+details{
+    background:#f8fafc;
+    border:1px solid #cbd5e1;
+    border-radius:12px;
+    padding:14px;
+    margin:12px 0;
+}
+summary{
+    cursor:pointer;
+    color:#1d4ed8;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>Lazy Segment Tree</h1>
+    <p>구간 업데이트 + 최댓값 쿼리를 직접 실험하는 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+    <h2>1. Lazy Segment Tree는 언제 쓰는가?</h2>
+    <p>다음 두 작업을 빠르게 해야 할 때 사용합니다.</p>
+    <div class="formula">1. 구간 [L, R]에 값을 더하기
+2. 전체 또는 특정 구간의 최댓값 구하기</div>
+
+    <div class="box">
+        <p>예를 들어 배열이 다음과 같다고 합시다.</p>
+        <div class="formula">A = [0, 0, 0, 0, 0]</div>
+        <p>여기서 `[1, 3]에 +2`, `[2, 5]에 +1` 같은 작업이 많이 들어오면 직접 배열을 모두 수정하면 느립니다.</p>
+    </div>
+</section>
+
+<section>
+    <h2>2. Lazy의 뜻</h2>
+    <p>
+        Lazy는 “게으르게 미룬다”는 뜻입니다.
+        구간 전체에 더할 값이 있을 때, 자식 노드까지 바로 내려가지 않고 표시만 해둡니다.
+    </p>
+    <div class="formula">tree[node] = 현재 구간의 최댓값
+lazy[node] = 자식에게 아직 내려보내지 않은 값</div>
+
+    <div class="good box">
+        <p>
+            완전히 포함되는 구간을 만나면 자식으로 내려가지 않고,
+            현재 노드의 tree와 lazy에만 값을 더합니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>3. 예제 문제</h2>
+    <div class="formula">N = 5
+초기 배열 = 0 0 0 0 0
+
+작업 1: [1, 3]에 +2
+작업 2: [2, 5]에 +1
+작업 3: [3, 3]에 +5
+
+각 작업 후 전체 최댓값 출력</div>
+
+    <table>
+        <tr><th>작업</th><th>배열 상태</th><th>최댓값</th></tr>
+        <tr><td>[1,3]+2</td><td>2 2 2 0 0</td><td>2</td></tr>
+        <tr><td>[2,5]+1</td><td>2 3 3 1 1</td><td>3</td></tr>
+        <tr><td>[3,3]+5</td><td>2 3 8 1 1</td><td>8</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>4. 인터랙티브 실험</h2>
+    <p>
+        N과 작업을 입력하고 “전체 실행”을 누르면 각 단계의 배열 상태와 최댓값을 볼 수 있습니다.
+        “다음 작업 실행”을 누르면 한 단계씩 확인할 수 있습니다.
+    </p>
+
+    <div class="grid">
+        <div>
+            <label><b>N</b></label><br>
+            <input id="nInput" value="5">
+        </div>
+    </div>
+
+    <p><b>작업 입력: L R value 형식으로 한 줄에 하나씩 입력</b></p>
+    <textarea id="opsInput">1 3 2
+2 5 1
+3 3 5</textarea>
+
+    <button onclick="resetSim()">초기화</button>
+    <button onclick="nextOp()">다음 작업 실행</button>
+    <button onclick="runAll()">전체 실행</button>
+    <button class="smallbtn" onclick="loadDefault()">기본 예제</button>
+
+    <h3>현재 배열 상태</h3>
+    <div id="arrayView" class="array-row"></div>
+
+    <h3>작업 결과</h3>
+    <div id="simResult" class="result"></div>
+
+    <h3>간단 Tree/Lazy 상태 보기</h3>
+    <div id="treeView" class="treebox"></div>
+</section>
+
+<section>
+    <h2>5. 코드 작성 방법</h2>
+
+    <div class="step">
+        <h3>1단계. 배열 선언</h3>
+<pre><code>#define MAXN 100000
+
+int tree[MAXN * 4];
+int lazy[MAXN * 4];</code></pre>
+        <p>세그먼트 트리는 보통 원소 개수의 4배 크기로 잡습니다.</p>
+    </div>
+
+    <div class="step">
+        <h3>2단계. 최댓값 함수</h3>
+<pre><code>int max_int(int a, int b) {
+    return a &gt; b ? a : b;
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>3단계. push 함수</h3>
+<pre><code>void push(int node) {
+    if (lazy[node] != 0) {
+        int value = lazy[node];
+
+        tree[node * 2] += value;
+        lazy[node * 2] += value;
+
+        tree[node * 2 + 1] += value;
+        lazy[node * 2 + 1] += value;
+
+        lazy[node] = 0;
+    }
+}</code></pre>
+        <p>
+            현재 노드에 미뤄둔 lazy 값을 왼쪽 자식과 오른쪽 자식에게 전달합니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>4단계. update 함수의 3가지 경우</h3>
+        <div class="formula">1. 전혀 안 겹치면 return
+2. 완전히 포함되면 tree와 lazy에 value를 더하고 return
+3. 일부만 겹치면 push 후 자식으로 내려감</div>
+<pre><code>void update(int node, int start, int end, int left, int right, int value) {
+    if (right &lt; start || end &lt; left) {
+        return;
+    }
+
+    if (left &lt;= start &amp;&amp; end &lt;= right) {
+        tree[node] += value;
+        lazy[node] += value;
+        return;
+    }
+
+    push(node);
+
+    int mid = (start + end) / 2;
+
+    update(node * 2, start, mid, left, right, value);
+    update(node * 2 + 1, mid + 1, end, left, right, value);
+
+    tree[node] = max_int(tree[node * 2], tree[node * 2 + 1]);
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>5단계. 전체 최댓값 출력</h3>
+<pre><code>int query_max() {
+    return tree[1];
+}</code></pre>
+        <p>루트 노드인 tree[1]이 전체 구간의 최댓값입니다.</p>
+    </div>
+</section>
+
+<section>
+    <h2>6. 완성 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 100000
+
+int tree[MAXN * 4];
+int lazy[MAXN * 4];
+
+int max_int(int a, int b) {
+    return a &gt; b ? a : b;
+}
+
+void push(int node) {
+    if (lazy[node] != 0) {
+        int value = lazy[node];
+
+        tree[node * 2] += value;
+        lazy[node * 2] += value;
+
+        tree[node * 2 + 1] += value;
+        lazy[node * 2 + 1] += value;
+
+        lazy[node] = 0;
+    }
+}
+
+void update(int node, int start, int end, int left, int right, int value) {
+    if (right &lt; start || end &lt; left) {
+        return;
+    }
+
+    if (left &lt;= start &amp;&amp; end &lt;= right) {
+        tree[node] += value;
+        lazy[node] += value;
+        return;
+    }
+
+    push(node);
+
+    int mid = (start + end) / 2;
+
+    update(node * 2, start, mid, left, right, value);
+    update(node * 2 + 1, mid + 1, end, left, right, value);
+
+    tree[node] = max_int(tree[node * 2], tree[node * 2 + 1]);
+}
+
+int query_max() {
+    return tree[1];
+}
+
+int main() {
+    int N = 5;
+
+    update(1, 1, N, 1, 3, 2);
+    printf("%d\n", query_max());
+
+    update(1, 1, N, 2, 5, 1);
+    printf("%d\n", query_max());
+
+    update(1, 1, N, 3, 3, 5);
+    printf("%d\n", query_max());
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+    <h2>7. 핵심 정리</h2>
+    <div class="formula">tree[node] = 현재 구간의 최댓값
+lazy[node] = 아직 자식에게 안 내려보낸 값
+
+update 핵심:
+1. 안 겹치면 return
+2. 완전히 포함되면 tree와 lazy에 더하고 return
+3. 일부만 겹치면 push 후 자식으로 내려감</div>
+
+    <div class="good box">
+        <p>
+            Lazy Segment Tree는 구간 전체를 한 번에 수정하는 문제에서 매우 중요합니다.
+            정올 #8607 상자 보관처럼 구간에 1을 더하고 최대값을 구하는 문제에 바로 사용할 수 있습니다.
+        </p>
+    </div>
+</section>
+</main>
+
+<script>
+let arr = [];
+let ops = [];
+let cur = 0;
+let tree = [];
+let lazy = [];
+let N = 5;
+
+function loadDefault(){
+    document.getElementById("nInput").value = "5";
+    document.getElementById("opsInput").value = "1 3 2\n2 5 1\n3 3 5";
+    resetSim();
+}
+
+function parseOps(){
+    N = parseInt(document.getElementById("nInput").value.trim(),10);
+    const lines = document.getElementById("opsInput").value.trim().split(/\n+/);
+    let result = [];
+    for(const line of lines){
+        const p = line.trim().split(/\s+/).map(Number);
+        if(p.length >= 3){
+            result.push({l:p[0], r:p[1], v:p[2]});
+        }
+    }
+    return result;
+}
+
+function maxInt(a,b){ return a>b?a:b; }
+
+function pushJS(node){
+    if(lazy[node] !== 0){
+        const value = lazy[node];
+
+        tree[node*2] += value;
+        lazy[node*2] += value;
+
+        tree[node*2+1] += value;
+        lazy[node*2+1] += value;
+
+        lazy[node] = 0;
+    }
+}
+
+function updateJS(node,start,end,left,right,value){
+    if(right < start || end < left) return;
+
+    if(left <= start && end <= right){
+        tree[node] += value;
+        lazy[node] += value;
+        return;
+    }
+
+    pushJS(node);
+
+    const mid = Math.floor((start+end)/2);
+    updateJS(node*2,start,mid,left,right,value);
+    updateJS(node*2+1,mid+1,end,left,right,value);
+
+    tree[node] = maxInt(tree[node*2] || 0, tree[node*2+1] || 0);
+}
+
+function resetSim(){
+    try{
+        ops = parseOps();
+        arr = new Array(N+1).fill(0);
+        tree = new Array(N*4+10).fill(0);
+        lazy = new Array(N*4+10).fill(0);
+        cur = 0;
+        drawArray(-1,-1);
+        drawTree();
+        document.getElementById("simResult").textContent = "초기화 완료\n배열: " + arr.slice(1).join(" ") + "\n전체 최댓값: 0";
+    }catch(e){
+        document.getElementById("simResult").textContent = "오류: " + e.message;
+    }
+}
+
+function nextOp(){
+    if(cur >= ops.length){
+        document.getElementById("simResult").textContent += "\n\n모든 작업을 실행했습니다.";
+        return;
+    }
+
+    const op = ops[cur];
+
+    if(op.l < 1 || op.r > N || op.l > op.r){
+        document.getElementById("simResult").textContent += "\n\n잘못된 작업: " + JSON.stringify(op);
+        cur++;
+        return;
+    }
+
+    for(let i=op.l;i<=op.r;i++){
+        arr[i] += op.v;
+    }
+
+    updateJS(1,1,N,op.l,op.r,op.v);
+
+    const maxVal = tree[1];
+
+    let text = "";
+    text += (cur+1) + "번째 작업 실행\n";
+    text += "[" + op.l + ", " + op.r + "] 구간에 +" + op.v + "\n\n";
+    text += "직접 배열 상태: " + arr.slice(1).join(" ") + "\n";
+    text += "Lazy Segment Tree의 tree[1] = " + maxVal + "\n";
+    text += "현재 전체 최댓값 = " + maxVal + "\n";
+
+    document.getElementById("simResult").textContent = text;
+
+    drawArray(op.l,op.r);
+    drawTree();
+
+    cur++;
+}
+
+function runAll(){
+    resetSim();
+    let logs = "";
+    for(let k=0;k<ops.length;k++){
+        const op = ops[k];
+        for(let i=op.l;i<=op.r;i++) arr[i] += op.v;
+        updateJS(1,1,N,op.l,op.r,op.v);
+        logs += (k+1) + "번째 작업 [" + op.l + "," + op.r + "] +" + op.v + "\n";
+        logs += "배열: " + arr.slice(1).join(" ") + "\n";
+        logs += "최댓값: " + tree[1] + "\n\n";
+    }
+    cur = ops.length;
+    document.getElementById("simResult").textContent = logs;
+    drawArray(-1,-1);
+    drawTree();
+}
+
+function drawArray(l,r){
+    const view = document.getElementById("arrayView");
+    let html = "";
+    for(let i=1;i<=N;i++){
+        const cls = (i>=l && i<=r) ? "cell hot" : "cell";
+        html += `<div class="${cls}"><span class="idx">${i}번</span>${arr[i] || 0}</div>`;
+    }
+    view.innerHTML = html;
+}
+
+function drawTree(){
+    const view = document.getElementById("treeView");
+    let html = "";
+    const limit = Math.min(N*4, 15);
+    for(let i=1;i<=limit;i++){
+        const tv = tree[i] || 0;
+        const lv = lazy[i] || 0;
+        if(tv !== 0 || lv !== 0 || i === 1){
+            html += `<div class="node">node ${i}<br>tree=<b>${tv}</b><br>lazy=<span class="lazy">${lv}</span></div>`;
+        }
+    }
+    view.innerHTML = html || "<p>아직 표시할 tree/lazy 값이 없습니다.</p>";
+}
+
+resetSim();
+</script>
+</body>
+</html>

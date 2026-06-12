@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 1396 창고다각형 - 인터랙티브 해설</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f4f7fb;color:#111827;font-size:18px;line-height:1.7}
+header{background:linear-gradient(135deg,#172554,#2563eb);color:white;text-align:center;padding:34px 20px}
+header h1{margin:0;font-size:34px}header p{margin:10px 0 0;font-size:19px}
+main{max-width:1200px;margin:0 auto;padding:24px}
+section{background:white;border-radius:18px;padding:26px;margin:22px 0;box-shadow:0 8px 24px rgba(15,23,42,.08);border:1px solid #dbe4f0}
+h2{margin-top:0;color:#1e3a8a;border-left:8px solid #2563eb;padding-left:14px;font-size:28px}h3{color:#0f172a;font-size:23px;margin-top:26px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;padding:18px;border-radius:14px;margin:16px 0}.good{background:#ecfdf5;border-color:#bbf7d0}.warn{background:#fff7ed;border-color:#fed7aa}
+.formula{background:#111827;color:#f9fafb;padding:16px;border-radius:12px;font-family:Consolas,monospace;white-space:pre-wrap;overflow-x:auto;font-size:17px}
+pre{background:#0f172a;color:#e5e7eb;padding:18px;border-radius:14px;overflow-x:auto;font-size:16px;line-height:1.55}code{font-family:Consolas,monospace}
+input,textarea,button{font-size:17px;padding:10px;border-radius:10px;border:1px solid #94a3b8}textarea{width:100%;min-height:150px;font-family:Consolas,monospace}
+button{border:none;background:#2563eb;color:white;font-weight:bold;cursor:pointer;margin:6px 4px 6px 0}button:hover{background:#1d4ed8}.smallbtn{background:#475569}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}table{width:100%;border-collapse:collapse;margin:16px 0;background:white}th,td{border:1px solid #cbd5e1;padding:9px;text-align:center}th{background:#dbeafe;color:#111827}
+.result{background:#f8fafc;border:1px solid #cbd5e1;padding:16px;border-radius:12px;margin-top:12px;white-space:pre-wrap;font-family:Consolas,monospace;overflow-x:auto}
+.step{border-left:6px solid #60a5fa;padding:14px 18px;background:#f8fafc;border-radius:12px;margin:15px 0}.canvasWrap{overflow-x:auto;background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:16px;margin:16px 0}
+canvas{background:white;border:1px solid #cbd5e1;border-radius:10px}.legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}.legend span{display:inline-block;padding:6px 10px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc}
+</style>
+</head>
+<body>
+<header><h1>정올 1396 창고다각형</h1><p>왼쪽 최대 높이 + 오른쪽 최대 높이로 최소 면적을 구하는 인터랙티브 강의자료</p></header>
+<main>
+<section><h2>1. 문제 핵심</h2><p>여러 기둥을 모두 포함하면서, 비가 고이지 않도록 오목하지 않은 지붕을 만들어야 합니다.</p><div class="formula">창고 다각형의 최소 면적
+
+왼쪽 → 가장 높은 기둥까지:
+현재까지 만난 최대 높이로 지붕을 만든다.
+
+오른쪽 → 가장 높은 기둥까지:
+현재까지 만난 최대 높이로 지붕을 만든다.</div><div class="good box"><p>가장 높은 기둥을 기준으로 왼쪽과 오른쪽을 나누어 계산하면 됩니다.</p></div></section>
+<section><h2>2. 왜 가장 높은 기둥을 기준으로 나누는가?</h2><p>왼쪽에서 최고 기둥으로 갈 때 지붕이 낮아졌다가 다시 높아지면 오목한 부분이 생깁니다.</p><div class="formula">왼쪽 부분의 지붕 높이 = 왼쪽에서 현재까지의 최대 높이
+오른쪽 부분의 지붕 높이 = 오른쪽에서 현재까지의 최대 높이</div><p>이렇게 해야 모든 기둥을 포함하면서 면적이 가장 작습니다.</p></section>
+<section><h2>3. 인터랙티브 계산기</h2><p>기둥 정보를 입력하면 가장 높은 기둥, 왼쪽 면적, 오른쪽 면적, 전체 면적을 계산하고 그림으로 보여줍니다.</p><div class="grid"><div><label><b>N</b></label><br><input id="nInput" value="7"></div></div><p><b>기둥 정보: L H 형식으로 한 줄에 하나씩 입력</b></p><textarea id="pillarInput">2 4
+11 4
+15 8
+4 6
+5 3
+8 10
+13 6</textarea><button onclick="solve()">계산하기</button><button class="smallbtn" onclick="loadExample()">예제 불러오기</button><div class="legend"><span>파란 막대: 실제 기둥</span><span>연한 파랑: 창고 다각형 면적</span><span>주황색: 가장 높은 기둥</span></div><div class="canvasWrap"><canvas id="chart" width="1050" height="420"></canvas></div><div id="tableView"></div><div id="resultView" class="result"></div></section>
+<section><h2>4. 코드 작성 방법</h2><div class="step"><h3>1단계. 위치별 높이 배열 만들기</h3><pre><code>#define MAXL 1000
+
+int height[MAXL + 1];</code></pre><p>기둥 위치 L이 1 이상 1000 이하이므로 배열로 관리할 수 있습니다.</p></div><div class="step"><h3>2단계. 입력 받으면서 필요한 값 찾기</h3><pre><code>if (L &lt; left) left = L;
+if (L &gt; right) right = L;
+
+if (H &gt; maxHeight) {
+    maxHeight = H;
+    maxPos = L;
+}</code></pre></div><div class="step"><h3>3단계. 왼쪽에서 최고 기둥까지 계산</h3><pre><code>int current = 0;
+
+for (int i = left; i &lt;= maxPos; i++) {
+    if (height[i] &gt; current) {
+        current = height[i];
+    }
+
+    area += current;
+}</code></pre></div><div class="step"><h3>4단계. 오른쪽에서 최고 기둥 다음 위치까지 계산</h3><pre><code>current = 0;
+
+for (int i = right; i &gt; maxPos; i--) {
+    if (height[i] &gt; current) {
+        current = height[i];
+    }
+
+    area += current;
+}</code></pre><p>최고 기둥 위치는 왼쪽 계산에서 이미 포함했으므로 오른쪽에서는 제외합니다.</p></div></section>
+<section><h2>5. 정답 C 코드</h2><pre><code>#include &lt;stdio.h&gt;
+
+#define MAXL 1000
+
+int height[MAXL + 1];
+
+int main() {
+    int N;
+    int L, H;
+    int left = 1001;
+    int right = 0;
+    int maxHeight = 0;
+    int maxPos = 0;
+    int area = 0;
+
+    scanf("%d", &amp;N);
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf("%d %d", &amp;L, &amp;H);
+        height[L] = H;
+        if (L &lt; left) left = L;
+        if (L &gt; right) right = L;
+        if (H &gt; maxHeight) {
+            maxHeight = H;
+            maxPos = L;
+        }
+    }
+
+    int current = 0;
+
+    for (int i = left; i &lt;= maxPos; i++) {
+        if (height[i] &gt; current) current = height[i];
+        area += current;
+    }
+
+    current = 0;
+
+    for (int i = right; i &gt; maxPos; i--) {
+        if (height[i] &gt; current) current = height[i];
+        area += current;
+    }
+
+    printf("%d\n", area);
+    return 0;
+}</code></pre></section>
+<section><h2>6. 시간복잡도</h2><div class="formula">입력 처리: O(N)
+왼쪽 계산: O(1000)
+오른쪽 계산: O(1000)
+
+전체 시간복잡도 = O(N + 1000)</div><div class="good box"><p>위치가 1000 이하이므로 배열을 이용한 풀이가 가장 쉽고 빠릅니다.</p></div></section>
+</main>
+<script>
+function loadExample(){document.getElementById('nInput').value='7';document.getElementById('pillarInput').value='2 4\n11 4\n15 8\n4 6\n5 3\n8 10\n13 6';solve();}
+function parseInput(){const N=parseInt(document.getElementById('nInput').value.trim(),10);const lines=document.getElementById('pillarInput').value.trim().split(/\n+/);const pillars=[];for(const line of lines){const p=line.trim().split(/\s+/).map(Number);if(p.length>=2)pillars.push({L:p[0],H:p[1]});}if(pillars.length!==N)throw new Error('N과 기둥 개수가 다릅니다. 현재 개수: '+pillars.length);return pillars;}
+function solve(){const result=document.getElementById('resultView');const tableView=document.getElementById('tableView');try{const pillars=parseInput();const height=new Array(1001).fill(0);let left=1001,right=0,maxHeight=0,maxPos=0;for(const p of pillars){height[p.L]=p.H;if(p.L<left)left=p.L;if(p.L>right)right=p.L;if(p.H>maxHeight){maxHeight=p.H;maxPos=p.L;}}let roof=new Array(1001).fill(0);let area=0,current=0;let leftDetails=[];for(let i=left;i<=maxPos;i++){if(height[i]>current)current=height[i];roof[i]=current;area+=current;leftDetails.push({pos:i,h:height[i],roof:current,add:current});}current=0;let rightDetails=[];for(let i=right;i>maxPos;i--){if(height[i]>current)current=height[i];roof[i]=current;area+=current;rightDetails.push({pos:i,h:height[i],roof:current,add:current});}drawChart(height,roof,left,right,maxPos,maxHeight);let html='<h3>위치별 계산표</h3><table><tr><th>구간</th><th>위치</th><th>실제 기둥 높이</th><th>지붕 높이</th><th>더한 면적</th></tr>';for(const d of leftDetails){html+=`<tr><td>왼쪽→최고</td><td>${d.pos}</td><td>${d.h}</td><td>${d.roof}</td><td>${d.add}</td></tr>`;}rightDetails.reverse();for(const d of rightDetails){html+=`<tr><td>오른쪽→최고</td><td>${d.pos}</td><td>${d.h}</td><td>${d.roof}</td><td>${d.add}</td></tr>`;}html+='</table>';tableView.innerHTML=html;let text='';text+='가장 왼쪽 기둥 위치 = '+left+'\n';text+='가장 오른쪽 기둥 위치 = '+right+'\n';text+='가장 높은 기둥 위치 = '+maxPos+'\n';text+='가장 높은 기둥 높이 = '+maxHeight+'\n\n';text+='왼쪽에서 최고 기둥까지 현재 최대 높이를 더합니다.\n';text+='오른쪽에서 최고 기둥 다음 위치까지 현재 최대 높이를 더합니다.\n\n';text+='최소 창고 다각형 면적 = '+area;result.textContent=text;}catch(e){result.textContent='오류: '+e.message;tableView.innerHTML='';clearCanvas();}}
+function clearCanvas(){const canvas=document.getElementById('chart');const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);}
+function drawChart(height,roof,left,right,maxPos,maxHeight){const canvas=document.getElementById('chart');const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);const margin=55;const w=canvas.width-margin*2;const h=canvas.height-margin*2;const range=right-left+1;const cellW=w/range;const scaleY=h/(maxHeight+2);ctx.strokeStyle='#334155';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(margin,canvas.height-margin);ctx.lineTo(canvas.width-margin+20,canvas.height-margin);ctx.stroke();for(let x=left;x<=right;x++){const idx=x-left;const px=margin+idx*cellW;const base=canvas.height-margin;if(roof[x]>0){ctx.fillStyle='rgba(96,165,250,0.25)';ctx.fillRect(px,base-roof[x]*scaleY,cellW,roof[x]*scaleY);}if(height[x]>0){ctx.fillStyle=(x===maxPos)?'#f97316':'#2563eb';ctx.fillRect(px+cellW*0.18,base-height[x]*scaleY,cellW*0.64,height[x]*scaleY);}if(height[x]>0||x===left||x===right||x===maxPos){ctx.fillStyle='#111827';ctx.font='13px Consolas';ctx.textAlign='center';ctx.fillText(x,px+cellW/2,base+18);}}ctx.strokeStyle='#0f172a';ctx.lineWidth=3;ctx.beginPath();for(let x=left;x<=right;x++){const idx=x-left;const px=margin+idx*cellW+cellW/2;const py=canvas.height-margin-roof[x]*scaleY;if(x===left)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();ctx.fillStyle='#111827';ctx.font='15px Malgun Gothic';ctx.textAlign='left';ctx.fillText('높이',12,28);ctx.fillText('위치',canvas.width-80,canvas.height-20);}
+solve();
+</script>
+</body>
+</html>

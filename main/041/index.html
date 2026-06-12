@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>트리의 공통 조상 LCA 인터렉티브 강의자료</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#f8fafc,#ecfdf5);color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#111827,#15803d);color:white;text-align:center;padding:40px 20px}
+header h1{margin:0;font-size:34px}
+main{max-width:1120px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:22px;padding:28px;margin-bottom:24px;box-shadow:0 12px 30px rgba(21,128,61,.12)}
+h2{color:#15803d;border-left:8px solid #22c55e;padding-left:12px;margin-top:0}
+h3{color:#4338ca}
+.box{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:16px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:16px 0}
+pre{background:#111827;color:#f9fafb;padding:22px;border-radius:16px;overflow-x:auto;font-size:14px;line-height:1.6}
+button{border:0;border-radius:12px;padding:12px 18px;background:#15803d;color:white;font-weight:800;cursor:pointer;font-size:15px;margin:6px 4px 6px 0}
+button:hover{background:#166534}
+input{padding:10px;border-radius:12px;border:2px solid #86efac;font-size:16px;width:100px}
+textarea{width:100%;min-height:120px;border:2px solid #86efac;border-radius:14px;padding:14px;font-family:Consolas,monospace;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.tree{position:relative;height:360px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;margin-top:16px}
+.node{position:absolute;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;border:3px solid #3b82f6;background:#dbeafe;color:#1e3a8a;z-index:2}
+.mark{background:#fef3c7!important;border-color:#f59e0b!important;color:#92400e!important}
+.lca{background:#dcfce7!important;border-color:#22c55e!important;color:#14532d!important}
+svg{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:9px;text-align:center;vertical-align:top}
+th{background:#dcfce7;color:#14532d}
+tr:nth-child(even){background:#f9fafb}
+.result{font-size:18px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:16px;padding:18px;margin-top:18px;white-space:pre-wrap}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>트리의 공통 조상 LCA</h1>
+<p>Binary Lifting으로 두 노드의 가장 가까운 공통 조상 찾기</p>
+</header>
+<main>
+
+<section>
+<h2>1. 문제 핵심</h2>
+<p>루트가 1번인 트리에서 두 노드 A, B가 주어질 때 두 노드의 가장 가까운 공통 조상, 즉 LCA를 출력하는 문제입니다.</p>
+<div class="box">
+<p>1. LCA는 Lowest Common Ancestor의 약자입니다.</p>
+<p>2. 두 노드가 공통으로 가지는 조상 중 가장 아래쪽 조상입니다.</p>
+<p>3. N과 Q가 최대 300,000이므로 한 칸씩 올라가면 시간초과가 납니다.</p>
+<p>4. Binary Lifting으로 O(log N)에 질의를 처리합니다.</p>
+</div>
+</section>
+
+<section>
+<h2>2. 예제 트리 인터렉티브</h2>
+<p>예제 트리에서 LCA 질의를 직접 실행해 보세요.</p>
+<div class="tree" id="treeView"></div>
+<div class="grid2">
+<div>
+<h3>LCA 질의</h3>
+<label>A</label><input id="lcaA" type="number" value="4">
+<label>B</label><input id="lcaB" type="number" value="5">
+<button onclick="showLCA()">LCA 찾기</button>
+<button onclick="runAllQueries()">예제 질의 전체 실행</button>
+<div id="lcaResult" class="result"></div>
+</div>
+<div>
+<h3>예제 질의 결과</h3>
+<div id="queryResult"></div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>3. depth와 parent 테이블</h2>
+<p>BFS로 depth와 parent[0]을 만들고, 이후 parent[k] 테이블을 완성합니다.</p>
+<div id="parentTable"></div>
+</section>
+
+<section>
+<h2>4. 직접 트리 입력해서 실행하기</h2>
+<p>작은 트리를 입력하면 LCA 테이블을 만들어 확인할 수 있습니다.</p>
+<label>N</label><input id="customN" type="number" value="5">
+<button onclick="loadDefault()">예제 불러오기</button>
+<button onclick="runCustom()">테이블 만들기</button>
+<textarea id="customEdges">1 2
+2 3
+3 4
+2 5</textarea>
+<div id="customResult"></div>
+</section>
+
+<section>
+<h2>5. LCA 계산 방법</h2>
+<div class="box">
+<p>1. 더 깊은 노드를 위로 올려 두 노드의 깊이를 맞춥니다.</p>
+<p>2. 두 노드가 같아지면 그 노드가 LCA입니다.</p>
+<p>3. 다르면 큰 점프부터 동시에 위로 올립니다.</p>
+<p>4. 두 노드가 LCA 바로 아래에 도착하면 parent[0][a]가 답입니다.</p>
+</div>
+<pre><code>if (depth[a] &lt; depth[b]) swap(a, b);
+
+diff = depth[a] - depth[b];
+
+for (k = 0; k &lt; LOG; k++) {
+    if (diff &amp; (1 &lt;&lt; k)) {
+        a = parent[k][a];
+    }
+}
+
+if (a == b) return a;
+
+for (k = LOG - 1; k &gt;= 0; k--) {
+    if (parent[k][a] != parent[k][b]) {
+        a = parent[k][a];
+        b = parent[k][b];
+    }
+}
+
+return parent[0][a];</code></pre>
+</section>
+
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 300005
+#define MAXE 600005
+#define LOG 20
+
+typedef struct {
+    int to;
+    int next;
+} Edge;
+
+Edge edges[MAXE];
+int head[MAXN];
+int edgeCount = 0;
+
+int parent[LOG][MAXN];
+int depth[MAXN];
+int visited[MAXN];
+int queue[MAXN];
+
+void addEdge(int a, int b) {
+    edges[edgeCount].to = b;
+    edges[edgeCount].next = head[a];
+    head[a] = edgeCount++;
+}
+
+void bfs(int root) {
+    int front = 0;
+    int rear = 0;
+
+    visited[root] = 1;
+    depth[root] = 0;
+    parent[0][root] = 0;
+    queue[rear++] = root;
+
+    while (front &lt; rear) {
+        int now = queue[front++];
+
+        for (int e = head[now]; e != -1; e = edges[e].next) {
+            int next = edges[e].to;
+
+            if (visited[next]) continue;
+
+            visited[next] = 1;
+            depth[next] = depth[now] + 1;
+            parent[0][next] = now;
+            queue[rear++] = next;
+        }
+    }
+}
+
+void buildTable(int N) {
+    for (int k = 1; k &lt; LOG; k++) {
+        for (int v = 1; v &lt;= N; v++) {
+            parent[k][v] = parent[k - 1][ parent[k - 1][v] ];
+        }
+    }
+}
+
+int lca(int a, int b) {
+    if (depth[a] &lt; depth[b]) {
+        int temp = a;
+        a = b;
+        b = temp;
+    }
+
+    int diff = depth[a] - depth[b];
+
+    for (int k = 0; k &lt; LOG; k++) {
+        if (diff &amp; (1 &lt;&lt; k)) {
+            a = parent[k][a];
+        }
+    }
+
+    if (a == b) return a;
+
+    for (int k = LOG - 1; k &gt;= 0; k--) {
+        if (parent[k][a] != parent[k][b]) {
+            a = parent[k][a];
+            b = parent[k][b];
+        }
+    }
+
+    return parent[0][a];
+}
+
+int main() {
+    int N, Q;
+
+    scanf("%d", &amp;N);
+
+    for (int i = 1; i &lt;= N; i++) {
+        head[i] = -1;
+    }
+
+    for (int i = 0; i &lt; N - 1; i++) {
+        int a, b;
+        scanf("%d %d", &amp;a, &amp;b);
+        addEdge(a, b);
+        addEdge(b, a);
+    }
+
+    bfs(1);
+    buildTable(N);
+
+    scanf("%d", &amp;Q);
+
+    for (int i = 0; i &lt; Q; i++) {
+        int a, b;
+        scanf("%d %d", &amp;a, &amp;b);
+        printf("%d\n", lca(a, b));
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>7. 왜 BFS를 사용하는가?</h2>
+<div class="warn">
+<p>N이 최대 300,000이므로 재귀 DFS를 사용하면 트리가 일자로 긴 경우 C에서 스택 오버플로우가 날 수 있습니다. 그래서 큐를 이용한 BFS가 안전합니다.</p>
+</div>
+</section>
+
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. LOG를 너무 작게 잡는 경우</h3>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">N이 300,000이므로 2^19=524,288까지 필요합니다. LOG는 20으로 잡으면 안전합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 2. 깊이를 맞추지 않고 동시에 올리는 경우</h3>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">두 노드의 깊이가 다르면 같은 높이의 조상을 비교할 수 없으므로 먼저 깊이를 맞춰야 합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 3. parent[0]을 만들기 전에 테이블을 만드는 경우</h3>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">parent[k]는 parent[k-1]로 만들기 때문에 BFS로 parent[0]을 먼저 완성해야 합니다.</div>
+</div>
+</section>
+
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. LCA는 두 노드의 가장 가까운 공통 조상입니다.</p>
+<p>2. parent[k][v]는 v의 2^k번째 조상입니다.</p>
+<p>3. BFS로 depth와 parent[0]을 만듭니다.</p>
+<p>4. Binary Lifting 테이블을 만듭니다.</p>
+<p>5. 질의마다 깊이를 맞춘 뒤 동시에 위로 올립니다.</p>
+<p>6. 전처리 O(N log N), 질의 O(log N)입니다.</p>
+</section>
+
+</main>
+
+<script>
+let N=5;
+let edges=[[1,2],[2,3],[3,4],[2,5]];
+let graph=[], parent=[], depth=[], LOG=4;
+const pos={1:[270,30],2:[270,110],3:[180,200],4:[180,285],5:[360,200]};
+
+function build(n, es){
+  N=n; edges=es;
+  LOG=1;
+  while((1<<LOG)<=N) LOG++;
+  graph=Array.from({length:N+1},()=>[]);
+  for(const [a,b] of edges){graph[a].push(b);graph[b].push(a);}
+  parent=Array.from({length:LOG+1},()=>Array(N+1).fill(0));
+  depth=Array(N+1).fill(0);
+  const visited=Array(N+1).fill(false);
+  const q=[1];
+  visited[1]=true;
+  for(let qi=0;qi<q.length;qi++){
+    const now=q[qi];
+    for(const next of graph[now]){
+      if(visited[next]) continue;
+      visited[next]=true;
+      depth[next]=depth[now]+1;
+      parent[0][next]=now;
+      q.push(next);
+    }
+  }
+  for(let k=1;k<=LOG;k++){
+    for(let v=1;v<=N;v++){
+      parent[k][v]=parent[k-1][parent[k-1][v]];
+    }
+  }
+}
+
+function getLCA(a,b){
+  let steps=[];
+  if(depth[a]<depth[b]){let t=a;a=b;b=t;}
+  steps.push("시작: a="+a+", b="+b);
+  steps.push("깊이: depth[a]="+depth[a]+", depth[b]="+depth[b]);
+  let diff=depth[a]-depth[b];
+  for(let k=0;k<=LOG;k++){
+    if(diff & (1<<k)){
+      steps.push("a를 "+(1<<k)+"칸 올림: "+a+" → "+parent[k][a]);
+      a=parent[k][a];
+    }
+  }
+  if(a===b){
+    steps.push("깊이를 맞춘 뒤 두 노드가 같으므로 LCA="+a);
+    return {lca:a,steps};
+  }
+  for(let k=LOG;k>=0;k--){
+    if(parent[k][a]!==parent[k][b]){
+      steps.push((1<<k)+"칸 동시 점프: a "+a+"→"+parent[k][a]+", b "+b+"→"+parent[k][b]);
+      a=parent[k][a];
+      b=parent[k][b];
+    }
+  }
+  steps.push("두 노드가 LCA 바로 아래에 있음. parent[0]["+a+"]="+parent[0][a]);
+  return {lca:parent[0][a],steps};
+}
+
+function renderTree(mark=[], lcaNode=0){
+  const view=document.getElementById("treeView");
+  let svg="<svg>";
+  for(const [a,b] of edges){
+    const p1=pos[a]||[60+(a%8)*80,60+Math.floor(a/8)*90];
+    const p2=pos[b]||[60+(b%8)*80,60+Math.floor(b/8)*90];
+    svg+='<line x1="'+(p1[0]+27)+'" y1="'+(p1[1]+27)+'" x2="'+(p2[0]+27)+'" y2="'+(p2[1]+27)+'" stroke="#64748b" stroke-width="3"/>';
+  }
+  svg+="</svg>";
+  let html=svg;
+  for(let v=1;v<=N;v++){
+    const p=pos[v]||[60+(v%8)*80,60+Math.floor(v/8)*90];
+    let cls="node";
+    if(mark.includes(v)) cls+=" mark";
+    if(v===lcaNode) cls+=" lca";
+    html+='<div class="'+cls+'" style="left:'+p[0]+'px;top:'+p[1]+'px">'+v+'</div>';
+  }
+  view.innerHTML=html;
+}
+
+function renderParentTable(){
+  let html="<table><tr><th>노드</th><th>depth</th>";
+  for(let k=0;k<=LOG;k++) html+="<th>parent["+k+"]<br>2^"+k+" 조상</th>";
+  html+="</tr>";
+  for(let v=1;v<=N;v++){
+    html+="<tr><td>"+v+"</td><td>"+depth[v]+"</td>";
+    for(let k=0;k<=LOG;k++) html+="<td>"+parent[k][v]+"</td>";
+    html+="</tr>";
+  }
+  document.getElementById("parentTable").innerHTML=html+"</table>";
+}
+
+function showLCA(){
+  const a=Number(document.getElementById("lcaA").value);
+  const b=Number(document.getElementById("lcaB").value);
+  if(a<1||a>N||b<1||b>N){
+    document.getElementById("lcaResult").textContent="입력을 확인하세요.";
+    return;
+  }
+  const r=getLCA(a,b);
+  renderTree([a,b],r.lca);
+  document.getElementById("lcaResult").textContent="결과: LCA("+a+", "+b+") = "+r.lca+"\n\n과정\n"+r.steps.join("\n");
+}
+
+function runAllQueries(){
+  const qs=[[1,2],[3,5],[4,5],[3,4]];
+  let rows="";
+  for(const [a,b] of qs){
+    const r=getLCA(a,b);
+    rows+="<tr><td>"+a+" "+b+"</td><td>"+r.lca+"</td></tr>";
+  }
+  document.getElementById("queryResult").innerHTML="<table><tr><th>질의</th><th>LCA</th></tr>"+rows+"</table>";
+}
+
+function parseCustomEdges(){
+  const text=document.getElementById("customEdges").value.trim();
+  if(!text)return [];
+  return text.split(/\n+/).map(line=>line.trim().split(/\s+/).map(Number)).filter(a=>a.length>=2);
+}
+
+function runCustom(){
+  const n=Number(document.getElementById("customN").value);
+  const es=parseCustomEdges();
+  if(!n||n<2||n>30||es.length!==n-1){
+    document.getElementById("customResult").innerHTML='<div class="warn">N은 2~30, 간선은 N-1개로 입력해주세요.</div>';
+    return;
+  }
+  build(n,es);
+  renderTree();
+  renderParentTable();
+  document.getElementById("customResult").innerHTML='<div class="result">테이블 생성 완료! 위 parent 테이블을 확인하세요.</div>';
+}
+
+function loadDefault(){
+  document.getElementById("customN").value=5;
+  document.getElementById("customEdges").value="1 2\n2 3\n3 4\n2 5";
+  build(5,[[1,2],[2,3],[3,4],[2,5]]);
+  renderTree();
+  renderParentTable();
+  showLCA();
+  runAllQueries();
+}
+
+function toggleAnswer(id){
+  const el=document.getElementById(id);
+  el.style.display=el.style.display==="block"?"none":"block";
+}
+
+build(N,edges);
+renderTree();
+renderParentTable();
+showLCA();
+runAllQueries();
+</script>
+</body>
+</html>

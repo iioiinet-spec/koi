@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 11761 승리 스왑 - 인터랙티브 해설</title>
+<style>
+body{margin:0;font-family:Malgun Gothic,Arial,sans-serif;background:#f4f7fb;color:#111827;font-size:18px;line-height:1.7}
+header{background:linear-gradient(135deg,#0f172a,#2563eb);color:white;text-align:center;padding:32px}
+main{max-width:1150px;margin:auto;padding:24px}
+section{background:white;border-radius:18px;padding:24px;margin:20px 0;box-shadow:0 8px 22px #0001;border:1px solid #dbe4f0}
+h1{margin:0;font-size:34px} h2{color:#1e3a8a;border-left:8px solid #2563eb;padding-left:12px}
+.formula,pre,.result{background:#111827;color:white;padding:16px;border-radius:12px;white-space:pre-wrap;overflow:auto;font-family:Consolas,monospace}
+.result{background:#f8fafc;color:#111827;border:1px solid #cbd5e1}
+.box{background:#eff6ff;border:2px solid #bfdbfe;padding:16px;border-radius:14px;margin:12px 0}
+.good{background:#ecfdf5;border-color:#bbf7d0}.warn{background:#fff7ed;border-color:#fed7aa}
+input,textarea,button{font-size:17px;padding:10px;border-radius:10px;border:1px solid #94a3b8}
+textarea{width:100%;min-height:110px;font-family:Consolas,monospace}
+button{border:0;background:#2563eb;color:white;font-weight:bold;cursor:pointer;margin:6px 4px}
+button.gray{background:#475569}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.step{border-left:6px solid #60a5fa;background:#f8fafc;padding:14px;border-radius:12px;margin:14px 0}
+.strrow{display:flex;align-items:center;gap:8px;margin:10px 0;flex-wrap:wrap}
+.label{width:65px;font-weight:bold;color:#1e3a8a}
+.char{min-width:38px;padding:7px;border-radius:10px;background:#e0f2fe;border:2px solid #0284c7;text-align:center;font-family:Consolas,monospace;font-weight:bold}
+.idx{display:block;font-size:11px;color:#475569;font-weight:normal}
+.fixed{background:#dcfce7;border-color:#16a34a}.cur{background:#fef3c7;border-color:#f59e0b}.swap{background:#fee2e2;border-color:#dc2626}.target{background:#ede9fe;border-color:#7c3aed}
+</style>
+</head>
+<body>
+<header><h1>정올 11761 승리 스왑</h1><p>s1을 t로 만드는 과정을 한 단계씩 확인하는 인터랙티브 강의자료</p></header>
+<main>
+<section>
+<h2>1. 문제 핵심</h2>
+<p>목표는 여러 문자열 중 <b>s1</b>을 목표 문자열 <b>t</b>와 같게 만드는 것입니다.</p>
+<div class="formula">1번 연산: 1 x p q
+x번 문자열 안에서 p번째 문자와 q번째 문자를 교환
+
+2번 연산: 2 x y k
+x번 문자열과 y번 문자열의 k번째 문자를 교환</div>
+<div class="box good">왼쪽부터 오른쪽으로 s1의 문자를 하나씩 t와 같게 만들면 됩니다.</div>
+</section>
+
+<section>
+<h2>2. 핵심 전략</h2>
+<div class="formula">i번째 위치를 맞춘다고 하자.
+
+필요한 문자 = t[i]
+
+1. s1의 i보다 오른쪽에서 필요한 문자를 찾는다.
+   찾으면 1번 연산 한 번으로 해결한다.
+
+2. s1 뒤쪽에 없으면 다른 문자열에서 필요한 문자를 찾는다.
+   다른 문자열 안에서 i번째 위치로 옮긴 뒤,
+   s1과 같은 위치끼리 교환한다.</div>
+<div class="box warn">이미 맞춘 앞부분은 건드리면 안 됩니다. 그래서 s1 안에서는 항상 현재 위치보다 오른쪽만 찾습니다.</div>
+</section>
+
+<section>
+<h2>3. 인터랙티브 실행기</h2>
+<div class="grid">
+<div><b>N</b><br><input id="nInput" value="3"></div>
+<div><b>M</b><br><input id="mInput" value="6"></div>
+</div>
+<p><b>목표 문자열 t</b></p>
+<input id="tInput" style="width:100%" value="banana">
+<p><b>문자열 s1~sN, 한 줄에 하나씩</b></p>
+<textarea id="sInput">nabana
+banana
+nnbaaa</textarea>
+<button onclick="resetSim()">초기화</button>
+<button onclick="nextStep()">다음 위치 맞추기</button>
+<button onclick="runAll()">전체 실행</button>
+<button class="gray" onclick="loadExample(1)">예제 1</button>
+<button class="gray" onclick="loadExample(2)">예제 2</button>
+<button class="gray" onclick="loadExample(3)">예제 3</button>
+<h3>문자열 상태</h3><div id="stringsView"></div>
+<h3>출력 연산</h3><div id="opsView" class="result"></div>
+<h3>단계 설명</h3><div id="logView" class="result"></div>
+</section>
+
+<section>
+<h2>4. 코드 작성 방법</h2>
+<div class="step"><h3>1단계. 문자열과 연산 저장 배열</h3>
+<pre><code>#define MAXN 1000
+#define MAXM 1000
+#define MAXOP 2005
+
+char t[MAXM + 5];
+char s[MAXN + 5][MAXM + 5];
+
+typedef struct {
+    int type;
+    int a;
+    int b;
+    int c;
+} Operation;
+
+Operation ops[MAXOP];
+int opCount;</code></pre></div>
+
+<div class="step"><h3>2단계. 문자 교환 함수</h3>
+<pre><code>void swap_char(char *a, char *b) {
+    char temp = *a;
+    *a = *b;
+    *b = temp;
+}</code></pre></div>
+
+<div class="step"><h3>3단계. s1 뒤쪽에서 필요한 문자 찾기</h3>
+<pre><code>for (int j = i + 1; j < M; j++) {
+    if (s[0][j] == need) {
+        add_operation(1, 1, i + 1, j + 1);
+        swap_char(&s[0][i], &s[0][j]);
+        found = 1;
+        break;
+    }
+}</code></pre></div>
+
+<div class="step"><h3>4단계. 다른 문자열에서 필요한 문자 가져오기</h3>
+<pre><code>if (col != i) {
+    add_operation(1, row + 1, col + 1, i + 1);
+    swap_char(&s[row][col], &s[row][i]);
+}
+
+add_operation(2, 1, row + 1, i + 1);
+swap_char(&s[0][i], &s[row][i]);</code></pre></div>
+</section>
+
+<section>
+<h2>5. 최종 정답 C 코드</h2>
+<pre><code>#include <stdio.h>
+#include <string.h>
+
+#define MAXN 1000
+#define MAXM 1000
+#define MAXOP 2005
+
+typedef struct {
+    int type;
+    int a;
+    int b;
+    int c;
+} Operation;
+
+int N, M;
+char t[MAXM + 5];
+char s[MAXN + 5][MAXM + 5];
+Operation ops[MAXOP];
+int opCount;
+
+void swap_char(char *a, char *b) {
+    char temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void add_operation(int type, int a, int b, int c) {
+    ops[opCount].type = type;
+    ops[opCount].a = a;
+    ops[opCount].b = b;
+    ops[opCount].c = c;
+    opCount++;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+
+    while (T--) {
+        scanf("%d %d", &N, &M);
+        scanf("%s", t);
+
+        for (int i = 0; i < N; i++) scanf("%s", s[i]);
+
+        opCount = 0;
+
+        for (int i = 0; i < M; i++) {
+            if (s[0][i] == t[i]) continue;
+
+            char need = t[i];
+            int found = 0;
+
+            for (int j = i + 1; j < M; j++) {
+                if (s[0][j] == need) {
+                    add_operation(1, 1, i + 1, j + 1);
+                    swap_char(&s[0][i], &s[0][j]);
+                    found = 1;
+                    break;
+                }
+            }
+
+            if (found) continue;
+
+            int row = -1, col = -1;
+
+            for (int x = 1; x < N; x++) {
+                for (int j = 0; j < M; j++) {
+                    if (s[x][j] == need) {
+                        row = x;
+                        col = j;
+                        found = 1;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+
+            if (col != i) {
+                add_operation(1, row + 1, col + 1, i + 1);
+                swap_char(&s[row][col], &s[row][i]);
+            }
+
+            add_operation(2, 1, row + 1, i + 1);
+            swap_char(&s[0][i], &s[row][i]);
+        }
+
+        printf("%d\n", opCount);
+
+        for (int i = 0; i < opCount; i++) {
+            printf("%d %d %d %d\n", ops[i].type, ops[i].a, ops[i].b, ops[i].c);
+        }
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>6. 연산 수가 2M 이하인 이유</h2>
+<div class="formula">각 위치마다
+
+이미 맞음: 0번
+s1 뒤쪽에서 찾음: 1번
+다른 문자열 같은 위치에서 찾음: 1번
+다른 문자열 다른 위치에서 찾음: 2번
+
+따라서 전체 연산 수 ≤ 2M</div>
+</section>
+</main>
+
+<script>
+let N=3,M=6,t="",s=[],pos=0,ops=[],mark={r:-1,c:-1,r2:-1,c2:-1};
+
+function loadExample(num){
+ if(num===1){
+  nInput.value="3"; mInput.value="6"; tInput.value="banana"; sInput.value="nabana\nbanana\nnnbaaa";
+ }else if(num===2){
+  nInput.value="5"; mInput.value="3"; tInput.value="abc"; sInput.value="def\nbca\nghi\njkl\nmno";
+ }else{
+  nInput.value="3"; mInput.value="5"; tInput.value="abcde"; sInput.value="abcde\nabcde\nzzzzz";
+ }
+ resetSim();
+}
+
+function parseInput(){
+ N=parseInt(nInput.value.trim(),10);
+ M=parseInt(mInput.value.trim(),10);
+ t=tInput.value.trim();
+ const lines=sInput.value.trim().split(/\n+/).map(x=>x.trim());
+ if(lines.length!==N) throw new Error("N과 문자열 개수가 다릅니다. 현재 개수: "+lines.length);
+ if(t.length!==M) throw new Error("t의 길이가 M과 다릅니다.");
+ for(const line of lines) if(line.length!==M) throw new Error("모든 s 문자열의 길이는 M이어야 합니다.");
+ s=lines.map(line=>line.split(""));
+}
+
+function resetSim(){
+ try{
+  parseInput(); pos=0; ops=[]; mark={r:-1,c:-1,r2:-1,c2:-1};
+  draw(); logView.textContent="초기화 완료\n왼쪽부터 s1을 t와 같게 맞춥니다.";
+ }catch(e){stringsView.innerHTML="";opsView.textContent="";logView.textContent="오류: "+e.message;}
+}
+function addOp(type,a,b,c){ops.push({type,a,b,c});}
+function sw(r1,c1,r2,c2){const tmp=s[r1][c1];s[r1][c1]=s[r2][c2];s[r2][c2]=tmp;}
+
+function nextStep(){
+ if(pos>=M){logView.textContent="완료!\ns1 = "+s[0].join("")+"\nt  = "+t+"\n총 연산 수 = "+ops.length;draw();return;}
+ let log=""; mark={r:0,c:pos,r2:-1,c2:-1};
+ if(s[0][pos]===t[pos]){
+  log=(pos+1)+"번째 위치는 이미 맞습니다.\n";
+  pos++; draw(); logView.textContent=log; return;
+ }
+ const need=t[pos]; let found=false;
+ log+=(pos+1)+"번째 위치를 맞춥니다. 필요한 문자 = '"+need+"'\n\n";
+ for(let j=pos+1;j<M;j++){
+  if(s[0][j]===need){
+   log+="s1의 "+(j+1)+"번째에서 발견 → 1번 연산\n";
+   addOp(1,1,pos+1,j+1); sw(0,pos,0,j); mark={r:0,c:pos,r2:0,c2:j}; found=true; break;
+  }
+ }
+ if(!found){
+  let row=-1,col=-1;
+  outer: for(let x=1;x<N;x++){for(let j=0;j<M;j++){if(s[x][j]===need){row=x;col=j;break outer;}}}
+  log+="다른 문자열 s"+(row+1)+"의 "+(col+1)+"번째에서 발견\n";
+  if(col!==pos){
+   log+="먼저 s"+(row+1)+" 내부에서 "+(col+1)+" ↔ "+(pos+1)+" 교환\n";
+   addOp(1,row+1,col+1,pos+1); sw(row,col,row,pos);
+  }
+  log+="그 다음 s1과 s"+(row+1)+"의 "+(pos+1)+"번째 교환\n";
+  addOp(2,1,row+1,pos+1); sw(0,pos,row,pos); mark={r:0,c:pos,r2:row,c2:pos};
+ }
+ log+="\n현재 s1 = "+s[0].join("");
+ pos++; draw(); logView.textContent=log;
+}
+
+function runAll(){
+ resetSim();
+ while(pos<M) nextStep();
+ logView.textContent="전체 실행 완료\ns1 = "+s[0].join("")+"\nt  = "+t+"\n총 연산 수 = "+ops.length;
+ draw();
+}
+
+function draw(){
+ let html="<div class='strrow'><span class='label'>t</span>";
+ for(let j=0;j<M;j++){
+  let cls="char target"; if(j===pos) cls+=" cur";
+  html+=`<span class="${cls}"><span class="idx">${j+1}</span>${t[j]}</span>`;
+ }
+ html+="</div>";
+ for(let r=0;r<N;r++){
+  html+=`<div class='strrow'><span class='label'>s${r+1}</span>`;
+  for(let j=0;j<M;j++){
+   let cls="char"; if(r===0&&j<pos) cls+=" fixed"; if(j===pos) cls+=" cur";
+   if((r===mark.r&&j===mark.c)||(r===mark.r2&&j===mark.c2)) cls+=" swap";
+   html+=`<span class="${cls}"><span class="idx">${j+1}</span>${s[r][j]}</span>`;
+  }
+  html+="</div>";
+ }
+ stringsView.innerHTML=html;
+ let txt=ops.length+"\n";
+ for(const op of ops) txt+=op.type+" "+op.a+" "+op.b+" "+op.c+"\n";
+ opsView.textContent=txt;
+}
+resetSim();
+</script>
+</body>
+</html>

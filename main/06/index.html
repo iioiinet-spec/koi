@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 5758 배수가 되는 두 수의 합 - 인터랙티브 해설</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f4f7fb;color:#111827;font-size:18px;line-height:1.75}
+header{background:linear-gradient(135deg,#172554,#2563eb);color:white;text-align:center;padding:34px 20px}
+header h1{margin:0;font-size:34px}
+main{max-width:1150px;margin:0 auto;padding:24px}
+section{background:white;border-radius:18px;padding:26px;margin:22px 0;box-shadow:0 8px 24px rgba(15,23,42,.08);border:1px solid #dbe4f0}
+h2{margin-top:0;color:#1e3a8a;border-left:8px solid #2563eb;padding-left:14px;font-size:28px}
+h3{color:#0f172a;font-size:23px;margin-top:26px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;padding:18px;border-radius:14px;margin:16px 0}
+.good{background:#ecfdf5;border-color:#bbf7d0}
+.formula{background:#111827;color:#f9fafb;padding:16px;border-radius:12px;font-family:Consolas,monospace;white-space:pre-wrap;overflow-x:auto;font-size:17px}
+pre{background:#0f172a;color:#e5e7eb;padding:18px;border-radius:14px;overflow-x:auto;font-size:16px;line-height:1.55}
+code{font-family:Consolas,monospace}
+input,textarea,button{font-size:17px;padding:10px;border-radius:10px;border:1px solid #94a3b8}
+textarea{width:100%;min-height:80px;font-family:Consolas,monospace}
+button{border:none;background:#2563eb;color:white;font-weight:bold;cursor:pointer;margin:6px 4px 6px 0}
+button:hover{background:#1d4ed8}
+.smallbtn{background:#475569}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:white}
+th,td{border:1px solid #cbd5e1;padding:9px;text-align:center}
+th{background:#dbeafe;color:#111827}
+.result{background:#f8fafc;border:1px solid #cbd5e1;padding:16px;border-radius:12px;margin-top:12px;white-space:pre-wrap;font-family:Consolas,monospace;overflow-x:auto}
+.step{border-left:6px solid #60a5fa;padding:14px 18px;background:#f8fafc;border-radius:12px;margin:15px 0}
+.array-row,.rem-row{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.cell{min-width:76px;padding:10px;border-radius:12px;background:#e0f2fe;border:2px solid #0284c7;text-align:center;font-family:Consolas,monospace;font-weight:bold}
+.idx{display:block;font-size:13px;color:#475569;font-weight:normal}
+.paircell{display:inline-block;padding:8px 12px;margin:5px;border-radius:12px;border:2px solid #cbd5e1;background:#f8fafc;font-family:Consolas,monospace}
+.hit{background:#dcfce7;border-color:#16a34a}
+details{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:14px;margin:12px 0}
+summary{cursor:pointer;color:#1d4ed8;font-weight:bold}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 5758 배수가 되는 두 수의 합</h1>
+<p>나머지 개수 세기 + 조합 계산을 직접 확인하는 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+<h2>1. 문제 핵심</h2>
+<p>두 수의 합이 X의 배수가 되려면 다음 조건을 만족해야 합니다.</p>
+<div class="formula">(a + b) % X == 0</div>
+<p>실제 숫자 전체보다 <b>X로 나눈 나머지</b>가 중요합니다.</p>
+<div class="formula">a % X = r1
+b % X = r2
+
+(r1 + r2) % X == 0 이면
+(a + b)는 X의 배수</div>
+</section>
+
+<section>
+<h2>2. 예제 이해</h2>
+<div class="formula">N = 4
+A = 1 4 2 1
+X = 2</div>
+<table>
+<tr><th>수</th><th>2로 나눈 나머지</th></tr>
+<tr><td>1</td><td>1</td></tr>
+<tr><td>4</td><td>0</td></tr>
+<tr><td>2</td><td>0</td></tr>
+<tr><td>1</td><td>1</td></tr>
+</table>
+<div class="formula">나머지 0: 2개 → 4, 2
+나머지 1: 2개 → 1, 1
+
+가능한 쌍:
+0 + 0 = 0
+1 + 1 = 2
+
+정답 = 2</div>
+</section>
+
+<section>
+<h2>3. 인터랙티브 계산기</h2>
+<p>수열과 X를 입력하면 나머지 개수, 가능한 나머지 쌍, 최종 답을 계산합니다.</p>
+<div class="grid">
+<div><label><b>N</b></label><br><input id="nInput" value="4"></div>
+<div><label><b>X</b></label><br><input id="xInput" value="2"></div>
+</div>
+<p><b>수열 A</b></p>
+<textarea id="arrInput">1 4 2 1</textarea>
+<button onclick="solve()">계산하기</button>
+<button class="smallbtn" onclick="loadExample(1)">예제 1</button>
+<button class="smallbtn" onclick="loadExample(2)">X=3 예제</button>
+<button class="smallbtn" onclick="loadExample(3)">X=5 예제</button>
+<h3>각 수의 나머지</h3>
+<div id="arrayView" class="array-row"></div>
+<h3>나머지 개수 cnt</h3>
+<div id="cntView" class="rem-row"></div>
+<h3>가능한 나머지 쌍</h3>
+<div id="pairView"></div>
+<h3>계산 과정</h3>
+<div id="resultView" class="result"></div>
+</section>
+
+<section>
+<h2>4. 코드 작성 방법</h2>
+<div class="step">
+<h3>1단계. 배열과 cnt 만들기</h3>
+<pre><code>#define MAXN 200000
+
+long long A[MAXN];
+long long cnt[10];</code></pre>
+<p>X는 최대 10이므로 나머지는 0부터 9까지만 필요합니다.</p>
+</div>
+
+<div class="step">
+<h3>2단계. 입력받기</h3>
+<pre><code>scanf("%d", &amp;N);
+
+for (int i = 0; i &lt; N; i++) {
+    scanf("%lld", &amp;A[i]);
+}
+
+scanf("%d", &amp;X);</code></pre>
+<p>X가 세 번째 줄에 나오므로, 먼저 A 배열을 저장한 뒤 X를 입력받습니다.</p>
+</div>
+
+<div class="step">
+<h3>3단계. 나머지 개수 세기</h3>
+<pre><code>for (int i = 0; i &lt; N; i++) {
+    int r = A[i] % X;
+    cnt[r]++;
+}</code></pre>
+</div>
+
+<div class="step">
+<h3>4단계. 나머지 쌍 확인하기</h3>
+<pre><code>for (int i = 0; i &lt; X; i++) {
+    for (int j = i; j &lt; X; j++) {
+        if ((i + j) % X == 0) {
+            ...
+        }
+    }
+}</code></pre>
+<p>j를 i부터 시작하면 (i, j)와 (j, i)를 중복해서 세지 않습니다.</p>
+</div>
+
+<div class="step">
+<h3>5단계. 같은 나머지와 다른 나머지 구분</h3>
+<pre><code>if (i == j) {
+    answer += cnt[i] * (cnt[i] - 1) / 2;
+} else {
+    answer += cnt[i] * cnt[j];
+}</code></pre>
+</div>
+</section>
+
+<section>
+<h2>5. 최종 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 200000
+
+long long A[MAXN];
+long long cnt[10];
+
+int main() {
+    int N;
+    int X;
+    long long answer = 0;
+
+    scanf("%d", &amp;N);
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf("%lld", &amp;A[i]);
+    }
+
+    scanf("%d", &amp;X);
+
+    for (int i = 0; i &lt; N; i++) {
+        int r = A[i] % X;
+        cnt[r]++;
+    }
+
+    for (int i = 0; i &lt; X; i++) {
+        for (int j = i; j &lt; X; j++) {
+            if ((i + j) % X == 0) {
+                if (i == j) {
+                    answer += cnt[i] * (cnt[i] - 1) / 2;
+                } else {
+                    answer += cnt[i] * cnt[j];
+                }
+            }
+        }
+    }
+
+    printf("%lld\n", answer);
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>6. 코드 해설</h2>
+<details open>
+<summary>1. 왜 long long을 쓰는가?</summary>
+<p>N이 최대 200000입니다. 가능한 쌍의 개수는 최대 N × (N - 1) / 2가 될 수 있어 int 범위를 넘을 수 있습니다.</p>
+</details>
+<details>
+<summary>2. cnt[r]의 의미</summary>
+<p>cnt[r]은 X로 나누었을 때 나머지가 r인 수의 개수입니다.</p>
+</details>
+<details>
+<summary>3. 같은 나머지끼리 고를 때</summary>
+<div class="formula">cnt[i] C 2 = cnt[i] × (cnt[i] - 1) / 2</div>
+</details>
+<details>
+<summary>4. 다른 나머지끼리 고를 때</summary>
+<div class="formula">경우의 수 = cnt[i] × cnt[j]</div>
+</details>
+</section>
+
+<section>
+<h2>7. 시간복잡도</h2>
+<div class="formula">수열 저장: O(N)
+나머지 개수 세기: O(N)
+나머지 쌍 확인: O(X²)
+
+X ≤ 10 이므로 전체 시간복잡도는 O(N)</div>
+<div class="good box">
+<p>모든 두 수를 직접 비교하지 않고, 나머지 개수만 세면 빠르게 해결됩니다.</p>
+</div>
+</section>
+</main>
+
+<script>
+function loadExample(num){
+    if(num === 1){
+        document.getElementById("nInput").value = "4";
+        document.getElementById("arrInput").value = "1 4 2 1";
+        document.getElementById("xInput").value = "2";
+    }else if(num === 2){
+        document.getElementById("nInput").value = "6";
+        document.getElementById("arrInput").value = "1 2 3 4 5 6";
+        document.getElementById("xInput").value = "3";
+    }else{
+        document.getElementById("nInput").value = "7";
+        document.getElementById("arrInput").value = "5 7 8 10 12 13 20";
+        document.getElementById("xInput").value = "5";
+    }
+    solve();
+}
+
+function solve(){
+    const N = parseInt(document.getElementById("nInput").value.trim(),10);
+    const X = parseInt(document.getElementById("xInput").value.trim(),10);
+    const A = document.getElementById("arrInput").value.trim().split(/\s+/).filter(v=>v.length>0).map(Number);
+
+    const arrayView = document.getElementById("arrayView");
+    const cntView = document.getElementById("cntView");
+    const pairView = document.getElementById("pairView");
+    const resultView = document.getElementById("resultView");
+
+    if(A.length !== N){
+        resultView.textContent = "오류: N과 수열 개수가 다릅니다. 현재 개수: " + A.length;
+        arrayView.innerHTML = "";
+        cntView.innerHTML = "";
+        pairView.innerHTML = "";
+        return;
+    }
+
+    if(X < 1 || X > 10){
+        resultView.textContent = "오류: X는 1 이상 10 이하이어야 합니다.";
+        arrayView.innerHTML = "";
+        cntView.innerHTML = "";
+        pairView.innerHTML = "";
+        return;
+    }
+
+    let cnt = new Array(X).fill(0);
+    let remainders = [];
+
+    for(let i=0;i<N;i++){
+        const r = A[i] % X;
+        remainders.push(r);
+        cnt[r]++;
+    }
+
+    let html = "";
+    for(let i=0;i<N;i++){
+        html += `<div class="cell"><span class="idx">${i+1}번</span>${A[i]}<br>% ${X} = ${remainders[i]}</div>`;
+    }
+    arrayView.innerHTML = html;
+
+    let cntHtml = "";
+    for(let r=0;r<X;r++){
+        cntHtml += `<div class="cell"><span class="idx">cnt[${r}]</span>${cnt[r]}개</div>`;
+    }
+    cntView.innerHTML = cntHtml;
+
+    let answer = 0;
+    let text = "";
+    let pairHtml = "";
+
+    text += "나머지 개수\n";
+    for(let r=0;r<X;r++){
+        text += "cnt[" + r + "] = " + cnt[r] + "\n";
+    }
+    text += "\n가능한 나머지 쌍 확인\n";
+
+    for(let i=0;i<X;i++){
+        for(let j=i;j<X;j++){
+            const ok = ((i+j) % X === 0);
+            let add = 0;
+
+            if(ok){
+                if(i === j){
+                    add = cnt[i] * (cnt[i] - 1) / 2;
+                    text += "(" + i + ", " + j + ") → 같은 나머지: " + cnt[i] + "C2 = " + add + "\n";
+                }else{
+                    add = cnt[i] * cnt[j];
+                    text += "(" + i + ", " + j + ") → 다른 나머지: " + cnt[i] + " × " + cnt[j] + " = " + add + "\n";
+                }
+                answer += add;
+            }
+
+            pairHtml += `<span class="paircell ${ok ? 'hit' : ''}">(${i},${j})<br>${ok ? '+'+add : '불가'}</span>`;
+        }
+    }
+
+    text += "\n최종 정답 = " + answer;
+
+    pairView.innerHTML = pairHtml;
+    resultView.textContent = text;
+}
+
+solve();
+</script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 #8609 로봇 - 인터랙티브 C언어 해설</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+        background: #f4f7fb;
+        color: #111827;
+        font-size: 18px;
+        line-height: 1.75;
+    }
+    header {
+        background: linear-gradient(135deg, #0f172a, #2563eb);
+        color: white;
+        text-align: center;
+        padding: 34px 20px;
+    }
+    header h1 { margin: 0; font-size: 34px; }
+    header p { margin: 10px 0 0; font-size: 19px; }
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+    section {
+        background: white;
+        border-radius: 18px;
+        padding: 26px;
+        margin: 22px 0;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #dbe4f0;
+    }
+    h2 {
+        margin-top: 0;
+        color: #1e3a8a;
+        border-left: 8px solid #2563eb;
+        padding-left: 14px;
+        font-size: 28px;
+    }
+    h3 {
+        color: #0f172a;
+        font-size: 23px;
+        margin-top: 26px;
+    }
+    .box {
+        background: #eff6ff;
+        border: 2px solid #bfdbfe;
+        padding: 18px;
+        border-radius: 14px;
+        margin: 16px 0;
+    }
+    .good {
+        background: #ecfdf5;
+        border-color: #bbf7d0;
+    }
+    .warn {
+        background: #fff7ed;
+        border-color: #fed7aa;
+    }
+    .formula {
+        background: #111827;
+        color: #f9fafb;
+        padding: 16px;
+        border-radius: 12px;
+        font-family: Consolas, monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-size: 17px;
+    }
+    pre {
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 18px;
+        border-radius: 14px;
+        overflow-x: auto;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+    code { font-family: Consolas, monospace; }
+    input, textarea, button, select {
+        font-size: 17px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #94a3b8;
+    }
+    textarea {
+        width: 100%;
+        min-height: 120px;
+        font-family: Consolas, monospace;
+    }
+    button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 6px 4px 6px 0;
+    }
+    button:hover { background: #1d4ed8; }
+    .smallbtn { background: #475569; }
+    .smallbtn:hover { background: #334155; }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 14px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 9px;
+        text-align: center;
+    }
+    th {
+        background: #dbeafe;
+        color: #111827;
+    }
+    .result {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 12px;
+        white-space: pre-wrap;
+        font-family: Consolas, monospace;
+        overflow-x: auto;
+    }
+    .step {
+        border-left: 6px solid #60a5fa;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin: 15px 0;
+    }
+    .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1e3a8a;
+        font-weight: bold;
+        margin: 2px;
+    }
+    .line {
+        position: relative;
+        height: 80px;
+        border-top: 4px solid #334155;
+        margin: 30px 0;
+        overflow: hidden;
+    }
+    .point {
+        position: absolute;
+        top: -16px;
+        transform: translateX(-50%);
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .dot {
+        display: block;
+        width: 22px;
+        height: 22px;
+        background: #2563eb;
+        border-radius: 50%;
+        margin: 0 auto 4px;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #1e3a8a;
+    }
+    .robot {
+        background: #f97316;
+        box-shadow: 0 0 0 2px #c2410c;
+    }
+    details {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 14px;
+        margin: 12px 0;
+    }
+    summary {
+        cursor: pointer;
+        color: #1d4ed8;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>정올 #8609 로봇</h1>
+    <p>Binary Lifting + 압축 이동 + 빠른 쿼리 처리 인터랙티브 강의자료</p>
+</header>
+
+<main>
+<section>
+    <h2>1. 문제 핵심</h2>
+    <p>
+        로봇은 수직선 위에서 움직입니다. 현재 위치에 점프대가 없으면 왼쪽으로 1칸 이동하고,
+        점프대가 있으면 오른쪽으로 점프한 뒤 그 점프대의 파워가 2배가 됩니다.
+    </p>
+    <div class="formula">점프대가 없을 때:
+위치 = 위치 - 1
+시간 = 1 증가
+
+점프대가 있을 때:
+위치 = X[i] + 현재 파워
+시간 = 1 증가
+그 점프대의 파워 = 2배</div>
+
+    <div class="warn box">
+        <p>
+            T가 최대 10^17이므로 1초씩 직접 시뮬레이션하면 절대 통과할 수 없습니다.
+            움직임을 큰 단위로 압축해야 합니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>2. 가장 중요한 관찰</h2>
+    <p>
+        로봇은 기본적으로 왼쪽으로 걸어갑니다.
+        하지만 점프대를 타면 오른쪽으로 갑니다.
+    </p>
+    <div class="good box">
+        <p>
+            한 번 오른쪽 점프대로 넘어가면, 다시 왼쪽 점프대로 돌아가지 않습니다.
+        </p>
+        <p>
+            따라서 로봇이 만나는 점프대 번호는 시간이 지나면서 감소하지 않고 증가합니다.
+        </p>
+    </div>
+
+    <div class="formula">점프대 번호 흐름:
+1번 → 2번 → 3번 → 5번 → ...
+처럼 오른쪽으로만 이동한다.</div>
+</section>
+
+<section>
+    <h2>3. 한 점프대에서 다음 점프대로 넘어가는 과정</h2>
+    <p>
+        현재 i번 점프대에 있다고 합시다.
+    </p>
+    <div class="formula">위치 = X[i]
+초기 파워 = P[i]
+다음 점프대까지 거리 = X[i + 1] - X[i]</div>
+
+    <p>
+        점프 파워는 사용할 때마다 2배가 됩니다.
+    </p>
+
+    <div class="formula">P[i], 2P[i], 4P[i], 8P[i], ...</div>
+
+    <p>
+        다음 점프대까지 닿지 못하는 점프는 다시 왼쪽으로 걸어서 같은 점프대로 돌아옵니다.
+        다음 점프대에 닿는 순간 오른쪽 점프대로 넘어갑니다.
+    </p>
+</section>
+
+<section>
+    <h2>4. 실패 점프와 성공 점프 공식</h2>
+    <p>
+        fail을 성공하기 전까지 실패한 점프 횟수라고 합시다.
+    </p>
+
+    <div class="formula">P[i] × 2^fail >= X[i + 1] - X[i]</div>
+
+    <p>실패 점프 시간은 다음과 같습니다.</p>
+
+    <div class="formula">(1 + P[i]) + (1 + 2P[i]) + (1 + 4P[i]) + ...
+
+실패 시간 = fail + P[i] × (2^fail - 1)</div>
+
+    <p>성공 점프 시간은 다음과 같습니다.</p>
+
+    <div class="formula">landing = X[i] + P[i] × 2^fail
+nxt = landing 이하의 가장 오른쪽 점프대
+
+성공 시간 = 1 + landing - X[nxt]</div>
+</section>
+
+<section>
+    <h2>5. 인터랙티브 시뮬레이터</h2>
+    <p>
+        작은 예제를 넣고 실제 로봇이 어떻게 움직이는지 확인할 수 있습니다.
+        이 시뮬레이터는 이해용이므로 T가 너무 큰 값은 넣지 않는 것이 좋습니다.
+    </p>
+
+    <div class="grid">
+        <div>
+            <label><b>N</b></label><br>
+            <input id="nInput" value="2">
+        </div>
+        <div>
+            <label><b>시작 위치 S</b></label><br>
+            <input id="sInput" value="3">
+        </div>
+        <div>
+            <label><b>시간 T</b></label><br>
+            <input id="tInput" value="7">
+        </div>
+    </div>
+
+    <p><b>점프대 정보: X P 형식으로 한 줄에 하나씩 입력</b></p>
+    <textarea id="jumpInput">2 2
+5 3</textarea>
+
+    <button onclick="runSimulation()">직접 시뮬레이션</button>
+    <button class="smallbtn" onclick="loadExample(1)">예제 1</button>
+    <button class="smallbtn" onclick="loadExample(2)">예제 2</button>
+
+    <div id="visualLine"></div>
+    <div id="simResult" class="result"></div>
+</section>
+
+<section>
+    <h2>6. 압축 이동 계산기</h2>
+    <p>
+        선택한 점프대에서 다음 오른쪽 점프대로 넘어가기까지의 압축 이동 정보를 계산합니다.
+    </p>
+
+    <div class="grid">
+        <div>
+            <label><b>점프대 번호</b></label><br>
+            <input id="idxInput" value="1">
+        </div>
+    </div>
+
+    <button onclick="calcCompressedMove()">압축 이동 계산</button>
+    <div id="compressedResult" class="result"></div>
+</section>
+
+<section>
+    <h2>7. 왜 Binary Lifting을 사용하는가?</h2>
+    <p>
+        쿼리가 많고 시간이 매우 크기 때문에 압축 이동도 여러 번 반복하면 느립니다.
+        그래서 압축 이동을 2배씩 묶습니다.
+    </p>
+
+    <div class="formula">up[i][0] = i번 점프대에서 1번 압축 이동 후 도착 점프대
+up[i][1] = i번 점프대에서 2번 압축 이동 후 도착 점프대
+up[i][2] = i번 점프대에서 4번 압축 이동 후 도착 점프대
+up[i][3] = i번 점프대에서 8번 압축 이동 후 도착 점프대</div>
+
+    <div class="good box">
+        <p>
+            N ≤ 300000이고 2^19 = 524288이므로 LOG = 20이면 충분합니다.
+        </p>
+        <p>
+            LOG를 60으로 잡으면 메모리와 반복 횟수가 커져 #7에서 시간초과가 날 수 있습니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>8. 코드 작성 단계</h2>
+
+    <div class="step">
+        <h3>1단계. 상수와 자료형</h3>
+<pre><code>#define MAXN 300000
+#define LOG 20
+
+typedef long long ll;
+typedef __int128 i128;</code></pre>
+        <p>
+            위치, 파워, 시간은 10^17까지 가능하므로 long long을 사용합니다.
+            중간 곱셈은 더 커질 수 있어 __int128을 사용합니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>2단계. 배열 선언</h3>
+<pre><code>ll X[MAXN + 1];
+ll P[MAXN + 1];
+
+int up[MAXN + 1][LOG];
+ll cost[MAXN + 1][LOG];</code></pre>
+        <p>
+            up[i][k]는 i번 점프대에서 2^k번 압축 이동했을 때 도착하는 점프대입니다.
+            cost[i][k]는 그때 걸리는 시간입니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>3단계. 현재 위치 이하의 가장 오른쪽 점프대 찾기</h3>
+<pre><code>int upper_bound_x(ll value) {
+    int left = 1;
+    int right = N;
+    int answer = 0;
+
+    while (left &lt;= right) {
+        int mid = (left + right) &gt;&gt; 1;
+
+        if (X[mid] &lt;= value) {
+            answer = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return answer;
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>4단계. 기본 압축 이동 만들기</h3>
+<pre><code>while (power &lt; gap) {
+    power &lt;&lt;= 1;
+    fail++;
+}</code></pre>
+        <p>
+            다음 점프대까지 닿을 수 있을 때까지 파워를 2배로 키웁니다.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>5단계. Binary Lifting 만들기</h3>
+<pre><code>up[i][k] = up[mid][k - 1];
+cost[i][k] = cost[i][k - 1] + cost[mid][k - 1];</code></pre>
+    </div>
+
+    <div class="step">
+        <h3>6단계. 쿼리 처리</h3>
+        <p>
+            시작 위치에서 왼쪽으로 걸어가 처음 만나는 점프대를 찾고,
+            그 후에는 Binary Lifting으로 가능한 만큼 압축 이동합니다.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>9. 정답 C 코드</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 300000
+#define LOG 20
+
+typedef long long ll;
+typedef __int128 i128;
+
+const ll INF = 4000000000000000000LL;
+
+int N, Q;
+ll X[MAXN + 1];
+ll P[MAXN + 1];
+
+int up[MAXN + 1][LOG];
+ll cost[MAXN + 1][LOG];
+
+static inline ll read_ll() {
+    ll x = 0;
+    int sign = 1;
+    int c = getchar_unlocked();
+
+    while (c != '-' &amp;&amp; (c &lt; '0' || c &gt; '9')) {
+        c = getchar_unlocked();
+    }
+
+    if (c == '-') {
+        sign = -1;
+        c = getchar_unlocked();
+    }
+
+    while (c &gt;= '0' &amp;&amp; c &lt;= '9') {
+        x = x * 10 + (c - '0');
+        c = getchar_unlocked();
+    }
+
+    return x * sign;
+}
+
+static inline void write_ll(ll x) {
+    if (x == 0) {
+        putchar_unlocked('0');
+        putchar_unlocked('\n');
+        return;
+    }
+
+    if (x &lt; 0) {
+        putchar_unlocked('-');
+        x = -x;
+    }
+
+    char buf[30];
+    int len = 0;
+
+    while (x &gt; 0) {
+        buf[len++] = (char)('0' + x % 10);
+        x /= 10;
+    }
+
+    for (int i = len - 1; i &gt;= 0; i--) {
+        putchar_unlocked(buf[i]);
+    }
+
+    putchar_unlocked('\n');
+}
+
+static inline ll cap(i128 v) {
+    if (v &gt; INF) return INF;
+    return (ll)v;
+}
+
+int upper_bound_x(ll value) {
+    int left = 1;
+    int right = N;
+    int answer = 0;
+
+    while (left &lt;= right) {
+        int mid = (left + right) &gt;&gt; 1;
+
+        if (X[mid] &lt;= value) {
+            answer = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return answer;
+}
+
+void build_base() {
+    for (int i = 1; i &lt;= N; i++) {
+        if (i == N) {
+            up[i][0] = i;
+            cost[i][0] = INF;
+            continue;
+        }
+
+        ll gap = X[i + 1] - X[i];
+
+        ll power = P[i];
+        int fail = 0;
+
+        while (power &lt; gap) {
+            power &lt;&lt;= 1;
+            fail++;
+        }
+
+        ll landing = X[i] + power;
+        int nxt = upper_bound_x(landing);
+
+        i128 failed_time = 0;
+
+        if (fail &gt; 0) {
+            failed_time = (i128)fail + (i128)P[i] * (((i128)1 &lt;&lt; fail) - 1);
+        }
+
+        i128 success_time = 1 + (i128)landing - X[nxt];
+
+        up[i][0] = nxt;
+        cost[i][0] = cap(failed_time + success_time);
+    }
+}
+
+void build_lifting() {
+    for (int k = 1; k &lt; LOG; k++) {
+        for (int i = 1; i &lt;= N; i++) {
+            int mid = up[i][k - 1];
+
+            up[i][k] = up[mid][k - 1];
+            cost[i][k] = cap((i128)cost[i][k - 1] + cost[mid][k - 1]);
+        }
+    }
+}
+
+ll finish_same_trampoline(int idx, ll T) {
+    ll power = P[idx];
+
+    while (1) {
+        if (T == 0) {
+            return X[idx];
+        }
+
+        ll landing = X[idx] + power;
+
+        if (T == 1) {
+            return landing;
+        }
+
+        if ((i128)T &lt;= 1 + (i128)power) {
+            return landing - (T - 1);
+        }
+
+        T -= 1 + power;
+        power &lt;&lt;= 1;
+    }
+}
+
+ll solve_query(ll S, ll T) {
+    int idx = upper_bound_x(S);
+
+    if (idx == 0) {
+        return S - T;
+    }
+
+    ll walk = S - X[idx];
+
+    if (T &lt;= walk) {
+        return S - T;
+    }
+
+    T -= walk;
+
+    for (int k = LOG - 1; k &gt;= 0; k--) {
+        if (cost[idx][k] &lt;= T) {
+            T -= cost[idx][k];
+            idx = up[idx][k];
+        }
+    }
+
+    return finish_same_trampoline(idx, T);
+}
+
+int main() {
+    N = (int)read_ll();
+
+    for (int i = 1; i &lt;= N; i++) {
+        X[i] = read_ll();
+        P[i] = read_ll();
+    }
+
+    build_base();
+    build_lifting();
+
+    Q = (int)read_ll();
+
+    for (int i = 0; i &lt; Q; i++) {
+        ll S = read_ll();
+        ll T = read_ll();
+
+        write_ll(solve_query(S, T));
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+    <h2>10. 시간복잡도</h2>
+    <table>
+        <tr><th>작업</th><th>복잡도</th></tr>
+        <tr><td>기본 압축 이동 계산</td><td>O(N log N)</td></tr>
+        <tr><td>Binary Lifting 전처리</td><td>O(N × LOG)</td></tr>
+        <tr><td>각 쿼리 처리</td><td>O(LOG + log N)</td></tr>
+        <tr><td>LOG</td><td>20</td></tr>
+    </table>
+
+    <div class="good box">
+        <p>
+            LOG를 20으로 줄인 것이 #7 통과의 핵심입니다.
+            점프대 번호는 오른쪽으로만 증가하므로 2^19번 압축 이동이면 충분합니다.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<script>
+function parseJumpData() {
+    const N = parseInt(document.getElementById("nInput").value.trim(), 10);
+    const lines = document.getElementById("jumpInput").value.trim().split(/\n+/);
+    let X = [];
+    let P = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const parts = lines[i].trim().split(/\s+/).map(Number);
+        if (parts.length >= 2) {
+            X.push(parts[0]);
+            P.push(parts[1]);
+        }
+    }
+
+    if (X.length !== N) {
+        throw new Error("N과 점프대 개수가 다릅니다. 현재 점프대 개수: " + X.length);
+    }
+
+    return {N, X, P};
+}
+
+function upperBound(X, value) {
+    let l = 0;
+    let r = X.length - 1;
+    let ans = -1;
+
+    while (l <= r) {
+        let m = Math.floor((l + r) / 2);
+
+        if (X[m] <= value) {
+            ans = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
+    }
+
+    return ans;
+}
+
+function drawLine(X, S, pos) {
+    const visual = document.getElementById("visualLine");
+    let all = X.slice();
+    all.push(S);
+    all.push(pos);
+    const mn = Math.min(...all);
+    const mx = Math.max(...all);
+    const width = Math.max(1, mx - mn);
+
+    let html = "<div class='line'>";
+    X.forEach((x, i) => {
+        const left = ((x - mn) / width) * 92 + 4;
+        html += `<div class="point" style="left:${left}%"><span class="dot"></span>X${i+1}<br>${x}</div>`;
+    });
+    const leftRobot = ((pos - mn) / width) * 92 + 4;
+    html += `<div class="point" style="left:${leftRobot}%"><span class="dot robot"></span>Robot<br>${pos}</div>`;
+    html += "</div>";
+    visual.innerHTML = html;
+}
+
+function runSimulation() {
+    const out = document.getElementById("simResult");
+
+    try {
+        const data = parseJumpData();
+        let X = data.X;
+        let P = data.P.slice();
+        let S = Number(document.getElementById("sInput").value.trim());
+        let T = Number(document.getElementById("tInput").value.trim());
+
+        let pos = S;
+        let text = "";
+        text += "시간 0: 위치 " + pos + "\n";
+
+        for (let t = 1; t <= T; t++) {
+            let idx = X.indexOf(pos);
+
+            if (idx === -1) {
+                pos -= 1;
+                text += "시간 " + t + ": 점프대 없음 → 왼쪽 이동 → 위치 " + pos + "\n";
+            } else {
+                let oldPower = P[idx];
+                pos = pos + oldPower;
+                P[idx] *= 2;
+                text += "시간 " + t + ": " + (idx + 1) + "번 점프대 사용, 파워 " + oldPower + " → 위치 " + pos + ", 다음 파워 " + P[idx] + "\n";
+            }
+
+            if (t > 200) {
+                text += "\nT가 너무 커서 200단계까지만 표시합니다.\n";
+                break;
+            }
+        }
+
+        text += "\n최종 위치 = " + pos;
+        out.textContent = text;
+        drawLine(X, S, pos);
+    } catch (e) {
+        out.textContent = "오류: " + e.message;
+        document.getElementById("visualLine").innerHTML = "";
+    }
+}
+
+function calcCompressedMove() {
+    const out = document.getElementById("compressedResult");
+
+    try {
+        const data = parseJumpData();
+        const X = data.X;
+        const P = data.P;
+        const idxOneBased = parseInt(document.getElementById("idxInput").value.trim(), 10);
+        const i = idxOneBased - 1;
+
+        if (i < 0 || i >= X.length) {
+            out.textContent = "점프대 번호가 범위를 벗어났습니다.";
+            return;
+        }
+
+        if (i === X.length - 1) {
+            out.textContent = "마지막 점프대입니다. 오른쪽 다음 점프대가 없으므로 cost = INF로 처리합니다.";
+            return;
+        }
+
+        const gap = X[i + 1] - X[i];
+        let power = P[i];
+        let fail = 0;
+
+        let detail = "";
+        detail += idxOneBased + "번 점프대\n";
+        detail += "X = " + X[i] + ", P = " + P[i] + "\n";
+        detail += "다음 점프대 위치 = " + X[i + 1] + "\n";
+        detail += "gap = " + gap + "\n\n";
+
+        while (power < gap) {
+            detail += "실패 점프 " + (fail + 1) + ": power = " + power + ", 다음 점프대까지 못 감\n";
+            power *= 2;
+            fail++;
+        }
+
+        const landing = X[i] + power;
+        const nxt = upperBound(X, landing);
+        const failedTime = fail + P[i] * (Math.pow(2, fail) - 1);
+        const successTime = 1 + landing - X[nxt];
+        const total = failedTime + successTime;
+
+        detail += "\n성공 점프 power = " + power + "\n";
+        detail += "landing = " + landing + "\n";
+        detail += "landing 이하의 가장 오른쪽 점프대 = " + (nxt + 1) + "번, 위치 " + X[nxt] + "\n\n";
+        detail += "실패 시간 = fail + P × (2^fail - 1)\n";
+        detail += "실패 시간 = " + fail + " + " + P[i] + " × (" + Math.pow(2, fail) + " - 1) = " + failedTime + "\n\n";
+        detail += "성공 시간 = 1 + landing - X[nxt] = " + successTime + "\n";
+        detail += "총 압축 이동 시간 = " + total + "\n";
+        detail += "up[i][0] = " + (nxt + 1) + "\n";
+        detail += "cost[i][0] = " + total + "\n";
+
+        out.textContent = detail;
+    } catch (e) {
+        out.textContent = "오류: " + e.message;
+    }
+}
+
+function loadExample(num) {
+    if (num === 1) {
+        document.getElementById("nInput").value = "2";
+        document.getElementById("jumpInput").value = "2 2\n5 3";
+        document.getElementById("sInput").value = "3";
+        document.getElementById("tInput").value = "7";
+        document.getElementById("idxInput").value = "1";
+    } else {
+        document.getElementById("nInput").value = "3";
+        document.getElementById("jumpInput").value = "-3 3\n2 2\n11 6";
+        document.getElementById("sInput").value = "1";
+        document.getElementById("tInput").value = "6";
+        document.getElementById("idxInput").value = "2";
+    }
+
+    runSimulation();
+    calcCompressedMove();
+}
+
+runSimulation();
+calcCompressedMove();
+</script>
+</body>
+</html>
