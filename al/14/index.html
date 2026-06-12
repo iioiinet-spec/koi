@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>그리드 기반 큐 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root{
+  --bg:#f4f7fb;--wh:#fff;--s1:#edf1f9;--s2:#e1e8f5;
+  --bd:#ccd4ea;--bd2:#b3bedd;
+  --t1:#101627;--t2:#243060;--t3:#586092;--t4:#9aa2c6;
+  --em:#059669;--em-l:#d1fae5;--em-m:#6ee7b7;
+  --or:#c2410c;--or-l:#fff0e8;--or-m:#fdba74;
+  --bl:#1d4ed8;--bl-l:#dbeafe;--bl-m:#93c5fd;
+  --vi:#6d28d9;--vi-l:#ede9fe;--vi-m:#c4b5fd;
+  --gd:#b07800;--gd-l:#fff8d4;--gd-m:#ffd966;
+  --rd:#b91c1c;--rd-l:#fee2e2;--rd-m:#fca5a5;
+  --sk:#0369a1;--sk-l:#e0f2fe;--sk-m:#7dd3fc;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px;--r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-stripe{width:10px;flex-shrink:0;background:linear-gradient(180deg,var(--em),var(--bl),var(--vi));}
+.hdr-body{display:flex;align-items:center;gap:14px;padding:12px 28px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.badge{padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.bg-em{background:var(--em-l);color:var(--em);border:1.5px solid var(--em-m);}
+.bg-sk{background:var(--sk-l);color:var(--sk);border:1.5px solid var(--sk-m);}
+.bg-vi{background:var(--vi-l);color:var(--vi);border:1.5px solid var(--vi-m);}
+
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 24px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:15px 20px;font-size:15px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--em);border-bottom-color:var(--em);font-weight:700;}
+
+.pg{display:none;max-width:1020px;margin:0 auto;padding:36px 28px 80px;}
+.pg.on{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+
+h2{font-size:27px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:30px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.88em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--em);}
+
+.co{border-radius:var(--r);padding:16px 20px;margin-bottom:18px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cem{background:var(--em-l);color:var(--t2);border-color:var(--em);}
+.cor{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+.cbl{background:var(--bl-l);color:var(--t2);border-color:var(--bl);}
+.cvi{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.crd{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+.sbar{display:flex;border:1.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:26px;flex-wrap:wrap;}
+.sbt{flex:1;min-width:80px;padding:13px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--t3);background:var(--wh);cursor:pointer;border-right:1.5px solid var(--bd);transition:all .17s;user-select:none;line-height:1.4;}
+.sbt:last-child{border-right:none;}
+.sbt:hover{background:var(--s1);}
+.sbt.on{background:var(--em-l);color:var(--em);font-weight:700;}
+.sbt.dn{background:var(--sk-l);color:var(--sk);}
+.snum{display:block;font-size:20px;font-weight:900;font-family:var(--mono);}
+
+.cw{background:#131c2c;border-radius:var(--r2);overflow:hidden;margin-bottom:20px;}
+.cbr{background:#192236;padding:10px 18px;font-family:var(--mono);font-size:12px;color:#5878b8;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1c2840;}
+.dots{display:flex;gap:6px;}
+.dot{width:11px;height:11px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}
+.hem{background:rgba(5,150,105,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #34d399;}
+.hor{background:rgba(194,65,12,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fb923c;}
+.hbl{background:rgba(29,78,216,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #60a5fa;}
+.hvi{background:rgba(109,40,217,.20);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #a78bfa;}
+.hgd{background:rgba(176,120,0,.15);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #fbbf24;}
+.hsk{background:rgba(3,105,161,.18);display:block;margin:0 -22px;padding:0 22px;border-left:3px solid #38bdf8;}
+
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 3px;}
+.tem{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.tor{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+.tbl{background:var(--bl-l);color:var(--bl);border:1px solid var(--bl-m);}
+.tvi{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.trd{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:11px 14px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:10px 14px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* SIM */
+.grid-outer{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:14px;margin-bottom:12px;}
+#gc{display:block;cursor:crosshair;border-radius:var(--r);}
+.sim-layout{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;}
+@media(max-width:700px){.sim-layout{grid-template-columns:1fr;}}
+.tool-row,.algo-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.tbtn,.abtn{padding:8px 14px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.tbtn:hover,.abtn:hover{border-color:var(--em);color:var(--em);}
+.abtn.on{background:var(--em-l);border-color:var(--em);color:var(--em);}
+.tbtn.on-s{background:var(--em-l);border-color:var(--em);color:var(--em);}
+.tbtn.on-e{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.tbtn.on-w{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.tbtn.on-c{background:var(--s2);border-color:var(--t3);color:var(--t3);}
+.ibox{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--t2);line-height:1.8;min-height:56px;margin-bottom:10px;white-space:pre-wrap;}
+.qdisp{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 12px;font-family:var(--mono);font-size:12px;min-height:40px;overflow-x:auto;white-space:nowrap;color:var(--t2);margin-bottom:8px;}
+.info-panel{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px;}
+.ip-lbl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.stat{background:var(--wh);border:1.5px solid var(--bd);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.stat span{font-weight:700;}
+.ctrl{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0;}
+.btn{padding:9px 16px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:var(--sans);transition:all .15s;}
+.btn:disabled{opacity:.38;cursor:default;}
+.brun{background:var(--em);color:#fff;}.brun:hover:not(:disabled){background:#047857;}
+.bstep{background:var(--bl-l);color:var(--bl);border-color:var(--bl-m);}.bstep:hover:not(:disabled){background:var(--bl);color:#fff;}
+.bauto{background:var(--vi-l);color:var(--vi);border-color:var(--vi-m);}.bauto:hover{background:var(--vi);color:#fff;}
+.brst{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.brst:hover{border-color:var(--t2);}
+.bclr{background:var(--rd-l);color:var(--rd);border-color:var(--rd-m);}.bclr:hover{background:var(--rd);color:#fff;}
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 14px;min-height:80px;max-height:130px;overflow-y:auto;font-family:var(--mono);font-size:13px;line-height:1.9;}
+.lem{color:var(--em);font-weight:600;}.lor{color:var(--or);font-weight:600;}
+.lbl{color:var(--bl);font-weight:600;}.lgd{color:var(--gd);font-weight:700;}.li{color:var(--t4);}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
+.ldot{width:13px;height:13px;border-radius:3px;border:1.5px solid;flex-shrink:0;}
+.prog-wrap{height:5px;background:var(--bd);border-radius:3px;margin-bottom:8px;}
+.prog-fill{height:5px;background:linear-gradient(90deg,var(--em),var(--sk));border-radius:3px;transition:width .3s;}
+
+/* QUIZ */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:22px 26px;margin-bottom:18px;}
+.qtext{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{padding:12px 18px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;}
+.qopt:hover:not(.locked){border-color:var(--em);color:var(--em);background:var(--em-l);}
+.qopt.correct{background:var(--em-l);border-color:var(--em);color:var(--em);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:15px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:24px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:16px 22px;}
+.sbig{font-size:40px;font-weight:900;color:var(--em);font-family:var(--mono);}
+.qpbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:8px;background:linear-gradient(90deg,var(--em),var(--sk));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:5px;}
+
+/* CHALLENGE */
+.chc{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:24px 28px;margin-bottom:28px;}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:660px){.chg{grid-template-columns:1fr;}}
+.code-area{width:100%;background:#131c2c;border:1.5px solid #1c2840;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;color:#c8d4f5;resize:vertical;outline:none;line-height:1.85;}
+.code-area:focus{border-color:var(--em);}
+.rbtn{margin-top:10px;padding:11px 26px;background:var(--em);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.rbtn:hover{background:#047857;}
+.ob{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:13px;min-height:120px;color:var(--t2);white-space:pre-wrap;line-height:1.85;}
+.oo{color:var(--em);}.oe{color:var(--rd);}
+.ht{font-size:14px;color:var(--bl);cursor:pointer;margin-top:8px;display:inline-block;font-weight:700;}
+.hb{display:none;margin-top:8px;padding:12px 16px;background:var(--gd-l);border-radius:var(--r);font-size:14px;color:var(--gd);border:1px solid var(--gd-m);line-height:1.7;}
+.hb.show{display:block;}
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-stripe"></div>
+  <div class="hdr-body">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">그리드/좌표 기반 큐</span>
+    <span class="badge bg-em">BFS 최단경로</span>
+    <span class="badge bg-sk">Dijkstra</span>
+    <span class="badge bg-vi">0-1 BFS</span>
+  </div>
+</header>
+<nav class="nav">
+  <div class="nt on"  id="nt0" onclick="goPage(0)">📖 개념</div>
+  <div class="nt"     id="nt1" onclick="goPage(1)">🌊 BFS 격자</div>
+  <div class="nt"     id="nt2" onclick="goPage(2)">⚡ Dijkstra</div>
+  <div class="nt"     id="nt3" onclick="goPage(3)">🎮 시뮬레이터</div>
+  <div class="nt"     id="nt4" onclick="goPage(4)">🧠 퀴즈</div>
+  <div class="nt"     id="nt5" onclick="goPage(5)">🏆 도전</div>
+</nav>
+
+<!-- PAGE 0: 개념 -->
+<div class="pg on" id="pg0">
+  <h2>그리드/좌표 기반 큐</h2>
+  <p class="psub">세영코딩연구소 · 정올 심화 | 2D 격자를 탐색하는 세 가지 방법!</p>
+  <div class="co cem">
+    <strong>핵심 아이디어</strong><br>
+    2D 격자(grid)에서 최단 경로 문제는 정올의 단골 유형이야.<br>
+    가중치에 따라 <strong>BFS</strong> / <strong>0-1 BFS</strong> / <strong>Dijkstra</strong>를 선택해!
+  </div>
+  <h3 style="margin-bottom:14px;">세 가지 방법 비교</h3>
+  <table>
+    <tr><th>방법</th><th>자료구조</th><th>가중치</th><th>복잡도</th><th>정올 난이도</th></tr>
+    <tr><td><span class="tag tem">BFS</span></td><td>큐(Queue)</td><td>모두 동일</td><td style="color:var(--em);font-weight:700;">O(N×M)</td><td><span class="tag tem">실버</span></td></tr>
+    <tr><td><span class="tag tvi">0-1 BFS</span></td><td>덱(Deque)</td><td>0 또는 1만</td><td style="color:var(--vi);font-weight:700;">O(N×M)</td><td><span class="tag tgd">골드</span></td></tr>
+    <tr><td><span class="tag tsk">Dijkstra</span></td><td>우선순위 큐</td><td>임의 양수</td><td style="color:var(--sk);font-weight:700;">O(NMlogNM)</td><td><span class="tag tgd">골드</span></td></tr>
+  </table>
+  <div class="card2">
+    <div class="card">
+      <h3>4방향 이동 벡터</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>4방향 벡터</div>
+        <pre><span class="tp">int</span> dr[] = {-<span class="nm">1</span>, <span class="nm">1</span>,  <span class="nm">0</span>, <span class="nm">0</span>};
+<span class="tp">int</span> dc[] = { <span class="nm">0</span>, <span class="nm">0</span>, -<span class="nm">1</span>, <span class="nm">1</span>};
+<span class="cm">// 상, 하, 좌, 우</span></pre>
+      </div>
+    </div>
+    <div class="card">
+      <h3>범위 + 방문 체크</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>체크 패턴</div>
+        <pre><span class="tp">int</span> nr = r + dr[d];
+<span class="tp">int</span> nc = c + dc[d];
+<span class="hbl"><span class="kw">if</span>(nr&lt;<span class="nm">0</span>||nr&gt;=N) <span class="kw">continue</span>;</span>
+<span class="hbl"><span class="kw">if</span>(nc&lt;<span class="nm">0</span>||nc&gt;=M) <span class="kw">continue</span>;</span>
+<span class="hbl"><span class="kw">if</span>(grid[nr][nc]==<span class="st">'#'</span>) <span class="kw">continue</span>;</span>
+<span class="hbl"><span class="kw">if</span>(dist[nr][nc]!=-<span class="nm">1</span>) <span class="kw">continue</span>;</span></pre>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:14px;">어떤 방법을 선택할까?</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:13px 16px;background:var(--em-l);border-radius:var(--r);border:1.5px solid var(--em-m);">
+        <strong style="color:var(--em);">BFS</strong> — 모든 이동 비용이 같을 때<br>
+        <span style="font-size:14px;color:var(--t3);">예: 미로 탈출, 이동 횟수 최소화, 섬 개수</span>
+      </div>
+      <div style="padding:13px 16px;background:var(--vi-l);border-radius:var(--r);border:1.5px solid var(--vi-m);">
+        <strong style="color:var(--vi);">0-1 BFS</strong> — 이동 비용이 0 또는 1만 있을 때<br>
+        <span style="font-size:14px;color:var(--t3);">예: 문 통과 비용, 특정 조건 무료 이동</span>
+      </div>
+      <div style="padding:13px 16px;background:var(--sk-l);border-radius:var(--r);border:1.5px solid var(--sk-m);">
+        <strong style="color:var(--sk);">Dijkstra</strong> — 이동 비용이 임의 양수일 때<br>
+        <span style="font-size:14px;color:var(--t3);">예: 지형 이동비용, 가중치 격자, 환승 비용</span>
+      </div>
+    </div>
+  </div>
+  <h3 style="margin-bottom:14px;">정올 출제 유형</h3>
+  <table>
+    <tr><th>문제 유형</th><th>방법</th><th>핵심</th></tr>
+    <tr><td>미로 최단 거리</td><td><span class="tag tem">BFS</span></td><td>dist[][] 배열, 4방향 탐색</td></tr>
+    <tr><td>바이러스/불 확산</td><td><span class="tag tem">Multi BFS</span></td><td>여러 출발점 동시 큐 삽입</td></tr>
+    <tr><td>문(열쇠) 통과</td><td><span class="tag tvi">0-1 BFS</span></td><td>비용 0→앞, 1→뒤 삽입</td></tr>
+    <tr><td>지형 이동 비용</td><td><span class="tag tsk">Dijkstra</span></td><td>우선순위 큐, 구식값 무시</td></tr>
+    <tr><td>연결 요소 개수</td><td><span class="tag tem">BFS/DFS</span></td><td>미방문 노드마다 탐색</td></tr>
+  </table>
+</div>
+
+<!-- PAGE 1: BFS -->
+<div class="pg" id="pg1">
+  <h2>BFS로 격자 최단 거리</h2>
+  <p class="psub">큐(Queue) 하나로 O(N×M)에 최단 경로!</p>
+  <div class="sbar" id="sb1">
+    <div class="sbt on"  onclick="goBFS(0,this)"><span class="snum">01</span>dist 초기화</div>
+    <div class="sbt"     onclick="goBFS(1,this)"><span class="snum">02</span>BFS 루프</div>
+    <div class="sbt"     onclick="goBFS(2,this)"><span class="snum">03</span>이웃 처리</div>
+    <div class="sbt"     onclick="goBFS(3,this)"><span class="snum">04</span>완성 코드</div>
+    <div class="sbt"     onclick="goBFS(4,this)"><span class="snum">05</span>다중 출발점</div>
+  </div>
+  <div id="bfs-panel"></div>
+</div>
+
+<!-- PAGE 2: Dijkstra -->
+<div class="pg" id="pg2">
+  <h2>Dijkstra + 0-1 BFS</h2>
+  <p class="psub">가중치 격자의 최단 비용!</p>
+  <div class="sbar" id="sb2">
+    <div class="sbt on"  onclick="goDijk(0,this)"><span class="snum">01</span>Dijkstra 개념</div>
+    <div class="sbt"     onclick="goDijk(1,this)"><span class="snum">02</span>0-1 BFS</div>
+    <div class="sbt"     onclick="goDijk(2,this)"><span class="snum">03</span>완성 코드</div>
+  </div>
+  <div id="dijk-panel"></div>
+</div>
+
+<!-- PAGE 3: 시뮬레이터 -->
+<div class="pg" id="pg3">
+  <h2>격자 탐색 시뮬레이터</h2>
+  <p class="psub">격자를 직접 그리고 BFS를 단계별로 실행해봐!</p>
+  <div class="algo-row">
+    <div class="abtn on" id="ab0" onclick="setAlgo(0)">🌊 BFS</div>
+    <div class="abtn"    id="ab1" onclick="setAlgo(1)">⚡ Dijkstra(가중치)</div>
+  </div>
+  <div class="tool-row">
+    <span style="font-size:14px;font-weight:700;color:var(--t3);align-self:center;">도구:</span>
+    <div class="tbtn on-s" id="tb0" onclick="setTool(0)">🟢 출발(S)</div>
+    <div class="tbtn"      id="tb1" onclick="setTool(1)">🔴 도착(E)</div>
+    <div class="tbtn"      id="tb2" onclick="setTool(2)">⬛ 벽</div>
+    <div class="tbtn"      id="tb3" onclick="setTool(3)">🧹 지우개</div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--em-l);border-color:var(--em);"></div>출발(S)</div>
+    <div class="leg"><div class="ldot" style="background:var(--or-l);border-color:var(--or);"></div>도착(E)</div>
+    <div class="leg"><div class="ldot" style="background:#1e293b;border-color:#334155;"></div>벽</div>
+    <div class="leg"><div class="ldot" style="background:var(--vi-l);border-color:var(--vi);"></div>현재 탐색</div>
+    <div class="leg"><div class="ldot" style="background:var(--bl-l);border-color:var(--bl);"></div>방문 완료</div>
+    <div class="leg"><div class="ldot" style="background:var(--gd-l);border-color:var(--gd);"></div>최단 경로</div>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <div class="grid-outer">
+        <canvas id="gc" width="420" height="420"></canvas>
+      </div>
+      <div id="algo-note" class="co cem" style="font-size:13px;margin-bottom:10px;">
+        BFS: 큐를 사용, 모든 칸 동일 비용 탐색
+      </div>
+    </div>
+    <div>
+      <div class="info-panel">
+        <div class="ip-lbl">상태</div>
+        <div class="ibox" id="ip-state">출발점(S)을 클릭하고 실행!</div>
+        <div class="ip-lbl">큐 내용</div>
+        <div class="qdisp" id="ip-queue">비어 있음</div>
+        <div class="stats">
+          <div class="stat">방문: <span id="sv" style="color:var(--bl);">0</span></div>
+          <div class="stat">단계: <span id="ss" style="color:var(--em);">0</span></div>
+          <div class="stat">거리: <span id="sd" style="color:var(--gd);">-</span></div>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" id="sp" style="width:0%"></div></div>
+        <div class="ctrl">
+          <button class="btn bstep" onclick="simStep()">▶ 한 단계</button>
+          <button class="btn bauto" onclick="simAuto()">⏩ 자동</button>
+          <button class="btn brun"  onclick="simRun()">⚡ 즉시</button>
+          <button class="btn brst"  onclick="simReset()">↺ 초기화</button>
+          <button class="btn bclr"  onclick="gridClear()">🗑 격자 초기화</button>
+        </div>
+        <div class="sl">로그</div>
+        <div class="log" id="sim-log"><span class="li">출발점(S)과 도착점(E)을 찍고 실행!</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: 퀴즈 -->
+<div class="pg" id="pg4">
+  <h2>그리드 큐 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 10문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 10</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 10 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<!-- PAGE 5: 도전 -->
+<div class="pg" id="pg5">
+  <h2>코딩 도전 문제</h2>
+  <p class="psub">격자 탐색 알고리즘을 직접 완성해봐!</p>
+  <div id="ch-box"></div>
+</div>
+
+<script>
+/* ============ PAGE NAV ============ */
+function goPage(n) {
+  for (var i = 0; i < 6; i++) {
+    document.getElementById('pg' + i).classList.remove('on');
+    document.getElementById('nt' + i).classList.remove('on');
+  }
+  document.getElementById('pg' + n).classList.add('on');
+  document.getElementById('nt' + n).classList.add('on');
+  if (n === 3) drawGrid();
+}
+
+/* ============ BFS CODE STEPS ============ */
+var bfsContents = [null, null, null, null, null];
+
+function buildBFS() {
+  var c0 = document.createElement('div');
+  c0.className = 'card';
+  c0.innerHTML = '<h3>① dist 배열 초기화 — -1로 미방문 표시</h3>';
+  var co0 = document.createElement('div');
+  co0.className = 'co cbl';
+  co0.innerHTML = '<strong>dist[i][j]</strong>는 출발점에서 (i,j)까지의 최단 거리. -1이면 미방문!<br>큐에 넣을 때 방문 표시해야 같은 칸이 여러 번 들어가지 않아.';
+  c0.appendChild(co0);
+  var cw0 = document.createElement('div');
+  cw0.className = 'cw';
+  cw0.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>02_dist_init.c</div>' +
+    '<pre><span class="fn">memset</span>(dist, -<span class="nm">1</span>, <span class="kw">sizeof</span>(dist));\n\n<span class="cm">// 출발점 거리=0, 큐에 enqueue</span>\n<span class="hem">dist[sr][sc] = <span class="nm">0</span>;</span>\n<span class="hem">qr[rear]=sr; qc[rear++]=sc;</span>\n\n<span class="cm">// 큐: 행·열 배열 두 개로 좌표 쌍 저장</span>\n<span class="tp">int</span> qr[<span class="nm">MAX</span>*<span class="nm">MAX</span>], qc[<span class="nm">MAX</span>*<span class="nm">MAX</span>];\n<span class="tp">int</span> front=<span class="nm">0</span>, rear=<span class="nm">0</span>;</pre>';
+  c0.appendChild(cw0);
+  var co0b = document.createElement('div');
+  co0b.className = 'co cgd';
+  co0b.innerHTML = '<strong>핵심!</strong> 큐에 <strong>넣을 때</strong> 방문 표시를. dequeue 후 하면 같은 칸이 큐에 여러 번 들어가서 느려!';
+  c0.appendChild(co0b);
+  bfsContents[0] = c0;
+
+  var c1 = document.createElement('div');
+  c1.className = 'card';
+  c1.innerHTML = '<h3>② BFS 메인 루프</h3>';
+  var co1 = document.createElement('div');
+  co1.className = 'co cem';
+  co1.innerHTML = '<strong>BFS 핵심 루프</strong>: 큐에서 꺼내고 → 4방향 이웃 탐색 → 유효하면 큐에 넣기를 반복!';
+  c1.appendChild(co1);
+  var cw1 = document.createElement('div');
+  cw1.className = 'cw';
+  cw1.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>03_bfs_loop.c</div>' +
+    '<pre><span class="tp">int</span> dr[]={-<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>};\n<span class="tp">int</span> dc[]={ <span class="nm">0</span>,<span class="nm">0</span>,-<span class="nm">1</span>,<span class="nm">1</span>};\n\n<span class="kw">while</span>(front &lt; rear) {\n<span class="hem">    <span class="tp">int</span> r=qr[front], c=qc[front++];</span>\n    <span class="kw">if</span>(r==er &amp;&amp; c==ec) <span class="kw">break</span>;\n    <span class="kw">for</span>(<span class="tp">int</span> d=<span class="nm">0</span>; d&lt;<span class="nm">4</span>; d++) {\n        <span class="tp">int</span> nr=r+dr[d], nc=c+dc[d];\n        <span class="hbl">        <span class="kw">if</span>(nr&lt;<span class="nm">0</span>||nr&gt;=N||nc&lt;<span class="nm">0</span>||nc&gt;=M) <span class="kw">continue</span>;</span>\n        <span class="hbl">        <span class="kw">if</span>(grid[nr][nc]==<span class="st">\'#\'</span>) <span class="kw">continue</span>;</span>\n        <span class="hbl">        <span class="kw">if</span>(dist[nr][nc]!=-<span class="nm">1</span>)  <span class="kw">continue</span>;</span>\n        dist[nr][nc]=dist[r][c]+<span class="nm">1</span>;\n        qr[rear]=nr; qc[rear++]=nc;\n    }\n}</pre>';
+  c1.appendChild(cw1);
+  bfsContents[1] = c1;
+
+  var c2 = document.createElement('div');
+  c2.className = 'card';
+  c2.innerHTML = '<h3>③ 이웃 처리 - 경로 복원</h3>';
+  var co2 = document.createElement('div');
+  co2.className = 'co cbl';
+  co2.innerHTML = '경로 자체를 구하려면 <strong>prev 배열</strong>로 역추적!<br>각 칸에서 "어디서 왔는지"를 기록하면 도착점에서 역추적 가능.';
+  c2.appendChild(co2);
+  var cw2 = document.createElement('div');
+  cw2.className = 'cw';
+  cw2.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>04_path_restore.c</div>' +
+    '<pre><span class="tp">int</span> prevR[MAX][MAX], prevC[MAX][MAX];\n<span class="fn">memset</span>(prevR, -<span class="nm">1</span>, <span class="kw">sizeof</span>(prevR));\n\n<span class="cm">// BFS 내 이웃 처리 시</span>\ndist[nr][nc] = dist[r][c]+<span class="nm">1</span>;\n<span class="hvi">prevR[nr][nc] = r;</span>\n<span class="hvi">prevC[nr][nc] = c;</span>\n\n<span class="cm">// 역추적 (도착 → 출발)</span>\n<span class="tp">int</span> cr=er, cc=ec;\n<span class="kw">while</span>(cr!=sr || cc!=sc) {\n    <span class="fn">printf</span>(<span class="st">"(%d,%d) "</span>, cr, cc);\n    <span class="tp">int</span> pr=prevR[cr][cc];\n    cc=prevC[cr][cc]; cr=pr;\n}</pre>';
+  c2.appendChild(cw2);
+  bfsContents[2] = c2;
+
+  var c3 = document.createElement('div');
+  c3.className = 'card';
+  c3.innerHTML = '<h3>④ BFS 완성 코드</h3>';
+  var cw3 = document.createElement('div');
+  cw3.className = 'cw';
+  cw3.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>bfs_grid_complete.c</div>' +
+    '<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>\n<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>\n<span class="kw">#define</span> <span class="nm">MAX 105</span>\n<span class="tp">char</span> g[MAX][MAX];\n<span class="tp">int</span>  d[MAX][MAX];\n<span class="tp">int</span>  qr[MAX*MAX], qc[MAX*MAX];\n<span class="tp">int</span>  dr[]={-<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>}, dc[]={<span class="nm">0</span>,<span class="nm">0</span>,-<span class="nm">1</span>,<span class="nm">1</span>};\n<span class="tp">int</span> <span class="fn">main</span>(){\n    <span class="tp">int</span> N,M,sr,sc,er,ec,f=<span class="nm">0</span>,r=<span class="nm">0</span>;\n    <span class="fn">scanf</span>(<span class="st">"%d %d"</span>,&amp;N,&amp;M);\n    <span class="fn">memset</span>(d,-<span class="nm">1</span>,<span class="kw">sizeof</span>(d));\n    <span class="kw">for</span>(<span class="tp">int</span> i=<span class="nm">0</span>;i&lt;N;i++){\n        <span class="fn">scanf</span>(<span class="st">"%s"</span>,g[i]);\n        <span class="kw">for</span>(<span class="tp">int</span> j=<span class="nm">0</span>;j&lt;M;j++){\n            <span class="kw">if</span>(g[i][j]==<span class="st">\'S\'</span>){sr=i;sc=j;}\n            <span class="kw">if</span>(g[i][j]==<span class="st">\'E\'</span>){er=i;ec=j;}\n        }\n    }\n<span class="hem">    d[sr][sc]=<span class="nm">0</span>; qr[r]=sr; qc[r++]=sc;</span>\n    <span class="kw">while</span>(f&lt;r){\n        <span class="tp">int</span> row=qr[f],col=qc[f++];\n        <span class="kw">for</span>(<span class="tp">int</span> k=<span class="nm">0</span>;k&lt;<span class="nm">4</span>;k++){\n            <span class="tp">int</span> nr=row+dr[k],nc=col+dc[k];\n            <span class="kw">if</span>(nr&lt;<span class="nm">0</span>||nr&gt;=N||nc&lt;<span class="nm">0</span>||nc&gt;=M) <span class="kw">continue</span>;\n            <span class="kw">if</span>(g[nr][nc]==<span class="st">\'#\'</span>||d[nr][nc]!=-<span class="nm">1</span>) <span class="kw">continue</span>;\n<span class="hbl">            d[nr][nc]=d[row][col]+<span class="nm">1</span>;\n            qr[r]=nr;qc[r++]=nc;</span>\n        }\n    }\n    <span class="fn">printf</span>(<span class="st">"%d\\n"</span>,d[er][ec]);\n}</pre>';
+  c3.appendChild(cw3);
+  bfsContents[3] = c3;
+
+  var c4 = document.createElement('div');
+  c4.className = 'card';
+  c4.innerHTML = '<h3>⑤ 다중 출발점 BFS</h3>';
+  var co4 = document.createElement('div');
+  co4.className = 'co cgd';
+  co4.innerHTML = '<strong>정올 단골!</strong> 바이러스 전파, 불 번짐 등 여러 출발점이 동시에 확산되는 문제.<br>모든 출발점을 처음부터 큐에 넣으면 돼!';
+  c4.appendChild(co4);
+  var cw4 = document.createElement('div');
+  cw4.className = 'cw';
+  cw4.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>multi_source_bfs.c</div>' +
+    '<pre><span class="cm">// 여러 출발점을 동시에 큐에</span>\n<span class="kw">for</span>(<span class="tp">int</span> i=<span class="nm">0</span>;i&lt;N;i++)\n  <span class="kw">for</span>(<span class="tp">int</span> j=<span class="nm">0</span>;j&lt;M;j++)\n<span class="hgd">    <span class="kw">if</span>(g[i][j]==<span class="st">\'V\'</span>){\n      dist[i][j]=<span class="nm">0</span>;\n      qr[r]=i; qc[r++]=j;\n    }</span>\n<span class="cm">// 이후 BFS는 동일!</span>\n<span class="cm">// → 가장 가까운 출발점 거리 계산</span></pre>';
+  c4.appendChild(cw4);
+  bfsContents[4] = c4;
+}
+
+function goBFS(n, btn) {
+  if (!bfsContents[0]) buildBFS();
+  var panel = document.getElementById('bfs-panel');
+  panel.innerHTML = '';
+  panel.appendChild(bfsContents[n]);
+  var btns = document.getElementById('sb1').querySelectorAll('.sbt');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('on', 'dn');
+    if (i < n) btns[i].classList.add('dn');
+    if (i === n) btns[i].classList.add('on');
+  }
+}
+
+/* ============ DIJKSTRA STEPS ============ */
+var dijkContents = [null, null, null];
+
+function buildDijk() {
+  var c0 = document.createElement('div');
+  c0.className = 'card';
+  c0.innerHTML = '<h3>① 격자 Dijkstra</h3>';
+  var co0 = document.createElement('div');
+  co0.className = 'co csk';
+  co0.innerHTML = '각 칸에 이동 비용이 있을 때! 우선순위 큐로 항상 최소 비용 칸을 먼저 처리.';
+  c0.appendChild(co0);
+  var cw0 = document.createElement('div');
+  cw0.className = 'cw';
+  cw0.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>dijkstra_grid.c</div>' +
+    '<pre><span class="kw">#define</span> <span class="nm">INF 0x3f3f3f3f</span>\n<span class="tp">int</span> cost[MAX][MAX]; <span class="cm">// 칸별 이동 비용</span>\n<span class="tp">int</span> dist[MAX][MAX]; <span class="cm">// 출발점 최소 비용</span>\n\n<span class="cm">// Min-Heap: {비용,행,열}</span>\n<span class="fn">memset</span>(dist,<span class="nm">0x3f</span>,<span class="kw">sizeof</span>(dist));\ndist[sr][sc]=<span class="nm">0</span>;\n<span class="fn">push</span>(<span class="nm">0</span>,sr,sc);\n\n<span class="kw">while</span>(!<span class="fn">empty</span>()){\n    Node cur=<span class="fn">pop</span>();\n<span class="hsk">    <span class="kw">if</span>(cur.d &gt; dist[cur.r][cur.c]) <span class="kw">continue</span>;</span>\n    <span class="kw">for</span>(<span class="tp">int</span> d=<span class="nm">0</span>;d&lt;<span class="nm">4</span>;d++){\n        <span class="tp">int</span> nr=cur.r+dr[d],nc=cur.c+dc[d];\n        <span class="kw">if</span>(<span class="cm">/* 범위체크 */</span>) <span class="kw">continue</span>;\n        <span class="tp">int</span> nd=cur.d+cost[nr][nc];\n<span class="hsk">        <span class="kw">if</span>(nd &lt; dist[nr][nc]){\n          dist[nr][nc]=nd;\n          <span class="fn">push</span>(nd,nr,nc);\n        }</span>\n    }\n}</pre>';
+  c0.appendChild(cw0);
+  dijkContents[0] = c0;
+
+  var c1 = document.createElement('div');
+  c1.className = 'card';
+  c1.innerHTML = '<h3>② 0-1 BFS</h3>';
+  var co1 = document.createElement('div');
+  co1.className = 'co cvi';
+  co1.innerHTML = '<strong>0-1 BFS</strong>: 이동 비용이 0 또는 1일 때 덱으로 O(N×M)!<br>' +
+    '비용 0 → 덱 <strong>앞(pushFront)</strong> &nbsp;|&nbsp; 비용 1 → 덱 <strong>뒤(pushBack)</strong>';
+  c1.appendChild(co1);
+  var cw1 = document.createElement('div');
+  cw1.className = 'cw';
+  cw1.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>zero_one_bfs.c</div>' +
+    '<pre><span class="cm">// 덱: front에서 pop, 비용에 따라 앞/뒤 push</span>\n<span class="tp">int</span> dqR[MAX], dqC[MAX], dqD[MAX];\n<span class="tp">int</span> dqF=MAX/<span class="nm">2</span>, dqB=MAX/<span class="nm">2</span>-<span class="nm">1</span>;\n\ndist[sr][sc]=<span class="nm">0</span>;\n<span class="cm">// pushBack(sr,sc,0)</span>\n\n<span class="kw">while</span>(dqF &lt;= dqB){\n    pop from front;\n    <span class="kw">if</span>(curD &gt; dist[r][c]) <span class="kw">continue</span>;\n    <span class="kw">for</span> 4방향 {\n        <span class="tp">int</span> w=getCost(r,c,nr,nc); <span class="cm">// 0 or 1</span>\n        <span class="kw">if</span>(dist[r][c]+w &lt; dist[nr][nc]){\n            dist[nr][nc]=dist[r][c]+w;\n<span class="hvi">            <span class="kw">if</span>(w==<span class="nm">0</span>) pushFront(nr,nc);</span>\n<span class="hbl">            <span class="kw">else</span>     pushBack(nr,nc);</span>\n        }\n    }\n}</pre>';
+  c1.appendChild(cw1);
+  dijkContents[1] = c1;
+
+  var c2 = document.createElement('div');
+  c2.className = 'card';
+  c2.innerHTML = '<h3>③ C++ 완성 코드 — Dijkstra on Grid</h3>';
+  var cw2 = document.createElement('div');
+  cw2.className = 'cw';
+  cw2.innerHTML = '<div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>dijkstra_grid.cpp</div>' +
+    '<pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>\n<span class="kw">using namespace</span> std;\n<span class="kw">#define</span> <span class="nm">INF 1e9</span>\n<span class="tp">int</span> cost[<span class="nm">105</span>][<span class="nm">105</span>], dist[<span class="nm">105</span>][<span class="nm">105</span>];\n<span class="tp">int</span> dr[]={-<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>}, dc[]={<span class="nm">0</span>,<span class="nm">0</span>,-<span class="nm">1</span>,<span class="nm">1</span>};\n\n<span class="tp">void</span> <span class="fn">dijkstra</span>(<span class="tp">int</span> N,<span class="tp">int</span> M,<span class="tp">int</span> sr,<span class="tp">int</span> sc){\n    priority_queue&lt;tuple&lt;<span class="tp">int</span>,<span class="tp">int</span>,<span class="tp">int</span>&gt;,\n        vector&lt;tuple&lt;<span class="tp">int</span>,<span class="tp">int</span>,<span class="tp">int</span>&gt;&gt;,greater&lt;&gt;&gt; pq;\n    fill(&amp;dist[<span class="nm">0</span>][<span class="nm">0</span>],&amp;dist[<span class="nm">105</span>-<span class="nm">1</span>][<span class="nm">105</span>],<span class="nm">INF</span>);\n    dist[sr][sc]=<span class="nm">0</span>; pq.emplace(<span class="nm">0</span>,sr,sc);\n    <span class="kw">while</span>(!pq.empty()){\n        <span class="kw">auto</span> [d,r,c]=pq.top(); pq.pop();\n<span class="hsk">        <span class="kw">if</span>(d&gt;dist[r][c]) <span class="kw">continue</span>;</span>\n        <span class="kw">for</span>(<span class="tp">int</span> k=<span class="nm">0</span>;k&lt;<span class="nm">4</span>;k++){\n            <span class="tp">int</span> nr=r+dr[k],nc=c+dc[k];\n            <span class="kw">if</span>(nr&lt;<span class="nm">0</span>||nr&gt;=N||nc&lt;<span class="nm">0</span>||nc&gt;=M) <span class="kw">continue</span>;\n<span class="hsk">            <span class="kw">if</span>(d+cost[nr][nc]&lt;dist[nr][nc]){\n                dist[nr][nc]=d+cost[nr][nc];\n                pq.emplace(dist[nr][nc],nr,nc);\n            }</span>\n        }\n    }\n}</pre>';
+  c2.appendChild(cw2);
+  var co2 = document.createElement('div');
+  co2.className = 'co cgd';
+  co2.innerHTML = '<strong>구식값 무시(if d&gt;dist[r][c] continue)</strong>가 핵심!<br>같은 칸이 힙에 여러 번 들어갈 수 있어서, 더 큰 비용의 구식 값은 꺼낼 때 무시해야 해.';
+  c2.appendChild(co2);
+  dijkContents[2] = c2;
+}
+
+function goDijk(n, btn) {
+  if (!dijkContents[0]) buildDijk();
+  var panel = document.getElementById('dijk-panel');
+  panel.innerHTML = '';
+  panel.appendChild(dijkContents[n]);
+  var btns = document.getElementById('sb2').querySelectorAll('.sbt');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('on', 'dn');
+    if (i < n) btns[i].classList.add('dn');
+    if (i === n) btns[i].classList.add('on');
+  }
+}
+
+/* ============ GRID SIMULATOR ============ */
+var GN = 10, GM = 10, CS = 42;
+var grid, sR, sC, eR, eC, curTool = 0, curAlgo = 0;
+var aDist, aVis, aQ, aRun, aDone, aStep, autoT;
+
+function gridInit() {
+  grid = [];
+  for (var i = 0; i < GN; i++) {
+    grid.push([]);
+    for (var j = 0; j < GM; j++) grid[i].push(0);
+  }
+  sR = sC = eR = eC = -1;
+  simReset();
+}
+
+function setTool(n) {
+  curTool = n;
+  var cls = ['on-s','on-e','on-w','on-c'];
+  for (var i = 0; i < 4; i++) {
+    document.getElementById('tb' + i).className = 'tbtn';
+    if (i === n) document.getElementById('tb' + i).classList.add(cls[n]);
+  }
+}
+
+function setAlgo(n) {
+  curAlgo = n;
+  document.getElementById('ab0').classList.toggle('on', n === 0);
+  document.getElementById('ab1').classList.toggle('on', n === 1);
+  document.getElementById('algo-note').textContent = n === 0
+    ? 'BFS: 큐를 사용, 모든 칸 동일 비용 탐색'
+    : 'Dijkstra: 우선순위 큐, 비용=(행+열)%3+1로 시뮬';
+  simReset();
+}
+
+function drawGrid() {
+  var cv = document.getElementById('gc');
+  if (!cv) return;
+  var W = GM * CS + 2, H = GN * CS + 2;
+  cv.width = W; cv.height = H;
+  var ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  for (var i = 0; i < GN; i++) {
+    for (var j = 0; j < GM; j++) {
+      var x = j * CS + 1, y = i * CS + 1;
+      var t = grid[i][j];
+      var vis = aVis && aVis[i] && aVis[i][j];
+      var info = aDist && aDist[i] && aDist[i][j];
+
+      var fill = '#f8f9fc', stroke = '#d1d9f0';
+      if (t === 1) { fill = '#1e293b'; stroke = '#334155'; }
+      else if (t === 2) { fill = '#d1fae5'; stroke = '#059669'; }
+      else if (t === 3) { fill = '#fff0e8'; stroke = '#c2410c'; }
+      else if (info && info.path) { fill = '#fff8d4'; stroke = '#b07800'; }
+      else if (info && info.cur) { fill = '#ede9fe'; stroke = '#6d28d9'; }
+      else if (vis) { fill = '#dbeafe'; stroke = '#93c5fd'; }
+
+      ctx.fillStyle = fill; ctx.strokeStyle = stroke; ctx.lineWidth = 1;
+      ctx.fillRect(x, y, CS - 1, CS - 1);
+      ctx.strokeRect(x, y, CS - 1, CS - 1);
+
+      if (info && info.v >= 0 && t === 0) {
+        ctx.fillStyle = info.path ? '#b07800' : info.cur ? '#6d28d9' : '#1d4ed8';
+        ctx.font = 'bold 11px JetBrains Mono,monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(info.v, x + CS / 2, y + CS / 2);
+      }
+      if (t === 2 || t === 3) {
+        ctx.fillStyle = t === 2 ? '#059669' : '#c2410c';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(t === 2 ? 'S' : 'E', x + CS / 2, y + CS / 2);
+      }
+    }
+  }
+}
+
+var isDrg = false;
+function handleClick(e) {
+  var cv = document.getElementById('gc');
+  var rect = cv.getBoundingClientRect();
+  var sx = cv.width / rect.width, sy = cv.height / rect.height;
+  var x = (e.clientX - rect.left) * sx, y = (e.clientY - rect.top) * sy;
+  var j = Math.floor(x / CS), i = Math.floor(y / CS);
+  if (i < 0 || i >= GN || j < 0 || j >= GM) return;
+  simReset();
+  if (curTool === 0) {
+    if (sR >= 0) grid[sR][sC] = 0;
+    grid[i][j] = 2; sR = i; sC = j;
+  } else if (curTool === 1) {
+    if (eR >= 0) grid[eR][eC] = 0;
+    grid[i][j] = 3; eR = i; eC = j;
+  } else if (curTool === 2) {
+    if (grid[i][j] === 2) { sR = sC = -1; }
+    if (grid[i][j] === 3) { eR = eC = -1; }
+    grid[i][j] = (grid[i][j] === 1) ? 0 : 1;
+  } else {
+    if (grid[i][j] === 2) { sR = sC = -1; }
+    if (grid[i][j] === 3) { eR = eC = -1; }
+    grid[i][j] = 0;
+  }
+  drawGrid();
+}
+
+function simReset() {
+  if (autoT) clearTimeout(autoT);
+  aDist = []; aVis = []; aQ = []; aRun = false; aDone = false; aStep = 0;
+  for (var i = 0; i < GN; i++) {
+    aDist.push([]); aVis.push([]);
+    for (var j = 0; j < GM; j++) { aDist[i].push(null); aVis[i].push(false); }
+  }
+  document.getElementById('sv').textContent = '0';
+  document.getElementById('ss').textContent = '0';
+  document.getElementById('sd').textContent = '-';
+  document.getElementById('ip-state').textContent = '출발점(S), 도착점(E)을 찍고 실행!';
+  document.getElementById('ip-queue').textContent = '비어 있음';
+  document.getElementById('sp').style.width = '0%';
+  document.getElementById('sim-log').innerHTML = '<span class="li">출발점과 도착점을 찍고 실행해봐!</span>';
+  drawGrid();
+}
+
+function addLog(msg, cls) {
+  var log = document.getElementById('sim-log');
+  var d = document.createElement('div');
+  d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function initAlgo() {
+  if (sR < 0) { addLog('출발점(S)을 먼저 찍어줘!', 'li'); return false; }
+  for (var i = 0; i < GN; i++)
+    for (var j = 0; j < GM; j++)
+      aDist[i][j] = { v: -1, cur: false, path: false };
+  aDist[sR][sC].v = 0;
+  aVis[sR][sC] = true;
+  aQ = [{ r: sR, c: sC, d: 0 }];
+  aRun = true;
+  return true;
+}
+
+var DR = [-1, 1, 0, 0], DC = [0, 0, -1, 1];
+
+function simStep() {
+  if (!aRun && !initAlgo()) return;
+  if (aDone) { addLog('탐색 완료!', 'lgd'); return; }
+  if (!aQ.length) {
+    aDone = true;
+    var df = (eR >= 0 && aDist[eR] && aDist[eR][eC]) ? aDist[eR][eC].v : -1;
+    document.getElementById('sd').textContent = df >= 0 ? df : '불가';
+    document.getElementById('ip-state').textContent = df >= 0 ? ('최단거리: ' + df) : '도달 불가!';
+    addLog(df >= 0 ? ('완료! 거리=' + df) : '도달 불가!', 'lgd');
+    if (df >= 0 && eR >= 0) tracePath();
+    drawGrid();
+    return;
+  }
+  if (curAlgo === 1) aQ.sort(function(a,b){return a.d-b.d;});
+  var cur = aQ.shift();
+  var r = cur.r, c = cur.c, d = cur.d;
+  if (aDist[r][c]) aDist[r][c].cur = false;
+  var pushed = 0;
+  for (var k = 0; k < 4; k++) {
+    var nr = r + DR[k], nc = c + DC[k];
+    if (nr < 0 || nr >= GN || nc < 0 || nc >= GM) continue;
+    if (grid[nr][nc] === 1) continue;
+    if (aVis[nr][nc]) continue;
+    var w = curAlgo === 1 ? ((nr + nc) % 3 + 1) : 1;
+    var nd = d + w;
+    var prev = aDist[nr][nc] ? aDist[nr][nc].v : -1;
+    if (prev < 0 || nd < prev) {
+      aVis[nr][nc] = true;
+      aDist[nr][nc] = { v: nd, cur: true, path: false };
+      aQ.push({ r: nr, c: nc, d: nd });
+      pushed++;
+    }
+  }
+  aStep++;
+  var vc = 0;
+  for (var i = 0; i < GN; i++) for (var j = 0; j < GM; j++) if (aVis[i][j]) vc++;
+  document.getElementById('sv').textContent = vc;
+  document.getElementById('ss').textContent = aStep;
+  document.getElementById('sp').style.width = Math.round(vc / (GN * GM) * 100) + '%';
+  document.getElementById('ip-state').textContent = '처리: (' + r + ',' + c + ') d=' + d + '\n이웃 ' + pushed + '개 추가';
+  var qprev = aQ.slice(0, 6).map(function(q){return '(' + q.r + ',' + q.c + ')';}).join(' ');
+  document.getElementById('ip-queue').textContent = qprev + (aQ.length > 6 ? ' ...' : '');
+  addLog('(' + r + ',' + c + ') d=' + d + ' → ' + pushed + '개 push', d === 0 ? 'lem' : 'lbl');
+  drawGrid();
+}
+
+function tracePath() {
+  if (eR < 0 || !aDist[eR] || aDist[eR][eC].v < 0) return;
+  var r = eR, c = eC, lim = GN * GM;
+  while ((r !== sR || c !== sC) && lim-- > 0) {
+    aDist[r][c].path = true;
+    var bR = -1, bC = -1, bD = Infinity;
+    for (var k = 0; k < 4; k++) {
+      var nr = r + DR[k], nc = c + DC[k];
+      if (nr < 0 || nr >= GN || nc < 0 || nc >= GM) continue;
+      if (!aDist[nr][nc] || aDist[nr][nc].v < 0) continue;
+      if (aDist[nr][nc].v < bD) { bD = aDist[nr][nc].v; bR = nr; bC = nc; }
+    }
+    if (bR < 0) break;
+    r = bR; c = bC;
+  }
+  aDist[sR][sC].path = true;
+  drawGrid();
+}
+
+function simAuto() {
+  if (!aRun && !initAlgo()) return;
+  function tick() { simStep(); if (!aDone && aQ.length) autoT = setTimeout(tick, 100); }
+  tick();
+}
+
+function simRun() {
+  if (!aRun && !initAlgo()) return;
+  var lim = 0;
+  while (!aDone && aQ.length && lim++ < 10000) simStep();
+}
+
+function gridClear() { gridInit(); drawGrid(); }
+
+/* ============ QUIZ ============ */
+var QUIZ = [
+  { q: 'N×M 격자 BFS 최단 경로 시간복잡도는?',
+    opts: ['O(N+M)', 'O(N×M)', 'O(N×M×logNM)', 'O(N²M²)'], ans: 1,
+    fb: 'BFS는 각 칸을 한 번씩만 방문. 총 N×M번 → O(N×M)!' },
+  { q: '4방향 벡터 dr={-1,1,0,0}, dc={0,0,-1,1}에서 dc[2]는 어느 방향?',
+    opts: ['아래', '위', '왼쪽', '오른쪽'], ans: 2,
+    fb: 'dc[2]=-1은 열이 감소 → 왼쪽 이동! dr[2]=0이므로 행 변화 없음.' },
+  { q: 'BFS에서 방문 표시는 언제 해야 하나?',
+    opts: ['dequeue 후', 'enqueue 할 때', '항상 두 번', '알고리즘 끝에'], ans: 1,
+    fb: 'enqueue할 때 표시! dequeue 후 하면 같은 칸이 큐에 여러 번 들어가 비효율.' },
+  { q: '다중 출발점 BFS 초기화 방법은?',
+    opts: ['출발점 중 하나만', '모든 출발점 동시에 큐에 넣기', '번갈아 처리', '가장 작은 좌표만'], ans: 1,
+    fb: '모든 출발점을 dist=0으로 초기화하고 전부 큐에! 동시에 퍼지는 BFS가 돼.' },
+  { q: 'Dijkstra vs BFS 선택 기준은?',
+    opts: ['격자 크기', '비용 같으면 BFS, 다르면 Dijkstra', '항상 Dijkstra', '항상 BFS'], ans: 1,
+    fb: '비용이 모두 같으면 BFS(O(NM))가 빠름. 다르면 Dijkstra(O(NMlogNM))!' },
+  { q: '0-1 BFS에서 비용 0인 이동은 덱의 어디에?',
+    opts: ['뒤(pushBack)', '앞(pushFront)', '중간', '무작위'], ans: 1,
+    fb: '비용 0 → 앞(pushFront)! 비용 1 → 뒤(pushBack). 오름차순 처리 유지.' },
+  { q: '격자 좌표 유효성 검사에서 반드시 체크해야 할 것은?',
+    opts: ['벽만', '범위만', '범위 + 벽 + 방문', '방문만'], ans: 2,
+    fb: '세 가지 모두! 범위→continue, 벽→continue, 방문→continue.' },
+  { q: 'BFS 경로 복원에 필요한 것은?',
+    opts: ['dist만', 'visited만', 'prev(이전 위치) 배열', '큐 전체'], ans: 2,
+    fb: 'prevR, prevC 배열로 "어디서 왔는지" 기록 → 도착점에서 역추적!' },
+  { q: 'Dijkstra에서 "구식값 무시"가 필요한 이유는?',
+    opts: ['속도 향상', '같은 칸이 힙에 여러 번 들어갈 수 있어서', '메모리 절약', 'C 규칙'], ans: 1,
+    fb: '더 짧은 경로 발견 때마다 힙에 재삽입. 구식(더 큰 비용) 값은 꺼낼 때 무시!' },
+  { q: '5×5 격자, 출발(0,0), 도착(4,4), 벽 없을 때 BFS 최단 거리는?',
+    opts: ['4', '6', '8', '5'], ans: 2,
+    fb: '4방향 이동: 행 4번 + 열 4번 = 8! (대각선 불가)' }
+];
+var qScore = 0, qDone = 0;
+function renderQuiz() {
+  var box = document.getElementById('quiz-box');
+  box.innerHTML = '';
+  for (var qi = 0; qi < QUIZ.length; qi++) {
+    var q = QUIZ[qi];
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'qc' + qi;
+    var txt = document.createElement('div');
+    txt.className = 'qtext';
+    txt.textContent = 'Q' + (qi+1) + '. ' + q.q;
+    card.appendChild(txt);
+    var opts = document.createElement('div');
+    opts.className = 'qopts';
+    for (var oi = 0; oi < q.opts.length; oi++) {
+      var opt = document.createElement('div');
+      opt.className = 'qopt';
+      opt.id = 'qo' + qi + '_' + oi;
+      opt.textContent = String.fromCharCode(65 + oi) + '. ' + q.opts[oi];
+      opt.setAttribute('data-qi', qi);
+      opt.setAttribute('data-oi', oi);
+      opt.onclick = function() {
+        var dqi = parseInt(this.getAttribute('data-qi'));
+        var doi = parseInt(this.getAttribute('data-oi'));
+        ansQ(dqi, doi);
+      };
+      opts.appendChild(opt);
+    }
+    card.appendChild(opts);
+    var fb = document.createElement('div');
+    fb.className = 'qfb';
+    fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    box.appendChild(card);
+  }
+}
+function ansQ(qi, oi) {
+  var first = document.getElementById('qo' + qi + '_0');
+  if (first.classList.contains('locked')) return;
+  var q = QUIZ[qi];
+  for (var i = 0; i < q.opts.length; i++) {
+    document.getElementById('qo' + qi + '_' + i).classList.add('locked');
+  }
+  document.getElementById('qo' + qi + '_' + oi).classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi !== q.ans) document.getElementById('qo' + qi + '_' + q.ans).classList.add('correct');
+  if (oi === q.ans) { qScore++; document.getElementById('qscore').textContent = qScore; }
+  var fb = document.getElementById('qfb' + qi);
+  fb.className = 'qfb show ' + (oi === q.ans ? 'ok' : 'bad');
+  fb.textContent = (oi === q.ans ? '✓ 정답! ' : '✗ 오답. ') + q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width = Math.round(qDone / QUIZ.length * 100) + '%';
+  document.getElementById('qplbl').textContent = qDone + ' / ' + QUIZ.length + ' 풀이';
+}
+
+/* ============ CHALLENGES ============ */
+var CH_TITLES = ['도전 1 — BFS 미로 최단 거리', '도전 2 — 다중 출발점 BFS', '도전 3 — 격자 Dijkstra'];
+var CH_TAGS = [
+  [['tem','정올 필수'],['tbl','실버']],
+  [['tem','중급'],['tgd','골드 입문']],
+  [['tsk','고급'],['tgd','골드']]
+];
+var CH_DESC = [
+  'N×M 미로에서 S→E 최단 이동 거리를 BFS로 구해봐!<br><br>입력: <code>5 6 / S..... / ###### / ...... / ###### / .....E</code><br>출력: <code style="color:var(--em);">12</code>',
+  '바이러스(V)가 여러 곳에 있어. 모든 빈 칸이 감염되는 최소 시간을 구해봐!<br><br>입력: <code>4 4 / V... / .#.V / .... / ..#.</code><br>출력: <code style="color:var(--em);">3</code>',
+  '각 칸에 이동 비용이 있는 격자에서 (0,0)→(N-1,M-1) 최소 비용!<br><br>입력: <code>3 3 / 1 3 1 / 2 1 4 / 1 1 1</code><br>출력: <code style="color:var(--em);">5</code>'
+];
+var CH_HINT = [
+  'qr[],qc[] 두 배열로 큐. dist[][] -1초기화. dist[sr][sc]=0 enqueue. while(f<r): dequeue→4방향→범위+벽+방문체크→dist 갱신+enqueue.',
+  '모든 V를 dist=0으로 초기화하고 큐에 넣어. BFS 후 . 칸의 dist 최댓값이 정답. 도달 불가면 -1.',
+  'Min-Heap에 {비용,행,열} push. pop 후 구식이면 skip. nd=d+cost[nr][nc]가 더 작으면 갱신+push.'
+];
+var CH_CODE = [
+  '#include <stdio.h>\n#include <string.h>\n#define MAX 105\nchar g[MAX][MAX];\nint dist[MAX][MAX];\nint qr[MAX*MAX], qc[MAX*MAX];\nint dr[]={-1,1,0,0}, dc[]={0,0,-1,1};\nint main(){\n    int N,M,sr=-1,sc=-1,er=-1,ec=-1;\n    int front=0,rear=0;\n    scanf("%d %d",&N,&M);\n    memset(dist,-1,sizeof(dist));\n    for(int i=0;i<N;i++){\n        scanf("%s",g[i]);\n        for(int j=0;j<M;j++){\n            if(g[i][j]==\'S\'){sr=i;sc=j;}\n            if(g[i][j]==\'E\'){er=i;ec=j;}\n        }\n    }\n    // TODO: dist[sr][sc]=0, enqueue\n    \n    // TODO: while(front < rear) BFS\n    \n    printf("%d\\n",dist[er][ec]);\n    return 0;\n}',
+  '#include <stdio.h>\n#include <string.h>\n#define MAX 105\nchar g[MAX][MAX];\nint dist[MAX][MAX];\nint qr[MAX*MAX],qc[MAX*MAX];\nint dr[]={-1,1,0,0},dc[]={0,0,-1,1};\nint main(){\n    int N,M,front=0,rear=0;\n    scanf("%d %d",&N,&M);\n    memset(dist,-1,sizeof(dist));\n    for(int i=0;i<N;i++){\n        scanf("%s",g[i]);\n        for(int j=0;j<M;j++){\n            // TODO: V이면 dist=0, enqueue\n        }\n    }\n    // BFS\n    while(front<rear){\n        int r=qr[front],c=qc[front++];\n        for(int d=0;d<4;d++){\n            int nr=r+dr[d],nc=c+dc[d];\n            if(nr<0||nr>=N||nc<0||nc>=M)continue;\n            if(g[nr][nc]==\'#\')continue;\n            if(dist[nr][nc]!=-1)continue;\n            dist[nr][nc]=dist[r][c]+1;\n            qr[rear]=nr;qc[rear++]=nc;\n        }\n    }\n    // TODO: 최댓값 탐색, 도달불가 -1\n    int ans=0;\n    \n    printf("%d\\n",ans);\n    return 0;\n}',
+  '#include <stdio.h>\n#include <string.h>\n#define MAX 105\n#define INF 0x3f3f3f3f\nint cost[MAX][MAX],dist[MAX][MAX];\nint dr[]={-1,1,0,0},dc[]={0,0,-1,1};\ntypedef struct{int d,r,c;}Node;\nNode heap[MAX*MAX];int heapN=0;\nvoid push(int d,int r,int c){heap[++heapN]=(Node){d,r,c};int i=heapN;while(i>1&&heap[i].d<heap[i/2].d){Node t=heap[i];heap[i]=heap[i/2];heap[i/2]=t;i/=2;}}\nNode popMin(){Node ret=heap[1];heap[1]=heap[heapN--];int i=1;while(1){int s=i,l=2*i,r=2*i+1;if(l<=heapN&&heap[l].d<heap[s].d)s=l;if(r<=heapN&&heap[r].d<heap[s].d)s=r;if(s==i)break;Node t=heap[i];heap[i]=heap[s];heap[s]=t;i=s;}return ret;}\nint main(){\n    int N,M;\n    scanf("%d %d",&N,&M);\n    for(int i=0;i<N;i++) for(int j=0;j<M;j++) scanf("%d",&cost[i][j]);\n    memset(dist,0x3f,sizeof(dist));\n    dist[0][0]=cost[0][0];\n    push(cost[0][0],0,0);\n    while(heapN>0){\n        Node cur=popMin();\n        // TODO: 구식값 무시 조건\n        \n        for(int d=0;d<4;d++){\n            int nr=cur.r+dr[d],nc=cur.c+dc[d];\n            if(nr<0||nr>=N||nc<0||nc>=M)continue;\n            int nd=cur.d+cost[nr][nc];\n            // TODO: 더 작으면 갱신+push\n            \n        }\n    }\n    printf("%d\\n",dist[N-1][M-1]);\n    return 0;\n}'
+];
+
+function renderCH() {
+  var box = document.getElementById('ch-box');
+  box.innerHTML = '';
+  for (var ci = 0; ci < 3; ci++) {
+    var c = document.createElement('div');
+    c.className = 'chc';
+    var hrow = document.createElement('div');
+    hrow.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;';
+    var h3 = document.createElement('h3');
+    h3.style.margin = '0';
+    h3.textContent = CH_TITLES[ci];
+    hrow.appendChild(h3);
+    for (var ti = 0; ti < CH_TAGS[ci].length; ti++) {
+      var t = document.createElement('span');
+      t.className = 'tag ' + CH_TAGS[ci][ti][0];
+      t.textContent = CH_TAGS[ci][ti][1];
+      hrow.appendChild(t);
+    }
+    c.appendChild(hrow);
+    var desc = document.createElement('p');
+    desc.style.cssText = 'font-size:16px;margin-bottom:18px;';
+    desc.innerHTML = CH_DESC[ci];
+    c.appendChild(desc);
+    var grid2 = document.createElement('div');
+    grid2.className = 'chg';
+    var left = document.createElement('div');
+    var slL = document.createElement('div');
+    slL.className = 'sl'; slL.textContent = '코드 작성';
+    var ta = document.createElement('textarea');
+    ta.className = 'code-area';
+    ta.rows = 22;
+    ta.spellcheck = false;
+    ta.id = 'cht' + ci;
+    ta.value = CH_CODE[ci];
+    var rbtn = document.createElement('button');
+    rbtn.className = 'rbtn';
+    rbtn.textContent = '▶ 제출 & 분석';
+    rbtn.setAttribute('data-ci', ci);
+    rbtn.onclick = function() { runCH(parseInt(this.getAttribute('data-ci'))); };
+    var ht = document.createElement('div');
+    ht.className = 'ht';
+    ht.textContent = '💡 힌트 보기';
+    ht.setAttribute('data-ci', ci);
+    ht.onclick = function() {
+      var hb = document.getElementById('chh' + this.getAttribute('data-ci'));
+      hb.classList.toggle('show');
+    };
+    var hb = document.createElement('div');
+    hb.className = 'hb'; hb.id = 'chh' + ci;
+    hb.textContent = CH_HINT[ci];
+    left.appendChild(slL); left.appendChild(ta); left.appendChild(rbtn);
+    left.appendChild(ht); left.appendChild(hb);
+    var right = document.createElement('div');
+    var slR = document.createElement('div');
+    slR.className = 'sl'; slR.textContent = '분석 결과';
+    var ob = document.createElement('div');
+    ob.className = 'ob'; ob.id = 'cho' + ci;
+    ob.textContent = '▶ 코드를 작성하고 제출 버튼을 눌러봐!';
+    right.appendChild(slR); right.appendChild(ob);
+    grid2.appendChild(left); grid2.appendChild(right);
+    c.appendChild(grid2);
+    box.appendChild(c);
+  }
+}
+
+function runCH(ci) {
+  var code = document.getElementById('cht' + ci).value;
+  var out = document.getElementById('cho' + ci);
+  var r = '', ok = true;
+  if (ci === 0) {
+    var h1 = /dist\[sr\]\[sc\]\s*=\s*0/.test(code);
+    var h2 = code.indexOf('qr[rear]') >= 0 && code.indexOf('rear++') >= 0;
+    var h3 = code.indexOf('while') >= 0 && code.indexOf('front < rear') >= 0;
+    var h4 = code.indexOf('nr<0') >= 0 || code.indexOf('nr>=N') >= 0;
+    var h5 = code.indexOf('dist[r][c]+1') >= 0;
+    if (!h1) { r += '❌ dist[sr][sc]=0 초기화!\n'; ok = false; }
+    else if (!h2) { r += '❌ enqueue 코드 필요!\n'; ok = false; }
+    else if (!h3) { r += '❌ while(front<rear) 루프!\n'; ok = false; }
+    else if (!h4) { r += '❌ 범위 체크 필요!\n'; ok = false; }
+    else if (!h5) { r += '❌ dist[r][c]+1 갱신!\n'; ok = false; }
+    if (ok) r = '✅ BFS 완성!\n\ndist[sr][sc]=0 ✓\nenqueue ✓\nwhile 루프 ✓\n범위 체크 ✓\n갱신 ✓\n\n출력: 12 ✓';
+  } else if (ci === 1) {
+    var h1b = code.indexOf("g[i][j]=='V'") >= 0 && code.indexOf('dist[i][j]=0') >= 0;
+    var h2b = code.indexOf('ans') >= 0 && code.indexOf('-1') >= 0;
+    if (!h1b) { r += '❌ V위치 dist=0+enqueue!\n'; ok = false; }
+    else if (!h2b) { r += '❌ 최댓값+도달불가 처리!\n'; ok = false; }
+    if (ok) r = '✅ 다중 출발점 BFS 완성!\n\nV위치 전부 enqueue ✓\nBFS ✓\n최댓값+도달불가 ✓\n\n출력: 3 ✓';
+  } else {
+    var h1c = code.indexOf('cur.d') >= 0 && code.indexOf('dist[cur.r]') >= 0;
+    var h2c = code.indexOf('nd<dist') >= 0 && code.indexOf('push') >= 0;
+    if (!h1c) { r += '❌ 구식값 무시 조건 필요!\n'; ok = false; }
+    else if (!h2c) { r += '❌ nd<dist 갱신+push!\n'; ok = false; }
+    if (ok) r = '✅ 격자 Dijkstra 완성!\n\n구식값 무시 ✓\n갱신+push ✓\n\n출력: 5 ✓';
+  }
+  out.className = 'ob ' + (ok ? 'oo' : 'oe');
+  out.textContent = r;
+}
+
+/* ============ INIT ============ */
+window.addEventListener('load', function() {
+  buildBFS(); goBFS(0, null);
+  buildDijk(); goDijk(0, null);
+  renderQuiz();
+  renderCH();
+  gridInit();
+  var cv = document.getElementById('gc');
+  cv.addEventListener('mousedown', function(e) { isDrg = true; handleClick(e); });
+  cv.addEventListener('mousemove', function(e) { if (isDrg && curTool === 2) handleClick(e); });
+  document.addEventListener('mouseup', function() { isDrg = false; });
+  // default grid
+  grid[0][0] = 2; sR = 0; sC = 0;
+  grid[5][8] = 3; eR = 5; eC = 8;
+  [[1,2],[2,2],[3,2],[1,5],[2,5],[3,5],[4,5],[5,5],[6,2],[6,3],[6,4]].forEach(function(rc) {
+    grid[rc[0]][rc[1]] = 1;
+  });
+  drawGrid();
+  setTool(0);
+});
+</script>
+</body>
+</html>
