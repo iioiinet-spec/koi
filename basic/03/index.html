@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 1161 하노이1 인터렉티브 해설</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:#f8fafc;color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#7c2d12,#4338ca);color:white;text-align:center;padding:38px 20px}
+header h1{margin:0;font-size:32px}
+main{max-width:1100px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:20px;padding:26px;margin-bottom:22px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+h2{color:#4338ca;border-left:8px solid #6366f1;padding-left:12px}
+h3{color:#9a3412}
+.box{background:#eef2ff;border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin:14px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:14px 0}
+pre{background:#111827;color:#f9fafb;padding:20px;border-radius:14px;overflow-x:auto;font-size:14px}
+button{border:0;border-radius:12px;padding:12px 18px;background:#4338ca;color:white;font-weight:800;cursor:pointer;margin:6px 4px}
+button:hover{background:#312e81}
+input{padding:10px;border-radius:12px;border:2px solid #c7d2fe;font-size:16px;width:90px}
+.result{font-size:18px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:14px;padding:16px;margin-top:16px;white-space:pre-wrap}
+.stage{display:flex;justify-content:space-around;align-items:flex-end;height:310px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:20px;margin-top:18px}
+.pegWrap{width:30%;height:260px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative}
+.peg{position:absolute;bottom:30px;width:12px;height:210px;background:#475569;border-radius:10px}
+.base{height:14px;width:90%;background:#334155;border-radius:999px;margin-top:8px;z-index:1}
+.disk{height:24px;border-radius:999px;margin:3px 0;text-align:center;color:white;font-weight:900;line-height:24px;z-index:2;border:2px solid rgba(0,0,0,.15)}
+.label{font-weight:900;margin-top:10px;color:#1e293b}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:9px;text-align:center}
+th{background:#e0e7ff;color:#312e81}
+tr:nth-child(even){background:#f9fafb}
+.current{background:#dcfce7!important;color:#14532d;font-weight:900}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:14px;padding:16px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 1161 하노이1</h1>
+<p>재귀로 하노이 탑 최소 이동 과정 출력하기</p>
+</header>
+<main>
+<section>
+<h2>1. 문제 핵심</h2>
+<p>N개의 원판이 모두 1번 기둥에 있습니다. 모든 원판을 최소 횟수로 3번 기둥으로 옮기는 과정을 출력해야 합니다.</p>
+<div class="box">
+<p>1. 한 번에 하나의 원판만 옮길 수 있습니다.</p>
+<p>2. 큰 원판은 작은 원판 위에 올라갈 수 없습니다.</p>
+<p>3. 원판 번호는 작은 원판부터 1, 2, 3, ..., N입니다.</p>
+<p>4. 처음 호출은 hanoi(N, 1, 3, 2)입니다.</p>
+</div>
+</section>
+<section>
+<h2>2. 인터렉티브 하노이 실행기</h2>
+<label><b>N:</b></label>
+<input id="nInput" type="number" value="3" min="1" max="8">
+<button onclick="setup()">생성</button>
+<button onclick="prevMove()">이전 이동</button>
+<button onclick="nextMove()">다음 이동</button>
+<button onclick="autoRun()">자동 실행</button>
+<button onclick="stopRun()">정지</button>
+<div id="summary" class="result"></div>
+<div class="stage">
+<div class="pegWrap"><div class="peg"></div><div id="peg1"></div><div class="base"></div><div class="label">1번 기둥</div></div>
+<div class="pegWrap"><div class="peg"></div><div id="peg2"></div><div class="base"></div><div class="label">2번 기둥</div></div>
+<div class="pegWrap"><div class="peg"></div><div id="peg3"></div><div class="base"></div><div class="label">3번 기둥</div></div>
+</div>
+<div id="moveTable"></div>
+</section>
+<section>
+<h2>3. 재귀 구조 이해하기</h2>
+<pre><code>hanoi(n, from, to, temp)
+
+1. hanoi(n - 1, from, temp, to)
+2. n번 원판을 from에서 to로 이동
+3. hanoi(n - 1, temp, to, from)</code></pre>
+<div class="warn"><p>큰 원판 n을 옮기려면, 그 위의 n-1개 원판을 먼저 보조 기둥으로 치워야 합니다.</p></div>
+</section>
+<section>
+<h2>4. N = 3 호출 구조</h2>
+<pre><code>hanoi(3, 1, 3, 2)
+
+1. hanoi(2, 1, 2, 3)
+2. 3 : 1 -> 3
+3. hanoi(2, 2, 3, 1)</code></pre>
+<pre><code>1 : 1 -> 3
+2 : 1 -> 2
+1 : 3 -> 2
+3 : 1 -> 3
+1 : 2 -> 1
+2 : 2 -> 3
+1 : 1 -> 3</code></pre>
+</section>
+<section>
+<h2>5. 최소 이동 횟수</h2>
+<pre><code>2^N - 1</code></pre>
+<p>N=3이면 2^3 - 1 = 7번입니다.</p>
+</section>
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+void hanoi(int n, int from, int to, int temp) {
+    if (n == 1) {
+        printf("1 : %d -> %d\n", from, to);
+        return;
+    }
+
+    hanoi(n - 1, from, temp, to);
+
+    printf("%d : %d -> %d\n", n, from, to);
+
+    hanoi(n - 1, temp, to, from);
+}
+
+int main() {
+    int N;
+    scanf("%d", &amp;N);
+    hanoi(N, 1, 3, 2);
+    return 0;
+}</code></pre>
+</section>
+<section>
+<h2>7. 코드 작성 방법</h2>
+<h3>1. 함수 정의</h3>
+<pre><code>void hanoi(int n, int from, int to, int temp)</code></pre>
+<h3>2. 종료 조건</h3>
+<pre><code>if (n == 1) {
+    printf("1 : %d -> %d\n", from, to);
+    return;
+}</code></pre>
+<h3>3. 재귀 호출</h3>
+<pre><code>hanoi(n - 1, from, temp, to);
+printf("%d : %d -> %d\n", n, from, to);
+hanoi(n - 1, temp, to, from);</code></pre>
+</section>
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz"><h3>실수 1. 보조 기둥 순서를 헷갈리는 경우</h3><button onclick="toggleAnswer('q1')">설명 보기</button><div id="q1" class="answer">처음에는 n-1개를 보조 기둥으로 보내므로 hanoi(n-1, from, temp, to)입니다.</div></div>
+<div class="quiz"><h3>실수 2. 원판 번호를 잘못 출력하는 경우</h3><button onclick="toggleAnswer('q2')">설명 보기</button><div id="q2" class="answer">현재 옮기는 가장 큰 원판 번호는 n입니다.</div></div>
+<div class="quiz"><h3>실수 3. 출력 형식을 다르게 쓰는 경우</h3><button onclick="toggleAnswer('q3')">설명 보기</button><div id="q3" class="answer">원판번호 : 이동전 기둥번호 -> 이동후 기둥번호 형식으로 출력합니다.</div></div>
+</section>
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. 하노이는 재귀의 대표 문제입니다.</p>
+<p>2. N개를 옮기려면 먼저 N-1개를 보조 기둥으로 옮깁니다.</p>
+<p>3. N번 원판을 목표 기둥으로 옮깁니다.</p>
+<p>4. N-1개를 다시 목표 기둥으로 옮깁니다.</p>
+<p>5. 최소 이동 횟수는 2^N - 1입니다.</p>
+</section>
+</main>
+<script>
+let moves=[], pegs=[[],[],[]], idx=0, timer=null, N=3;
+function generate(n, from, to, temp){
+ if(n===1){moves.push({disk:1, from, to});return;}
+ generate(n-1, from, temp, to);
+ moves.push({disk:n, from, to});
+ generate(n-1, temp, to, from);
+}
+function setup(){
+ stopRun();
+ N=Number(document.getElementById('nInput').value);
+ if(!N||N<1)N=1;if(N>8)N=8;document.getElementById('nInput').value=N;
+ moves=[];generate(N,1,3,2);
+ pegs=[[],[],[]];for(let d=N;d>=1;d--)pegs[0].push(d);
+ idx=0;render();
+}
+function render(){
+ for(let p=0;p<3;p++){
+  const el=document.getElementById('peg'+(p+1));let html='';
+  for(let i=0;i<pegs[p].length;i++){
+   const d=pegs[p][i], w=30+d*18;
+   const colors=['#2563eb','#16a34a','#f97316','#dc2626','#9333ea','#0891b2','#ca8a04','#be123c'];
+   html+='<div class="disk" style="width:'+w+'px;background:'+colors[(d-1)%colors.length]+'">'+d+'</div>';
+  }
+  el.innerHTML=html;el.style.display='flex';el.style.flexDirection='column-reverse';el.style.alignItems='center';el.style.zIndex='2';
+ }
+ document.getElementById('summary').textContent='총 이동 횟수: '+moves.length+'회\n현재 진행: '+idx+' / '+moves.length+(idx>0?'\n마지막 이동: '+formatMove(moves[idx-1]):'');
+ renderTable();
+}
+function formatMove(m){return m.disk+' : '+m.from+' -> '+m.to;}
+function nextMove(){if(idx>=moves.length)return;const m=moves[idx];const disk=pegs[m.from-1].pop();pegs[m.to-1].push(disk);idx++;render();}
+function prevMove(){if(idx<=0)return;idx--;const m=moves[idx];const disk=pegs[m.to-1].pop();pegs[m.from-1].push(disk);render();}
+function autoRun(){stopRun();timer=setInterval(()=>{if(idx>=moves.length){stopRun();return;}nextMove();},450);}
+function stopRun(){if(timer){clearInterval(timer);timer=null;}}
+function renderTable(){let rows='';for(let i=0;i<moves.length;i++){rows+='<tr class="'+(i===idx-1?'current':'')+'"><td>'+(i+1)+'</td><td>'+formatMove(moves[i])+'</td></tr>';}document.getElementById('moveTable').innerHTML='<table><tr><th>순서</th><th>이동</th></tr>'+rows+'</table>';}
+function toggleAnswer(id){const el=document.getElementById(id);el.style.display=el.style.display==='block'?'none':'block';}
+setup();
+</script>
+</body>
+</html>

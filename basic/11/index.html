@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 1411 두 줄로 타일 깔기 인터랙티브 강의자료</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; font-family:"Malgun Gothic",Arial,sans-serif; background:#f8fbff; color:#111827; font-size:19px; line-height:1.75; }
+header { background:linear-gradient(135deg,#dbeafe,#fef3c7); border-bottom:5px solid #2563eb; padding:34px 20px; text-align:center; }
+header h1 { margin:0; color:#1e3a8a; font-size:34px; }
+header p { margin:10px 0 0; font-size:21px; font-weight:900; }
+main { max-width:1120px; margin:0 auto; padding:24px; }
+section { background:white; border:2px solid #d1d5db; border-radius:18px; padding:26px; margin:22px 0; box-shadow:0 8px 22px rgba(15,23,42,.08); }
+h2 { margin-top:0; color:#1d4ed8; border-left:8px solid #2563eb; padding-left:12px; font-size:27px; }
+h3 { color:#92400e; font-size:23px; }
+.note { background:#ecfdf5; border:2px solid #10b981; border-radius:14px; padding:16px; font-weight:800; }
+.warning { background:#fff7ed; border:2px solid #fb923c; border-radius:14px; padding:16px; font-weight:800; }
+.code, pre { background:#111827; color:#f9fafb; padding:18px; border-radius:14px; overflow-x:auto; font-size:16px; line-height:1.6; }
+label { display:block; font-weight:900; margin-bottom:6px; }
+input, select { width:100%; padding:13px; font-size:18px; border:2px solid #9ca3af; border-radius:12px; background:white; color:#111827; }
+button { border:none; background:#2563eb; color:white; font-size:18px; font-weight:900; padding:13px 18px; border-radius:12px; cursor:pointer; margin:6px 4px; }
+button:hover { background:#1d4ed8; }
+button.green { background:#059669; }
+button.orange { background:#ea580c; }
+.row { display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:end; }
+.result-box { background:#f8fafc; border:2px solid #94a3b8; border-radius:16px; padding:18px; margin-top:14px; min-height:80px; }
+table { width:100%; border-collapse:collapse; background:white; margin-top:14px; }
+th,td { border:2px solid #cbd5e1; padding:12px; text-align:center; color:#111827; }
+th { background:#dbeafe; color:#1e3a8a; font-weight:900; }
+.tile-demo { display:flex; flex-wrap:wrap; gap:18px; margin-top:18px; }
+.tile-card { background:#eff6ff; border:2px solid #93c5fd; border-radius:16px; padding:16px; min-width:210px; font-weight:800; }
+.board { display:grid; grid-template-rows:repeat(2,34px); gap:2px; margin-top:10px; }
+.board.small { grid-template-columns:repeat(2,34px); }
+.cell { width:34px; height:34px; border:2px solid #111827; display:flex; align-items:center; justify-content:center; font-weight:900; background:#fef3c7; }
+.cell.a { background:#bfdbfe; } .cell.b { background:#bbf7d0; } .cell.c { background:#fecaca; }
+.visual-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+.quiz { border:2px solid #a78bfa; background:#faf5ff; border-radius:14px; padding:16px; margin:16px 0; }
+@media(max-width:720px){ body{font-size:17px;} header h1{font-size:27px;} .row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<header><h1>정올 1411 두 줄로 타일 깔기</h1><p>DP 점화식 · 2×N 타일링 · 나머지 연산</p></header>
+<main>
+<section><h2>1. 문제 이해</h2><p>가로 2칸, 세로 N칸 크기의 판을 주어진 타일로 채우는 경우의 수를 구합니다. 회전이 가능하므로 마지막 칸을 기준으로 경우를 나누어 생각하면 됩니다.</p><div class="note">출력은 경우의 수를 20100529로 나눈 나머지입니다.</div></section>
+<section><h2>2. 2×2 판을 채우는 3가지 방법</h2><div class="tile-demo"><div class="tile-card">1. 세로 타일 2개<div class="board small"><div class="cell a">1</div><div class="cell b">2</div><div class="cell a">1</div><div class="cell b">2</div></div></div><div class="tile-card">2. 가로 타일 2개<div class="board small"><div class="cell a">1</div><div class="cell a">1</div><div class="cell b">2</div><div class="cell b">2</div></div></div><div class="tile-card">3. 2×2 타일 1개<div class="board small"><div class="cell c">3</div><div class="cell c">3</div><div class="cell c">3</div><div class="cell c">3</div></div></div></div></section>
+<section><h2>3. DP 정의</h2><p><b>dp[i]</b>를 2×i 크기의 판을 채우는 방법의 수라고 정의합니다.</p><div class="code">dp[1] = 1<br>dp[2] = 3</div></section>
+<section><h2>4. 점화식 이해</h2><div class="visual-row"><div class="tile-card">마지막 1칸 세로줄 채우기<div class="code">dp[N-1]</div><p>맨 끝 한 줄을 세로 타일 1개로 채웁니다.</p></div><div class="tile-card">마지막 2칸 세로줄 채우기<div class="code">2 × dp[N-2]</div><p>가로 타일 2개 또는 2×2 타일 1개로 채웁니다.</p></div></div><div class="warning">따라서 dp[N] = dp[N-1] + 2 × dp[N-2] 입니다.</div></section>
+<section><h2>5. 인터랙티브 DP 계산기</h2><div class="row"><div><label>N 입력</label><input id="nInput" type="number" value="6" min="1" max="100000"></div><button onclick="calculate()">계산하기</button><button class="green" onclick="loadExample()">예제 N=6</button></div><div class="result-box" id="resultBox">아직 계산하지 않았습니다.</div></section>
+<section><h2>6. 작은 N 직접 확인</h2><button onclick="showSmallTable()">N=1부터 N=8까지 표 보기</button><div class="result-box" id="smallBox">아직 표시하지 않았습니다.</div></section>
+<section><h2>7. 예제 풀이</h2><div class="code">입력: 6</div><table><tr><th>i</th><th>계산</th><th>dp[i]</th></tr><tr><td>1</td><td>초기값</td><td>1</td></tr><tr><td>2</td><td>초기값</td><td>3</td></tr><tr><td>3</td><td>3 + 2×1</td><td>5</td></tr><tr><td>4</td><td>5 + 2×3</td><td>11</td></tr><tr><td>5</td><td>11 + 2×5</td><td>21</td></tr><tr><td>6</td><td>21 + 2×11</td><td>43</td></tr></table><div class="code">출력: 43</div></section>
+<section><h2>8. 이해 확인 문제</h2><div class="quiz"><h3>문제 1</h3><p>dp[i]의 의미로 알맞은 것은?</p><select id="q1"><option value="">선택하세요</option><option value="a">2×i 판을 채우는 방법의 수</option><option value="b">i번째 타일의 넓이</option><option value="c">타일을 자르는 횟수</option></select></div><div class="quiz"><h3>문제 2</h3><p>점화식으로 알맞은 것은?</p><select id="q2"><option value="">선택하세요</option><option value="a">dp[i] = dp[i-1] + 2×dp[i-2]</option><option value="b">dp[i] = dp[i-1] + i</option><option value="c">dp[i] = dp[i-1] × dp[i-2]</option></select></div><div class="quiz"><h3>문제 3</h3><p>마지막 2칸 세로줄을 채우는 방법이 2가지인 이유는?</p><select id="q3"><option value="">선택하세요</option><option value="a">가로 타일 2개 또는 2×2 타일 1개</option><option value="b">항상 세로 타일 1개만 가능</option><option value="c">타일을 놓을 수 없음</option></select></div><button onclick="checkQuiz()">채점하기</button><div class="result-box" id="quizResult">아직 채점하지 않았습니다.</div></section>
+<section><h2>9. 정답 C 코드</h2><pre>#include &lt;stdio.h&gt;
+
+#define MOD 20100529
+
+int dp[100001];
+
+int main() {
+    int N;
+    int i;
+
+    scanf("%d", &amp;N);
+
+    dp[1] = 1;
+
+    if (N &gt;= 2) {
+        dp[2] = 3;
+    }
+
+    for (i = 3; i &lt;= N; i++) {
+        dp[i] = (dp[i - 1] + 2 * dp[i - 2]) % MOD;
+    }
+
+    printf("%d\n", dp[N]);
+
+    return 0;
+}</pre></section>
+<section><h2>10. 마무리 정리</h2><p>이 문제는 2×N 타일링의 대표적인 동적계획법 문제입니다. 마지막 1칸을 채우는 경우와 마지막 2칸을 채우는 경우로 나누면 점화식이 자연스럽게 나옵니다.</p><div class="note">시간복잡도는 O(N)입니다. N이 100,000이어도 충분히 빠릅니다.</div></section>
+</main>
+<script>
+const MOD = 20100529;
+function computeDP(N){ const dp=new Array(N+1).fill(0); if(N>=1) dp[1]=1; if(N>=2) dp[2]=3; for(let i=3;i<=N;i++) dp[i]=(dp[i-1]+2*dp[i-2])%MOD; return dp; }
+function calculate(){ const N=Number(document.getElementById('nInput').value); if(!Number.isInteger(N)||N<1||N>100000){ alert('N은 1 이상 100000 이하의 정수입니다.'); return; } const dp=computeDP(N); let html='<p><b>정답:</b> '+dp[N]+'</p><div class="code">출력: '+dp[N]+'</div>'; const limit=Math.min(N,30); html+='<p>아래 표는 최대 30번째까지만 표시합니다.</p><table><tr><th>i</th><th>dp[i]</th><th>계산식</th></tr>'; for(let i=1;i<=limit;i++){ let f=(i===1||i===2)?'초기값':'dp['+(i-1)+'] + 2×dp['+(i-2)+']'; html+='<tr><td>'+i+'</td><td>'+dp[i]+'</td><td>'+f+'</td></tr>'; } html+='</table>'; document.getElementById('resultBox').innerHTML=html; }
+function loadExample(){ document.getElementById('nInput').value=6; calculate(); }
+function showSmallTable(){ const dp=computeDP(8); let html='<table><tr><th>N</th><th>경우의 수 dp[N]</th></tr>'; for(let i=1;i<=8;i++) html+='<tr><td>'+i+'</td><td>'+dp[i]+'</td></tr>'; html+='</table>'; document.getElementById('smallBox').innerHTML=html; }
+function checkQuiz(){ let score=0; if(document.getElementById('q1').value==='a') score++; if(document.getElementById('q2').value==='a') score++; if(document.getElementById('q3').value==='a') score++; let html='<b>점수: '+score+' / 3</b><br>'; html += score===3 ? '완벽합니다. DP 정의와 점화식을 잘 이해했습니다.' : '다시 확인하세요. 핵심은 dp[i] = dp[i-1] + 2×dp[i-2] 입니다.'; document.getElementById('quizResult').innerHTML=html; }
+calculate();
+</script>
+</body>
+</html>

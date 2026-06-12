@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 8222 가위 바위 보 인터랙티브 강의자료</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root{--bg:#f8fafc;--card:#ffffff;--ink:#102033;--muted:#526579;--line:#d6e0ee;--blue:#2563eb;--green:#059669;--orange:#d97706;--red:#dc2626;--soft:#eef4ff;--code:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:20px;line-height:1.75}
+    header{background:linear-gradient(135deg,#ffffff,#eaf1ff);border-bottom:5px solid var(--blue);padding:34px 22px}
+    .wrap{max-width:1150px;margin:0 auto;padding:22px}
+    h1{font-size:42px;margin:0 0 10px;color:#0b1b38}
+    h2{font-size:34px;margin:34px 0 16px;border-left:10px solid var(--blue);padding-left:14px}
+    h3{font-size:26px;margin:24px 0 10px;color:#17356d}
+    .lead{font-size:23px;color:#233b57}
+    .card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:24px;margin:20px 0;box-shadow:0 8px 20px rgba(20,40,80,.06)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr} h1{font-size:34px} body{font-size:18px}}
+    .pill{display:inline-block;background:#e8f2ff;color:#123a7a;border:1px solid #bcd3ff;border-radius:999px;padding:4px 12px;margin:3px;font-weight:700}
+    table{width:100%;border-collapse:collapse;background:#fff;margin:14px 0}
+    th,td{border:2px solid var(--line);padding:10px;text-align:center}
+    th{background:#eaf1ff;color:#0b2c69}
+    pre{background:var(--code);color:#f8fafc;padding:18px;border-radius:14px;overflow:auto;font-size:16px;line-height:1.55;border:4px solid #2b3445}
+    code{font-family:Consolas,Menlo,monospace}
+    input{width:100%;font-size:20px;padding:12px;border:2px solid var(--line);border-radius:12px;margin:6px 0 12px;font-family:Consolas,"Malgun Gothic",monospace}
+    button{font-size:18px;padding:10px 16px;border-radius:12px;border:2px solid #1d4ed8;background:#2563eb;color:white;cursor:pointer;font-weight:800;margin:4px}
+    button.secondary{background:#fff;color:#1d4ed8}
+    button.good{background:#059669;border-color:#047857}
+    .note{background:#ecfdf5;border-left:8px solid var(--green);padding:14px;border-radius:12px}
+    .warnbox{background:#fffbeb;border-left:8px solid var(--orange);padding:14px;border-radius:12px}
+    .result{background:#fff7ed;border:2px solid #fed7aa;padding:14px;border-radius:14px;white-space:pre-wrap;min-height:90px;font-family:Consolas,"Malgun Gothic",monospace}
+    .rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px}
+    .round{border:2px solid var(--line);border-radius:14px;padding:14px;background:#ffffff;text-align:center}
+    .winJ{border-color:#059669;background:#ecfdf5}.winH{border-color:#dc2626;background:#fef2f2}.draw{border-color:#64748b;background:#f8fafc}
+    .hand{font-size:42px;line-height:1.2}.small{color:var(--muted);font-size:17px}
+    .quiz{border:2px dashed #94a3b8;padding:15px;border-radius:14px;background:#f8fafc;margin-top:14px}
+    .answer{display:none;background:#f0fdf4;border:2px solid #86efac;padding:12px;border-radius:10px;margin-top:10px}
+    .footer{margin-top:40px;padding:30px;text-align:center;color:#4b5563}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+    <h1>정올 8222 가위 바위 보</h1>
+    <p class="lead">문자열 두 개를 한 글자씩 비교하여 정올이와 한글이의 승리 횟수를 세는 기초 구현 문제입니다.</p>
+    <span class="pill">문자열</span><span class="pill">조건문</span><span class="pill">반복문</span><span class="pill">C언어</span>
+</div>
+</header>
+<div class="wrap">
+<section class="card">
+    <h2>1. 문제 이해</h2>
+    <p>정올이와 한글이가 총 <b>N번</b> 가위바위보를 합니다.</p>
+    <p>정올이의 손 모양은 문자열 <b>S</b>, 한글이의 손 모양은 문자열 <b>T</b>로 주어집니다.</p>
+    <div class="note">이 문제에서는 정올이는 <b>R, S</b>만 낼 수 있고, 한글이는 <b>R, P</b>만 낼 수 있습니다.</div>
+</section>
+<section class="card">
+    <h2>2. 가위바위보 규칙</h2>
+    <table>
+        <tr><th>손 모양</th><th>뜻</th><th>이기는 상대</th></tr>
+        <tr><td>R</td><td>바위</td><td>S</td></tr>
+        <tr><td>S</td><td>가위</td><td>P</td></tr>
+        <tr><td>P</td><td>보</td><td>R</td></tr>
+    </table>
+</section>
+<section class="card">
+    <h2>3. 가능한 경우 정리</h2>
+    <table>
+        <tr><th>정올이</th><th>한글이</th><th>결과</th></tr>
+        <tr><td>R</td><td>R</td><td>비김</td></tr>
+        <tr><td>R</td><td>P</td><td>한글이 승</td></tr>
+        <tr><td>S</td><td>R</td><td>한글이 승</td></tr>
+        <tr><td>S</td><td>P</td><td>정올이 승</td></tr>
+    </table>
+    <div class="warnbox">정올이가 이기는 경우는 오직 <b>S vs P</b>입니다. 나머지 서로 다른 경우는 한글이가 이깁니다.</div>
+</section>
+<section class="card">
+    <h2>4. 인터랙티브 시뮬레이터</h2>
+    <div class="grid">
+        <div>
+            <h3>입력하기</h3>
+            <label>길이 N</label><input id="nInput" value="3">
+            <label>정올이 문자열 S</label><input id="sInput" value="RSR">
+            <label>한글이 문자열 T</label><input id="tInput" value="PPR">
+            <button onclick="runGame()" class="good">판정하기</button>
+            <button onclick="loadEx(1)" class="secondary">예제 1</button>
+            <button onclick="loadEx(2)" class="secondary">예제 2</button>
+            <button onclick="loadEx(3)" class="secondary">예제 3</button>
+            <button onclick="loadEx(4)" class="secondary">예제 4</button>
+        </div>
+        <div>
+            <h3>출력 결과</h3>
+            <div class="result" id="gameResult">판정하기 버튼을 눌러보세요.</div>
+        </div>
+    </div>
+    <div class="rounds" id="roundCards"></div>
+</section>
+<section class="card">
+    <h2>5. 알고리즘</h2>
+    <p>1. N을 입력받습니다.</p>
+    <p>2. 문자열 S와 T를 입력받습니다.</p>
+    <p>3. i를 0부터 N-1까지 반복합니다.</p>
+    <p>4. S[i]와 T[i]가 같으면 비긴 것이므로 아무 점수도 올리지 않습니다.</p>
+    <p>5. S[i]가 'S'이고 T[i]가 'P'이면 정올이가 이깁니다.</p>
+    <p>6. 그 외 서로 다른 경우는 한글이가 이깁니다.</p>
+</section>
+<section class="card">
+    <h2>6. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int N;
+    char S[105];
+    char T[105];
+
+    scanf("%d", &N);
+    scanf("%s", S);
+    scanf("%s", T);
+
+    int jungolWin = 0;
+    int hangulWin = 0;
+
+    for (int i = 0; i &lt; N; i++) {
+        if (S[i] == T[i]) {
+            continue;
+        }
+
+        if (S[i] == 'S' && T[i] == 'P') {
+            jungolWin++;
+        } else {
+            hangulWin++;
+        }
+    }
+
+    printf("%d %d\n", jungolWin, hangulWin);
+
+    return 0;
+}</code></pre>
+</section>
+<section class="card">
+    <h2>7. 코드 자세한 설명</h2>
+    <h3>1. 입력</h3>
+<pre><code>scanf("%d", &N);
+scanf("%s", S);
+scanf("%s", T);</code></pre>
+    <p>N과 두 문자열을 입력받습니다.</p>
+    <h3>2. 승리 횟수 변수</h3>
+<pre><code>int jungolWin = 0;
+int hangulWin = 0;</code></pre>
+    <p>정올이와 한글이의 승리 횟수를 저장합니다.</p>
+    <h3>3. 한 글자씩 비교</h3>
+<pre><code>for (int i = 0; i &lt; N; i++)</code></pre>
+    <p>문자열의 0번 위치부터 N-1번 위치까지 차례대로 확인합니다.</p>
+    <h3>4. 비긴 경우</h3>
+<pre><code>if (S[i] == T[i]) {
+    continue;
+}</code></pre>
+    <p>두 손 모양이 같으면 아무도 이기지 않았으므로 다음 회차로 넘어갑니다.</p>
+    <h3>5. 정올이가 이기는 경우</h3>
+<pre><code>if (S[i] == 'S' && T[i] == 'P') {
+    jungolWin++;
+}</code></pre>
+    <p>가위는 보를 이기므로 정올이 승리입니다.</p>
+    <h3>6. 한글이가 이기는 경우</h3>
+<pre><code>else {
+    hangulWin++;
+}</code></pre>
+    <p>비기지 않았고 정올이가 이긴 경우도 아니면 한글이가 이깁니다.</p>
+</section>
+<section class="card">
+    <h2>8. 미니 퀴즈</h2>
+    <div class="quiz"><h3>문제 1</h3><p>정올이가 S, 한글이가 P를 냈다면 누가 이길까요?</p><button onclick="showAns('a1')">정답 보기</button><div class="answer" id="a1">정답: 정올이입니다. S는 가위, P는 보이고, 가위는 보를 이깁니다.</div></div>
+    <div class="quiz"><h3>문제 2</h3><p>정올이가 R, 한글이가 P를 냈다면 누가 이길까요?</p><button onclick="showAns('a2')">정답 보기</button><div class="answer" id="a2">정답: 한글이입니다. P는 보, R은 바위이고, 보는 바위를 이깁니다.</div></div>
+    <div class="quiz"><h3>문제 3</h3><p>두 사람이 모두 R을 냈다면 승리 횟수는 올라갈까요?</p><button onclick="showAns('a3')">정답 보기</button><div class="answer" id="a3">정답: 올라가지 않습니다. 같은 손 모양이면 비깁니다.</div></div>
+</section>
+<div class="footer">세영코딩연구소 | Jungol 8222 Rock Paper Scissors Interactive Lesson</div>
+</div>
+<script>
+const examples={1:{n:3,s:"RSR",t:"PPR"},2:{n:5,s:"RRRRR",t:"PPPPP"},3:{n:4,s:"RSRR",t:"RPRR"},4:{n:6,s:"RSSRSS",t:"PPRRRP"}};
+function handIcon(ch){if(ch==="R")return "✊";if(ch==="S")return "✌️";if(ch==="P")return "✋";return "❓";}
+function handName(ch){if(ch==="R")return "바위";if(ch==="S")return "가위";if(ch==="P")return "보";return "알 수 없음";}
+function judge(a,b){if(a===b)return "draw";if(a==="S"&&b==="P")return "jungol";return "hangul";}
+function runGame(){
+    const n=Number(document.getElementById("nInput").value);
+    const s=document.getElementById("sInput").value.trim().toUpperCase();
+    const t=document.getElementById("tInput").value.trim().toUpperCase();
+    const result=document.getElementById("gameResult");
+    const cards=document.getElementById("roundCards");
+    cards.innerHTML="";
+    if(!n||s.length!==n||t.length!==n){result.textContent="입력 오류: N과 문자열 길이가 같아야 합니다.";return;}
+    if(!/^[RS]+$/.test(s)||!/^[RP]+$/.test(t)){result.textContent="입력 오류: S는 R,S만 가능하고 T는 R,P만 가능합니다.";return;}
+    let jw=0,hw=0,log="";
+    for(let i=0;i<n;i++){
+        const r=judge(s[i],t[i]);
+        let text="",cls="round ";
+        if(r==="jungol"){jw++;text="정올이 승";cls+="winJ";}
+        else if(r==="hangul"){hw++;text="한글이 승";cls+="winH";}
+        else{text="비김";cls+="draw";}
+        log+=(i+1)+"회차: 정올이 "+s[i]+"("+handName(s[i])+") vs 한글이 "+t[i]+"("+handName(t[i])+") → "+text+"\n";
+        const div=document.createElement("div");
+        div.className=cls;
+        div.innerHTML="<b>"+(i+1)+"회차</b><div class='hand'>"+handIcon(s[i])+" VS "+handIcon(t[i])+"</div><div>정올이: "+s[i]+" / 한글이: "+t[i]+"</div><div><b>"+text+"</b></div>";
+        cards.appendChild(div);
+    }
+    log+="\n출력: "+jw+" "+hw;
+    result.textContent=log;
+}
+function loadEx(num){const e=examples[num];document.getElementById("nInput").value=e.n;document.getElementById("sInput").value=e.s;document.getElementById("tInput").value=e.t;runGame();}
+function showAns(id){const el=document.getElementById(id);el.style.display=el.style.display==="block"?"none":"block";}
+runGame();
+</script>
+</body>
+</html>

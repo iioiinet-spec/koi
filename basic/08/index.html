@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 5383 우유는 순서대로 인터랙티브 강의자료</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: "Malgun Gothic", "Noto Sans KR", Arial, sans-serif;
+        background: #f7fbff;
+        color: #111827;
+        line-height: 1.75;
+        font-size: 19px;
+    }
+
+    header {
+        background: linear-gradient(135deg, #dbeafe, #fef3c7);
+        padding: 34px 22px;
+        text-align: center;
+        border-bottom: 4px solid #2563eb;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 34px;
+        color: #1e3a8a;
+    }
+
+    header p {
+        margin: 10px 0 0;
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    section {
+        background: white;
+        margin: 22px 0;
+        padding: 26px;
+        border-radius: 18px;
+        border: 2px solid #d1d5db;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    h2 {
+        color: #1d4ed8;
+        border-left: 8px solid #2563eb;
+        padding-left: 12px;
+        margin-top: 0;
+        font-size: 27px;
+    }
+
+    h3 {
+        color: #92400e;
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    .badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1e40af;
+        border: 2px solid #93c5fd;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-weight: 800;
+        margin: 4px;
+    }
+
+    .cow-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .cow {
+        background: #fefce8;
+        border: 2px solid #facc15;
+        border-radius: 14px;
+        padding: 12px;
+        text-align: center;
+        font-weight: 800;
+    }
+
+    .code, pre {
+        background: #111827;
+        color: #f9fafb;
+        padding: 18px;
+        border-radius: 14px;
+        overflow-x: auto;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .note {
+        background: #ecfdf5;
+        border: 2px solid #10b981;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+    }
+
+    .warning {
+        background: #fff7ed;
+        border: 2px solid #fb923c;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+    }
+
+    button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-size: 18px;
+        font-weight: 800;
+        padding: 13px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        margin: 6px 4px;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    button.secondary {
+        background: #059669;
+    }
+
+    button.orange {
+        background: #ea580c;
+    }
+
+    button.gray {
+        background: #4b5563;
+    }
+
+    select, textarea {
+        width: 100%;
+        font-size: 18px;
+        padding: 12px;
+        border: 2px solid #9ca3af;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #111827;
+    }
+
+    textarea {
+        min-height: 160px;
+        font-family: Consolas, monospace;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        margin: 12px 0;
+    }
+
+    .result-box {
+        background: #f8fafc;
+        border: 2px solid #94a3b8;
+        border-radius: 16px;
+        padding: 18px;
+        min-height: 80px;
+    }
+
+    .answer-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .answer-item {
+        background: #dbeafe;
+        border: 2px solid #60a5fa;
+        border-radius: 14px;
+        padding: 12px;
+        text-align: center;
+        font-weight: 900;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+        background: white;
+    }
+
+    th, td {
+        border: 2px solid #cbd5e1;
+        padding: 12px;
+        text-align: center;
+        color: #111827;
+    }
+
+    th {
+        background: #dbeafe;
+        color: #1e3a8a;
+    }
+
+    .quiz {
+        border: 2px solid #a78bfa;
+        background: #faf5ff;
+        border-radius: 14px;
+        padding: 16px;
+        margin: 16px 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .small {
+        font-size: 16px;
+        color: #374151;
+    }
+
+    @media (max-width: 720px) {
+        body {
+            font-size: 17px;
+        }
+
+        header h1 {
+            font-size: 27px;
+        }
+
+        .row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>정올 5383 우유는 순서대로</h1>
+    <p>Livestock Lineup · 완전탐색 DFS · 사전순 순열</p>
+</header>
+
+<main>
+<section>
+    <h2>1. 문제 이해</h2>
+    <p>
+        존은 8마리의 소에게서 우유를 짭니다. 소들은 몇 가지 조건을 요구합니다.
+        조건은 항상 다음 형태입니다.
+    </p>
+    <div class="code">X must be milked beside Y</div>
+    <p>
+        이 뜻은 <b>X와 Y가 반드시 서로 바로 옆에 있어야 한다</b>는 의미입니다.
+        X가 Y의 앞에 있어도 되고, Y가 X의 앞에 있어도 됩니다.
+    </p>
+    <div class="note">
+        답이 여러 개라면 사전순으로 가장 빠른 순서를 출력해야 합니다.
+    </div>
+</section>
+
+<section>
+    <h2>2. 소 이름 사전순</h2>
+    <p>소 이름을 사전순으로 정렬하면 아래와 같습니다.</p>
+    <div class="cow-list" id="cowList"></div>
+</section>
+
+<section>
+    <h2>3. 핵심 풀이 전략</h2>
+    <p>
+        소는 8마리뿐이므로 모든 순서를 만들어도 됩니다.
+    </p>
+    <div class="code">8! = 40320</div>
+    <p>
+        순열 하나를 만들 때마다 조건을 만족하는지 검사합니다.
+        처음부터 사전순으로 순열을 만들면, 처음 발견되는 정답이 바로 사전순 최소 답입니다.
+    </p>
+    <div class="warning">
+        핵심: 사전순 배열에서 DFS로 순열 생성 → 조건 검사 → 첫 번째 정답 출력
+    </div>
+</section>
+
+<section>
+    <h2>4. 조건 직접 입력하고 정답 찾기</h2>
+    <p>
+        아래에서 조건을 추가한 뒤 <b>정답 계산하기</b>를 눌러 보세요.
+    </p>
+
+    <div class="row">
+        <div>
+            <label>첫 번째 소 X</label>
+            <select id="cowA"></select>
+        </div>
+        <div>
+            <label>두 번째 소 Y</label>
+            <select id="cowB"></select>
+        </div>
+        <div>
+            <button onclick="addCondition()">조건 추가</button>
+        </div>
+    </div>
+
+    <button class="secondary" onclick="loadExample()">예제 조건 불러오기</button>
+    <button class="orange" onclick="solve()">정답 계산하기</button>
+    <button class="gray" onclick="resetAll()">초기화</button>
+
+    <h3>현재 조건</h3>
+    <div class="result-box" id="conditionBox"></div>
+
+    <h3>계산 결과</h3>
+    <div class="result-box" id="resultBox">아직 계산하지 않았습니다.</div>
+</section>
+
+<section>
+    <h2>5. 조건 검사 원리</h2>
+    <p>
+        어떤 순서가 만들어졌다고 합시다. 그러면 각 소의 위치를 배열에 저장합니다.
+    </p>
+    <div class="code">
+pos[소] = 소가 서 있는 위치
+    </div>
+    <p>
+        X와 Y가 바로 옆에 있으려면 위치 차이가 1이어야 합니다.
+    </p>
+    <div class="code">
+abs(pos[X] - pos[Y]) == 1
+    </div>
+
+    <h3>예시</h3>
+    <table>
+        <tr>
+            <th>소</th>
+            <th>위치</th>
+        </tr>
+        <tr>
+            <td>Blue</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>Bella</td>
+            <td>6</td>
+        </tr>
+    </table>
+    <p>
+        Blue와 Bella의 위치 차이는 1이므로 둘은 바로 옆에 있습니다.
+    </p>
+</section>
+
+<section>
+    <h2>6. 입력 문장 분석</h2>
+    <p>조건 문장은 항상 6개의 단어로 들어옵니다.</p>
+    <div class="code">Buttercup must be milked beside Bella</div>
+    <table>
+        <tr>
+            <th>단어 번호</th>
+            <th>단어</th>
+            <th>사용 여부</th>
+        </tr>
+        <tr><td>1</td><td>Buttercup</td><td>사용</td></tr>
+        <tr><td>2</td><td>must</td><td>버림</td></tr>
+        <tr><td>3</td><td>be</td><td>버림</td></tr>
+        <tr><td>4</td><td>milked</td><td>버림</td></tr>
+        <tr><td>5</td><td>beside</td><td>버림</td></tr>
+        <tr><td>6</td><td>Bella</td><td>사용</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>7. 직접 입력 형식으로 계산하기</h2>
+    <p>
+        정올 입력 형식 그대로 붙여넣고 계산할 수 있습니다.
+    </p>
+<textarea id="inputText">3
+Buttercup must be milked beside Bella
+Blue must be milked beside Bella
+Sue must be milked beside Beatrice</textarea>
+    <br>
+    <button onclick="solveFromText()">입력값으로 계산하기</button>
+    <div class="result-box" id="textResultBox">아직 계산하지 않았습니다.</div>
+</section>
+
+<section>
+    <h2>8. 이해 확인 문제</h2>
+
+    <div class="quiz">
+        <h3>문제 1</h3>
+        <p>이 문제에서 가능한 모든 순서의 개수는?</p>
+        <select id="q1">
+            <option value="">선택하세요</option>
+            <option value="a">8</option>
+            <option value="b">64</option>
+            <option value="c">40320</option>
+        </select>
+    </div>
+
+    <div class="quiz">
+        <h3>문제 2</h3>
+        <p>X와 Y가 바로 옆에 있는지 확인하는 조건으로 알맞은 것은?</p>
+        <select id="q2">
+            <option value="">선택하세요</option>
+            <option value="a">pos[X] == pos[Y]</option>
+            <option value="b">abs(pos[X] - pos[Y]) == 1</option>
+            <option value="c">pos[X] + pos[Y] == 1</option>
+        </select>
+    </div>
+
+    <div class="quiz">
+        <h3>문제 3</h3>
+        <p>사전순으로 가장 빠른 답을 얻기 위해 먼저 해야 할 일은?</p>
+        <select id="q3">
+            <option value="">선택하세요</option>
+            <option value="a">소 이름을 사전순으로 정렬한다</option>
+            <option value="b">조건을 거꾸로 저장한다</option>
+            <option value="c">출력을 역순으로 한다</option>
+        </select>
+    </div>
+
+    <button onclick="checkQuiz()">채점하기</button>
+    <div class="result-box" id="quizResult">아직 채점하지 않았습니다.</div>
+</section>
+
+<section>
+    <h2>9. 정답 C 코드</h2>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+char cows[8][20] = {
+    "Beatrice",
+    "Belinda",
+    "Bella",
+    "Bessie",
+    "Betsy",
+    "Blue",
+    "Buttercup",
+    "Sue"
+};
+
+int N;
+int condA[10], condB[10];
+
+int used[8];
+int order[8];
+int answerFound = 0;
+
+int getIndex(char name[]) {
+    int i;
+
+    for (i = 0; i &lt; 8; i++) {
+        if (strcmp(cows[i], name) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int checkCondition() {
+    int pos[8];
+    int i;
+
+    for (i = 0; i &lt; 8; i++) {
+        pos[order[i]] = i;
+    }
+
+    for (i = 0; i &lt; N; i++) {
+        if (abs(pos[condA[i]] - pos[condB[i]]) != 1) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void dfs(int depth) {
+    int i;
+
+    if (answerFound == 1) {
+        return;
+    }
+
+    if (depth == 8) {
+        if (checkCondition()) {
+            for (i = 0; i &lt; 8; i++) {
+                printf("%s\n", cows[order[i]]);
+            }
+            answerFound = 1;
+        }
+        return;
+    }
+
+    for (i = 0; i &lt; 8; i++) {
+        if (used[i] == 0) {
+            used[i] = 1;
+            order[depth] = i;
+
+            dfs(depth + 1);
+
+            used[i] = 0;
+        }
+    }
+}
+
+int main() {
+    int i;
+    char X[20], temp1[20], temp2[20], temp3[20], temp4[20], Y[20];
+
+    scanf("%d", &N);
+
+    for (i = 0; i &lt; N; i++) {
+        scanf("%s %s %s %s %s %s", X, temp1, temp2, temp3, temp4, Y);
+
+        condA[i] = getIndex(X);
+        condB[i] = getIndex(Y);
+    }
+
+    dfs(0);
+
+    return 0;
+}</pre>
+</section>
+
+<section>
+    <h2>10. 마무리 정리</h2>
+    <p>
+        이 문제는 소가 8마리뿐이므로 복잡한 알고리즘보다 완전탐색이 가장 쉽고 안전합니다.
+    </p>
+    <p>
+        사전순으로 정렬된 배열에서 순열을 만들면, 첫 번째로 조건을 만족하는 순서가 바로 정답입니다.
+    </p>
+    <div class="note">
+        완전탐색 문제에서는 먼저 데이터 크기를 확인하고, 가능한 모든 경우를 검사해도 되는지 판단하는 것이 중요합니다.
+    </div>
+</section>
+</main>
+
+<script>
+const cows = [
+    "Beatrice",
+    "Belinda",
+    "Bella",
+    "Bessie",
+    "Betsy",
+    "Blue",
+    "Buttercup",
+    "Sue"
+];
+
+let conditions = [];
+
+function init() {
+    const cowList = document.getElementById("cowList");
+    cowList.innerHTML = "";
+
+    cows.forEach((name, index) => {
+        const div = document.createElement("div");
+        div.className = "cow";
+        div.textContent = (index + 1) + ". " + name;
+        cowList.appendChild(div);
+    });
+
+    const cowA = document.getElementById("cowA");
+    const cowB = document.getElementById("cowB");
+
+    cows.forEach(name => {
+        const op1 = document.createElement("option");
+        op1.value = name;
+        op1.textContent = name;
+        cowA.appendChild(op1);
+
+        const op2 = document.createElement("option");
+        op2.value = name;
+        op2.textContent = name;
+        cowB.appendChild(op2);
+    });
+
+    cowB.selectedIndex = 1;
+    renderConditions();
+}
+
+function addCondition() {
+    const a = document.getElementById("cowA").value;
+    const b = document.getElementById("cowB").value;
+
+    if (a === b) {
+        alert("같은 소끼리는 조건을 만들 수 없습니다.");
+        return;
+    }
+
+    if (conditions.length >= 7) {
+        alert("조건은 최대 7개까지입니다.");
+        return;
+    }
+
+    conditions.push([a, b]);
+    renderConditions();
+}
+
+function renderConditions() {
+    const box = document.getElementById("conditionBox");
+
+    if (conditions.length === 0) {
+        box.innerHTML = "조건이 없습니다.";
+        return;
+    }
+
+    let html = "<table><tr><th>번호</th><th>조건</th></tr>";
+
+    conditions.forEach((c, i) => {
+        html += "<tr><td>" + (i + 1) + "</td><td>" + c[0] + " must be milked beside " + c[1] + "</td></tr>";
+    });
+
+    html += "</table>";
+    box.innerHTML = html;
+}
+
+function loadExample() {
+    conditions = [
+        ["Buttercup", "Bella"],
+        ["Blue", "Bella"],
+        ["Sue", "Beatrice"]
+    ];
+    renderConditions();
+    document.getElementById("resultBox").innerHTML = "예제 조건을 불러왔습니다. 정답 계산하기를 누르세요.";
+}
+
+function resetAll() {
+    conditions = [];
+    renderConditions();
+    document.getElementById("resultBox").innerHTML = "아직 계산하지 않았습니다.";
+}
+
+function isValid(order, conds) {
+    const pos = {};
+
+    for (let i = 0; i < order.length; i++) {
+        pos[order[i]] = i;
+    }
+
+    for (const [a, b] of conds) {
+        if (Math.abs(pos[a] - pos[b]) !== 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function findAnswer(conds) {
+    const used = {};
+    const order = [];
+    let answer = null;
+    let checked = 0;
+
+    function dfs(depth) {
+        if (answer !== null) return;
+
+        if (depth === 8) {
+            checked++;
+
+            if (isValid(order, conds)) {
+                answer = order.slice();
+            }
+            return;
+        }
+
+        for (const cow of cows) {
+            if (!used[cow]) {
+                used[cow] = true;
+                order.push(cow);
+
+                dfs(depth + 1);
+
+                order.pop();
+                used[cow] = false;
+            }
+        }
+    }
+
+    dfs(0);
+    return { answer, checked };
+}
+
+function solve() {
+    const result = findAnswer(conditions);
+
+    if (result.answer === null) {
+        document.getElementById("resultBox").innerHTML = "정답을 찾지 못했습니다.";
+        return;
+    }
+
+    let html = "<p><b>검사한 완성 순열 수:</b> " + result.checked + "개</p>";
+    html += "<div class='answer-list'>";
+
+    result.answer.forEach((name, i) => {
+        html += "<div class='answer-item'>" + (i + 1) + "<br>" + name + "</div>";
+    });
+
+    html += "</div>";
+    document.getElementById("resultBox").innerHTML = html;
+}
+
+function solveFromText() {
+    const text = document.getElementById("inputText").value.trim();
+    const lines = text.split(/\n+/).map(line => line.trim()).filter(line => line.length > 0);
+
+    if (lines.length === 0) {
+        alert("입력값을 넣어주세요.");
+        return;
+    }
+
+    const n = parseInt(lines[0], 10);
+    const conds = [];
+
+    for (let i = 1; i <= n && i < lines.length; i++) {
+        const parts = lines[i].split(/\s+/);
+        if (parts.length >= 6) {
+            conds.push([parts[0], parts[5]]);
+        }
+    }
+
+    const result = findAnswer(conds);
+
+    if (result.answer === null) {
+        document.getElementById("textResultBox").innerHTML = "정답을 찾지 못했습니다.";
+        return;
+    }
+
+    let output = result.answer.join("<br>");
+    document.getElementById("textResultBox").innerHTML =
+        "<p><b>출력 결과</b></p><div class='code'>" + output + "</div>";
+}
+
+function checkQuiz() {
+    let score = 0;
+
+    if (document.getElementById("q1").value === "c") score++;
+    if (document.getElementById("q2").value === "b") score++;
+    if (document.getElementById("q3").value === "a") score++;
+
+    let message = "<b>점수: " + score + " / 3</b><br>";
+
+    if (score === 3) {
+        message += "완벽합니다. 완전탐색과 사전순 순열의 핵심을 잘 이해했습니다.";
+    } else {
+        message += "다시 확인하세요. 핵심은 8! 완전탐색, 위치 차이 1, 사전순 DFS입니다.";
+    }
+
+    document.getElementById("quizResult").innerHTML = message;
+}
+
+init();
+</script>
+</body>
+</html>

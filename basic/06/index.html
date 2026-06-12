@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>초콜릿 포장 인터렉티브 해설</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:#f8fafc;color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#78350f,#4338ca);color:white;text-align:center;padding:38px 20px}
+header h1{margin:0;font-size:32px}
+main{max-width:1120px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:20px;padding:26px;margin-bottom:22px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+h2{color:#4338ca;border-left:8px solid #6366f1;padding-left:12px}
+h3{color:#92400e}
+.box{background:#eef2ff;border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin:14px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:14px 0}
+pre{background:#111827;color:#f9fafb;padding:20px;border-radius:14px;overflow-x:auto;font-size:14px}
+button{border:0;border-radius:12px;padding:12px 18px;background:#4338ca;color:white;font-weight:800;cursor:pointer;margin:6px 4px}
+button:hover{background:#312e81}
+input{padding:10px;border-radius:12px;border:2px solid #c7d2fe;font-size:16px;margin:4px}
+textarea{width:100%;min-height:70px;border:2px solid #c7d2fe;border-radius:14px;padding:14px;font-family:Consolas,monospace;font-size:17px}
+.result{font-size:19px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:14px;padding:16px;margin-top:16px;white-space:pre-wrap}
+.chocos{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding:14px;background:#f8fafc;border-radius:14px;border:1px solid #e5e7eb}
+.choco{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;border:2px solid #92400e;background:#fde68a;color:#78350f}
+.fault{background:#fecaca!important;border-color:#dc2626!important;color:#991b1b!important}
+.sel2{outline:4px solid #3b82f6}
+.sel3{outline:4px solid #22c55e}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:8px;text-align:center;vertical-align:top}
+th{background:#e0e7ff;color:#312e81}
+tr:nth-child(even){background:#f9fafb}
+.best{background:#dcfce7!important;color:#14532d;font-weight:900}
+.bad{background:#fee2e2!important;color:#991b1b}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:14px;padding:16px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+.small{color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>초콜릿 포장</h1>
+<p>길이 2 또는 3 묶음으로 자르는 DP 문제</p>
+</header>
+
+<main>
+
+<section>
+<h2>1. 문제 핵심</h2>
+<p>초콜릿 문자열을 앞에서부터 여러 묶음으로 잘라 포장합니다. 각 묶음은 연속한 2개 또는 3개여야 하고, 불량 초콜릿 F는 묶음 하나에 최대 1개만 들어갈 수 있습니다.</p>
+<div class="box">
+<p>1. 모든 초콜릿을 반드시 사용해야 합니다.</p>
+<p>2. 묶음 길이는 2 또는 3입니다.</p>
+<p>3. 한 묶음에 F가 2개 이상이면 불가능합니다.</p>
+<p>4. 얻을 수 있는 금액의 최댓값을 구합니다.</p>
+</div>
+</section>
+
+<section>
+<h2>2. 가격표</h2>
+<table>
+<tr><th>묶음 길이</th><th>F 개수</th><th>가격</th></tr>
+<tr><td>2</td><td>0</td><td>4</td></tr>
+<tr><td>2</td><td>1</td><td>3</td></tr>
+<tr><td>3</td><td>0</td><td>7</td></tr>
+<tr><td>3</td><td>1</td><td>5</td></tr>
+<tr class="bad"><td>2 또는 3</td><td>2개 이상</td><td>불가능</td></tr>
+</table>
+</section>
+
+<section>
+<h2>3. 핵심 DP</h2>
+<p>앞에서부터 i개 초콜릿을 포장했을 때의 최대 금액을 저장합니다.</p>
+<pre><code>dp[i] = 앞에서부터 i개를 포장했을 때 얻을 수 있는 최대 금액</code></pre>
+<p>마지막 묶음은 길이 2 또는 3뿐입니다.</p>
+<pre><code>dp[i] = max(
+    dp[i - 2] + 마지막 2개 가격,
+    dp[i - 3] + 마지막 3개 가격
+)</code></pre>
+</section>
+
+<section>
+<h2>4. 인터렉티브 DP 계산기</h2>
+<p>문자열을 입력하고 DP 계산 과정을 확인하세요.</p>
+<label><b>N:</b></label>
+<input id="nInput" value="14" type="number">
+<label><b>S:</b></label>
+<textarea id="sInput">CCFCCFCFCCCFCC</textarea>
+<button onclick="runDP()">DP 실행</button>
+<button onclick="loadExample()">예제 불러오기</button>
+<button onclick="loadImpossible()">불가능 예제</button>
+<div id="resultArea"></div>
+<div id="chocoView" class="chocos"></div>
+<div id="dpTable"></div>
+</section>
+
+<section>
+<h2>5. 예제 이해</h2>
+<pre><code>입력
+14
+CCFCCFCFCCCFCC
+
+가능한 포장
+CCF / CCF / CF / CCC / FCC
+
+가격
+5 + 5 + 3 + 7 + 5 = 25</code></pre>
+<p>따라서 최댓값은 25입니다.</p>
+</section>
+
+<section>
+<h2>6. 누적합으로 F 개수 구하기</h2>
+<p>매번 묶음 안의 F를 직접 세지 않고, prefix 배열을 사용합니다.</p>
+<pre><code>prefix[i] = 1번부터 i번까지 F의 개수
+
+구간 l~r의 F 개수
+= prefix[r] - prefix[l - 1]</code></pre>
+</section>
+
+<section>
+<h2>7. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 300005
+#define NEG -1000000000
+
+int dp[MAXN];
+int prefix[MAXN];
+char S[MAXN];
+
+int max(int a, int b) {
+    return a &gt; b ? a : b;
+}
+
+int getPrice(int len, int fCount) {
+    if (fCount &gt;= 2) {
+        return NEG;
+    }
+
+    if (len == 2) {
+        if (fCount == 0) return 4;
+        else return 3;
+    }
+
+    if (len == 3) {
+        if (fCount == 0) return 7;
+        else return 5;
+    }
+
+    return NEG;
+}
+
+int main() {
+    int N;
+
+    scanf("%d", &amp;N);
+    scanf("%s", S + 1);
+
+    for (int i = 1; i &lt;= N; i++) {
+        prefix[i] = prefix[i - 1];
+
+        if (S[i] == 'F') {
+            prefix[i]++;
+        }
+    }
+
+    for (int i = 0; i &lt;= N; i++) {
+        dp[i] = NEG;
+    }
+
+    dp[0] = 0;
+
+    for (int i = 1; i &lt;= N; i++) {
+        if (i &gt;= 2 &amp;&amp; dp[i - 2] != NEG) {
+            int fCount = prefix[i] - prefix[i - 2];
+            int price = getPrice(2, fCount);
+
+            if (price != NEG) {
+                dp[i] = max(dp[i], dp[i - 2] + price);
+            }
+        }
+
+        if (i &gt;= 3 &amp;&amp; dp[i - 3] != NEG) {
+            int fCount = prefix[i] - prefix[i - 3];
+            int price = getPrice(3, fCount);
+
+            if (price != NEG) {
+                dp[i] = max(dp[i], dp[i - 3] + price);
+            }
+        }
+    }
+
+    if (dp[N] == NEG) {
+        printf("-1\n");
+    } else {
+        printf("%d\n", dp[N]);
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. 길이 1 묶음을 허용하는 경우</h3>
+<p>묶음은 반드시 2개 또는 3개입니다.</p>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">dp[i-1]은 고려하면 안 됩니다. 오직 dp[i-2], dp[i-3]만 봅니다.</div>
+</div>
+
+<div class="quiz">
+<h3>실수 2. F가 2개 이상인 묶음을 포장하는 경우</h3>
+<p>한 묶음에 불량 초콜릿은 최대 1개입니다.</p>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">fCount >= 2이면 그 묶음은 불가능 처리해야 합니다.</div>
+</div>
+
+<div class="quiz">
+<h3>실수 3. 불가능 상태를 0으로 두는 경우</h3>
+<p>아직 만들 수 없는 dp 상태와 실제 가격 0을 구분해야 합니다.</p>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">NEG 같은 아주 작은 값을 사용해서 불가능 상태를 표시합니다.</div>
+</div>
+</section>
+
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. dp[i]는 앞에서부터 i개를 포장한 최대 금액입니다.</p>
+<p>2. 마지막 묶음은 길이 2 또는 3입니다.</p>
+<p>3. F 개수는 prefix로 빠르게 구합니다.</p>
+<p>4. fCount가 2 이상이면 그 묶음은 불가능합니다.</p>
+<p>5. dp[N]이 불가능 상태이면 -1을 출력합니다.</p>
+</section>
+
+</main>
+
+<script>
+const NEG = -1000000000;
+
+function price(len, f){
+    if(f >= 2) return NEG;
+    if(len === 2) return f === 0 ? 4 : 3;
+    if(len === 3) return f === 0 ? 7 : 5;
+    return NEG;
+}
+
+function runDP(){
+    let N = Number(document.getElementById('nInput').value);
+    let S = document.getElementById('sInput').value.trim().toUpperCase().replace(/\s+/g,'');
+    if(!/^[CF]+$/.test(S)){
+        document.getElementById('resultArea').innerHTML = '<div class="warn">문자열은 C와 F로만 입력하세요.</div>';
+        return;
+    }
+    if(N !== S.length){
+        N = S.length;
+        document.getElementById('nInput').value = N;
+    }
+
+    const prefix = Array(N+1).fill(0);
+    for(let i=1;i<=N;i++){
+        prefix[i] = prefix[i-1] + (S[i-1] === 'F' ? 1 : 0);
+    }
+
+    const dp = Array(N+1).fill(NEG);
+    const choice = Array(N+1).fill('');
+    dp[0] = 0;
+
+    let rows = '';
+    for(let i=1;i<=N;i++){
+        let cand2 = '불가', cand3 = '불가';
+
+        if(i >= 2 && dp[i-2] !== NEG){
+            const f = prefix[i] - prefix[i-2];
+            const p = price(2, f);
+            if(p !== NEG){
+                const val = dp[i-2] + p;
+                cand2 = '구간 '+(i-1)+'~'+i+', F='+f+', 가격 '+p+', 합 '+val;
+                if(val > dp[i]){
+                    dp[i] = val;
+                    choice[i] = '2';
+                }
+            }else{
+                cand2 = '구간 '+(i-1)+'~'+i+', F='+f+' → 불가';
+            }
+        }
+
+        if(i >= 3 && dp[i-3] !== NEG){
+            const f = prefix[i] - prefix[i-3];
+            const p = price(3, f);
+            if(p !== NEG){
+                const val = dp[i-3] + p;
+                cand3 = '구간 '+(i-2)+'~'+i+', F='+f+', 가격 '+p+', 합 '+val;
+                if(val > dp[i]){
+                    dp[i] = val;
+                    choice[i] = '3';
+                }
+            }else{
+                cand3 = '구간 '+(i-2)+'~'+i+', F='+f+' → 불가';
+            }
+        }
+
+        rows += '<tr class="'+(dp[i]!==NEG?'best':'bad')+'"><td>'+i+'</td><td>'+cand2+'</td><td>'+cand3+'</td><td>'+(dp[i]===NEG?'불가능':dp[i])+'</td><td>'+choice[i]+'</td></tr>';
+    }
+
+    let answer = dp[N] === NEG ? -1 : dp[N];
+
+    document.getElementById('resultArea').innerHTML =
+        '<div class="result">N = '+N+
+        '\\nS = '+S+
+        '\\n최대 금액 = '+answer+'</div>';
+
+    renderChocos(S, choice, dp);
+    document.getElementById('dpTable').innerHTML =
+        '<table><tr><th>i</th><th>마지막 2개 후보</th><th>마지막 3개 후보</th><th>dp[i]</th><th>선택 길이</th></tr>'+rows+'</table>';
+}
+
+function renderChocos(S, choice, dp){
+    const N = S.length;
+    let groups = [];
+    if(dp[N] !== NEG){
+        let i=N;
+        while(i>0){
+            const len = Number(choice[i]);
+            if(!len) break;
+            groups.push([i-len+1, i]);
+            i -= len;
+        }
+        groups.reverse();
+    }
+
+    let html='';
+    for(let i=1;i<=N;i++){
+        let cls = 'choco ' + (S[i-1]==='F'?'fault':'');
+        let title = '';
+        for(let g=0;g<groups.length;g++){
+            if(i>=groups[g][0] && i<=groups[g][1]){
+                cls += (groups[g][1]-groups[g][0]+1===2) ? ' sel2' : ' sel3';
+                title = '묶음 '+(g+1);
+            }
+        }
+        html += '<div class="'+cls+'" title="'+title+'">'+S[i-1]+'<br><span style="font-size:10px">'+i+'</span></div>';
+    }
+    document.getElementById('chocoView').innerHTML = html;
+}
+
+function loadExample(){
+    document.getElementById('nInput').value = 14;
+    document.getElementById('sInput').value = 'CCFCCFCFCCCFCC';
+    runDP();
+}
+
+function loadImpossible(){
+    document.getElementById('nInput').value = 4;
+    document.getElementById('sInput').value = 'FFFF';
+    runDP();
+}
+
+function toggleAnswer(id){
+    const el=document.getElementById(id);
+    el.style.display=el.style.display==='block'?'none':'block';
+}
+
+loadExample();
+</script>
+</body>
+</html>

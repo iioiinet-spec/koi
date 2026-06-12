@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 1450 케이크자르기 인터랙티브</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:'Malgun Gothic',Arial,sans-serif;background:#f8fbff;color:#111827;font-size:19px;line-height:1.75}header{background:linear-gradient(135deg,#dbeafe,#fef3c7);border-bottom:5px solid #2563eb;padding:34px 20px;text-align:center}header h1{margin:0;color:#1e3a8a;font-size:34px}header p{margin:10px 0 0;font-size:21px;font-weight:900}main{max-width:1180px;margin:0 auto;padding:24px}section{background:white;border:2px solid #d1d5db;border-radius:18px;padding:26px;margin:22px 0;box-shadow:0 8px 22px rgba(15,23,42,.08)}h2{margin-top:0;color:#1d4ed8;border-left:8px solid #2563eb;padding-left:12px;font-size:27px}h3{color:#92400e;font-size:23px}.note{background:#ecfdf5;border:2px solid #10b981;border-radius:14px;padding:16px;font-weight:800}.warning{background:#fff7ed;border:2px solid #fb923c;border-radius:14px;padding:16px;font-weight:800}.code,pre{background:#111827;color:#f9fafb;padding:18px;border-radius:14px;overflow-x:auto;font-size:16px;line-height:1.6}label{display:block;font-weight:900;margin-bottom:6px}input,textarea,select{width:100%;padding:13px;font-size:18px;border:2px solid #9ca3af;border-radius:12px;background:white;color:#111827}textarea{min-height:150px;font-family:Consolas,monospace}button{border:none;background:#2563eb;color:white;font-size:18px;font-weight:900;padding:13px 18px;border-radius:12px;cursor:pointer;margin:6px 4px}button:hover{background:#1d4ed8}.green{background:#059669}.orange{background:#ea580c}.gray{background:#4b5563}.row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;align-items:end}.result-box{background:#f8fafc;border:2px solid #94a3b8;border-radius:16px;padding:18px;margin-top:14px;min-height:80px}table{width:100%;border-collapse:collapse;background:white;margin-top:14px}th,td{border:2px solid #cbd5e1;padding:12px;text-align:center;color:#111827}th{background:#dbeafe;color:#1e3a8a;font-weight:900}.canvas-wrap{overflow:auto;background:#f9fafb;border:2px solid #cbd5e1;border-radius:16px;padding:18px;margin-top:16px}canvas{background:white;border:2px solid #111827;display:block;margin:0 auto}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:#eff6ff;border:2px solid #93c5fd;border-radius:16px;padding:16px;font-weight:800}.quiz{border:2px solid #a78bfa;background:#faf5ff;border-radius:14px;padding:16px;margin:16px 0}@media(max-width:900px){.row{grid-template-columns:1fr 1fr}}@media(max-width:640px){body{font-size:17px}header h1{font-size:27px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>정올 1450 케이크자르기</h1><p>격자 모델링 · 절단선 표시 · BFS로 조각 개수 세기</p></header>
+<main>
+<section><h2>1. 문제 이해</h2><p>직사각형 케이크를 여러 개의 사각형 틀로 자릅니다. 사각형 틀은 내부를 없애는 것이 아니라 <b>사각형의 둘레</b>를 따라 케이크를 자릅니다.</p><p>출력해야 하는 것은 잘라진 뒤의 <b>연결된 케이크 조각 수</b>입니다.</p><div class="note">핵심: 1×1 칸으로 나누고, 칸 사이의 절단선을 벽처럼 처리한 뒤 BFS로 연결 요소를 셉니다.</div></section>
+<section><h2>2. 좌표와 칸의 관계</h2><p>케이크 크기가 H × W라면 실제 칸은 H × W개입니다. 좌표는 선 위의 위치이고, 칸은 좌표 사이의 작은 사각형입니다.</p><div class="grid2"><div class="card">세로 절단선 vcut[y][x]<br>x 위치의 세로선이 있으면 왼쪽 칸과 오른쪽 칸이 분리됩니다.</div><div class="card">가로 절단선 hcut[y][x]<br>y 위치의 가로선이 있으면 아래 칸과 위 칸이 분리됩니다.</div></div></section>
+<section><h2>3. 사각형 둘레 표시 방법</h2><div class="code">left = min(x1, x2)<br>right = max(x1, x2)<br>bottom = min(y1, y2)<br>top = max(y1, y2)</div><p>네 변을 절단선으로 표시합니다.</p><div class="code">왼쪽 세로선: x = left<br>오른쪽 세로선: x = right<br>아래 가로선: y = bottom<br>위 가로선: y = top</div><div class="warning">케이크 바깥 테두리의 절단선은 따로 표시하지 않아도 됩니다. BFS 범위 검사로 밖으로 이동하지 못하게 합니다.</div></section>
+<section><h2>4. 인터랙티브 절단선 계산기</h2><p>케이크 크기와 사각형 틀 좌표를 입력해 보세요. 그림에는 절단선과 조각 번호가 표시됩니다.</p><div class="row"><div><label>높이 H</label><input id="HInput" type="number" value="3" min="1" max="20"></div><div><label>너비 W</label><input id="WInput" type="number" value="5" min="1" max="20"></div><div><label>x1</label><input id="x1" type="number" value="1"></div><div><label>y1</label><input id="y1" type="number" value="1"></div><div><label>x2</label><input id="x2" type="number" value="3"></div><div><label>y2</label><input id="y2" type="number" value="2"></div></div><button onclick="addRect()">사각형 틀 추가</button><button class="green" onclick="loadExample()">예제 불러오기</button><button class="orange" onclick="solveAndDraw()">조각 수 계산하기</button><button class="gray" onclick="resetAll()">초기화</button><h3>현재 사각형 틀 목록</h3><div class="result-box" id="rectBox">아직 추가된 사각형 틀이 없습니다.</div><div class="canvas-wrap"><canvas id="cakeCanvas" width="700" height="480"></canvas></div><div class="result-box" id="calcResult">아직 계산하지 않았습니다.</div></section>
+<section><h2>5. 정올 입력 형식으로 계산하기</h2><textarea id="inputText">3 5
+3
+1 1 3 2
+4 0 2 3
+4 0 5 1</textarea><br><button class="orange" onclick="calculateFromText()">입력값으로 계산하기</button><div class="result-box" id="textResult">아직 계산하지 않았습니다.</div></section>
+<section><h2>6. BFS 이동 조건</h2><table><tr><th>이동 방향</th><th>조건</th><th>의미</th></tr><tr><td>왼쪽</td><td>vcut[y][x] == 0</td><td>왼쪽 칸 사이에 세로 절단선이 없음</td></tr><tr><td>오른쪽</td><td>vcut[y][x + 1] == 0</td><td>오른쪽 칸 사이에 세로 절단선이 없음</td></tr><tr><td>아래쪽</td><td>hcut[y][x] == 0</td><td>아래 칸 사이에 가로 절단선이 없음</td></tr><tr><td>위쪽</td><td>hcut[y + 1][x] == 0</td><td>위 칸 사이에 가로 절단선이 없음</td></tr></table></section>
+<section><h2>7. 이해 확인 문제</h2><div class="quiz"><h3>문제 1</h3><p>사각형 틀로 자른다는 것은 무엇을 표시하는 것인가요?</p><select id="q1"><option value="">선택하세요</option><option value="a">사각형 내부를 모두 없앤다</option><option value="b">사각형 둘레를 절단선으로 표시한다</option><option value="c">케이크 전체를 삭제한다</option></select></div><div class="quiz"><h3>문제 2</h3><p>조각 수를 세는 데 적합한 방법은?</p><select id="q2"><option value="">선택하세요</option><option value="a">BFS 또는 DFS로 연결 요소를 센다</option><option value="b">좌표 네 개를 모두 더한다</option><option value="c">사각형 개수 N만 출력한다</option></select></div><div class="quiz"><h3>문제 3</h3><p>현재 칸에서 오른쪽 칸으로 이동할 수 있으려면?</p><select id="q3"><option value="">선택하세요</option><option value="a">vcut[y][x + 1] == 0</option><option value="b">hcut[y][x] == 1</option><option value="c">visited[y][x] == 2</option></select></div><button onclick="checkQuiz()">채점하기</button><div class="result-box" id="quizResult">아직 채점하지 않았습니다.</div></section>
+<section><h2>8. 정답 C 코드</h2><pre>#include &lt;stdio.h&gt;
+
+int H, W, N;
+int vcut[25][25];
+int hcut[25][25];
+int visited[25][25];
+int qy[1000], qx[1000];
+
+int minValue(int a, int b) { return a &lt; b ? a : b; }
+int maxValue(int a, int b) { return a &gt; b ? a : b; }
+
+void addVerticalCut(int x, int y1, int y2) {
+    int y;
+    if (x &lt;= 0 || x &gt;= W) return;
+    for (y = y1; y &lt; y2; y++) vcut[y][x] = 1;
+}
+
+void addHorizontalCut(int y, int x1, int x2) {
+    int x;
+    if (y &lt;= 0 || y &gt;= H) return;
+    for (x = x1; x &lt; x2; x++) hcut[y][x] = 1;
+}
+
+void bfs(int sy, int sx) {
+    int front = 0, rear = 0;
+    qy[rear] = sy;
+    qx[rear] = sx;
+    rear++;
+    visited[sy][sx] = 1;
+
+    while (front &lt; rear) {
+        int y = qy[front];
+        int x = qx[front];
+        front++;
+
+        if (x &gt; 0 && vcut[y][x] == 0 && visited[y][x - 1] == 0) {
+            visited[y][x - 1] = 1;
+            qy[rear] = y;
+            qx[rear] = x - 1;
+            rear++;
+        }
+
+        if (x &lt; W - 1 && vcut[y][x + 1] == 0 && visited[y][x + 1] == 0) {
+            visited[y][x + 1] = 1;
+            qy[rear] = y;
+            qx[rear] = x + 1;
+            rear++;
+        }
+
+        if (y &gt; 0 && hcut[y][x] == 0 && visited[y - 1][x] == 0) {
+            visited[y - 1][x] = 1;
+            qy[rear] = y - 1;
+            qx[rear] = x;
+            rear++;
+        }
+
+        if (y &lt; H - 1 && hcut[y + 1][x] == 0 && visited[y + 1][x] == 0) {
+            visited[y + 1][x] = 1;
+            qy[rear] = y + 1;
+            qx[rear] = x;
+            rear++;
+        }
+    }
+}
+
+int main() {
+    int i, x1, y1, x2, y2;
+    int left, right, bottom, top;
+    int y, x, answer = 0;
+
+    scanf("%d %d", &H, &W);
+    scanf("%d", &N);
+
+    for (i = 0; i &lt; N; i++) {
+        scanf("%d %d %d %d", &x1, &y1, &x2, &y2);
+        left = minValue(x1, x2);
+        right = maxValue(x1, x2);
+        bottom = minValue(y1, y2);
+        top = maxValue(y1, y2);
+        addVerticalCut(left, bottom, top);
+        addVerticalCut(right, bottom, top);
+        addHorizontalCut(bottom, left, right);
+        addHorizontalCut(top, left, right);
+    }
+
+    for (y = 0; y &lt; H; y++) {
+        for (x = 0; x &lt; W; x++) {
+            if (visited[y][x] == 0) {
+                bfs(y, x);
+                answer++;
+            }
+        }
+    }
+
+    printf("%d\n", answer);
+    return 0;
+}</pre></section>
+<section><h2>9. 마무리 정리</h2><p>이 문제는 도형 문제처럼 보이지만 실제로는 격자 그래프 문제입니다.</p><p>사각형 둘레를 칸 사이의 벽으로 저장하고, BFS로 연결된 칸 덩어리 수를 세면 됩니다.</p><div class="note">시간복잡도는 O(H × W + N × (H + W))이며, H와 W가 최대 20이므로 충분히 빠릅니다.</div></section>
+</main>
+<script>
+let rects=[];
+function getInputs(){return{H:Number(document.getElementById('HInput').value),W:Number(document.getElementById('WInput').value)}}
+function addRect(){const{H,W}=getInputs();const x1=Number(document.getElementById('x1').value),y1=Number(document.getElementById('y1').value),x2=Number(document.getElementById('x2').value),y2=Number(document.getElementById('y2').value);if(H<1||H>20||W<1||W>20){alert('H와 W는 1 이상 20 이하입니다.');return}if(x1<0||x1>W||x2<0||x2>W||y1<0||y1>H||y2<0||y2>H){alert('좌표가 케이크 범위를 벗어났습니다.');return}if(x1===x2||y1===y2){alert('가로와 세로 길이가 모두 있는 사각형을 입력하세요.');return}rects.push([x1,y1,x2,y2]);renderRectBox();solveAndDraw()}
+function renderRectBox(){const box=document.getElementById('rectBox');if(rects.length===0){box.innerHTML='아직 추가된 사각형 틀이 없습니다.';return}let html='<table><tr><th>번호</th><th>x1</th><th>y1</th><th>x2</th><th>y2</th></tr>';rects.forEach((r,i)=>{html+=`<tr><td>${i+1}</td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`});html+='</table>';box.innerHTML=html}
+function buildCuts(H,W,list){const vcut=Array.from({length:H},()=>Array(W+1).fill(0));const hcut=Array.from({length:H+1},()=>Array(W).fill(0));for(const r of list){const left=Math.min(r[0],r[2]),right=Math.max(r[0],r[2]),bottom=Math.min(r[1],r[3]),top=Math.max(r[1],r[3]);if(left>0&&left<W)for(let y=bottom;y<top;y++)vcut[y][left]=1;if(right>0&&right<W)for(let y=bottom;y<top;y++)vcut[y][right]=1;if(bottom>0&&bottom<H)for(let x=left;x<right;x++)hcut[bottom][x]=1;if(top>0&&top<H)for(let x=left;x<right;x++)hcut[top][x]=1}return{vcut,hcut}}
+function countPieces(H,W,list){const{vcut,hcut}=buildCuts(H,W,list);const visited=Array.from({length:H},()=>Array(W).fill(0));const pieceId=Array.from({length:H},()=>Array(W).fill(0));let pieces=0;for(let sy=0;sy<H;sy++){for(let sx=0;sx<W;sx++){if(visited[sy][sx])continue;pieces++;const q=[[sy,sx]];visited[sy][sx]=1;pieceId[sy][sx]=pieces;for(let head=0;head<q.length;head++){const[y,x]=q[head];if(x>0&&vcut[y][x]===0&&!visited[y][x-1]){visited[y][x-1]=1;pieceId[y][x-1]=pieces;q.push([y,x-1])}if(x<W-1&&vcut[y][x+1]===0&&!visited[y][x+1]){visited[y][x+1]=1;pieceId[y][x+1]=pieces;q.push([y,x+1])}if(y>0&&hcut[y][x]===0&&!visited[y-1][x]){visited[y-1][x]=1;pieceId[y-1][x]=pieces;q.push([y-1,x])}if(y<H-1&&hcut[y+1][x]===0&&!visited[y+1][x]){visited[y+1][x]=1;pieceId[y+1][x]=pieces;q.push([y+1,x])}}}}return{pieces,vcut,hcut,pieceId}}
+function drawCake(H,W,result){const canvas=document.getElementById('cakeCanvas'),ctx=canvas.getContext('2d');const cell=Math.min(58,Math.floor(600/Math.max(H,W)));canvas.width=W*cell+90;canvas.height=H*cell+90;ctx.clearRect(0,0,canvas.width,canvas.height);const ox=45,oy=35;ctx.textAlign='center';ctx.textBaseline='middle';for(let y=0;y<H;y++){for(let x=0;x<W;x++){const drawY=oy+(H-1-y)*cell,drawX=ox+x*cell,id=result.pieceId[y][x],hue=(id*47)%360;ctx.fillStyle=`hsl(${hue},75%,88%)`;ctx.fillRect(drawX,drawY,cell,cell);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=1;ctx.strokeRect(drawX,drawY,cell,cell);ctx.fillStyle='#111827';ctx.font='bold 16px Malgun Gothic';ctx.fillText(id,drawX+cell/2,drawY+cell/2)}}ctx.strokeStyle='#111827';ctx.lineWidth=4;ctx.strokeRect(ox,oy,W*cell,H*cell);ctx.strokeStyle='#dc2626';ctx.lineWidth=5;for(let y=0;y<H;y++){for(let x=1;x<W;x++){if(result.vcut[y][x]){const px=ox+x*cell,py1=oy+(H-1-y)*cell,py2=py1+cell;ctx.beginPath();ctx.moveTo(px,py1);ctx.lineTo(px,py2);ctx.stroke()}}}for(let y=1;y<H;y++){for(let x=0;x<W;x++){if(result.hcut[y][x]){const px1=ox+x*cell,px2=px1+cell,py=oy+(H-y)*cell;ctx.beginPath();ctx.moveTo(px1,py);ctx.lineTo(px2,py);ctx.stroke()}}}ctx.fillStyle='#111827';ctx.font='bold 14px Malgun Gothic';for(let x=0;x<=W;x++)ctx.fillText(x,ox+x*cell,oy+H*cell+24);for(let y=0;y<=H;y++)ctx.fillText(y,ox-22,oy+(H-y)*cell)}
+function solveAndDraw(){const{H,W}=getInputs();if(H<1||H>20||W<1||W>20){alert('H와 W는 1 이상 20 이하입니다.');return}const result=countPieces(H,W,rects);drawCake(H,W,result);document.getElementById('calcResult').innerHTML=`<p><b>계산된 조각 수:</b> ${result.pieces}개</p><div class='code'>출력: ${result.pieces}</div>`}
+function loadExample(){document.getElementById('HInput').value=3;document.getElementById('WInput').value=5;rects=[[1,1,3,2],[4,0,2,3],[4,0,5,1]];renderRectBox();solveAndDraw()}
+function resetAll(){rects=[];renderRectBox();document.getElementById('calcResult').innerHTML='아직 계산하지 않았습니다.';solveAndDraw()}
+function calculateFromText(){const nums=document.getElementById('inputText').value.trim().split(/\s+/).map(Number);if(nums.length<3){alert('입력 형식을 확인하세요.');return}const H=nums[0],W=nums[1],N=nums[2];const list=[];let idx=3;for(let i=0;i<N;i++){if(idx+3>=nums.length){alert('사각형 틀 정보가 부족합니다.');return}list.push([nums[idx],nums[idx+1],nums[idx+2],nums[idx+3]]);idx+=4}const result=countPieces(H,W,list);document.getElementById('HInput').value=H;document.getElementById('WInput').value=W;rects=list;renderRectBox();drawCake(H,W,result);document.getElementById('textResult').innerHTML=`<p><b>출력 결과:</b></p><div class='code'>${result.pieces}</div>`;document.getElementById('calcResult').innerHTML=`<p><b>계산된 조각 수:</b> ${result.pieces}개</p><div class='code'>출력: ${result.pieces}</div>`}
+function checkQuiz(){let score=0;if(document.getElementById('q1').value==='b')score++;if(document.getElementById('q2').value==='a')score++;if(document.getElementById('q3').value==='a')score++;document.getElementById('quizResult').innerHTML=`<b>점수: ${score} / 3</b><br>`+(score===3?'완벽합니다. 절단선을 벽으로 보고 BFS로 조각 수를 세는 핵심을 잘 이해했습니다.':'다시 확인하세요. 핵심은 사각형 둘레 절단선, 칸 사이의 벽, BFS 연결 요소입니다.')}
+loadExample();
+</script>
+</body>
+</html>

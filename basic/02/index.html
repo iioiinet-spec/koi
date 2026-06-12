@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>정올 1295 이진탐색 인터렉티브 해설</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#f8fafc,#eef2ff);color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#1e3a8a,#4338ca);color:white;text-align:center;padding:38px 20px}
+header h1{margin:0;font-size:32px}
+main{max-width:1100px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:20px;padding:26px;margin-bottom:22px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+h2{color:#4338ca;border-left:8px solid #6366f1;padding-left:12px}
+h3{color:#1e40af}
+.box{background:#eef2ff;border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin:14px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:14px 0}
+pre{background:#111827;color:#f9fafb;padding:20px;border-radius:14px;overflow-x:auto;font-size:14px}
+button{border:0;border-radius:12px;padding:12px 18px;background:#4338ca;color:white;font-weight:800;cursor:pointer;margin:6px 4px}
+button:hover{background:#312e81}
+input{padding:10px;border-radius:12px;border:2px solid #a5b4fc;font-size:16px;margin:4px}
+.array{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding:14px;background:#f8fafc;border-radius:14px;border:1px solid #e5e7eb}
+.cell{min-width:62px;text-align:center;border-radius:12px;border:2px solid #cbd5e1;background:#f1f5f9;padding:8px;font-weight:900}
+.cell .idx{font-size:12px;color:#64748b}
+.range{background:#dbeafe!important;border-color:#3b82f6!important;color:#1e3a8a}
+.mid{background:#fef3c7!important;border-color:#f59e0b!important;color:#92400e}
+.found{background:#dcfce7!important;border-color:#22c55e!important;color:#14532d}
+.out{opacity:.35}
+.result{font-size:19px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:14px;padding:16px;margin-top:16px;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+th,td{border:1px solid #d1d5db;padding:9px;text-align:center}
+th{background:#e0e7ff;color:#312e81}
+tr:nth-child(even){background:#f9fafb}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:14px;padding:16px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 1295 이진탐색</h1>
+<p>정렬된 배열에서 원하는 수의 위치를 빠르게 찾기</p>
+</header>
+<main>
+
+<section>
+<h2>1. 문제 핵심</h2>
+<p>오름차순으로 정렬된 N개의 수에서 찾고 싶은 수가 몇 번째 위치에 있는지 출력하는 문제입니다.</p>
+<div class="box">
+<p>1. 배열은 이미 오름차순으로 정렬되어 있습니다.</p>
+<p>2. 값은 서로 다릅니다.</p>
+<p>3. 찾은 위치는 1부터 시작합니다.</p>
+<p>4. 없으면 0을 출력합니다.</p>
+</div>
+</section>
+
+<section>
+<h2>2. 이진탐색 원리</h2>
+<p>이진탐색은 가운데 값과 비교해서 탐색 범위를 절반씩 줄입니다.</p>
+<pre><code>1. left와 right를 정한다.
+2. mid = (left + right) / 2 를 구한다.
+3. arr[mid]와 target을 비교한다.
+4. 같으면 찾은 위치를 반환한다.
+5. arr[mid]가 작으면 오른쪽을 찾는다.
+6. arr[mid]가 크면 왼쪽을 찾는다.</code></pre>
+</section>
+
+<section>
+<h2>3. 인터렉티브 이진탐색</h2>
+<p>배열과 찾을 값을 입력하고 한 단계씩 실행해 보세요.</p>
+<label><b>배열:</b></label>
+<input id="arrayInput" style="width:520px" value="2 4 9 10 14 23 32">
+<label><b>찾을 값:</b></label>
+<input id="targetInput" type="number" value="23">
+<br>
+<button onclick="resetSearch()">처음부터</button>
+<button onclick="nextStep()">다음 단계</button>
+<button onclick="runAll()">끝까지 실행</button>
+<button onclick="loadExample()">예제 불러오기</button>
+<div id="arrayView" class="array"></div>
+<div id="status" class="result"></div>
+<div id="stepTable"></div>
+</section>
+
+<section>
+<h2>4. 여러 개의 수 한 번에 찾기</h2>
+<p>문제처럼 T개의 수를 한 번에 입력해서 위치를 확인합니다.</p>
+<label><b>찾을 수들:</b></label>
+<input id="queryInput" style="width:420px" value="6 23 9">
+<button onclick="runQueries()">여러 개 찾기</button>
+<div id="queryResult"></div>
+</section>
+
+<section>
+<h2>5. 예제 이해</h2>
+<pre><code>입력
+7
+2 4 9 10 14 23 32
+3
+6 23 9
+
+출력
+0
+6
+3</code></pre>
+<p>6은 없으므로 0, 23은 6번째, 9는 3번째입니다.</p>
+</section>
+
+<section>
+<h2>6. 코드 작성 방법</h2>
+<h3>1. left, right 설정</h3>
+<pre><code>int left = 0;
+int right = n - 1;</code></pre>
+<h3>2. 가운데 위치 mid 계산</h3>
+<pre><code>int mid = (left + right) / 2;</code></pre>
+<h3>3. 값을 찾았을 때</h3>
+<pre><code>if (arr[mid] == target) {
+    return mid + 1;
+}</code></pre>
+<h3>4. 오른쪽 탐색</h3>
+<pre><code>else if (arr[mid] &lt; target) {
+    left = mid + 1;
+}</code></pre>
+<h3>5. 왼쪽 탐색</h3>
+<pre><code>else {
+    right = mid - 1;
+}</code></pre>
+</section>
+
+<section>
+<h2>7. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define MAXN 50000
+
+int arr[MAXN];
+
+int binarySearch(int n, int target) {
+    int left = 0;
+    int right = n - 1;
+
+    while (left &lt;= right) {
+        int mid = (left + right) / 2;
+
+        if (arr[mid] == target) {
+            return mid + 1;
+        }
+        else if (arr[mid] &lt; target) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    int N;
+    int T;
+
+    scanf("%d", &amp;N);
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf("%d", &amp;arr[i]);
+    }
+
+    scanf("%d", &amp;T);
+
+    for (int i = 0; i &lt; T; i++) {
+        int target;
+        scanf("%d", &amp;target);
+
+        printf("%d\n", binarySearch(N, target));
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. 위치를 mid로 출력하는 경우</h3>
+<p>문제의 위치는 1부터 시작합니다.</p>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">C 배열 인덱스는 0부터 시작하므로 찾은 위치는 mid + 1을 출력해야 합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 2. left와 right 갱신을 반대로 하는 경우</h3>
+<p>arr[mid]가 target보다 작으면 오른쪽을 봐야 합니다.</p>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">arr[mid] < target이면 left = mid + 1입니다. arr[mid] > target이면 right = mid - 1입니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 3. 못 찾았을 때 0을 출력하지 않는 경우</h3>
+<p>left > right가 되면 탐색 실패입니다.</p>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">while문이 끝날 때까지 못 찾으면 return 0을 해야 합니다.</div>
+</div>
+</section>
+
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. 정렬된 배열에서는 이진탐색을 사용할 수 있습니다.</p>
+<p>2. 한 번 비교할 때마다 탐색 범위가 절반으로 줄어듭니다.</p>
+<p>3. 찾으면 mid + 1을 반환합니다.</p>
+<p>4. 못 찾으면 0을 반환합니다.</p>
+<p>5. 시간복잡도는 O(T log N)입니다.</p>
+</section>
+
+</main>
+
+<script>
+let arr=[], target=0, left=0, right=0, finished=false, logs=[];
+
+function parseArray(){
+    return document.getElementById('arrayInput').value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x));
+}
+
+function resetSearch(){
+    arr=parseArray();
+    target=Number(document.getElementById('targetInput').value);
+    left=0;
+    right=arr.length-1;
+    finished=false;
+    logs=[];
+    renderArray(-1,-1);
+    document.getElementById('status').textContent='탐색 시작\nleft = 0, right = '+right+'\n찾을 값 target = '+target;
+    renderLogs();
+}
+
+function nextStep(){
+    if(finished) return;
+    if(left>right){
+        finished=true;
+        logs.push({left,right,mid:'-',value:'-',action:'탐색 실패, 0 출력'});
+        renderArray(-1,-1);
+        document.getElementById('status').textContent='찾지 못했습니다. 정답은 0입니다.';
+        renderLogs();
+        return;
+    }
+    const mid=Math.floor((left+right)/2);
+    const value=arr[mid];
+    let action='';
+    if(value===target){
+        action='찾음! 위치는 '+(mid+1);
+        finished=true;
+        renderArray(mid,mid,true);
+        document.getElementById('status').textContent='찾았습니다!\n배열 인덱스 mid = '+mid+'\n문제 위치 = mid + 1 = '+(mid+1);
+    }else if(value<target){
+        action=value+' < '+target+' 이므로 오른쪽 탐색';
+        renderArray(mid,mid,false);
+        left=mid+1;
+        document.getElementById('status').textContent='오른쪽으로 이동합니다.\n새 left = '+left+', right = '+right;
+    }else{
+        action=value+' > '+target+' 이므로 왼쪽 탐색';
+        renderArray(mid,mid,false);
+        right=mid-1;
+        document.getElementById('status').textContent='왼쪽으로 이동합니다.\nleft = '+left+', 새 right = '+right;
+    }
+    logs.push({leftBefore:'',left:left,right:right,mid:mid,value:value,action:action});
+    renderLogs();
+}
+
+function runAll(){
+    let count=0;
+    while(!finished && count<100){
+        nextStep();
+        count++;
+    }
+}
+
+function renderArray(mid,foundIdx,isFound=false){
+    let html='';
+    for(let i=0;i<arr.length;i++){
+        let cls='cell';
+        if(i<left || i>right) cls+=' out';
+        else cls+=' range';
+        if(i===mid) cls+=' mid';
+        if(isFound && i===foundIdx) cls+=' found';
+        html+='<div class="'+cls+'"><div>'+arr[i]+'</div><div class="idx">'+(i+1)+'번째</div></div>';
+    }
+    document.getElementById('arrayView').innerHTML=html;
+}
+
+function renderLogs(){
+    let rows='';
+    logs.forEach((l,i)=>{
+        rows+='<tr><td>'+(i+1)+'</td><td>'+l.left+'</td><td>'+l.right+'</td><td>'+l.mid+'</td><td>'+l.value+'</td><td>'+l.action+'</td></tr>';
+    });
+    document.getElementById('stepTable').innerHTML='<table><tr><th>단계</th><th>left</th><th>right</th><th>mid</th><th>arr[mid]</th><th>판정</th></tr>'+rows+'</table>';
+}
+
+function binarySearch(a,t){
+    let l=0,r=a.length-1;
+    while(l<=r){
+        const m=Math.floor((l+r)/2);
+        if(a[m]===t) return m+1;
+        if(a[m]<t) l=m+1;
+        else r=m-1;
+    }
+    return 0;
+}
+
+function runQueries(){
+    const a=parseArray();
+    const qs=document.getElementById('queryInput').value.trim().split(/\s+/).map(Number).filter(x=>!isNaN(x));
+    let rows='';
+    qs.forEach(q=>{
+        rows+='<tr><td>'+q+'</td><td>'+binarySearch(a,q)+'</td></tr>';
+    });
+    document.getElementById('queryResult').innerHTML='<table><tr><th>찾을 수</th><th>출력 위치</th></tr>'+rows+'</table>';
+}
+
+function loadExample(){
+    document.getElementById('arrayInput').value='2 4 9 10 14 23 32';
+    document.getElementById('targetInput').value='23';
+    document.getElementById('queryInput').value='6 23 9';
+    resetSearch();
+    runQueries();
+}
+
+function toggleAnswer(id){
+    const el=document.getElementById(id);
+    el.style.display=el.style.display==='block'?'none':'block';
+}
+
+loadExample();
+</script>
+</body>
+</html>

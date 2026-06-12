@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>BIKO 5930 슬픔을 나누면 2</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:#f8fafc;color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#7f1d1d,#4338ca);color:white;text-align:center;padding:38px 20px}
+header h1{margin:0;font-size:32px}
+main{max-width:1050px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:20px;padding:26px;margin-bottom:22px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+h2{color:#4338ca;border-left:8px solid #6366f1;padding-left:12px}
+h3{color:#991b1b}
+.box{background:#eef2ff;border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin:14px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:14px 0}
+pre{background:#111827;color:#f9fafb;padding:20px;border-radius:14px;overflow-x:auto;font-size:15px}
+input{padding:12px;border-radius:12px;border:2px solid #c7d2fe;font-size:17px;width:230px;margin:4px}
+button{border:0;border-radius:12px;padding:12px 18px;background:#4338ca;color:white;font-weight:800;cursor:pointer;margin:6px 4px}
+button:hover{background:#312e81}
+.result{font-size:22px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:14px;padding:18px;margin-top:18px;text-align:center}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:15px}
+th,td{border:1px solid #d1d5db;padding:10px;text-align:center}
+th{background:#e0e7ff;color:#312e81}
+tr:nth-child(even){background:#f9fafb}
+.hit{background:#dcfce7!important;color:#14532d;font-weight:900}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:14px;padding:16px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>BIKO 5930 슬픔을 나누면 2</h1>
+<p>계속 반으로 나누었을 때 B가 될 수 있는지 확인하기</p>
+</header>
+<main>
+<section>
+<h2>1. 문제 핵심</h2>
+<p>슬픔의 양 <b>A</b>를 계속 반으로 나누었을 때, 어떤 조각의 크기가 <b>B</b>가 될 수 있는지 확인하는 문제입니다.</p>
+<div class="box">
+<p>1. x가 짝수이면 x/2, x/2로 나뉩니다.</p>
+<p>2. x가 홀수이면 ⌊x/2⌋, ⌊x/2⌋+1로 나뉩니다.</p>
+<p>3. 가능하면 1, 불가능하면 0을 출력합니다.</p>
+</div>
+</section>
+<section>
+<h2>2. 핵심 공식</h2>
+<p>A를 k번 나누었을 때 나올 수 있는 조각 크기는 다음 둘 중 하나입니다.</p>
+<pre><code>⌊ A / 2^k ⌋
+⌈ A / 2^k ⌉</code></pre>
+<p>B가 이 둘 중 하나이면 만들 수 있습니다.</p>
+</section>
+<section>
+<h2>3. 인터렉티브 확인기</h2>
+<label><b>A:</b></label><input id="aInput" value="10">
+<label><b>B:</b></label><input id="bInput" value="4">
+<button onclick="check()">확인하기</button>
+<button onclick="setExample(1)">예제 1</button>
+<button onclick="setExample(2)">예제 2</button>
+<button onclick="setExample(3)">큰 수 예제</button>
+<div id="resultArea"></div>
+<div id="tableArea"></div>
+</section>
+<section>
+<h2>4. 예제 이해</h2>
+<h3>예제 1</h3>
+<pre><code>3 1</code></pre>
+<p>3을 한 번 나누면 1과 2가 됩니다. 1을 만들 수 있으므로 정답은 1입니다.</p>
+<h3>예제 2</h3>
+<pre><code>10 4</code></pre>
+<p>10 → 5,5 → 2,3 이므로 4는 나오지 않습니다. 정답은 0입니다.</p>
+</section>
+<section>
+<h2>5. 코드 작성 방법</h2>
+<h3>1. long long 사용</h3>
+<pre><code>long long A, B;</code></pre>
+<h3>2. floor와 ceil 계산</h3>
+<pre><code>long long low = A / div;
+long long high = (A + div - 1) / div;</code></pre>
+<h3>3. B와 비교</h3>
+<pre><code>if (B == low || B == high) {
+    printf("1\n");
+    return 0;
+}</code></pre>
+</section>
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    long long A, B;
+
+    scanf("%lld %lld", &amp;A, &amp;B);
+
+    long long div = 2;
+
+    for (int k = 1; k &lt;= 60; k++) {
+        long long low = A / div;
+        long long high = (A + div - 1) / div;
+
+        if (B == low || B == high) {
+            printf("1\n");
+            return 0;
+        }
+
+        div *= 2;
+    }
+
+    printf("0\n");
+
+    return 0;
+}</code></pre>
+</section>
+<section>
+<h2>7. 왜 60번만 확인할까?</h2>
+<div class="warn">
+<p>A의 최대값은 10^18입니다. 2^60은 10^18보다 크기 때문에 60번 정도 확인하면 충분합니다.</p>
+</div>
+</section>
+<section>
+<h2>8. 자주 하는 실수</h2>
+<div class="quiz"><h3>실수 1. int 사용</h3><p>A와 B가 최대 10^18입니다.</p><button onclick="toggleAnswer('q1')">설명 보기</button><div id="q1" class="answer">int는 약 21억까지만 저장할 수 있습니다. 반드시 long long을 사용해야 합니다.</div></div>
+<div class="quiz"><h3>실수 2. 모든 조각을 저장</h3><p>조각 개수는 계속 2배로 늘어납니다.</p><button onclick="toggleAnswer('q2')">설명 보기</button><div id="q2" class="answer">k번 나누었을 때 가능한 값은 ⌊A/2^k⌋ 또는 ⌈A/2^k⌉뿐이라는 성질을 이용합니다.</div></div>
+<div class="quiz"><h3>실수 3. ceil 계산 실수</h3><button onclick="toggleAnswer('q3')">설명 보기</button><div id="q3" class="answer">ceil(A/div)는 (A + div - 1) / div 로 계산할 수 있습니다.</div></div>
+</section>
+<section>
+<h2>9. 핵심 정리</h2>
+<p>1. k번 나눈 뒤 가능한 값은 ⌊A/2^k⌋ 또는 ⌈A/2^k⌉입니다.</p>
+<p>2. B가 둘 중 하나이면 만들 수 있습니다.</p>
+<p>3. A가 10^18 이하이므로 60번만 확인하면 됩니다.</p>
+<p>4. 반드시 long long을 사용합니다.</p>
+</section>
+</main>
+<script>
+function check(){
+    const A = BigInt(document.getElementById('aInput').value);
+    const B = BigInt(document.getElementById('bInput').value);
+    let div = 2n;
+    let found = false;
+    let foundK = -1;
+    let rows = '';
+    for(let k=1;k<=60;k++){
+        const low = A / div;
+        const high = (A + div - 1n) / div;
+        const ok = (B === low || B === high);
+        if(ok && !found){ found = true; foundK = k; }
+        rows += '<tr class="'+(ok?'hit':'')+'"><td>'+k+'</td><td>2^'+k+' = '+div.toString()+'</td><td>'+low.toString()+'</td><td>'+high.toString()+'</td><td>'+(ok?'가능':'-')+'</td></tr>';
+        div *= 2n;
+        if(A < 1000000n && high <= 1n && k > 5) break;
+    }
+    document.getElementById('resultArea').innerHTML = '<div class="result">정답: '+(found?'1':'0')+(found?'<br>'+foundK+'번 나누었을 때 B가 나올 수 있습니다.':'<br>B는 만들 수 없습니다.')+'</div>';
+    document.getElementById('tableArea').innerHTML = '<table><tr><th>k</th><th>나누는 값</th><th>⌊A/2^k⌋</th><th>⌈A/2^k⌉</th><th>판정</th></tr>'+rows+'</table>';
+}
+function setExample(type){
+    if(type===1){document.getElementById('aInput').value='3';document.getElementById('bInput').value='1';}
+    else if(type===2){document.getElementById('aInput').value='10';document.getElementById('bInput').value='4';}
+    else{document.getElementById('aInput').value='1000000000000000000';document.getElementById('bInput').value='244140625000000';}
+    check();
+}
+function toggleAnswer(id){const el=document.getElementById(id);el.style.display=el.style.display==='block'?'none':'block';}
+check();
+</script>
+</body>
+</html>
