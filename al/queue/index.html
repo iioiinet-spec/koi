@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ STL 큐 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root{
+  --bg:#f4f7fb;--wh:#fff;--s1:#edf1f9;--s2:#e1e8f5;
+  --bd:#ccd4ea;--bd2:#b3bedd;
+  --t1:#101627;--t2:#243060;--t3:#586092;--t4:#9aa2c6;
+  --tl:#0d7c6a;--tl-l:#d0faf0;--tl-m:#5ee4ca;
+  --or:#c2410c;--or-l:#fff0e8;--or-m:#fdba74;
+  --bl:#1d4ed8;--bl-l:#dbeafe;--bl-m:#93c5fd;
+  --vi:#6d28d9;--vi-l:#ede9fe;--vi-m:#c4b5fd;
+  --gd:#b07800;--gd-l:#fff8d4;--gd-m:#ffd966;
+  --rd:#b91c1c;--rd-l:#fee2e2;--rd-m:#fca5a5;
+  --sk:#0369a1;--sk-l:#e0f2fe;--sk-m:#7dd3fc;
+  --pk:#be185d;--pk-l:#fce7f3;--pk-m:#f9a8d4;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px;--r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-s{width:10px;flex-shrink:0;background:linear-gradient(180deg,var(--tl),var(--or),var(--vi),var(--sk));}
+.hdr-b{display:flex;align-items:center;gap:12px;padding:12px 26px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:21px;font-weight:900;color:var(--t1);}
+.badge{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;}
+.b1{background:var(--tl-l);color:var(--tl);border:1.5px solid var(--tl-m);}
+.b2{background:var(--or-l);color:var(--or);border:1.5px solid var(--or-m);}
+.b3{background:var(--vi-l);color:var(--vi);border:1.5px solid var(--vi-m);}
+.b4{background:var(--sk-l);color:var(--sk);border:1.5px solid var(--sk-m);}
+
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 18px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:13px 15px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--tl);border-bottom-color:var(--tl);font-weight:700;}
+
+.pg{display:none;max-width:1060px;margin:0 auto;padding:32px 24px 80px;}
+.pg.on{display:block;animation:pgIn .2s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+h2{font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:15px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:14px;color:var(--t3);margin-bottom:26px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.86em;background:var(--s2);padding:2px 6px;border-radius:4px;color:var(--tl);}
+
+.co{border-radius:var(--r);padding:14px 18px;margin-bottom:16px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.ctl{background:var(--tl-l);color:var(--t2);border-color:var(--tl);}
+.cor{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+.cbl{background:var(--bl-l);color:var(--t2);border-color:var(--bl);}
+.cvi{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.crd{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+.cpk{background:var(--pk-l);color:var(--t2);border-color:var(--pk);}
+
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:18px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.card3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
+@media(max-width:700px){.card2,.card3{grid-template-columns:1fr;}}
+
+.cw{background:#131926;border-radius:var(--r2);overflow:hidden;margin-bottom:18px;border:1.5px solid #1c2640;}
+.cbr{background:#192236;padding:9px 16px;font-family:var(--mono);font-size:11px;color:#5878b8;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1c2640;}
+.dots{display:flex;gap:5px;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:2.0;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}.op{color:#fb923c;}
+.h1{background:rgba(13,124,106,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #34d399;}
+.h2{background:rgba(29,78,216,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #60a5fa;}
+.h3{background:rgba(109,40,217,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #a78bfa;}
+.h4{background:rgba(194,65,12,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fb923c;}
+.h5{background:rgba(176,120,0,.15);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fbbf24;}
+.h6{background:rgba(3,105,161,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #38bdf8;}
+
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:2px 3px;}
+.ttl{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.tor{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+.tbl{background:var(--bl-l);color:var(--bl);border:1px solid var(--bl-m);}
+.tvi{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.trd{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+.tpk{background:var(--pk-l);color:var(--pk);border:1px solid var(--pk-m);}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:10px 13px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:9px 13px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* DEMO */
+.demo-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:18px;margin-bottom:16px;}
+.dq-track{display:flex;gap:4px;flex-wrap:wrap;min-height:56px;align-items:center;padding:8px;background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);margin-bottom:10px;}
+.dq-cell{padding:8px 14px;border-radius:7px;font-family:var(--mono);font-size:14px;font-weight:700;border:1.5px solid var(--bd2);background:var(--wh);color:var(--t2);transition:all .28s cubic-bezier(.34,1.56,.64,1);}
+.dq-cell.cf{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.dq-cell.cb{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.dq-cell.cn{background:var(--s1);border-color:var(--bd2);color:var(--t2);}
+.dq-cell.cin{animation:cellIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes cellIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:none;}}
+.dq-empty{color:var(--t4);font-size:13px;font-style:italic;}
+
+.heap-tree{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:12px;min-height:100px;overflow-x:auto;padding:8px;}
+.heap-row{display:flex;gap:8px;justify-content:center;}
+.heap-node{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.heap-node.hn-max{background:var(--or-l);border:2px solid var(--or);color:var(--or);}
+.heap-node.hn-min{background:var(--tl-l);border:2px solid var(--tl);color:var(--tl);}
+.heap-node.hn-norm{background:var(--wh);border:2px solid var(--bd2);color:var(--t2);}
+.heap-node.hn-top{border-width:3px;box-shadow:0 0 0 3px rgba(194,65,12,.2);}
+.heap-node.hn-in{animation:cellIn .3s cubic-bezier(.34,1.56,.64,1);}
+
+.pq-item{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:4px;border:1.5px solid var(--bd2);}
+.pq-item.pi-top{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.pq-item.pi-norm{background:var(--wh);color:var(--t2);}
+.pq-item.pi-in{animation:cellIn .3s cubic-bezier(.34,1.56,.64,1);}
+
+.circ-track{display:flex;gap:0;overflow-x:auto;padding:4px 0 8px;}
+.circ-cell{width:52px;height:52px;border:2px solid var(--bd2);background:var(--wh);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;flex-shrink:0;position:relative;transition:all .25s;}
+.circ-cell:first-child{border-radius:var(--r) 0 0 var(--r);border-left:2px solid var(--bd2);}
+.circ-cell:last-child{border-radius:0 var(--r) var(--r) 0;}
+.circ-cell+.circ-cell{border-left:none;}
+.circ-cell .cv{font-size:17px;color:var(--t2);}
+.circ-cell .ci{font-size:9px;color:var(--t4);position:absolute;bottom:3px;}
+.circ-cell.cf{background:var(--bl-l);border-color:var(--bl);border-left:2px solid var(--bl)!important;}
+.circ-cell.cf .cv{color:var(--bl);}
+.circ-cell.cr{background:var(--vi-l);border-color:var(--vi);}
+.circ-cell.cr .cv{color:var(--vi);}
+.circ-cell.cd{background:var(--s1);}
+.circ-cell.cin{animation:cellIn .3s cubic-bezier(.34,1.56,.64,1);}
+
+.ttabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.ttab{padding:8px 15px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;user-select:none;}
+.ttab:hover{border-color:var(--tl);color:var(--tl);}
+.ttab.on{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.tcontent{display:none;}.tcontent.on{display:block;animation:pgIn .2s ease;}
+
+.ctrl{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;}
+.btn{padding:9px 16px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:var(--sans);transition:all .15s;}
+.btn:disabled{opacity:.38;cursor:default;}
+.bpf{background:var(--tl);color:#fff;}.bpf:hover{background:#0a5f50;}
+.bpb{background:var(--or);color:#fff;}.bpb:hover{background:#9a3209;}
+.bof{background:var(--tl-l);color:var(--tl);border-color:var(--tl-m);}.bof:hover{background:var(--tl);color:#fff;}
+.bob{background:var(--or-l);color:var(--or);border-color:var(--or-m);}.bob:hover{background:var(--or);color:#fff;}
+.bpush{background:var(--bl);color:#fff;}.bpush:hover{background:#1338a8;}
+.bpop{background:var(--vi);color:#fff;}.bpop:hover{background:#5219b0;}
+.bauto{background:var(--gd-l);color:var(--gd);border-color:var(--gd-m);}.bauto:hover{background:var(--gd);color:#fff;}
+.brst{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.brst:hover{border-color:var(--t2);}
+.inp{padding:8px 11px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:14px;color:var(--t1);background:var(--wh);outline:none;width:78px;}
+.inp:focus{border-color:var(--tl);}
+.inp2{padding:8px 11px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:14px;color:var(--t1);background:var(--wh);outline:none;width:78px;margin-left:4px;}
+.inp2:focus{border-color:var(--bl);}
+.stats2{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.stat{background:var(--s1);border:1.5px solid var(--bd);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.stat span{font-weight:700;}
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 14px;min-height:68px;max-height:130px;overflow-y:auto;font-family:var(--mono);font-size:13px;line-height:1.9;}
+.lem{color:var(--tl);font-weight:600;}.lor{color:var(--or);font-weight:600;}.lbl{color:var(--bl);font-weight:600;}.lvi{color:var(--vi);font-weight:600;}.lgd{color:var(--gd);font-weight:700;}.li{color:var(--t4);}
+.sl{font-size:11px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;}
+
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:16px;}
+.qtext{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:14px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:11px 16px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:14px;color:var(--t2);transition:all .15s;user-select:none;}
+.qopt:hover:not(.locked){border-color:var(--tl);color:var(--tl);background:var(--tl-l);}
+.qopt.correct{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:10px;padding:11px 14px;border-radius:var(--r);font-size:14px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:22px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:14px 20px;}
+.sbig{font-size:38px;font-weight:900;color:var(--tl);font-family:var(--mono);}
+.qpbar{height:7px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:7px;background:linear-gradient(90deg,var(--tl),var(--vi));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:4px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-s"></div>
+  <div class="hdr-b">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">C++ STL 큐 완전정복</span>
+    <span class="badge b1">deque</span>
+    <span class="badge b2">priority_queue</span>
+    <span class="badge b3">커스텀 PQ</span>
+    <span class="badge b4">원형큐 최적화</span>
+  </div>
+</header>
+<nav class="nav">
+  <div class="nt on" id="nt0" onclick="goPage(0)">📦 deque 개요</div>
+  <div class="nt"    id="nt1" onclick="goPage(1)">🔄 deque 활용</div>
+  <div class="nt"    id="nt2" onclick="goPage(2)">⬆ priority_queue</div>
+  <div class="nt"    id="nt3" onclick="goPage(3)">🏗 커스텀 PQ</div>
+  <div class="nt"    id="nt4" onclick="goPage(4)">🔁 원형큐 최적화</div>
+  <div class="nt"    id="nt5" onclick="goPage(5)">🎮 인터랙티브</div>
+  <div class="nt"    id="nt6" onclick="goPage(6)">📊 비교 총정리</div>
+  <div class="nt"    id="nt7" onclick="goPage(7)">🧠 퀴즈</div>
+</nav>
+
+<!-- PAGE 0: deque 개요 -->
+<div class="pg on" id="pg0">
+  <h2>STL deque — 양방향 큐</h2>
+  <p class="psub">세영코딩연구소 · 정올 준비 | Double-Ended Queue — 앞뒤 모두 O(1)!</p>
+  <div class="co ctl">
+    <strong>deque(덱)란?</strong> 앞(front)과 뒤(back) 양쪽에서 삽입·삭제가 모두 O(1)인 자료구조.<br>
+    내부적으로 <strong>청크(chunk) 단위 메모리</strong>를 사용해서 vector처럼 인덱스 접근도 O(1)이야!
+  </div>
+  <div class="card2">
+    <div class="card">
+      <h3>STL deque 전체 API</h3>
+      <table style="margin-bottom:0;">
+        <tr><th>메서드</th><th>설명</th><th>복잡도</th></tr>
+        <tr><td><code>push_front(x)</code></td><td>앞에 삽입</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>push_back(x)</code></td><td>뒤에 삽입</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>pop_front()</code></td><td>앞 제거</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>pop_back()</code></td><td>뒤 제거</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>front()</code></td><td>앞 원소 참조</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>back()</code></td><td>뒤 원소 참조</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>operator[]</code></td><td>인덱스 접근</td><td><span class="tag ttl">O(1)</span></td></tr>
+        <tr><td><code>size() / empty()</code></td><td>크기/비어있는지</td><td><span class="tag ttl">O(1)</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>deque vs vector vs list</h3>
+      <table style="margin-bottom:0;">
+        <tr><th></th><th>deque</th><th>vector</th><th>list</th></tr>
+        <tr><td>앞 삽입</td><td style="color:var(--tl);font-weight:700;">O(1)</td><td style="color:var(--rd);">O(n)</td><td style="color:var(--tl);">O(1)</td></tr>
+        <tr><td>뒤 삽입</td><td style="color:var(--tl);font-weight:700;">O(1)</td><td style="color:var(--tl);">O(1)</td><td style="color:var(--tl);">O(1)</td></tr>
+        <tr><td>인덱스</td><td style="color:var(--tl);font-weight:700;">O(1)</td><td style="color:var(--tl);">O(1)</td><td style="color:var(--rd);">O(n)</td></tr>
+        <tr><td>메모리</td><td>청크 단위</td><td>연속</td><td>포인터</td></tr>
+        <tr><td>캐시</td><td>보통</td><td style="color:var(--tl);font-weight:700;">최고</td><td style="color:var(--rd);">나쁨</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>deque_basic.cpp</div>
+    <pre><span class="h6"><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+<span class="h1">    deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> dq;                <span class="cm">// 선언</span></span>
+
+    <span class="cm">// 앞뒤 모두 삽입</span>
+<span class="h2">    dq.push_back(<span class="nm">10</span>);             <span class="cm">// [10]</span>
+    dq.push_back(<span class="nm">20</span>);             <span class="cm">// [10, 20]</span>
+    dq.push_front(<span class="nm">5</span>);             <span class="cm">// [5, 10, 20]</span>
+    dq.push_front(<span class="nm">1</span>);             <span class="cm">// [1, 5, 10, 20]</span></span>
+
+    cout <span class="op">&lt;&lt;</span> dq.front() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 1</span>
+    cout <span class="op">&lt;&lt;</span> dq.back()  <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 20</span>
+<span class="h3">    cout <span class="op">&lt;&lt;</span> dq[<span class="nm">2</span>]     <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 10 — 인덱스 접근 O(1)!</span></span>
+
+    <span class="cm">// 앞뒤 모두 제거</span>
+<span class="h4">    dq.pop_front();               <span class="cm">// [5, 10, 20]</span>
+    dq.pop_back();                <span class="cm">// [5, 10]</span></span>
+
+    <span class="cm">// range-based for</span>
+    <span class="kw">for</span> (<span class="tp">int</span> x : dq) cout <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="st">" "</span>;  <span class="cm">// 5 10</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre>
+  </div>
+  <div class="co cgd">
+    <strong>정올 핵심 팁!</strong><br>
+    deque는 stack과 queue를 동시에 대체할 수 있어.<br>
+    앞에서만 pop → 큐 / 뒤에서만 pop → 스택 / 양쪽 모두 → 덱!<br>
+    슬라이딩 윈도우 최솟값, 0-1 BFS 등 정올 골드 문제에서 필수!
+  </div>
+</div>
+
+<!-- PAGE 1: deque 활용 -->
+<div class="pg" id="pg1">
+  <h2>deque 실전 활용</h2>
+  <p class="psub">단조 덱, 슬라이딩 윈도우 최솟값, 0-1 BFS!</p>
+
+  <div class="ttabs">
+    <div class="ttab on" id="tt10" onclick="switchTab(1,0)">슬라이딩 윈도우</div>
+    <div class="ttab"    id="tt11" onclick="switchTab(1,1)">0-1 BFS</div>
+    <div class="ttab"    id="tt12" onclick="switchTab(1,2)">deque as Stack+Queue</div>
+  </div>
+
+  <div class="tcontent on" id="tc10">
+    <div class="co ctl">
+      <strong>슬라이딩 윈도우 최솟값</strong>: 크기 k 창이 이동하면서 각 창의 최솟값을 O(n)에!<br>
+      덱에 인덱스를 저장, 앞은 창 밖이면 제거, 뒤는 단조 증가 유지.
+    </div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>sliding_window_stl.cpp</div>
+      <pre>vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> <span class="fn">slidingMin</span>(vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>&amp; a, <span class="tp">int</span> k) {
+    <span class="tp">int</span> n = a.size();
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> res;
+<span class="h1">    deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> dq;  <span class="cm">// 인덱스 저장</span></span>
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) {
+<span class="h2">        <span class="cm">// ① 창 밖으로 벗어난 인덱스 제거</span>
+        <span class="kw">while</span> (!dq.empty() &amp;&amp; dq.front() <span class="op">&lt;=</span> i - k)
+            dq.pop_front();</span>
+<span class="h3">        <span class="cm">// ② 단조 증가 유지 (뒤에서 현재보다 큰 값 제거)</span>
+        <span class="kw">while</span> (!dq.empty() &amp;&amp; a[dq.back()] <span class="op">&gt;=</span> a[i])
+            dq.pop_back();</span>
+<span class="h4">        dq.push_back(i);
+        <span class="kw">if</span> (i <span class="op">&gt;=</span> k - <span class="nm">1</span>) res.push_back(a[dq.front()]);</span>
+    }
+    <span class="kw">return</span> res;
+}
+<span class="cm">// [3,1,2,5,4,2,6,3] k=3 → [1,1,2,2,2,2,3]</span></pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc11">
+    <div class="co cbl">
+      <strong>0-1 BFS</strong>: 비용이 0 또는 1인 그래프 최단경로를 O(V+E)에!<br>
+      비용 0 → <code>push_front</code> (현재 레벨 유지) / 비용 1 → <code>push_back</code> (다음 레벨)
+    </div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>zero_one_bfs_stl.cpp</div>
+      <pre><span class="tp">void</span> <span class="fn">bfs01</span>(<span class="tp">int</span> src, <span class="tp">int</span> n) {
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> dist(n, INT_MAX);
+<span class="h1">    deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> dq;
+    dist[src] = <span class="nm">0</span>;
+    dq.push_back(src);</span>
+    <span class="kw">while</span> (!dq.empty()) {
+        <span class="tp">int</span> v = dq.front(); dq.pop_front();
+        <span class="kw">for</span> (<span class="kw">auto</span> [u, w] : adj[v]) {
+            <span class="tp">int</span> nd = dist[v] + w;
+            <span class="kw">if</span> (nd <span class="op">&lt;</span> dist[u]) {
+                dist[u] = nd;
+<span class="h2">                <span class="kw">if</span> (w == <span class="nm">0</span>) dq.push_front(u); <span class="cm">// 비용 0 → 앞!</span></span>
+<span class="h3">                <span class="kw">else</span>        dq.push_back(u);  <span class="cm">// 비용 1 → 뒤!</span></span>
+            }
+        }
+    }
+}</pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc12">
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>deque_as_stack_queue.cpp</div>
+      <pre><span class="cm">// deque로 스택처럼</span>
+deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> stk;
+stk.push_back(<span class="nm">1</span>); stk.push_back(<span class="nm">2</span>);
+cout <span class="op">&lt;&lt;</span> stk.back(); stk.pop_back(); <span class="cm">// 2</span>
+
+<span class="cm">// deque로 큐처럼</span>
+deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> que;
+<span class="h1">que.push_back(<span class="nm">1</span>); que.push_back(<span class="nm">2</span>);
+cout <span class="op">&lt;&lt;</span> que.front(); que.pop_front(); <span class="cm">// 1</span></span>
+
+<span class="cm">// deque로 덱처럼 (양방향)</span>
+<span class="h2">deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> dq = {<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">5</span>};
+dq.push_front(<span class="nm">0</span>); <span class="cm">// [0,3,1,4,1,5]</span>
+dq.push_back(<span class="nm">9</span>);  <span class="cm">// [0,3,1,4,1,5,9]</span>
+dq.pop_front();   <span class="cm">// [3,1,4,1,5,9]</span>
+dq.pop_back();    <span class="cm">// [3,1,4,1,5]</span></span>
+
+<span class="cm">// 이터레이터로 중간 접근도 가능!</span>
+<span class="h3">auto it = dq.begin() + <span class="nm">2</span>;
+dq.insert(it, <span class="nm">99</span>);  <span class="cm">// [3,1,99,4,1,5]</span></span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: priority_queue -->
+<div class="pg" id="pg2">
+  <h2>STL priority_queue</h2>
+  <p class="psub">Max-Heap / Min-Heap — O(log n) push/pop, O(1) top!</p>
+
+  <div class="co cor">
+    <strong>priority_queue&lt;T, Container, Compare&gt;</strong><br>
+    기본값: <strong>Max-Heap</strong> (가장 큰 값이 top). Min-Heap은 <code>greater&lt;T&gt;</code> 사용.
+  </div>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>priority_queue_all.cpp</div>
+    <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="tp">int</span> <span class="fn">main</span>() {
+<span class="h1">    <span class="cm">// Max-Heap (기본) — 가장 큰 값 top</span>
+    priority_queue<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> maxPQ;
+    maxPQ.push(<span class="nm">3</span>); maxPQ.push(<span class="nm">1</span>); maxPQ.push(<span class="nm">7</span>); maxPQ.push(<span class="nm">5</span>);
+    cout <span class="op">&lt;&lt;</span> maxPQ.top() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 7</span>
+    maxPQ.pop();
+    cout <span class="op">&lt;&lt;</span> maxPQ.top() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 5</span></span>
+
+<span class="h2">    <span class="cm">// Min-Heap — 가장 작은 값 top</span>
+    priority_queue<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>, greater<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> minPQ;
+    minPQ.push(<span class="nm">3</span>); minPQ.push(<span class="nm">1</span>); minPQ.push(<span class="nm">7</span>);
+    cout <span class="op">&lt;&lt;</span> minPQ.top() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 1</span></span>
+
+<span class="h3">    <span class="cm">// pair 저장 — {우선순위, 데이터} 패턴 (다익스트라!)</span>
+    priority_queue<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;</span>, vector<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span>,
+                  greater<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;&gt;</span> dijkPQ;
+    dijkPQ.push({<span class="nm">0</span>, <span class="nm">1</span>}); <span class="cm">// {거리=0, 노드=1}</span>
+    dijkPQ.push({<span class="nm">3</span>, <span class="nm">2</span>});
+    <span class="kw">auto</span> [d, v] = dijkPQ.top(); <span class="cm">// d=0, v=1</span></span>
+
+<span class="h4">    <span class="cm">// 배열로 초기화 (O(n) heapify!)</span>
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> arr = {<span class="nm">5</span>,<span class="nm">2</span>,<span class="nm">8</span>,<span class="nm">1</span>,<span class="nm">9</span>};
+    priority_queue<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> pq(arr.begin(), arr.end());
+    cout <span class="op">&lt;&lt;</span> pq.top() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 9</span></span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre>
+  </div>
+
+  <div class="card">
+    <h3>다익스트라 — priority_queue 실전 패턴</h3>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>dijkstra_pq.cpp</div>
+      <pre><span class="kw">using</span> pii = pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;</span>;
+vector<span class="op">&lt;</span>pii<span class="op">&gt;</span> adj[MAXN];
+<span class="tp">int</span> dist[MAXN];
+
+<span class="tp">void</span> <span class="fn">dijkstra</span>(<span class="tp">int</span> src) {
+    fill(dist, dist+MAXN, INT_MAX);
+    <span class="h1">priority_queue<span class="op">&lt;</span>pii, vector<span class="op">&lt;</span>pii<span class="op">&gt;</span>, greater<span class="op">&lt;</span>pii<span class="op">&gt;&gt;</span> pq;</span>
+    dist[src] = <span class="nm">0</span>; pq.push({<span class="nm">0</span>, src});
+    <span class="kw">while</span> (!pq.empty()) {
+        <span class="kw">auto</span> [d, v] = pq.top(); pq.pop();
+<span class="h2">        <span class="kw">if</span> (d <span class="op">&gt;</span> dist[v]) <span class="kw">continue</span>; <span class="cm">// 구식값 무시!</span></span>
+        <span class="kw">for</span> (<span class="kw">auto</span> [u, w] : adj[v]) {
+<span class="h3">            <span class="kw">if</span> (dist[v]+w <span class="op">&lt;</span> dist[u]) {
+                dist[u] = dist[v]+w;
+                pq.push({dist[u], u});
+            }</span>
+        }
+    }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: 커스텀 PQ -->
+<div class="pg" id="pg3">
+  <h2>구조체 활용 커스텀 priority_queue</h2>
+  <p class="psub">operator&lt; / struct Cmp / lambda 세 가지 방법!</p>
+
+  <div class="co cvi">
+    <strong>왜 커스텀 비교가 필요할까?</strong><br>
+    여러 기준으로 정렬해야 할 때! 예: (비용 오름차순, 같으면 id 오름차순), 작업 스케줄링 등.
+  </div>
+
+  <div class="ttabs">
+    <div class="ttab on" id="tt30" onclick="switchTab(3,0)">방법 1: operator&lt;</div>
+    <div class="ttab"    id="tt31" onclick="switchTab(3,1)">방법 2: struct Cmp</div>
+    <div class="ttab"    id="tt32" onclick="switchTab(3,2)">방법 3: lambda</div>
+    <div class="ttab"    id="tt33" onclick="switchTab(3,3)">실전 응용</div>
+  </div>
+
+  <div class="tcontent on" id="tc30">
+    <div class="co cbl"><strong>방법 1</strong>: 구조체에 <code>operator&lt;</code>를 오버로딩. Max-Heap 기준으로 동작.</div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>custom_pq_operator.cpp</div>
+      <pre><span class="kw">struct</span> Task {
+    <span class="tp">int</span> cost, id;
+<span class="h1">    <span class="cm">// operator&lt; 오버로딩 — priority_queue는 Max-Heap!</span>
+    <span class="kw">bool</span> <span class="kw">operator</span><span class="op">&lt;</span>(<span class="kw">const</span> Task&amp; o) <span class="kw">const</span> {
+        <span class="kw">if</span> (cost != o.cost) <span class="kw">return</span> cost <span class="op">&gt;</span> o.cost; <span class="cm">// 비용 낮은 게 우선</span>
+        <span class="kw">return</span> id <span class="op">&gt;</span> o.id;  <span class="cm">// 같으면 id 낮은 게 우선</span>
+    }</span>
+};
+
+priority_queue<span class="op">&lt;</span>Task<span class="op">&gt;</span> pq;
+pq.push({<span class="nm">3</span>, <span class="nm">1</span>});  <span class="cm">// {cost=3, id=1}</span>
+pq.push({<span class="nm">1</span>, <span class="nm">2</span>});  <span class="cm">// {cost=1, id=2}</span>
+pq.push({<span class="nm">3</span>, <span class="nm">0</span>});  <span class="cm">// {cost=3, id=0}</span>
+<span class="kw">while</span>(!pq.empty()){
+    cout <span class="op">&lt;&lt;</span> pq.top().cost <span class="op">&lt;&lt;</span> <span class="st">" "</span> <span class="op">&lt;&lt;</span> pq.top().id <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;
+    pq.pop();
+}
+<span class="cm">// 출력: 1 2 / 3 0 / 3 1</span></pre>
+    </div>
+    <div class="co cgd" style="font-size:14px;"><strong>주의!</strong> priority_queue는 Max-Heap이야. <code>operator&lt;</code>에서 "큰 것"이 top이 되도록 반전해서 써야 해!</div>
+  </div>
+
+  <div class="tcontent" id="tc31">
+    <div class="co ctl"><strong>방법 2</strong>: 별도 Comparator 구조체 작성. 가장 명시적이고 안전한 방법!</div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>custom_pq_struct_cmp.cpp</div>
+      <pre><span class="kw">struct</span> Task { <span class="tp">int</span> cost, id, priority; };
+
+<span class="h1"><span class="kw">struct</span> Cmp {
+    <span class="kw">bool</span> <span class="kw">operator</span>()(<span class="kw">const</span> Task&amp; a, <span class="kw">const</span> Task&amp; b) <span class="kw">const</span> {
+        <span class="cm">// true면 b가 우선 (a를 b 뒤로 밀어냄)</span>
+        <span class="kw">if</span> (a.cost != b.cost) <span class="kw">return</span> a.cost <span class="op">&gt;</span> b.cost;
+        <span class="kw">if</span> (a.priority != b.priority) <span class="kw">return</span> a.priority <span class="op">&lt;</span> b.priority;
+        <span class="kw">return</span> a.id <span class="op">&gt;</span> b.id;
+    }
+};</span>
+
+<span class="h2">priority_queue<span class="op">&lt;</span>Task, vector<span class="op">&lt;</span>Task<span class="op">&gt;</span>, Cmp<span class="op">&gt;</span> pq;</span>
+pq.push({<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">5</span>}); <span class="cm">// {cost, id, priority}</span>
+pq.push({<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>});
+pq.push({<span class="nm">3</span>, <span class="nm">0</span>, <span class="nm">8</span>});</pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc32">
+    <div class="co cgd"><strong>방법 3</strong>: C++14 lambda — 간결하지만 타입 추론이 필요해서 <code>decltype</code> 또는 <code>function</code> 사용.</div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>custom_pq_lambda.cpp</div>
+      <pre><span class="kw">struct</span> Task { <span class="tp">int</span> cost, id; };
+
+<span class="h1"><span class="cm">// C++14: auto + decltype</span>
+<span class="kw">auto</span> cmp = [](<span class="kw">const</span> Task&amp; a, <span class="kw">const</span> Task&amp; b) {
+    <span class="kw">return</span> a.cost <span class="op">&gt;</span> b.cost; <span class="cm">// 비용 낮은 게 우선</span>
+};
+priority_queue<span class="op">&lt;</span>Task, vector<span class="op">&lt;</span>Task<span class="op">&gt;</span>, <span class="fn">decltype</span>(cmp)<span class="op">&gt;</span> pq(cmp);</span>
+
+<span class="h2"><span class="cm">// C++11: function&lt;&gt; 버전</span>
+<span class="kw">using</span> CmpFn = function<span class="op">&lt;</span><span class="tp">bool</span>(<span class="kw">const</span> Task&amp;, <span class="kw">const</span> Task&amp;)<span class="op">&gt;</span>;
+CmpFn cmp2 = [](<span class="kw">const</span> Task&amp; a, <span class="kw">const</span> Task&amp; b){
+    <span class="kw">return</span> a.cost <span class="op">&gt;</span> b.cost;
+};
+priority_queue<span class="op">&lt;</span>Task, vector<span class="op">&lt;</span>Task<span class="op">&gt;</span>, CmpFn<span class="op">&gt;</span> pq2(cmp2);</span></pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc33">
+    <div class="co cor"><strong>실전: 작업 스케줄링</strong> — 마감기한이 빠른 것 우선, 같으면 보상이 큰 것 우선!</div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>job_scheduling.cpp</div>
+      <pre><span class="kw">struct</span> Job {
+    <span class="tp">int</span> deadline, reward, id;
+<span class="h1">    <span class="kw">bool</span> <span class="kw">operator</span><span class="op">&lt;</span>(<span class="kw">const</span> Job&amp; o) <span class="kw">const</span> {
+        <span class="kw">if</span> (deadline != o.deadline) <span class="kw">return</span> deadline <span class="op">&gt;</span> o.deadline;
+        <span class="kw">return</span> reward <span class="op">&lt;</span> o.reward; <span class="cm">// 보상 큰 게 우선</span>
+    }</span>
+};
+
+priority_queue<span class="op">&lt;</span>Job<span class="op">&gt;</span> pq;
+pq.push({<span class="nm">3</span>, <span class="nm">50</span>, <span class="nm">1</span>}); <span class="cm">// 마감3, 보상50</span>
+pq.push({<span class="nm">1</span>, <span class="nm">80</span>, <span class="nm">2</span>}); <span class="cm">// 마감1, 보상80</span>
+pq.push({<span class="nm">3</span>, <span class="nm">70</span>, <span class="nm">3</span>}); <span class="cm">// 마감3, 보상70</span>
+
+<span class="kw">while</span>(!pq.empty()) {
+    <span class="kw">auto</span> j = pq.top(); pq.pop();
+    cout <span class="op">&lt;&lt;</span> <span class="st">"ID:"</span> <span class="op">&lt;&lt;</span> j.id <span class="op">&lt;&lt;</span> <span class="st">" d="</span> <span class="op">&lt;&lt;</span> j.deadline
+         <span class="op">&lt;&lt;</span> <span class="st">" r="</span> <span class="op">&lt;&lt;</span> j.reward <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;
+}
+<span class="cm">// 마감1→id2(80), 마감3→id3(70), 마감3→id1(50)</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: 원형큐 최적화 -->
+<div class="pg" id="pg4">
+  <h2>원형 큐 대용 — 모듈러 연산 + 기본 큐 최적화</h2>
+  <p class="psub">STL queue + deque로 원형 큐를 대체하는 방법!</p>
+
+  <div class="co ctl">
+    <strong>STL queue vs 원형 큐</strong><br>
+    C++의 <code>queue&lt;T&gt;</code>는 내부적으로 deque를 사용해서 이미 동적 확장을 해.<br>
+    원형 큐처럼 공간을 재활용하고 싶다면 <strong>모듈러 연산 + 고정 배열</strong>로 최적화!
+  </div>
+
+  <div class="ttabs">
+    <div class="ttab on" id="tt40" onclick="switchTab(4,0)">STL queue 기본</div>
+    <div class="ttab"    id="tt41" onclick="switchTab(4,1)">원형 큐 배열 최적화</div>
+    <div class="ttab"    id="tt42" onclick="switchTab(4,2)">BFS 최적화 패턴</div>
+    <div class="ttab"    id="tt43" onclick="switchTab(4,3)">성능 비교</div>
+  </div>
+
+  <div class="tcontent on" id="tc40">
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>stl_queue_basic.cpp</div>
+      <pre><span class="kw">#include</span> <span class="st">&lt;queue&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="h1">queue<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> q;          <span class="cm">// 선언 (내부: deque 기반)</span></span>
+q.push(<span class="nm">1</span>); q.push(<span class="nm">2</span>); q.push(<span class="nm">3</span>);
+
+cout <span class="op">&lt;&lt;</span> q.front() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 1</span>
+cout <span class="op">&lt;&lt;</span> q.back()  <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 3</span>
+cout <span class="op">&lt;&lt;</span> q.size()  <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 3</span>
+
+q.pop();
+cout <span class="op">&lt;&lt;</span> q.front() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>;  <span class="cm">// 2</span>
+
+<span class="h2"><span class="cm">// queue&lt;T, container&gt; 변형</span>
+queue<span class="op">&lt;</span><span class="tp">int</span>, deque<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span>  q1; <span class="cm">// 기본 (deque)</span>
+queue<span class="op">&lt;</span><span class="tp">int</span>, list<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span>   q2; <span class="cm">// list 기반 (보통 느림)</span>
+<span class="cm">// vector 기반은 불가 (front 삽입 미지원)</span></span>
+
+<span class="h3"><span class="cm">// pair 큐 — BFS에서 좌표 저장</span>
+queue<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span> bfsQ;
+bfsQ.push({<span class="nm">0</span>, <span class="nm">0</span>}); <span class="cm">// {row, col}</span>
+<span class="kw">auto</span> [r, c] = bfsQ.front(); bfsQ.pop();</span></pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc41">
+    <div class="co csk">
+      <strong>원형 큐 배열 최적화</strong>: 고정 배열 + 모듈러 연산으로 메모리 재사용!<br>
+      STL queue보다 빠르고 캐시 친화적. 정올 속도 최적화에 효과적.
+    </div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>circular_queue_optimized.cpp</div>
+      <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">#define</span> <span class="nm">QMAX 1000001</span>
+
+<span class="h1"><span class="cm">// 원형 큐 — 고정 배열 + 모듈러</span>
+<span class="tp">int</span> cq[QMAX];
+<span class="tp">int</span> head = <span class="nm">0</span>, tail = <span class="nm">0</span>;</span>
+
+<span class="h2"><span class="cm">// enqueue — O(1), 캐시 친화적!</span>
+<span class="kw">inline</span> <span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+    cq[tail] = x;
+    tail = (tail + <span class="nm">1</span>) % QMAX;
+}
+
+<span class="cm">// dequeue — O(1)</span>
+<span class="kw">inline</span> <span class="tp">int</span> <span class="fn">pop</span>() {
+    <span class="tp">int</span> v = cq[head];
+    head = (head + <span class="nm">1</span>) % QMAX;
+    <span class="kw">return</span> v;
+}</span>
+
+<span class="h3"><span class="kw">inline</span> <span class="tp">bool</span> <span class="fn">empty</span>() { <span class="kw">return</span> head == tail; }
+<span class="kw">inline</span> <span class="tp">int</span>  <span class="fn">size</span>()  { <span class="kw">return</span> (tail - head + QMAX) % QMAX; }
+<span class="kw">inline</span> <span class="tp">int</span>  <span class="fn">front</span>() { <span class="kw">return</span> cq[head]; }</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">push</span>(<span class="nm">1</span>); <span class="fn">push</span>(<span class="nm">2</span>); <span class="fn">push</span>(<span class="nm">3</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="fn">pop</span>() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 1</span>
+    <span class="fn">push</span>(<span class="nm">4</span>); <span class="fn">push</span>(<span class="nm">5</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="fn">size</span>() <span class="op">&lt;&lt;</span> <span class="st">"
+"</span>; <span class="cm">// 4</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc42">
+    <div class="co ctl"><strong>BFS 최적화</strong>: pair 큐 대신 배열 두 개 + 인덱스로 최고 성능!</div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>bfs_optimized.cpp</div>
+      <pre><span class="kw">#define</span> <span class="nm">QMAX 1000001</span>
+<span class="h1"><span class="cm">// pair를 두 배열로 분리 → 메모리 연속성 향상</span>
+<span class="tp">int</span> qr[QMAX], qc[QMAX];
+<span class="tp">int</span> head = <span class="nm">0</span>, tail = <span class="nm">0</span>;</span>
+
+<span class="kw">inline</span> <span class="tp">void</span> <span class="fn">enq</span>(<span class="tp">int</span> r, <span class="tp">int</span> c) {
+<span class="h2">    qr[tail] = r; qc[tail] = c;
+    tail = (tail + <span class="nm">1</span>) % QMAX;</span>
+}
+
+<span class="cm">// BFS</span>
+<span class="tp">int</span> dr[]={-<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>}, dc[]={<span class="nm">0</span>,<span class="nm">0</span>,-<span class="nm">1</span>,<span class="nm">1</span>};
+<span class="h3"><span class="fn">enq</span>(sr, sc); dist[sr][sc] = <span class="nm">0</span>;
+<span class="kw">while</span> (head != tail) {
+    <span class="tp">int</span> r = qr[head], c = qc[head];
+    head = (head + <span class="nm">1</span>) % QMAX;
+    <span class="kw">for</span> (<span class="tp">int</span> d = <span class="nm">0</span>; d <span class="op">&lt;</span> <span class="nm">4</span>; d++) {
+        <span class="tp">int</span> nr=r+dr[d], nc=c+dc[d];
+        <span class="kw">if</span>(...) { dist[nr][nc]=dist[r][c]+<span class="nm">1</span>; <span class="fn">enq</span>(nr,nc); }
+    }
+}</span></pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc43">
+    <div class="card">
+      <h3>성능 비교 (BFS, 10만 노드)</h3>
+      <table>
+        <tr><th>방법</th><th>특징</th><th>속도</th><th>메모리</th><th>추천</th></tr>
+        <tr><td>STL <code>queue&lt;pair&gt;</code></td><td>간단, 동적 확장</td><td>기준</td><td>동적</td><td>일반 문제</td></tr>
+        <tr><td>배열 두 개 + 인덱스</td><td>직접 관리, 선형</td><td style="color:var(--tl);font-weight:700;">1.3~1.5배↑</td><td>고정 2배</td><td>실버~골드</td></tr>
+        <tr><td><strong>원형 큐 (모듈러)</strong></td><td>공간 재활용</td><td style="color:var(--tl);font-weight:700;">1.4~1.6배↑</td><td>고정 1배</td><td style="color:var(--tl);font-weight:700;">★ 최적화</td></tr>
+        <tr><td>STL <code>deque</code> 직접</td><td>양방향 가능</td><td>queue와 유사</td><td>청크 단위</td><td>0-1 BFS</td></tr>
+      </table>
+    </div>
+    <div class="co cgd">
+      <strong>정올 속도 팁!</strong><br>
+      ios_base::sync_with_stdio(false); cin.tie(NULL); 와 함께 원형 큐 배열을 쓰면<br>
+      시간 초과 경계 문제에서 결정적인 차이를 만들 수 있어!
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: 인터랙티브 -->
+<div class="pg" id="pg5">
+  <h2>인터랙티브 데모</h2>
+  <p class="psub">네 가지 자료구조를 직접 조작해봐!</p>
+  <div class="ttabs">
+    <div class="ttab on" id="tt50" onclick="switchTab(5,0)">deque 양방향</div>
+    <div class="ttab"    id="tt51" onclick="switchTab(5,1)">Max/Min-Heap</div>
+    <div class="ttab"    id="tt52" onclick="switchTab(5,2)">커스텀 PQ</div>
+    <div class="ttab"    id="tt53" onclick="switchTab(5,3)">원형 큐</div>
+  </div>
+
+  <!-- DEQUE DEMO -->
+  <div class="tcontent on" id="tc50">
+    <div class="demo-wrap">
+      <div class="sl">deque 상태 (front ←→ back)</div>
+      <div class="dq-track" id="dq-track"><span class="dq-empty">비어 있음</span></div>
+      <div class="stats2">
+        <div class="stat">size = <span id="dq-size" style="color:var(--tl);">0</span></div>
+        <div class="stat">front = <span id="dq-front" style="color:var(--tl);">-</span></div>
+        <div class="stat">back = <span id="dq-back" style="color:var(--or);">-</span></div>
+        <div class="stat">empty = <span id="dq-empty" style="color:var(--gd);">true</span></div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="dq-val" value="10" placeholder="값">
+        <button class="btn bpf" onclick="dqPushFront()">push_front</button>
+        <button class="btn bpb" onclick="dqPushBack()">push_back</button>
+        <button class="btn bof" onclick="dqPopFront()">pop_front</button>
+        <button class="btn bob" onclick="dqPopBack()">pop_back</button>
+        <button class="btn bauto" onclick="dqAuto()">⏩ 자동</button>
+        <button class="btn brst" onclick="dqReset()">↺</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="dq-log"><span class="li">push_front / push_back 버튼을 눌러봐!</span></div>
+    </div>
+  </div>
+
+  <!-- HEAP DEMO -->
+  <div class="tcontent" id="tc51">
+    <div class="demo-wrap">
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn" id="htype-max" onclick="setHeapType('max')" style="background:var(--or-l);color:var(--or);border-color:var(--or-m);font-size:13px;">▲ Max-Heap</button>
+        <button class="btn" id="htype-min" onclick="setHeapType('min')" style="background:var(--wh);color:var(--t3);border-color:var(--bd2);font-size:13px;">▼ Min-Heap</button>
+      </div>
+      <div class="sl">힙 트리 구조</div>
+      <div class="heap-tree" id="heap-tree"><div style="color:var(--t4);font-size:13px;">비어 있음</div></div>
+      <div class="stats2">
+        <div class="stat">size = <span id="hp-size" style="color:var(--or);">0</span></div>
+        <div class="stat" style="background:var(--or-l);border-color:var(--or-m);">top = <span id="hp-top" style="color:var(--or);font-weight:900;">-</span></div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="hp-val" value="7" placeholder="값">
+        <button class="btn bpush" onclick="hpPush()">push(x)</button>
+        <button class="btn bpop"  onclick="hpPop()">pop()</button>
+        <button class="btn bauto" onclick="hpAuto()">⏩ 자동</button>
+        <button class="btn brst"  onclick="hpReset()">↺</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="hp-log"><span class="li">push 버튼을 눌러봐!</span></div>
+    </div>
+  </div>
+
+  <!-- CUSTOM PQ DEMO -->
+  <div class="tcontent" id="tc52">
+    <div class="demo-wrap">
+      <div class="sl">커스텀 PQ — {cost, id} 최소 비용 우선</div>
+      <div id="cpq-list" style="min-height:80px;margin-bottom:10px;"></div>
+      <div class="stats2">
+        <div class="stat">size = <span id="cpq-size" style="color:var(--vi);">0</span></div>
+        <div class="stat" style="background:var(--vi-l);border-color:var(--vi-m);">top = <span id="cpq-top" style="color:var(--vi);">-</span></div>
+      </div>
+      <div class="ctrl">
+        비용: <input class="inp" type="number" id="cpq-cost" value="3" placeholder="cost" style="width:64px;">
+        ID: <input class="inp2" type="number" id="cpq-id" value="1" placeholder="id" style="width:56px;">
+        <button class="btn bpush" onclick="cpqPush()">push({cost,id})</button>
+        <button class="btn bpop"  onclick="cpqPop()">pop()</button>
+        <button class="btn bauto" onclick="cpqAuto()">⏩ 자동</button>
+        <button class="btn brst"  onclick="cpqReset()">↺</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="cpq-log"><span class="li">비용과 ID를 입력하고 push!</span></div>
+    </div>
+  </div>
+
+  <!-- CIRCULAR QUEUE DEMO -->
+  <div class="tcontent" id="tc53">
+    <div class="demo-wrap">
+      <div class="sl">원형 큐 (MAX=8, head=F blue, tail=T violet)</div>
+      <div class="circ-track" id="cq-track"></div>
+      <div class="stats2">
+        <div class="stat">head = <span id="cq-head" style="color:var(--bl);">0</span></div>
+        <div class="stat">tail = <span id="cq-tail" style="color:var(--vi);">0</span></div>
+        <div class="stat">size = <span id="cq-size" style="color:var(--tl);">0</span></div>
+        <div class="stat" id="cq-state">isEmpty</div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="cq-val" value="5" placeholder="값">
+        <button class="btn bpush" onclick="cqPush()">push(enqueue)</button>
+        <button class="btn bpop"  onclick="cqPop()">pop(dequeue)</button>
+        <button class="btn bauto" onclick="cqAuto()">⏩ 자동</button>
+        <button class="btn brst"  onclick="cqReset()">↺</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="cq-log"><span class="li">push로 값을 넣어봐!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: 비교 총정리 -->
+<div class="pg" id="pg6">
+  <h2>STL 큐 계열 완전 비교</h2>
+  <p class="psub">언제 어떤 자료구조를 쓸지 한눈에!</p>
+  <table>
+    <tr><th>자료구조</th><th>헤더</th><th>push</th><th>pop</th><th>peek</th><th>특징</th><th>정올 용도</th></tr>
+    <tr><td><code>queue&lt;T&gt;</code></td><td>queue</td><td>push()</td><td>pop()/front()</td><td>front()/back()</td><td>FIFO</td><td>BFS 기본</td></tr>
+    <tr><td><code>deque&lt;T&gt;</code></td><td>deque</td><td>push_front/back</td><td>pop_front/back</td><td>front()/back()</td><td>양방향+인덱스</td><td>슬라이딩윈도우, 0-1BFS</td></tr>
+    <tr><td><code>priority_queue&lt;T&gt;</code></td><td>queue</td><td>push()</td><td>pop()/top()</td><td>top()</td><td>Max-Heap</td><td>다익스트라, 최솟값</td></tr>
+    <tr><td><code>priority_queue&lt;T,V,greater&gt;</code></td><td>queue</td><td>push()</td><td>pop()/top()</td><td>top()</td><td>Min-Heap</td><td>다익스트라(최단)</td></tr>
+    <tr><td>커스텀 PQ + struct</td><td>queue</td><td>push()</td><td>pop()/top()</td><td>top()</td><td>다중 기준 정렬</td><td>작업 스케줄링</td></tr>
+    <tr><td>원형 큐 (배열+%)</td><td>없음</td><td>O(1) inline</td><td>O(1) inline</td><td>cq[head]</td><td>캐시 최적화</td><td>BFS 속도 최적화</td></tr>
+  </table>
+
+  <div class="card3">
+    <div class="card">
+      <h4 style="color:var(--tl);">deque 선택 기준</h4>
+      <ul style="padding-left:16px;font-size:14px;color:var(--t2);line-height:2.1;">
+        <li>앞뒤 모두 삽입·삭제</li>
+        <li>슬라이딩 윈도우</li>
+        <li>0-1 BFS 구현</li>
+        <li>인덱스 접근 필요</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--or);">priority_queue 선택 기준</h4>
+      <ul style="padding-left:16px;font-size:14px;color:var(--t2);line-height:2.1;">
+        <li>항상 최대/최솟값 꺼내기</li>
+        <li>다익스트라 최단 경로</li>
+        <li>K번째 최솟값</li>
+        <li>힙 정렬 O(n log n)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--vi);">원형 큐 선택 기준</h4>
+      <ul style="padding-left:16px;font-size:14px;color:var(--t2);line-height:2.1;">
+        <li>BFS 시간 초과 경계</li>
+        <li>고정 크기 큐 필요</li>
+        <li>메모리 재사용 필요</li>
+        <li>inline 최적화 원할 때</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="co cgd">
+    <strong>정올 실전 선택 가이드</strong><br>
+    일반 BFS → <code>queue&lt;pair&lt;int,int&gt;&gt;</code> 또는 원형 큐 배열<br>
+    슬라이딩 윈도우 최솟값/최댓값 → <code>deque&lt;int&gt;</code> (단조 덱)<br>
+    0-1 BFS → <code>deque&lt;int&gt;</code> (push_front/push_back 활용)<br>
+    다익스트라 → <code>priority_queue&lt;pair, vector, greater&gt;</code><br>
+    다중 조건 우선순위 → 커스텀 구조체 + operator&lt; 오버로딩
+  </div>
+</div>
+
+<!-- PAGE 7: 퀴즈 -->
+<div class="pg" id="pg7">
+  <h2>STL 큐 계열 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 12문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 12</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 12 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<script>
+/* ===== PAGE NAV ===== */
+function goPage(n) {
+  for (var i = 0; i < 8; i++) {
+    document.getElementById('pg' + i).classList.remove('on');
+    document.getElementById('nt' + i).classList.remove('on');
+  }
+  document.getElementById('pg' + n).classList.add('on');
+  document.getElementById('nt' + n).classList.add('on');
+}
+
+/* ===== TAB SWITCH ===== */
+function switchTab(page, tab) {
+  var pg = document.getElementById('pg' + page);
+  var tabs = pg.querySelectorAll('.ttab');
+  var contents = pg.querySelectorAll('.tcontent');
+  tabs.forEach(function(t, i) { t.classList.toggle('on', i === tab); });
+  contents.forEach(function(c, i) { c.classList.toggle('on', i === tab); });
+}
+
+/* ===== DEQUE DEMO ===== */
+var dqArr = [], dqAutoT = null;
+
+function dqLog(msg, cls) {
+  var log = document.getElementById('dq-log');
+  var d = document.createElement('div'); d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function dqRender() {
+  var track = document.getElementById('dq-track');
+  if (!dqArr.length) {
+    track.innerHTML = '<span class="dq-empty">비어 있음</span>';
+  } else {
+    track.innerHTML = dqArr.map(function(v, i) {
+      var cls = 'dq-cell cn';
+      if (i === 0) cls = 'dq-cell cf';
+      else if (i === dqArr.length - 1) cls = 'dq-cell cb';
+      return '<div class="' + cls + '">' + v + (i===0?' F':'') + (i===dqArr.length-1?' B':'') + '</div>';
+    }).join('');
+  }
+  document.getElementById('dq-size').textContent = dqArr.length;
+  document.getElementById('dq-front').textContent = dqArr.length ? dqArr[0] : '-';
+  document.getElementById('dq-back').textContent = dqArr.length ? dqArr[dqArr.length-1] : '-';
+  var em = document.getElementById('dq-empty');
+  em.textContent = dqArr.length ? 'false' : 'true';
+  em.style.color = dqArr.length ? 'var(--tl)' : 'var(--gd)';
+}
+
+function dqPushFront() {
+  var v = parseInt(document.getElementById('dq-val').value);
+  if (isNaN(v)) return;
+  if (dqArr.length >= 10) { dqLog('최대 10개!', 'li'); return; }
+  dqArr.unshift(v); dqRender();
+  setTimeout(function() { var cells = document.querySelectorAll('#dq-track .dq-cell'); if(cells.length) cells[0].classList.add('cin'); }, 10);
+  dqLog('push_front(' + v + ')  front=' + dqArr[0], 'lem');
+}
+function dqPushBack() {
+  var v = parseInt(document.getElementById('dq-val').value);
+  if (isNaN(v)) return;
+  if (dqArr.length >= 10) { dqLog('최대 10개!', 'li'); return; }
+  dqArr.push(v); dqRender();
+  setTimeout(function() { var cells = document.querySelectorAll('#dq-track .dq-cell'); if(cells.length) cells[cells.length-1].classList.add('cin'); }, 10);
+  dqLog('push_back(' + v + ')  back=' + dqArr[dqArr.length-1], 'lor');
+}
+function dqPopFront() {
+  if (!dqArr.length) { dqLog('empty!', 'li'); return; }
+  var v = dqArr.shift(); dqRender();
+  dqLog('pop_front() = ' + v, 'lem');
+}
+function dqPopBack() {
+  if (!dqArr.length) { dqLog('empty!', 'li'); return; }
+  var v = dqArr.pop(); dqRender();
+  dqLog('pop_back() = ' + v, 'lor');
+}
+function dqReset() { clearTimeout(dqAutoT); dqArr = []; dqRender(); document.getElementById('dq-log').innerHTML = '<span class="li">초기화!</span>'; }
+function dqAuto() {
+  dqReset();
+  var ops = [
+    function(){document.getElementById('dq-val').value=10; dqPushBack();},
+    function(){document.getElementById('dq-val').value=20; dqPushBack();},
+    function(){document.getElementById('dq-val').value=5;  dqPushFront();},
+    function(){document.getElementById('dq-val').value=1;  dqPushFront();},
+    function(){dqLog('front()=' + dqArr[0], 'lgd');},
+    function(){dqPopFront();},
+    function(){dqPopBack();},
+    function(){document.getElementById('dq-val').value=99; dqPushBack();}
+  ];
+  var idx = 0;
+  function tick() { if (idx < ops.length) { ops[idx++](); dqAutoT = setTimeout(tick, 700); } }
+  setTimeout(tick, 200);
+}
+dqRender();
+
+/* ===== HEAP DEMO ===== */
+var hpArr = [], hpType = 'max', hpAutoT = null;
+
+function hpLog(msg, cls) {
+  var log = document.getElementById('hp-log');
+  var d = document.createElement('div'); d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function setHeapType(t) {
+  hpType = t;
+  document.getElementById('htype-max').style.background = t==='max' ? 'var(--or-l)' : 'var(--wh)';
+  document.getElementById('htype-max').style.color = t==='max' ? 'var(--or)' : 'var(--t3)';
+  document.getElementById('htype-max').style.borderColor = t==='max' ? 'var(--or-m)' : 'var(--bd2)';
+  document.getElementById('htype-min').style.background = t==='min' ? 'var(--tl-l)' : 'var(--wh)';
+  document.getElementById('htype-min').style.color = t==='min' ? 'var(--tl)' : 'var(--t3)';
+  document.getElementById('htype-min').style.borderColor = t==='min' ? 'var(--tl-m)' : 'var(--bd2)';
+  hpReset();
+}
+
+function hpCmp(a, b) { return hpType === 'max' ? a > b : a < b; }
+
+function hpUp(arr, i) {
+  while (i > 0) {
+    var p = Math.floor((i-1)/2);
+    if (hpCmp(arr[i], arr[p])) { var t=arr[i]; arr[i]=arr[p]; arr[p]=t; i=p; }
+    else break;
+  }
+}
+function hpDown(arr, i) {
+  var n = arr.length;
+  while (true) {
+    var l = 2*i+1, r = 2*i+2, best = i;
+    if (l < n && hpCmp(arr[l], arr[best])) best = l;
+    if (r < n && hpCmp(arr[r], arr[best])) best = r;
+    if (best === i) break;
+    var t=arr[i]; arr[i]=arr[best]; arr[best]=t; i=best;
+  }
+}
+
+function hpRender() {
+  var tree = document.getElementById('heap-tree');
+  if (!hpArr.length) { tree.innerHTML = '<div style="color:var(--t4);font-size:13px;">비어 있음</div>'; return; }
+  var rows = [];
+  var level = 0, start = 0;
+  while (start < hpArr.length) {
+    var end = Math.min(start + Math.pow(2, level), hpArr.length);
+    rows.push(hpArr.slice(start, end));
+    start = end; level++;
+  }
+  tree.innerHTML = rows.map(function(row, ri) {
+    return '<div class="heap-row">' + row.map(function(v, vi) {
+      var globalIdx = Math.pow(2, ri) - 1 + vi;
+      var isTop = globalIdx === 0;
+      var cls = 'heap-node ' + (hpType==='max' ? 'hn-max' : 'hn-min') + (isTop ? ' hn-top' : '');
+      return '<div class="' + cls + '">' + v + '</div>';
+    }).join('') + '</div>';
+  }).join('');
+  document.getElementById('hp-size').textContent = hpArr.length;
+  document.getElementById('hp-top').textContent = hpArr.length ? hpArr[0] : '-';
+}
+
+function hpPush() {
+  var v = parseInt(document.getElementById('hp-val').value);
+  if (isNaN(v)) return;
+  if (hpArr.length >= 15) { hpLog('최대 15개!', 'li'); return; }
+  hpArr.push(v); hpUp(hpArr, hpArr.length-1); hpRender();
+  hpLog('push(' + v + ')  top=' + hpArr[0], 'lem');
+}
+function hpPop() {
+  if (!hpArr.length) { hpLog('empty!', 'li'); return; }
+  var v = hpArr[0];
+  hpArr[0] = hpArr[hpArr.length-1]; hpArr.pop();
+  if (hpArr.length) hpDown(hpArr, 0);
+  hpRender();
+  hpLog('pop() = ' + v + '  새 top=' + (hpArr.length ? hpArr[0] : '-'), 'lor');
+}
+function hpReset() { clearTimeout(hpAutoT); hpArr = []; hpRender(); document.getElementById('hp-log').innerHTML = '<span class="li">초기화!</span>'; }
+function hpAuto() {
+  hpReset();
+  var vals = [5,3,8,1,9,2,7,4,6];
+  var idx = 0;
+  function tick() {
+    if (idx < vals.length) { document.getElementById('hp-val').value = vals[idx++]; hpPush(); hpAutoT = setTimeout(tick, 600); }
+    else if (idx === vals.length) { idx++; hpAutoT = setTimeout(function(){ hpPop(); hpAutoT = setTimeout(function(){ hpPop(); }, 700); }, 700); }
+  }
+  setTimeout(tick, 200);
+}
+hpRender();
+
+/* ===== CUSTOM PQ DEMO ===== */
+var cpqArr = [], cpqAutoT = null;
+
+function cpqLog(msg, cls) {
+  var log = document.getElementById('cpq-log');
+  var d = document.createElement('div'); d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function cpqRender() {
+  var list = document.getElementById('cpq-list');
+  if (!cpqArr.length) { list.innerHTML = '<div style="color:var(--t4);font-size:13px;padding:8px;">비어 있음</div>'; }
+  else {
+    list.innerHTML = cpqArr.map(function(item, i) {
+      var isTop = i === 0;
+      return '<div class="pq-item ' + (isTop ? 'pi-top' : 'pi-norm') + '">' +
+        '<span>cost=' + item.cost + '  id=' + item.id + '</span>' +
+        (isTop ? '<span style="font-size:11px;font-weight:700;">← top()</span>' : '') +
+        '</div>';
+    }).join('');
+  }
+  document.getElementById('cpq-size').textContent = cpqArr.length;
+  document.getElementById('cpq-top').textContent = cpqArr.length ? 'cost=' + cpqArr[0].cost + ' id=' + cpqArr[0].id : '-';
+}
+
+function cpqPush() {
+  var cost = parseInt(document.getElementById('cpq-cost').value);
+  var id   = parseInt(document.getElementById('cpq-id').value);
+  if (isNaN(cost) || isNaN(id)) return;
+  if (cpqArr.length >= 8) { cpqLog('최대 8개!', 'li'); return; }
+  cpqArr.push({cost:cost, id:id});
+  cpqArr.sort(function(a,b){ return a.cost !== b.cost ? a.cost-b.cost : a.id-b.id; });
+  cpqRender();
+  cpqLog('push({cost=' + cost + ', id=' + id + '})  top=cost' + cpqArr[0].cost, 'lbl');
+}
+function cpqPop() {
+  if (!cpqArr.length) { cpqLog('empty!', 'li'); return; }
+  var item = cpqArr.shift(); cpqRender();
+  cpqLog('pop() = {cost=' + item.cost + ', id=' + item.id + '}', 'lvi');
+}
+function cpqReset() { clearTimeout(cpqAutoT); cpqArr = []; cpqRender(); document.getElementById('cpq-log').innerHTML = '<span class="li">초기화!</span>'; }
+function cpqAuto() {
+  cpqReset();
+  var items = [{cost:3,id:1},{cost:1,id:2},{cost:3,id:0},{cost:2,id:3},{cost:1,id:5}];
+  var idx = 0;
+  function tick() {
+    if (idx < items.length) {
+      document.getElementById('cpq-cost').value = items[idx].cost;
+      document.getElementById('cpq-id').value = items[idx].id;
+      cpqPush(); idx++;
+      cpqAutoT = setTimeout(tick, 700);
+    } else if (idx === items.length) {
+      idx++; cpqAutoT = setTimeout(function(){ cpqPop(); cpqAutoT = setTimeout(cpqPop, 700); }, 800);
+    }
+  }
+  setTimeout(tick, 200);
+}
+cpqRender();
+
+/* ===== CIRCULAR QUEUE DEMO ===== */
+var CQ_MAX = 8, cqArr2, cqHead, cqTail, cqAutoT = null;
+
+function cqInit() { cqArr2 = new Array(CQ_MAX).fill(null); cqHead = 0; cqTail = 0; }
+function cqIsEmpty() { return cqHead === cqTail; }
+function cqIsFull()  { return (cqTail + 1) % CQ_MAX === cqHead; }
+function cqSize2()   { return (cqTail - cqHead + CQ_MAX) % CQ_MAX; }
+
+function cqLog(msg, cls) {
+  var log = document.getElementById('cq-log');
+  var d = document.createElement('div'); d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function cqRender() {
+  var track = document.getElementById('cq-track');
+  track.innerHTML = '';
+  for (var i = 0; i < CQ_MAX; i++) {
+    var cell = document.createElement('div');
+    cell.className = 'circ-cell';
+    var isHead = (i === cqHead);
+    var isTail = (i === cqTail);
+    var hasData = cqArr2[i] !== null;
+    if (isHead && isTail && cqIsEmpty()) cell.classList.add('cf');
+    else if (isHead) cell.classList.add('cf');
+    else if (isTail) cell.classList.add('cr');
+    else if (hasData) cell.classList.add('cd');
+    var cv = document.createElement('span'); cv.className = 'cv';
+    cv.textContent = hasData ? cqArr2[i] : '';
+    var ci = document.createElement('span'); ci.className = 'ci';
+    ci.textContent = '[' + i + ']';
+    cell.appendChild(cv); cell.appendChild(ci);
+    track.appendChild(cell);
+  }
+  document.getElementById('cq-head').textContent = cqHead;
+  document.getElementById('cq-tail').textContent = cqTail;
+  document.getElementById('cq-size').textContent = cqSize2();
+  var st = document.getElementById('cq-state');
+  if (cqIsFull()) { st.textContent = 'isFull!'; st.style.color = 'var(--rd)'; }
+  else if (cqIsEmpty()) { st.textContent = 'isEmpty'; st.style.color = 'var(--gd)'; }
+  else { st.textContent = 'size=' + cqSize2(); st.style.color = 'var(--tl)'; }
+}
+
+function cqPush() {
+  var v = parseInt(document.getElementById('cq-val').value);
+  if (isNaN(v)) return;
+  if (cqIsFull()) { cqLog('Queue Full! (tail+1)%MAX==head', 'li'); return; }
+  cqArr2[cqTail] = v;
+  cqTail = (cqTail + 1) % CQ_MAX;
+  cqRender();
+  cqLog('enqueue(' + v + ') tail=' + cqTail + ' size=' + cqSize2(), 'lem');
+}
+function cqPop() {
+  if (cqIsEmpty()) { cqLog('Queue Empty! head==tail', 'li'); return; }
+  var v = cqArr2[cqHead];
+  cqArr2[cqHead] = null;
+  cqHead = (cqHead + 1) % CQ_MAX;
+  cqRender();
+  cqLog('dequeue()=' + v + ' head=' + cqHead + ' size=' + cqSize2(), 'lor');
+}
+function cqReset() { clearTimeout(cqAutoT); cqInit(); cqRender(); document.getElementById('cq-log').innerHTML = '<span class="li">초기화!</span>'; }
+function cqAuto() {
+  cqReset();
+  var ops = [
+    function(){document.getElementById('cq-val').value=10;cqPush();},
+    function(){document.getElementById('cq-val').value=20;cqPush();},
+    function(){document.getElementById('cq-val').value=30;cqPush();},
+    function(){cqPop();},
+    function(){cqPop();},
+    function(){document.getElementById('cq-val').value=40;cqPush();},
+    function(){document.getElementById('cq-val').value=50;cqPush();},
+    function(){document.getElementById('cq-val').value=60;cqPush();},
+    function(){document.getElementById('cq-val').value=70;cqPush();},
+    function(){document.getElementById('cq-val').value=80;cqPush();},
+    function(){cqPop();}
+  ];
+  var idx = 0;
+  function tick() { if (idx < ops.length) { ops[idx++](); cqAutoT = setTimeout(tick, 700); } }
+  setTimeout(tick, 200);
+}
+cqInit(); cqRender();
+
+/* ===== QUIZ ===== */
+var QUIZ = [
+  { q: 'STL deque에서 push_front와 push_back의 시간복잡도는?',
+    opts: ['O(n), O(1)', 'O(1), O(1)', 'O(log n), O(1)', 'O(1), O(n)'], ans: 1,
+    fb: 'deque는 앞뒤 모두 O(1)! 이게 vector와의 핵심 차이야. vector는 push_front가 O(n).' },
+  { q: 'deque를 활용한 슬라이딩 윈도우 최솟값에서 덱에 저장하는 것은?',
+    opts: ['값(value)', '인덱스(index)', '값+인덱스 쌍', '최솟값만'], ans: 1,
+    fb: '인덱스를 저장! front 인덱스가 창 밖이면 pop_front, back의 값이 현재보다 크면 pop_back.' },
+  { q: '0-1 BFS에서 비용 0인 간선의 목적지는 덱의 어디에?',
+    opts: ['push_back', 'push_front', '중간 삽입', '별도 큐'], ans: 1,
+    fb: 'push_front! 비용 0은 현재 레벨 유지, 비용 1은 push_back으로 다음 레벨. 이 차이가 핵심.' },
+  { q: 'STL priority_queue 기본(선언시 옵션 없음)은?',
+    opts: ['Min-Heap', 'Max-Heap', '정렬된 큐', 'FIFO 큐'], ans: 1,
+    fb: 'Max-Heap이 기본! Min-Heap을 원하면 greater<T>를 세 번째 인자로 넣어야 해.' },
+  { q: 'priority_queue에서 pop()의 시간복잡도는?',
+    opts: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'], ans: 1,
+    fb: 'O(log n) — 힙에서 루트를 제거하고 heapify_down하는 비용. top()은 O(1)!' },
+  { q: '커스텀 priority_queue에서 operator< 오버로딩 시 "a < b가 true"면?',
+    opts: ['a가 먼저 나옴', 'b가 먼저 나옴', '동일 우선순위', '정의되지 않음'], ans: 1,
+    fb: 'priority_queue는 Max-Heap이라 "더 큰" 것이 top에 와. a<b이면 b가 더 크므로 b가 먼저!' },
+  { q: 'struct Cmp의 operator()에서 return a.cost > b.cost 의 의미는?',
+    opts: ['비용 큰 것 우선', '비용 작은 것 우선', '순서 없음', '에러'], ans: 1,
+    fb: 'return true면 b를 a보다 우선. a.cost > b.cost → a가 더 비쌈 → b 우선 → Min-Heap!' },
+  { q: '원형 큐 배열에서 isEmpty 조건은?',
+    opts: ['head > tail', 'head == tail', '(tail+1)%MAX==head', 'size == 0'], ans: 1,
+    fb: 'head == tail이면 비어있음! (tail+1)%MAX==head는 isFull 조건이야.' },
+  { q: '원형 큐에서 size를 구하는 올바른 식은? (head, tail, MAX 사용)',
+    opts: ['tail - head', '(tail - head + MAX) % MAX', 'MAX - head + tail', 'tail + head'], ans: 1,
+    fb: '(tail - head + MAX) % MAX! head > tail인 순환 상황에도 +MAX로 정확히 계산돼.' },
+  { q: 'deque vs queue 선택 기준 — BFS만 할 때 추천은?',
+    opts: ['deque가 더 빠르므로 항상 deque', 'queue가 더 간단하고 충분', '항상 priority_queue', '배열 기반 원형 큐만'], ans: 1,
+    fb: '단순 BFS는 queue가 더 간결하고 충분해. deque는 양방향이 필요할 때(0-1 BFS, 슬라이딩윈도우) 쓰자.' },
+  { q: 'STL queue에서 front()와 pop()의 차이는?',
+    opts: ['같음', 'front()는 값 반환만, pop()은 제거만', 'pop()이 값도 반환', 'front()가 더 빠름'], ans: 1,
+    fb: 'front()는 앞 원소를 반환(제거 안 함), pop()은 제거만 함(반환값 없음). 꺼내려면 두 가지 모두 써야 해.' },
+  { q: '다익스트라에서 priority_queue에 {거리, 노드} 넣을 때 greater<> 쓰는 이유는?',
+    opts: ['Max-Heap이 필요해서', 'Min-Heap으로 최소 거리 노드 먼저 꺼내기 위해', '노드 번호 순서', '무관'], ans: 1,
+    fb: '다익스트라는 항상 최소 거리 노드부터 처리해야 해. greater<>로 Min-Heap을 만들어야 작은 거리가 top에 와!' }
+];
+
+var qScore = 0, qDone = 0;
+function renderQuiz() {
+  var box = document.getElementById('quiz-box');
+  box.innerHTML = '';
+  QUIZ.forEach(function(q, qi) {
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'qc' + qi;
+    var txt = document.createElement('div');
+    txt.className = 'qtext';
+    txt.textContent = 'Q' + (qi+1) + '. ' + q.q;
+    card.appendChild(txt);
+    var opts = document.createElement('div'); opts.className = 'qopts';
+    q.opts.forEach(function(o, oi) {
+      var opt = document.createElement('div');
+      opt.className = 'qopt'; opt.id = 'qo' + qi + '_' + oi;
+      opt.textContent = String.fromCharCode(65+oi) + '. ' + o;
+      opt.setAttribute('data-qi', qi); opt.setAttribute('data-oi', oi);
+      opt.onclick = function() { ansQ(parseInt(this.getAttribute('data-qi')), parseInt(this.getAttribute('data-oi'))); };
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+    var fb = document.createElement('div'); fb.className = 'qfb'; fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    box.appendChild(card);
+  });
+}
+
+function ansQ(qi, oi) {
+  if (document.getElementById('qo' + qi + '_0').classList.contains('locked')) return;
+  var q = QUIZ[qi];
+  for (var i = 0; i < q.opts.length; i++) document.getElementById('qo' + qi + '_' + i).classList.add('locked');
+  document.getElementById('qo' + qi + '_' + oi).classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi !== q.ans) document.getElementById('qo' + qi + '_' + q.ans).classList.add('correct');
+  if (oi === q.ans) { qScore++; document.getElementById('qscore').textContent = qScore; }
+  var fb = document.getElementById('qfb' + qi);
+  fb.className = 'qfb show ' + (oi === q.ans ? 'ok' : 'bad');
+  fb.textContent = (oi === q.ans ? '\u2713 \uc815\ub2f5! ' : '\u2717 \uc624\ub2f5. ') + q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width = Math.round(qDone / QUIZ.length * 100) + '%';
+  document.getElementById('qplbl').textContent = qDone + ' / ' + QUIZ.length + ' \ud480\uc774';
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
