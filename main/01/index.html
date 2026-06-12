@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>다익스트라 알고리즘 인터렉티브 강의자료</title>
+<style>
+body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#f0f9ff,#f0fdf4);color:#1f2937;line-height:1.75}
+header{background:linear-gradient(135deg,#2563eb,#15803d);color:white;text-align:center;padding:40px 20px}
+header h1{margin:0;font-size:34px}
+main{max-width:1120px;margin:30px auto;padding:0 20px 60px}
+section{background:white;border-radius:22px;padding:28px;margin-bottom:24px;box-shadow:0 12px 30px rgba(37,99,235,.12)}
+h2{color:#2563eb;border-left:8px solid #3b82f6;padding-left:12px;margin-top:0}
+h3{color:#15803d}
+.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:16px;padding:18px;margin:16px 0}
+.warn{background:#fff7ed;border-left:8px solid #f97316;border-radius:14px;padding:16px;margin:16px 0}
+pre{background:#111827;color:#f9fafb;padding:22px;border-radius:16px;overflow-x:auto;font-size:14px;line-height:1.6}
+button{border:0;border-radius:12px;padding:12px 18px;background:#2563eb;color:white;font-weight:800;cursor:pointer;font-size:15px;margin:6px 4px 6px 0}
+button:hover{background:#1e40af}
+textarea{width:100%;min-height:130px;border:2px solid #93c5fd;border-radius:14px;padding:14px;font-family:Consolas,monospace;font-size:15px}
+input{padding:10px;border-radius:12px;border:2px solid #93c5fd;font-size:16px;width:90px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.graph{position:relative;height:340px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;margin-top:16px;overflow:hidden}
+.node{position:absolute;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;border:3px solid #3b82f6;background:#dbeafe;color:#1e3a8a;z-index:2}
+.fixed{background:#dcfce7!important;border-color:#22c55e!important;color:#14532d!important}
+.current{background:#fef3c7!important;border-color:#f59e0b!important;color:#92400e!important}
+.edge-label{position:absolute;background:white;border:1px solid #cbd5e1;border-radius:999px;padding:2px 7px;font-weight:800;font-size:13px;z-index:3}
+svg{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:15px}
+th,td{border:1px solid #d1d5db;padding:10px;text-align:center}
+th{background:#dbeafe;color:#1e3a8a}
+tr:nth-child(even){background:#f9fafb}
+.result{font-size:20px;font-weight:900;color:#dc2626;background:#fef2f2;border-radius:16px;padding:18px;margin-top:18px;white-space:pre-wrap}
+.quiz{background:#ecfdf5;border:2px solid #bbf7d0;border-radius:16px;padding:18px;margin:14px 0}
+.answer{display:none;background:#dcfce7;border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>다익스트라(Dijkstra) 알고리즘</h1>
+<p>가장 가까운 정점부터 최단거리를 확정하는 알고리즘</p>
+</header>
+
+<main>
+<section>
+<h2>1. 다익스트라란?</h2>
+<p>다익스트라는 <b>한 출발점에서 모든 정점까지의 최단거리</b>를 구하는 알고리즘입니다.</p>
+<div class="box">
+<p>1. 출발점의 거리는 0입니다.</p>
+<p>2. 나머지 정점의 거리는 처음에 무한대입니다.</p>
+<p>3. 아직 확정하지 않은 정점 중 거리가 가장 작은 정점을 고릅니다.</p>
+<p>4. 그 정점에서 갈 수 있는 곳의 거리를 갱신합니다.</p>
+<p>5. 이 과정을 반복하면 최단거리가 완성됩니다.</p>
+</div>
+<pre><code>if (dist[next] > dist[now] + cost) {
+    dist[next] = dist[now] + cost;
+}</code></pre>
+</section>
+
+<section>
+<h2>2. 한 단계씩 이해하기</h2>
+<p>버튼을 눌러 정점 선택과 거리 갱신 과정을 확인하세요.</p>
+<button onclick="resetDemo()">처음부터</button>
+<button onclick="nextStep()">다음 단계</button>
+<button onclick="runAll()">끝까지 실행</button>
+<div class="grid2">
+<div>
+<h3>예제 그래프</h3>
+<div id="graphView" class="graph"></div>
+</div>
+<div>
+<h3>거리 배열</h3>
+<div id="statusBox" class="result"></div>
+<div id="distTable"></div>
+</div>
+</div>
+<div id="logTable"></div>
+</section>
+
+<section>
+<h2>3. 직접 그래프 입력해서 실행하기</h2>
+<p>정점 수, 출발점, 간선을 입력하면 최단거리를 계산합니다. 간선은 무방향으로 처리합니다.</p>
+<label><b>정점 수 N:</b></label>
+<input id="nInput" type="number" value="5">
+<label><b>출발점:</b></label>
+<input id="startInput" type="number" value="1">
+<button onclick="runCustom()">계산하기</button>
+<button onclick="loadCustomExample()">예제 불러오기</button>
+<textarea id="edgeInput">1 2 2
+1 3 5
+2 3 1
+2 4 4
+3 4 1
+4 5 3</textarea>
+<div id="customResult"></div>
+</section>
+
+<section>
+<h2>4. 예제 손풀이</h2>
+<pre><code>1 - 2 : 2
+1 - 3 : 5
+2 - 4 : 4
+3 - 4 : 1
+출발점: 1</code></pre>
+<table>
+<tr><th>단계</th><th>선택 정점</th><th>갱신 내용</th><th>거리 상태</th></tr>
+<tr><td>처음</td><td>-</td><td>dist[1]=0, 나머지 INF</td><td>0, INF, INF, INF</td></tr>
+<tr><td>1</td><td>1</td><td>2번=2, 3번=5</td><td>0, 2, 5, INF</td></tr>
+<tr><td>2</td><td>2</td><td>4번=6</td><td>0, 2, 5, 6</td></tr>
+<tr><td>3</td><td>3</td><td>4번 후보 6, 기존 6과 같음</td><td>0, 2, 5, 6</td></tr>
+<tr><td>4</td><td>4</td><td>끝</td><td>0, 2, 5, 6</td></tr>
+</table>
+</section>
+
+<section>
+<h2>5. 쉬운 배열 버전 C 코드</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define INF 1000000000
+
+int main() {
+    int graph[5][5] = {
+        {0,0,0,0,0},
+        {0,0,2,5,0},
+        {0,2,0,0,4},
+        {0,5,0,0,1},
+        {0,0,4,1,0}
+    };
+
+    int dist[5];
+    int visited[5];
+
+    for (int i = 1; i &lt;= 4; i++) {
+        dist[i] = INF;
+        visited[i] = 0;
+    }
+
+    dist[1] = 0;
+
+    for (int k = 1; k &lt;= 4; k++) {
+        int now = -1;
+        int minDist = INF;
+
+        for (int i = 1; i &lt;= 4; i++) {
+            if (!visited[i] && dist[i] &lt; minDist) {
+                minDist = dist[i];
+                now = i;
+            }
+        }
+
+        if (now == -1) break;
+
+        visited[now] = 1;
+
+        for (int next = 1; next &lt;= 4; next++) {
+            if (graph[now][next] != 0) {
+                if (dist[next] &gt; dist[now] + graph[now][next]) {
+                    dist[next] = dist[now] + graph[now][next];
+                }
+            }
+        }
+    }
+
+    for (int i = 1; i &lt;= 4; i++) {
+        printf("%d : %d\n", i, dist[i]);
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section>
+<h2>6. 대회용 우선순위 큐 버전 핵심</h2>
+<p>정점과 간선이 많을 때는 우선순위 큐를 사용합니다.</p>
+<pre><code>while (priority queue is not empty) {
+    가장 가까운 정점을 꺼낸다.
+
+    if (꺼낸 거리 != 현재 dist[now]) continue;
+
+    for (now와 연결된 next) {
+        if (dist[next] > dist[now] + cost) {
+            dist[next] = dist[now] + cost;
+            priority queue에 넣는다.
+        }
+    }
+}</code></pre>
+</section>
+
+<section>
+<h2>7. 자주 하는 실수</h2>
+<div class="quiz">
+<h3>실수 1. 음수 간선에 사용하는 경우</h3>
+<p>다익스트라는 간선 비용이 음수이면 사용할 수 없습니다.</p>
+<button onclick="toggleAnswer('q1')">설명 보기</button>
+<div id="q1" class="answer">음수 간선이 있으면 이미 확정한 거리가 나중에 더 작아질 수 있어 원리가 깨집니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 2. INF를 너무 작게 잡는 경우</h3>
+<p>경로 비용이 클 수 있으므로 충분히 큰 값이 필요합니다.</p>
+<button onclick="toggleAnswer('q2')">설명 보기</button>
+<div id="q2" class="answer">비용이 큰 문제에서는 long long과 1e18 수준의 INF를 사용하는 것이 안전합니다.</div>
+</div>
+<div class="quiz">
+<h3>실수 3. 오래된 힙 정보를 처리하는 경우</h3>
+<p>우선순위 큐에는 같은 정점이 여러 번 들어갈 수 있습니다.</p>
+<button onclick="toggleAnswer('q3')">설명 보기</button>
+<div id="q3" class="answer">if (cur.dist != dist[now]) continue; 로 오래된 정보를 건너뜁니다.</div>
+</div>
+</section>
+
+<section>
+<h2>8. 핵심 정리</h2>
+<p>1. 다익스트라는 한 출발점에서 모든 정점까지의 최단거리를 구합니다.</p>
+<p>2. 아직 확정하지 않은 정점 중 가장 가까운 정점을 선택합니다.</p>
+<p>3. 핵심 갱신식은 <b>dist[next] &gt; dist[now] + cost</b>입니다.</p>
+<p>4. 작은 그래프는 배열 버전으로 이해합니다.</p>
+<p>5. 큰 그래프는 우선순위 큐 버전을 사용합니다.</p>
+</section>
+</main>
+
+<script>
+const demoN=4;
+const demoEdges=[[1,2,2],[1,3,5],[2,4,4],[3,4,1]];
+const positions={1:[80,70],2:[270,70],3:[80,230],4:[270,230]};
+let demoDist, demoVisited, demoLogs;
+
+function buildGraph(n, edges){
+  const g=Array.from({length:n+1},()=>[]);
+  for(const e of edges){
+    const a=e[0], b=e[1], c=e[2];
+    g[a].push([b,c]);
+    g[b].push([a,c]);
+  }
+  return g;
+}
+function fmtNum(x){return x===Infinity?'INF':String(x);}
+function resetDemo(){
+  demoDist=Array(demoN+1).fill(Infinity);
+  demoVisited=Array(demoN+1).fill(false);
+  demoDist[1]=0;
+  demoLogs=[];
+  renderDemo(-1);
+}
+function nextStep(){
+  const g=buildGraph(demoN,demoEdges);
+  let now=-1, min=Infinity;
+  for(let i=1;i<=demoN;i++){
+    if(!demoVisited[i] && demoDist[i]<min){
+      min=demoDist[i];
+      now=i;
+    }
+  }
+  if(now===-1){
+    renderDemo(-1);
+    return;
+  }
+  demoVisited[now]=true;
+  let updates=[];
+  for(const item of g[now]){
+    const next=item[0], cost=item[1];
+    if(demoDist[next] > demoDist[now] + cost){
+      const old=demoDist[next];
+      demoDist[next]=demoDist[now]+cost;
+      updates.push(next+'번: '+fmtNum(old)+' → '+demoDist[next]);
+    }
+  }
+  if(updates.length===0) updates.push('갱신 없음');
+  demoLogs.push({step:demoLogs.length+1,now:now,update:updates.join('<br>'),dist:demoDist.slice(1)});
+  renderDemo(now);
+}
+function runAll(){
+  for(let i=0;i<demoN+1;i++) nextStep();
+}
+function renderDemo(current){
+  const graph=document.getElementById('graphView');
+  let svg='<svg>';
+  for(const e of demoEdges){
+    const a=e[0], b=e[1], c=e[2];
+    const p1=positions[a], p2=positions[b];
+    svg+='<line x1="'+(p1[0]+27)+'" y1="'+(p1[1]+27)+'" x2="'+(p2[0]+27)+'" y2="'+(p2[1]+27)+'" stroke="#64748b" stroke-width="3"/>';
+  }
+  svg+='</svg>';
+  let html=svg;
+  for(const e of demoEdges){
+    const a=e[0], b=e[1], c=e[2];
+    const p1=positions[a], p2=positions[b];
+    html+='<div class="edge-label" style="left:'+((p1[0]+p2[0])/2+20)+'px;top:'+((p1[1]+p2[1])/2+20)+'px">'+c+'</div>';
+  }
+  for(let i=1;i<=demoN;i++){
+    const p=positions[i];
+    let cls='node';
+    if(demoVisited[i]) cls+=' fixed';
+    if(i===current) cls+=' current';
+    html+='<div class="'+cls+'" style="left:'+p[0]+'px;top:'+p[1]+'px">'+i+'</div>';
+  }
+  graph.innerHTML=html;
+
+  document.getElementById('statusBox').textContent='출발점: 1\n초록: 최단거리 확정\n노랑: 이번 단계 선택 정점';
+
+  let rows='';
+  for(let i=1;i<=demoN;i++){
+    rows+='<tr><td>'+i+'</td><td>'+fmtNum(demoDist[i])+'</td><td>'+(demoVisited[i]?'확정':'미확정')+'</td></tr>';
+  }
+  document.getElementById('distTable').innerHTML='<table><tr><th>정점</th><th>dist</th><th>상태</th></tr>'+rows+'</table>';
+
+  let logRows='';
+  for(const l of demoLogs){
+    logRows+='<tr><td>'+l.step+'</td><td>'+l.now+'</td><td>'+l.update+'</td><td>'+l.dist.map(fmtNum).join(', ')+'</td></tr>';
+  }
+  document.getElementById('logTable').innerHTML='<table><tr><th>단계</th><th>선택 정점</th><th>갱신</th><th>거리 배열</th></tr>'+logRows+'</table>';
+}
+function parseCustomEdges(){
+  const text=document.getElementById('edgeInput').value.trim();
+  if(!text) return [];
+  return text.split(/\n+/).map(line=>line.trim().split(/\s+/).map(Number)).filter(a=>a.length>=3);
+}
+function runCustom(){
+  const n=Number(document.getElementById('nInput').value);
+  const start=Number(document.getElementById('startInput').value);
+  const edges=parseCustomEdges();
+  if(!n || n<1 || n>100){
+    document.getElementById('customResult').innerHTML='<div class="warn">N은 1~100 사이로 입력해주세요.</div>';
+    return;
+  }
+  const g=buildGraph(n,edges);
+  const dist=Array(n+1).fill(Infinity);
+  const visited=Array(n+1).fill(false);
+  dist[start]=0;
+  let rows='';
+  for(let step=1;step<=n;step++){
+    let now=-1,min=Infinity;
+    for(let i=1;i<=n;i++){
+      if(!visited[i] && dist[i]<min){min=dist[i];now=i;}
+    }
+    if(now===-1) break;
+    visited[now]=true;
+    let updates=[];
+    for(const item of g[now]){
+      const next=item[0], cost=item[1];
+      if(dist[next] > dist[now]+cost){
+        const old=dist[next];
+        dist[next]=dist[now]+cost;
+        updates.push(next+'번 '+fmtNum(old)+'→'+dist[next]);
+      }
+    }
+    rows+='<tr><td>'+step+'</td><td>'+now+'</td><td>'+(updates.join('<br>')||'갱신 없음')+'</td><td>'+dist.slice(1).map(fmtNum).join(', ')+'</td></tr>';
+  }
+  let finalRows='';
+  for(let i=1;i<=n;i++) finalRows+='<tr><td>'+i+'</td><td>'+fmtNum(dist[i])+'</td></tr>';
+  document.getElementById('customResult').innerHTML='<div class="result">최단거리 계산 완료</div><table><tr><th>단계</th><th>선택 정점</th><th>갱신</th><th>거리 배열</th></tr>'+rows+'</table><h3>최종 결과</h3><table><tr><th>정점</th><th>최단거리</th></tr>'+finalRows+'</table>';
+}
+function loadCustomExample(){
+  document.getElementById('nInput').value=5;
+  document.getElementById('startInput').value=1;
+  document.getElementById('edgeInput').value='1 2 2\n1 3 5\n2 3 1\n2 4 4\n3 4 1\n4 5 3';
+  runCustom();
+}
+function toggleAnswer(id){
+  const el=document.getElementById(id);
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+resetDemo();
+runCustom();
+</script>
+</body>
+</html>
