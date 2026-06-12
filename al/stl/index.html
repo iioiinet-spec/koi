@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ STL stack 완전정복 | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root{
+  --bg:#f4f7fb;--wh:#fff;--s1:#edf1f9;--s2:#e1e8f5;
+  --bd:#ccd4ea;--bd2:#b3bedd;
+  --t1:#101627;--t2:#243060;--t3:#586092;--t4:#9aa2c6;
+  --em:#059669;--em-l:#d1fae5;--em-m:#6ee7b7;
+  --or:#c2410c;--or-l:#fff0e8;--or-m:#fdba74;
+  --bl:#1d4ed8;--bl-l:#dbeafe;--bl-m:#93c5fd;
+  --vi:#6d28d9;--vi-l:#ede9fe;--vi-m:#c4b5fd;
+  --gd:#b07800;--gd-l:#fff8d4;--gd-m:#ffd966;
+  --rd:#b91c1c;--rd-l:#fee2e2;--rd-m:#fca5a5;
+  --sk:#0369a1;--sk-l:#e0f2fe;--sk-m:#7dd3fc;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px;--r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-s{width:10px;flex-shrink:0;background:linear-gradient(180deg,#f472b6,var(--bl),var(--em));}
+.hdr-b{display:flex;align-items:center;gap:14px;padding:12px 28px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:22px;font-weight:900;color:var(--t1);}
+.badge{padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;}
+.b-cpp{background:#fce7f3;color:#be185d;border:1.5px solid #f9a8d4;}
+.b-stl{background:var(--bl-l);color:var(--bl);border:1.5px solid var(--bl-m);}
+.b-opt{background:var(--em-l);color:var(--em);border:1.5px solid var(--em-m);}
+
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 20px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:14px 16px;font-size:14px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--bl);border-bottom-color:var(--bl);font-weight:700;}
+
+.pg{display:none;max-width:1060px;margin:0 auto;padding:32px 24px 80px;}
+.pg.on{display:block;animation:pgIn .2s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+h2{font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:19px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:15px;color:var(--t3);margin-bottom:28px;}
+p{font-size:16px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.87em;background:var(--s2);padding:2px 7px;border-radius:5px;color:var(--bl);}
+
+.co{border-radius:var(--r);padding:15px 18px;margin-bottom:16px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cem{background:var(--em-l);color:var(--t2);border-color:var(--em);}
+.cor{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+.cbl{background:var(--bl-l);color:var(--t2);border-color:var(--bl);}
+.cvi{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.crd{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+.cpk{background:#fce7f3;color:var(--t2);border-color:#f472b6;}
+
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:18px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+@media(max-width:640px){.card2{grid-template-columns:1fr;}}
+
+.cw{background:#131926;border-radius:var(--r2);overflow:hidden;margin-bottom:18px;border:1.5px solid #1c2640;}
+.cbr{background:#192236;padding:9px 16px;font-family:var(--mono);font-size:11px;color:#5878b8;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1c2640;}
+.dots{display:flex;gap:5px;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:14px;line-height:2.05;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}.op{color:#fb923c;}
+.h1{background:rgba(5,150,105,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #34d399;}
+.h2{background:rgba(29,78,216,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #60a5fa;}
+.h3{background:rgba(109,40,217,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #a78bfa;}
+.h4{background:rgba(194,65,12,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fb923c;}
+.h5{background:rgba(176,120,0,.15);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fbbf24;}
+.h6{background:rgba(244,114,182,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #f472b6;}
+
+.tag{display:inline-block;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700;margin:2px 3px;}
+.tem{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.tor{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+.tbl{background:var(--bl-l);color:var(--bl);border:1px solid var(--bl-m);}
+.tvi{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.trd{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+.tpk{background:#fce7f3;color:#be185d;border:1px solid #f9a8d4;}
+
+table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:16px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:10px 13px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:9px 13px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* Interactive demo */
+.demo-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:18px;margin-bottom:18px;}
+.stack-visual{display:flex;flex-direction:column-reverse;gap:4px;min-height:160px;background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;position:relative;margin-bottom:12px;}
+.stack-visual::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--bl);border-radius:0 0 var(--r) var(--r);}
+.sv-cell{padding:8px 14px;border-radius:7px;font-family:var(--mono);font-size:15px;font-weight:700;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.sv-cell.ctop{background:var(--or-l);border:1.5px solid var(--or);color:var(--or);}
+.sv-cell.cnorm{background:var(--wh);border:1.5px solid var(--bd2);color:var(--t2);}
+.sv-cell.cmin{background:var(--vi-l);border:1.5px solid var(--vi);color:var(--vi);}
+.sv-empty{color:var(--t4);font-size:13px;text-align:center;padding:20px 0;}
+.sv-in{animation:svIn .32s cubic-bezier(.34,1.56,.64,1);}
+@keyframes svIn{from{opacity:0;transform:scale(.72)translateY(10px);}to{opacity:1;transform:none;}}
+
+.ctrl{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0;}
+.btn{padding:9px 18px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:var(--sans);transition:all .15s;}
+.btn:disabled{opacity:.38;cursor:default;}
+.bpush{background:var(--em);color:#fff;}.bpush:hover{background:#047857;}
+.bpop{background:var(--or);color:#fff;}.bpop:hover{background:#9a3209;}
+.btop{background:var(--bl-l);color:var(--bl);border-color:var(--bl-m);}.btop:hover{background:var(--bl);color:#fff;}
+.brst{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.brst:hover{border-color:var(--t2);}
+.bauto{background:var(--vi-l);color:var(--vi);border-color:var(--vi-m);}.bauto:hover{background:var(--vi);color:#fff;}
+.inp{padding:8px 12px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:15px;color:var(--t1);background:var(--wh);outline:none;width:80px;}
+.inp:focus{border-color:var(--bl);}
+.stats2{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.stat{background:var(--s1);border:1.5px solid var(--bd);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:13px;color:var(--t2);}
+.stat span{font-weight:700;}
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 14px;min-height:70px;max-height:130px;overflow-y:auto;font-family:var(--mono);font-size:13px;line-height:1.9;}
+.lem{color:var(--em);font-weight:600;}.lor{color:var(--or);font-weight:600;}.lvi{color:var(--vi);font-weight:600;}.lgd{color:var(--gd);font-weight:700;}.li{color:var(--t4);}
+
+/* topic tabs */
+.ttabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+.ttab{padding:9px 16px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;user-select:none;}
+.ttab:hover{border-color:var(--bl);color:var(--bl);}
+.ttab.on{background:var(--bl-l);border-color:var(--bl);color:var(--bl);}
+.tcontent{display:none;}.tcontent.on{display:block;animation:pgIn .2s ease;}
+
+/* quiz */
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:16px;}
+.qtext{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:14px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:11px 16px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:15px;color:var(--t2);transition:all .15s;user-select:none;}
+.qopt:hover:not(.locked){border-color:var(--bl);color:var(--bl);background:var(--bl-l);}
+.qopt.correct{background:var(--em-l);border-color:var(--em);color:var(--em);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:10px;padding:11px 14px;border-radius:var(--r);font-size:14px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--em-l);color:var(--em);border:1px solid var(--em-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:22px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:14px 20px;}
+.sbig{font-size:38px;font-weight:900;color:var(--bl);font-family:var(--mono);}
+.qpbar{height:7px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:7px;background:linear-gradient(90deg,var(--bl),var(--em));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:4px;}
+
+.sl{font-size:12px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-s"></div>
+  <div class="hdr-b">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">C++ STL stack 완전정복</span>
+    <span class="badge b-cpp">C++17</span>
+    <span class="badge b-stl">STL</span>
+    <span class="badge b-opt">최적화</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nt on" id="nt0" onclick="goPage(0)">📦 STL 개요</div>
+  <div class="nt"    id="nt1" onclick="goPage(1)">📚 stack 기본</div>
+  <div class="nt"    id="nt2" onclick="goPage(2)">🌊 단조 스택</div>
+  <div class="nt"    id="nt3" onclick="goPage(3)">📊 히스토그램</div>
+  <div class="nt"    id="nt4" onclick="goPage(4)">🔍 DFS 스택</div>
+  <div class="nt"    id="nt5" onclick="goPage(5)">✌ 투 스택</div>
+  <div class="nt"    id="nt6" onclick="goPage(6)">🔻 최소 스택</div>
+  <div class="nt"    id="nt7" onclick="goPage(7)">🎮 인터랙티브</div>
+  <div class="nt"    id="nt8" onclick="goPage(8)">🧠 퀴즈</div>
+</nav>
+
+<!-- ========== PAGE 0: STL 개요 ========== -->
+<div class="pg on" id="pg0">
+  <h2>C++ STL stack — 왜 써야 할까?</h2>
+  <p class="psub">세영코딩연구소 · 정올 준비 | C 배열 스택 vs C++ STL stack 완전 비교</p>
+
+  <div class="co cpk">
+    <strong>STL(Standard Template Library)이란?</strong><br>
+    C++ 표준 라이브러리에 포함된 <strong>검증된 자료구조와 알고리즘</strong>의 모음이야.<br>
+    직접 구현보다 <strong>버그 없고, 빠르고, 코드가 짧아</strong>서 정올 실전에서 강력해!
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>C 배열 스택 (직접 구현)</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_stack.c</div>
+        <pre><span class="tp">int</span> stk[<span class="nm">100001</span>];
+<span class="tp">int</span> top = -<span class="nm">1</span>;
+
+stk[++top] = <span class="nm">5</span>;   <span class="cm">// push</span>
+stk[++top] = <span class="nm">3</span>;
+<span class="tp">int</span> v = stk[top--]; <span class="cm">// pop</span>
+<span class="tp">int</span> t = stk[top];   <span class="cm">// peek</span>
+<span class="tp">int</span> sz = top + <span class="nm">1</span>;   <span class="cm">// size</span>
+<span class="tp">int</span> empty = (top == -<span class="nm">1</span>); <span class="cm">// empty</span></pre>
+      </div>
+      <div class="co crd" style="margin-bottom:0;font-size:14px;">
+        ❌ 범위 초과 직접 관리 / 코드 길어짐 / 실수 위험
+      </div>
+    </div>
+    <div class="card">
+      <h3>C++ STL stack (권장)</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>stl_stack.cpp</div>
+        <pre><span class="h6"><span class="kw">#include</span> <span class="st">&lt;stack&gt;</span></span>
+<span class="kw">using namespace</span> std;
+stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> stk;
+
+stk.push(<span class="nm">5</span>);    <span class="cm">// push</span>
+stk.push(<span class="nm">3</span>);
+stk.pop();      <span class="cm">// 제거 (반환X)</span>
+<span class="tp">int</span> t = stk.top(); <span class="cm">// peek</span>
+<span class="tp">int</span> sz = stk.size(); <span class="cm">// size</span>
+<span class="tp">bool</span> e = stk.empty(); <span class="cm">// empty</span></pre>
+      </div>
+      <div class="co cem" style="margin-bottom:0;font-size:14px;">
+        ✅ 자동 크기 관리 / 깔끔한 API / 버그 없음
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:14px;">STL stack의 내부 구조</h3>
+  <div class="co cbl">
+    <strong>stack&lt;T, Container&gt;</strong> — 기본 컨테이너는 <code>deque&lt;T&gt;</code>야.<br>
+    성능이 중요하면 <code>stack&lt;int, vector&lt;int&gt;&gt;</code>로 vector 기반으로 바꿀 수 있어. 일반적으로 더 빠름!
+  </div>
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>stack_containers.cpp</div>
+    <pre><span class="h6"><span class="kw">#include</span> <span class="st">&lt;stack&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;vector&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;deque&gt;</span></span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// 기본 (deque 기반) — 메모리 단편화 가능</span>
+stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> s1;
+
+<span class="h1"><span class="cm">// vector 기반 — 캐시 친화적, 정올 추천!</span>
+stack<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> s2;</span>
+
+<span class="cm">// list 기반 (거의 안 씀)</span>
+stack<span class="op">&lt;</span><span class="tp">int</span>, list<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> s3;
+
+<span class="cm">// pair 저장 (인덱스+값 동시에)</span>
+<span class="h2">stack<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span> pstk;
+pstk.push({<span class="nm">3</span>, <span class="nm">10</span>}); <span class="cm">// {인덱스, 값}</span></span></pre>
+  </div>
+
+  <h3 style="margin-bottom:14px;">STL stack 전체 API</h3>
+  <table>
+    <tr><th>메서드</th><th>설명</th><th>복잡도</th><th>반환값</th></tr>
+    <tr><td><code>push(x)</code></td><td>top에 원소 삽입</td><td><span class="tag tem">O(1)</span></td><td>void</td></tr>
+    <tr><td><code>pop()</code></td><td>top 원소 제거</td><td><span class="tag tem">O(1)</span></td><td>void ⚠️</td></tr>
+    <tr><td><code>top()</code></td><td>top 원소 참조</td><td><span class="tag tem">O(1)</span></td><td>T&amp;</td></tr>
+    <tr><td><code>empty()</code></td><td>비어있으면 true</td><td><span class="tag tem">O(1)</span></td><td>bool</td></tr>
+    <tr><td><code>size()</code></td><td>원소 개수</td><td><span class="tag tem">O(1)</span></td><td>size_t</td></tr>
+    <tr><td><code>emplace(args)</code></td><td>직접 생성 push (C++11)</td><td><span class="tag tem">O(1)</span></td><td>void</td></tr>
+    <tr><td><code>swap(other)</code></td><td>두 스택 교환</td><td><span class="tag tem">O(1)</span></td><td>void</td></tr>
+  </table>
+
+  <div class="co cgd">
+    <strong>⚠️ pop()은 값을 반환하지 않아!</strong><br>
+    C++의 <code>pop()</code>은 제거만 해. 값을 꺼내려면 반드시 <code>top()</code>으로 먼저 읽고 <code>pop()</code>으로 제거해야 해!<br>
+    <code>int v = stk.top(); stk.pop();</code> — 이 패턴을 외워!
+  </div>
+</div>
+
+<!-- ========== PAGE 1: stack 기본 ========== -->
+<div class="pg" id="pg1">
+  <h2>STL stack 기본 사용법</h2>
+  <p class="psub">include부터 반복 패턴까지 — 정올에서 바로 쓰는 코드!</p>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>stack_basic.cpp — 완전 예제</div>
+    <pre><span class="h6"><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>  <span class="cm">// 정올: 헤더 한 줄로 끝!</span></span>
+<span class="kw">using namespace</span> std;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="h1"><span class="cm">// ① 선언 — vector 기반이 빠름</span>
+    stack<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> stk;</span>
+
+    <span class="cm">// ② push — O(1)</span>
+    stk.push(<span class="nm">10</span>);
+    stk.push(<span class="nm">20</span>);
+    stk.push(<span class="nm">30</span>);
+
+    <span class="cm">// ③ top + pop 패턴</span>
+    <span class="h2"><span class="kw">while</span> (!stk.empty()) {
+        cout <span class="op">&lt;&lt;</span> stk.top() <span class="op">&lt;&lt;</span> <span class="st">" "</span>;  <span class="cm">// 30 20 10</span>
+        stk.pop();
+    }</span>
+
+    <span class="cm">// ④ pair 저장 (인덱스, 값 쌍)</span>
+    <span class="h3">stack<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span> ps;
+    ps.push({<span class="nm">0</span>, <span class="nm">5</span>});   <span class="cm">// {인덱스=0, 값=5}</span>
+    ps.push({<span class="nm">1</span>, <span class="nm">3</span>});
+    <span class="kw">auto</span> [idx, val] = ps.top();  <span class="cm">// C++17 구조적 바인딩</span>
+    cout <span class="op">&lt;&lt;</span> idx <span class="op">&lt;&lt;</span> <span class="st">" "</span> <span class="op">&lt;&lt;</span> val;  <span class="cm">// 1 3</span></span>
+
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>괄호 검사 — STL 활용</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>bracket.cpp</div>
+        <pre><span class="kw">bool</span> <span class="fn">isValid</span>(string s) {
+    stack<span class="op">&lt;</span><span class="tp">char</span><span class="op">&gt;</span> stk;
+    <span class="kw">for</span> (<span class="tp">char</span> c : s) {
+<span class="h1">        <span class="kw">if</span> (c==<span class="st">'('</span>||c==<span class="st">'['</span>||c==<span class="st">'{'</span>)
+            stk.push(c);</span>
+<span class="h2">        <span class="kw">else</span> {
+            <span class="kw">if</span> (stk.empty()) <span class="kw">return false</span>;
+            <span class="tp">char</span> t = stk.top(); stk.pop();
+            <span class="kw">if</span> (c==<span class="st">')'</span> &amp;&amp; t!=<span class="st">'('</span>) <span class="kw">return false</span>;
+            <span class="kw">if</span> (c==<span class="st">']'</span> &amp;&amp; t!=<span class="st">'['</span>) <span class="kw">return false</span>;
+            <span class="kw">if</span> (c==<span class="st">'}'</span> &amp;&amp; t!=<span class="st">'{'</span>) <span class="kw">return false</span>;
+        }</span>
+    }
+    <span class="kw">return</span> stk.empty();
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <h3>스택으로 문자열 역순</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>reverse.cpp</div>
+        <pre>string <span class="fn">reverseStr</span>(string s) {
+    stack<span class="op">&lt;</span><span class="tp">char</span><span class="op">&gt;</span> stk;
+<span class="h1">    <span class="kw">for</span> (<span class="tp">char</span> c : s)
+        stk.push(c);</span>
+    string res;
+<span class="h2">    <span class="kw">while</span> (!stk.empty()) {
+        res += stk.top();
+        stk.pop();
+    }</span>
+    <span class="kw">return</span> res;
+}
+<span class="cm">// "hello" → "olleh"</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="co cvi">
+    <strong>정올 꿀팁 — emplace vs push</strong><br>
+    <code>push({1, 2})</code>는 pair를 먼저 만들고 복사. <code>emplace(1, 2)</code>는 스택 안에서 직접 생성해서 약간 더 빨라.<br>
+    성능이 민감한 문제라면 emplace 사용을 고려해봐!
+  </div>
+</div>
+
+<!-- ========== PAGE 2: 단조 스택 ========== -->
+<div class="pg" id="pg2">
+  <h2>단조 스택 (Monotonic Stack)</h2>
+  <p class="psub">STL stack으로 NGE(오큰수) 패턴 완성!</p>
+
+  <div class="co cbl">
+    <strong>단조 스택이란?</strong> 스택 안의 원소가 항상 단조 증가 또는 단조 감소 순서를 유지하는 스택.<br>
+    <strong>오큰수(NGE)</strong> = 각 원소의 오른쪽에서 자신보다 처음으로 큰 원소.
+  </div>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>nge_stl.cpp — 오큰수 (Next Greater Element)</div>
+    <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n; cin <span class="op">&gt;&gt;</span> n;
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> a(n), ans(n, -<span class="nm">1</span>);
+    <span class="kw">for</span> (<span class="tp">int</span>&amp; x : a) cin <span class="op">&gt;&gt;</span> x;
+
+    <span class="h1"><span class="cm">// STL stack에 인덱스 저장 (단조 감소 유지)</span>
+    stack<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> stk;</span>
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) {
+        <span class="cm">// 현재 값이 top보다 크면 → top이 찾던 오큰수!</span>
+<span class="h2">        <span class="kw">while</span> (!stk.empty() &amp;&amp; a[stk.top()] <span class="op">&lt;</span> a[i]) {
+            ans[stk.top()] = a[i];
+            stk.pop();
+        }</span>
+<span class="h3">        stk.push(i);</span>
+    }
+    <span class="cm">// 스택에 남은 것 → 오큰수 없음 (-1)</span>
+    <span class="kw">for</span> (<span class="tp">int</span> x : ans) cout <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+<span class="cm">// 입력: 3 5 2 7 / 출력: 5 7 7 -1</span></pre>
+  </div>
+
+  <div class="card2">
+    <div class="card">
+      <h3>NSE — 오왼쪽수 (Next Smaller)</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>nse_stl.cpp</div>
+        <pre>vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> <span class="fn">nse</span>(vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>&amp; a) {
+    <span class="tp">int</span> n = a.size();
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> ans(n, -<span class="nm">1</span>);
+    stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> stk;
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) {
+<span class="h4">        <span class="kw">while</span> (!stk.empty() &amp;&amp;
+               a[stk.top()] <span class="op">&gt;</span> a[i]) {
+            ans[stk.top()] = a[i];
+            stk.pop();
+        }</span>
+        stk.push(i);
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <h3>왼쪽 방향 오큰수 (Previous Greater)</h3>
+      <div class="cw">
+        <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>pge_stl.cpp</div>
+        <pre>vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> <span class="fn">pge</span>(vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>&amp; a) {
+    <span class="tp">int</span> n = a.size();
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> ans(n, -<span class="nm">1</span>);
+    stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> stk;
+<span class="h5">    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) {
+        <span class="kw">while</span> (!stk.empty() &amp;&amp;
+               a[stk.top()] <span class="op">&lt;=</span> a[i])
+            stk.pop();
+        <span class="kw">if</span> (!stk.empty())
+            ans[i] = stk.top();
+        stk.push(i);
+    }</span>
+    <span class="kw">return</span> ans;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="co cgd">
+    <strong>단조 스택 비교표</strong><br>
+    단조 감소 스택 (pop 조건: a[top] &lt; a[i]) → 오큰수(NGE)<br>
+    단조 증가 스택 (pop 조건: a[top] &gt; a[i]) → 오작은수(NSE), 히스토그램<br>
+    역방향 순회 → 이전 큰수(PGE), 이전 작은수(PSE)
+  </div>
+</div>
+
+<!-- ========== PAGE 3: 히스토그램 ========== -->
+<div class="pg" id="pg3">
+  <h2>히스토그램 최대 직사각형</h2>
+  <p class="psub">STL stack으로 O(n) 풀이!</p>
+
+  <div class="co cem">
+    <strong>문제</strong>: 너비 1인 막대들의 히스토그램에서 만들 수 있는 <strong>최대 직사각형 넓이</strong>를 구하라.<br>
+    단조 증가 스택으로 O(n)에 해결!
+  </div>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>histogram_stl.cpp — 완전 풀이</div>
+    <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="tp">long long</span> <span class="fn">largestRect</span>(vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>&amp; h) {
+    <span class="tp">int</span> n = h.size();
+    h.push_back(<span class="nm">0</span>); <span class="cm">// 센티널 추가!</span>
+
+    <span class="h1"><span class="cm">// STL stack — 단조 증가 (인덱스 저장)</span>
+    stack<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> stk;</span>
+    <span class="tp">long long</span> maxA = <span class="nm">0</span>;
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i <span class="op">&lt;=</span> n; i++) {
+<span class="h2">        <span class="kw">while</span> (!stk.empty() &amp;&amp; h[stk.top()] <span class="op">&gt;</span> h[i]) {
+            <span class="tp">int</span> idx = stk.top(); stk.pop();
+            <span class="tp">int</span> w = stk.empty() ? i : i - stk.top() - <span class="nm">1</span>;
+            maxA = max(maxA, (<span class="tp">long long</span>)h[idx] * w);
+        }</span>
+<span class="h3">        stk.push(i);</span>
+    }
+    h.pop_back(); <span class="cm">// 센티널 제거</span>
+    <span class="kw">return</span> maxA;
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n; cin <span class="op">&gt;&gt;</span> n;
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> h(n);
+    <span class="kw">for</span> (<span class="tp">int</span>&amp; x : h) cin <span class="op">&gt;&gt;</span> x;
+    cout <span class="op">&lt;&lt;</span> <span class="fn">largestRect</span>(h) <span class="op">&lt;&lt;</span> <span class="st">"\n"</span>;
+}</pre>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-bottom:12px;">너비 계산 공식 이해</h4>
+    <table>
+      <tr><th>상황</th><th>너비 공식</th><th>의미</th></tr>
+      <tr><td>스택이 비어있음</td><td style="font-family:var(--mono);color:var(--em);">w = i</td><td>왼쪽 끝까지 전부</td></tr>
+      <tr><td>스택에 원소 있음</td><td style="font-family:var(--mono);color:var(--bl);">w = i - stk.top() - 1</td><td>두 경계 사이</td></tr>
+    </table>
+    <div class="co cor" style="margin-bottom:0;font-size:14px;">
+      <strong>long long 필수!</strong> h[i]×w 최대값이 10^10을 넘을 수 있어. int 오버플로우 주의!
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 4: DFS 스택 ========== -->
+<div class="pg" id="pg4">
+  <h2>스택 DFS (STL stack 활용)</h2>
+  <p class="psub">재귀 대신 STL stack으로 명시적 DFS!</p>
+
+  <div class="co cbl">
+    <strong>왜 스택 DFS?</strong> 재귀 DFS는 시스템 콜 스택을 쓰기 때문에 깊이 제한이 있어.<br>
+    STL stack을 쓰면 <strong>스택 오버플로우 없이</strong> 깊은 그래프도 탐색 가능!
+  </div>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>dfs_stl.cpp — 인접 행렬</div>
+    <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">const</span> <span class="tp">int</span> MAXN = <span class="nm">1001</span>;
+
+vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> adj[MAXN];
+<span class="tp">bool</span> visited[MAXN];
+
+<span class="tp">void</span> <span class="fn">dfs_stack</span>(<span class="tp">int</span> start) {
+<span class="h1">    stack<span class="op">&lt;</span><span class="tp">int</span>, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> stk;
+    stk.push(start);</span>
+
+    <span class="kw">while</span> (!stk.empty()) {
+<span class="h2">        <span class="tp">int</span> v = stk.top(); stk.pop();</span>
+        <span class="kw">if</span> (visited[v]) <span class="kw">continue</span>;
+<span class="h3">        visited[v] = <span class="kw">true</span>;
+        cout <span class="op">&lt;&lt;</span> v <span class="op">&lt;&lt;</span> <span class="st">" "</span>;</span>
+        <span class="cm">// 역순 push → 오름차순 방문</span>
+<span class="h4">        <span class="kw">for</span> (<span class="tp">int</span> i = adj[v].size()-<span class="nm">1</span>; i <span class="op">&gt;=</span> <span class="nm">0</span>; i--)
+            <span class="kw">if</span> (!visited[adj[v][i]])
+                stk.push(adj[v][i]);</span>
+    }
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n, m; cin <span class="op">&gt;&gt;</span> n <span class="op">&gt;&gt;</span> m;
+    <span class="kw">for</span> (<span class="tp">int</span> i=<span class="nm">0</span>; i<span class="op">&lt;</span>m; i++) {
+        <span class="tp">int</span> u, v; cin <span class="op">&gt;&gt;</span> u <span class="op">&gt;&gt;</span> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    <span class="kw">for</span> (<span class="tp">int</span> v=<span class="nm">1</span>; v<span class="op">&lt;=</span>n; v++)
+        sort(adj[v].begin(), adj[v].end());
+    <span class="fn">dfs_stack</span>(<span class="nm">1</span>);
+}</pre>
+  </div>
+
+  <div class="card">
+    <h3>연결 요소 개수 세기</h3>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>connected_components_stl.cpp</div>
+      <pre><span class="tp">int</span> components = <span class="nm">0</span>;
+<span class="h5"><span class="kw">for</span> (<span class="tp">int</span> v = <span class="nm">1</span>; v <span class="op">&lt;=</span> n; v++) {
+    <span class="kw">if</span> (!visited[v]) {
+        <span class="fn">dfs_stack</span>(v);
+        components++;
+    }
+}</span>
+cout <span class="op">&lt;&lt;</span> components <span class="op">&lt;&lt;</span> <span class="st">"\n"</span>;</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 5: 투 스택 ========== -->
+<div class="pg" id="pg5">
+  <h2>투 스택 (Two Stacks)</h2>
+  <p class="psub">두 가지 패턴 — 공유 배열 & 두 스택으로 큐!</p>
+
+  <div class="ttabs">
+    <div class="ttab on" id="tt50" onclick="switchTab(5,0)">① 두 스택으로 큐 구현</div>
+    <div class="ttab"    id="tt51" onclick="switchTab(5,1)">② 공유 배열 두 스택</div>
+  </div>
+
+  <div class="tcontent on" id="tc50">
+    <div class="co cvi">
+      <strong>두 스택으로 큐 (inbox + outbox)</strong><br>
+      enqueue → inbox에 push / dequeue → outbox가 비면 inbox를 전부 이동 후 pop<br>
+      분할 상환 <strong>O(1)</strong>! 각 원소는 최대 3번만 처리돼.
+    </div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>two_stack_queue_stl.cpp</div>
+      <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">struct</span> <span class="fn">StackQueue</span> {
+<span class="h1">    stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> inbox, outbox;</span>
+
+    <span class="tp">void</span> <span class="fn">enqueue</span>(<span class="tp">int</span> x) {
+<span class="h2">        inbox.push(x);</span>
+    }
+
+    <span class="tp">int</span> <span class="fn">dequeue</span>() {
+        <span class="kw">if</span> (outbox.empty()) {
+<span class="h3">            <span class="kw">while</span> (!inbox.empty()) {
+                outbox.push(inbox.top());
+                inbox.pop();
+            }</span>
+        }
+        <span class="kw">if</span> (outbox.empty()) <span class="kw">return</span> -<span class="nm">1</span>; <span class="cm">// empty</span>
+<span class="h4">        <span class="tp">int</span> v = outbox.top(); outbox.pop(); <span class="kw">return</span> v;</span>
+    }
+
+    <span class="tp">int</span> <span class="fn">front</span>() {
+        <span class="kw">if</span> (outbox.empty() &amp;&amp; inbox.empty()) <span class="kw">return</span> -<span class="nm">1</span>;
+        <span class="kw">if</span> (!outbox.empty()) <span class="kw">return</span> outbox.top();
+        <span class="cm">// inbox bottom이 실제 front</span>
+        stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> tmp = inbox;
+        <span class="kw">while</span> (tmp.size() <span class="op">&gt;</span> <span class="nm">1</span>) tmp.pop();
+        <span class="kw">return</span> tmp.top();
+    }
+    <span class="tp">bool</span> <span class="fn">empty</span>() { <span class="kw">return</span> inbox.empty() &amp;&amp; outbox.empty(); }
+    <span class="tp">int</span>  <span class="fn">size</span>()  { <span class="kw">return</span> inbox.size() + outbox.size(); }
+};</pre>
+    </div>
+  </div>
+
+  <div class="tcontent" id="tc51">
+    <div class="co cem">
+      <strong>공유 배열 두 스택</strong><br>
+      배열 하나를 Stack A(왼쪽→)와 Stack B(←오른쪽)가 나눠 써. 공간 낭비 없음!<br>
+      STL stack은 독립적이므로, 공유 배열 패턴은 직접 구현하거나 pair 활용.
+    </div>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>shared_array_two_stacks.cpp</div>
+      <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">#define</span> <span class="nm">MAX 100</span>
+
+<span class="kw">struct</span> <span class="fn">TwoStacks</span> {
+<span class="h1">    <span class="tp">int</span> arr[MAX];
+    <span class="tp">int</span> top1 = -<span class="nm">1</span>;       <span class="cm">// A: 왼쪽→</span>
+    <span class="tp">int</span> top2 = MAX;      <span class="cm">// B: ←오른쪽</span></span>
+
+    <span class="tp">bool</span> <span class="fn">full</span>()  { <span class="kw">return</span> top1 + <span class="nm">1</span> == top2; }
+    <span class="tp">bool</span> <span class="fn">emptyA</span>(){ <span class="kw">return</span> top1 == -<span class="nm">1</span>; }
+    <span class="tp">bool</span> <span class="fn">emptyB</span>(){ <span class="kw">return</span> top2 == MAX; }
+
+<span class="h2">    <span class="tp">void</span> <span class="fn">pushA</span>(<span class="tp">int</span> x) { <span class="kw">if</span>(!<span class="fn">full</span>()) arr[++top1]=x; }
+    <span class="tp">void</span> <span class="fn">pushB</span>(<span class="tp">int</span> x) { <span class="kw">if</span>(!<span class="fn">full</span>()) arr[--top2]=x; }</span>
+<span class="h3">    <span class="tp">int</span>  <span class="fn">popA</span>()  { <span class="kw">return</span> <span class="fn">emptyA</span>()?-<span class="nm">1</span>:arr[top1--]; }
+    <span class="tp">int</span>  <span class="fn">popB</span>()  { <span class="kw">return</span> <span class="fn">emptyB</span>()?-<span class="nm">1</span>:arr[top2++]; }</span>
+};</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 6: 최소 스택 ========== -->
+<div class="pg" id="pg6">
+  <h2>최소 스택 (Min Stack)</h2>
+  <p class="psub">STL stack 두 개로 getMin() O(1)!</p>
+
+  <div class="co crd">
+    <strong>문제</strong>: push, pop, top 외에 <strong>현재 스택의 최솟값을 O(1)에 반환</strong>하는 getMin()을 구현하라.
+  </div>
+
+  <div class="cw">
+    <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>min_stack_stl.cpp — 보조 스택 방법 (정올 추천)</div>
+    <pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="fn">MinStack</span> {
+<span class="h1">    stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> stk;     <span class="cm">// 메인 스택</span>
+    stack<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> minStk;  <span class="cm">// 각 단계의 최솟값</span>
+</span>
+<span class="kw">public</span>:
+    <span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+<span class="h2">        stk.push(x);
+        <span class="tp">int</span> newMin = minStk.empty() ? x : min(x, minStk.top());
+        minStk.push(newMin);</span>
+    }
+
+    <span class="tp">int</span> <span class="fn">pop</span>() {
+        <span class="tp">int</span> v = stk.top();
+<span class="h3">        stk.pop(); minStk.pop(); <span class="cm">// 항상 같이!</span></span>
+        <span class="kw">return</span> v;
+    }
+
+<span class="h4">    <span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> minStk.top(); } <span class="cm">// O(1)!</span></span>
+    <span class="tp">int</span> <span class="fn">top</span>()    { <span class="kw">return</span> stk.top(); }
+    <span class="tp">bool</span> <span class="fn">empty</span>() { <span class="kw">return</span> stk.empty(); }
+    <span class="tp">int</span> <span class="fn">size</span>()   { <span class="kw">return</span> stk.size(); }
+};</pre>
+  </div>
+
+  <div class="card">
+    <h3>쌍(pair) 방법 — 스택 하나로!</h3>
+    <div class="cw">
+      <div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>min_stack_pair.cpp</div>
+      <pre><span class="kw">class</span> <span class="fn">MinStackPair</span> {
+<span class="h5">    stack<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span> stk; <span class="cm">// {값, 현재최솟값}</span></span>
+<span class="kw">public</span>:
+    <span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> x) {
+        <span class="tp">int</span> curMin = stk.empty() ? x : min(x, stk.top().second);
+        stk.push({x, curMin});
+    }
+    <span class="tp">int</span> <span class="fn">pop</span>()    { <span class="tp">int</span> v=stk.top().first; stk.pop(); <span class="kw">return</span> v; }
+    <span class="tp">int</span> <span class="fn">getMin</span>() { <span class="kw">return</span> stk.top().second; }
+    <span class="tp">int</span> <span class="fn">top</span>()    { <span class="kw">return</span> stk.top().first; }
+};</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 7: 인터랙티브 ========== -->
+<div class="pg" id="pg7">
+  <h2>인터랙티브 STL Stack 데모</h2>
+  <p class="psub">직접 조작하면서 STL stack의 동작을 눈으로 확인해봐!</p>
+
+  <div class="ttabs">
+    <div class="ttab on" id="tt70" onclick="switchTab(7,0)">기본 stack</div>
+    <div class="ttab"    id="tt71" onclick="switchTab(7,1)">단조 스택(NGE)</div>
+    <div class="ttab"    id="tt72" onclick="switchTab(7,2)">Min Stack</div>
+    <div class="ttab"    id="tt73" onclick="switchTab(7,3)">두 스택으로 큐</div>
+  </div>
+
+  <!-- Basic Stack Demo -->
+  <div class="tcontent on" id="tc70">
+    <div class="demo-wrap">
+      <div class="sl">STL stack 시각화</div>
+      <div class="stack-visual" id="sv-basic"><div class="sv-empty">비어 있음</div></div>
+      <div class="stats2">
+        <div class="stat">size() = <span id="bs-size" style="color:var(--bl);">0</span></div>
+        <div class="stat">top() = <span id="bs-top" style="color:var(--or);">-</span></div>
+        <div class="stat">empty() = <span id="bs-empty" style="color:var(--gd);">true</span></div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="bs-val" value="10" placeholder="값">
+        <button class="btn bpush" onclick="bsPush()">push(x)</button>
+        <button class="btn bpop"  onclick="bsPop()">pop()</button>
+        <button class="btn btop"  onclick="bsTop()">top()</button>
+        <button class="btn bauto" onclick="bsAuto()">⏩ 자동</button>
+        <button class="btn brst"  onclick="bsReset()">↺ 초기화</button>
+      </div>
+      <div class="sl">실행 로그</div>
+      <div class="log" id="bs-log"><span class="li">push 버튼을 눌러봐!</span></div>
+    </div>
+  </div>
+
+  <!-- NGE Demo -->
+  <div class="tcontent" id="tc71">
+    <div class="demo-wrap">
+      <div class="sl">배열 입력 (공백 구분)</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input class="inp" type="text" id="nge-arr" value="3 5 2 7 1 6" style="width:200px;">
+        <button class="btn bpush" onclick="ngeRun()">▶ 오큰수 계산</button>
+        <button class="btn brst"  onclick="ngeReset()">↺ 초기화</button>
+      </div>
+      <div id="nge-vis" style="overflow-x:auto;"></div>
+      <div class="log" id="nge-log" style="margin-top:12px;"><span class="li">배열을 입력하고 실행!</span></div>
+    </div>
+  </div>
+
+  <!-- Min Stack Demo -->
+  <div class="tcontent" id="tc72">
+    <div class="demo-wrap">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">
+        <div>
+          <div class="sl">메인 스택 (stk)</div>
+          <div class="stack-visual" id="sv-main" style="min-height:120px;"><div class="sv-empty">비어 있음</div></div>
+        </div>
+        <div>
+          <div class="sl">min 보조 스택 (minStk)</div>
+          <div class="stack-visual" id="sv-min" style="min-height:120px;"><div class="sv-empty">비어 있음</div></div>
+        </div>
+      </div>
+      <div class="stats2">
+        <div class="stat">top() = <span id="ms-top" style="color:var(--or);">-</span></div>
+        <div class="stat" style="background:var(--rd-l);border-color:var(--rd-m);">getMin() = <span id="ms-min" style="color:var(--rd);font-weight:900;">-</span></div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="ms-val" value="5" placeholder="값">
+        <button class="btn bpush" onclick="msPush()">push(x)</button>
+        <button class="btn bpop"  onclick="msPop()">pop()</button>
+        <button class="btn btop"  onclick="msGetMin()">getMin()</button>
+        <button class="btn bauto" onclick="msAuto()">⏩ 자동</button>
+        <button class="btn brst"  onclick="msReset()">↺ 초기화</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="ms-log"><span class="li">push로 값을 넣어봐!</span></div>
+    </div>
+  </div>
+
+  <!-- Queue via two stacks demo -->
+  <div class="tcontent" id="tc73">
+    <div class="demo-wrap">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;margin-bottom:12px;align-items:center;">
+        <div>
+          <div class="sl" style="color:var(--em);">inbox 스택</div>
+          <div class="stack-visual" id="sv-inbox" style="min-height:120px;"><div class="sv-empty">비어 있음</div></div>
+        </div>
+        <div style="text-align:center;font-size:22px;color:var(--or);padding-top:30px;">→</div>
+        <div>
+          <div class="sl" style="color:var(--or);">outbox 스택</div>
+          <div class="stack-visual" id="sv-outbox" style="min-height:120px;"><div class="sv-empty">비어 있음</div></div>
+        </div>
+      </div>
+      <div class="stats2">
+        <div class="stat">큐 size = <span id="qs-size" style="color:var(--bl);">0</span></div>
+        <div class="stat">front = <span id="qs-front" style="color:var(--em);">-</span></div>
+      </div>
+      <div class="ctrl">
+        <input class="inp" type="number" id="qs-val" value="10" placeholder="값">
+        <button class="btn bpush" onclick="qsEnq()">enqueue(x)</button>
+        <button class="btn bpop"  onclick="qsDeq()">dequeue()</button>
+        <button class="btn brst"  onclick="qsReset()">↺ 초기화</button>
+      </div>
+      <div class="sl">로그</div>
+      <div class="log" id="qs-log"><span class="li">enqueue로 값을 넣어봐!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 8: 퀴즈 ========== -->
+<div class="pg" id="pg8">
+  <h2>STL stack 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 12문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 12</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 12 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<script>
+/* ===== PAGE NAV ===== */
+function goPage(n) {
+  for (var i = 0; i < 9; i++) {
+    document.getElementById('pg' + i).classList.remove('on');
+    document.getElementById('nt' + i).classList.remove('on');
+  }
+  document.getElementById('pg' + n).classList.add('on');
+  document.getElementById('nt' + n).classList.add('on');
+}
+
+/* ===== TAB SWITCH ===== */
+function switchTab(page, tab) {
+  var tabs = document.querySelectorAll('#pg' + page + ' .ttab');
+  var contents = document.querySelectorAll('#pg' + page + ' .tcontent');
+  tabs.forEach(function(t, i) { t.classList.toggle('on', i === tab); });
+  contents.forEach(function(c, i) { c.classList.toggle('on', i === tab); });
+}
+
+/* ===== BASIC STACK DEMO ===== */
+var bsArr = [], bsTimer = null;
+
+function bsLog(msg, cls) {
+  var log = document.getElementById('bs-log');
+  var d = document.createElement('div');
+  d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function bsRender() {
+  var sv = document.getElementById('sv-basic');
+  if (bsArr.length === 0) {
+    sv.innerHTML = '<div class="sv-empty">비어 있음 — empty() = true</div>';
+  } else {
+    sv.innerHTML = bsArr.map(function(v, i) {
+      var isTop = i === bsArr.length - 1;
+      return '<div class="sv-cell ' + (isTop ? 'ctop' : 'cnorm') + '">' + v + (isTop ? ' ← top()' : '') + '</div>';
+    }).join('');
+  }
+  document.getElementById('bs-size').textContent = bsArr.length;
+  document.getElementById('bs-top').textContent = bsArr.length ? bsArr[bsArr.length-1] : '-';
+  var emEl = document.getElementById('bs-empty');
+  emEl.textContent = bsArr.length === 0 ? 'true' : 'false';
+  emEl.style.color = bsArr.length === 0 ? 'var(--or)' : 'var(--em)';
+}
+
+function bsPush() {
+  var v = parseInt(document.getElementById('bs-val').value);
+  if (isNaN(v)) return;
+  if (bsArr.length >= 10) { bsLog('스택이 가득 찼어! (데모용 최대 10개)', 'li'); return; }
+  bsArr.push(v);
+  bsRender();
+  setTimeout(function() {
+    var cells = document.querySelectorAll('#sv-basic .sv-cell');
+    if (cells.length) cells[cells.length-1].classList.add('sv-in');
+  }, 10);
+  bsLog('stk.push(' + v + ')  →  size=' + bsArr.length, 'lem');
+}
+
+function bsPop() {
+  if (!bsArr.length) { bsLog('stk.empty() == true → pop() 불가!', 'li'); return; }
+  var v = bsArr.pop();
+  bsRender();
+  bsLog('stk.top()=' + v + '; stk.pop();  →  size=' + bsArr.length, 'lor');
+}
+
+function bsTop() {
+  if (!bsArr.length) { bsLog('stk.empty() == true → top() 불가!', 'li'); return; }
+  bsLog('stk.top() = ' + bsArr[bsArr.length-1] + '  (스택 변화 없음)', 'lvi');
+}
+
+function bsReset() {
+  clearTimeout(bsTimer);
+  bsArr = [];
+  bsRender();
+  document.getElementById('bs-log').innerHTML = '<span class="li">↺ 초기화됨!</span>';
+}
+
+function bsAuto() {
+  bsReset();
+  var ops = [
+    function(){document.getElementById('bs-val').value=5; bsPush();},
+    function(){document.getElementById('bs-val').value=3; bsPush();},
+    function(){document.getElementById('bs-val').value=8; bsPush();},
+    function(){bsTop();},
+    function(){bsPop();},
+    function(){document.getElementById('bs-val').value=1; bsPush();},
+    function(){bsPop();},
+    function(){bsPop();},
+    function(){bsPop();}
+  ];
+  var idx = 0;
+  function tick() {
+    if (idx < ops.length) { ops[idx++](); bsTimer = setTimeout(tick, 700); }
+  }
+  setTimeout(tick, 200);
+}
+bsRender();
+
+/* ===== NGE DEMO ===== */
+function ngeReset() {
+  document.getElementById('nge-vis').innerHTML = '';
+  document.getElementById('nge-log').innerHTML = '<span class="li">배열을 입력하고 실행!</span>';
+}
+
+function ngeRun() {
+  var raw = document.getElementById('nge-arr').value.trim().split(/\s+/).map(Number).filter(function(x) { return !isNaN(x); });
+  if (raw.length < 2 || raw.length > 12) { alert('2~12개 숫자를 입력해줘!'); return; }
+  var n = raw.length;
+  var ans = new Array(n).fill(-1);
+  var stk = [];
+  var steps = [];
+
+  for (var i = 0; i < n; i++) {
+    var popped = [];
+    while (stk.length && raw[stk[stk.length-1]] < raw[i]) {
+      var idx = stk.pop();
+      ans[idx] = raw[i];
+      popped.push(idx);
+    }
+    stk.push(i);
+    steps.push({ i: i, stk: stk.slice(), popped: popped, ans: ans.slice() });
+  }
+
+  // Render array visualization
+  var vis = document.getElementById('nge-vis');
+  var html = '<div style="margin-bottom:12px;"><div class="sl">입력 배열과 오큰수 결과</div>';
+  html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">';
+  for (var i = 0; i < n; i++) {
+    html += '<div style="text-align:center;">';
+    html += '<div style="padding:8px 14px;background:var(--bl-l);border:1.5px solid var(--bl-m);border-radius:8px;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--bl);">' + raw[i] + '</div>';
+    html += '<div style="font-size:11px;color:var(--t4);margin-top:3px;">[' + i + ']</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+  for (var i = 0; i < n; i++) {
+    var color = ans[i] === -1 ? 'var(--t4)' : 'var(--em)';
+    html += '<div style="text-align:center;">';
+    html += '<div style="padding:8px 14px;background:' + (ans[i]===-1?'var(--s1)':'var(--em-l)') + ';border:1.5px solid ' + (ans[i]===-1?'var(--bd2)':'var(--em-m)') + ';border-radius:8px;font-family:var(--mono);font-size:16px;font-weight:700;color:' + color + ';">' + ans[i] + '</div>';
+    html += '<div style="font-size:10px;color:var(--t4);margin-top:3px;">NGE</div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+  vis.innerHTML = html;
+
+  // Log steps
+  var log = document.getElementById('nge-log');
+  log.innerHTML = '';
+  steps.forEach(function(s) {
+    var d = document.createElement('div');
+    if (s.popped.length) {
+      d.className = 'lor';
+      d.textContent = 'i=' + s.i + '(val=' + raw[s.i] + '): pop ' + s.popped.map(function(p){return 'idx'+p+'('+raw[p]+')→NGE='+raw[s.i];}).join(', ') + '  스택:' + JSON.stringify(s.stk);
+    } else {
+      d.className = 'lem';
+      d.textContent = 'i=' + s.i + '(val=' + raw[s.i] + '): push  스택:' + JSON.stringify(s.stk);
+    }
+    log.appendChild(d);
+  });
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ===== MIN STACK DEMO ===== */
+var msMain = [], msMin = [], msAutoT = null;
+
+function msLog(msg, cls) {
+  var log = document.getElementById('ms-log');
+  var d = document.createElement('div');
+  d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function msRender() {
+  var curMin = msMin.length ? msMin[msMin.length-1] : null;
+  var sv = document.getElementById('sv-main');
+  if (!msMain.length) {
+    sv.innerHTML = '<div class="sv-empty">비어 있음</div>';
+  } else {
+    sv.innerHTML = msMain.map(function(v, i) {
+      var isTop = i === msMain.length-1;
+      var isMin = v === curMin;
+      var cls = isTop && isMin ? 'ctop' : isTop ? 'ctop' : isMin ? 'cmin' : 'cnorm';
+      return '<div class="sv-cell ' + cls + '">' + v + (isMin ? ' ★' : '') + '</div>';
+    }).join('');
+  }
+  var svMin = document.getElementById('sv-min');
+  if (!msMin.length) {
+    svMin.innerHTML = '<div class="sv-empty">비어 있음</div>';
+  } else {
+    svMin.innerHTML = msMin.map(function(v, i) {
+      var isTop = i === msMin.length-1;
+      return '<div class="sv-cell ' + (isTop ? 'cmin' : 'cnorm') + '">' + v + (isTop ? ' ←' : '') + '</div>';
+    }).join('');
+  }
+  document.getElementById('ms-top').textContent = msMain.length ? msMain[msMain.length-1] : '-';
+  document.getElementById('ms-min').textContent = msMin.length ? msMin[msMin.length-1] : '-';
+}
+
+function msPush() {
+  var v = parseInt(document.getElementById('ms-val').value);
+  if (isNaN(v)) return;
+  if (msMain.length >= 8) { msLog('데모용 최대 8개!', 'li'); return; }
+  msMain.push(v);
+  var newMin = msMin.length ? Math.min(v, msMin[msMin.length-1]) : v;
+  msMin.push(newMin);
+  msRender();
+  var info = v === newMin ? '새 최솟값!' : '기존 최솟값(' + newMin + ') 유지';
+  msLog('push(' + v + ') → minStk.top()=' + newMin + ' [' + info + ']', 'lem');
+}
+
+function msPop() {
+  if (!msMain.length) { msLog('비어있어!', 'li'); return; }
+  var v = msMain.pop(); msMin.pop();
+  msRender();
+  var newMin = msMin.length ? msMin[msMin.length-1] : '-';
+  msLog('top()=' + v + '; pop(); → 이제 getMin()=' + newMin, 'lor');
+}
+
+function msGetMin() {
+  if (!msMin.length) { msLog('스택 비어있음!', 'li'); return; }
+  msLog('getMin() = ' + msMin[msMin.length-1] + '  O(1)!', 'lvi');
+}
+
+function msReset() {
+  clearTimeout(msAutoT);
+  msMain = []; msMin = [];
+  msRender();
+  document.getElementById('ms-log').innerHTML = '<span class="li">↺ 초기화됨!</span>';
+}
+
+function msAuto() {
+  msReset();
+  var vs = [5, 3, 8, 1, 6];
+  var ops = vs.map(function(v) {
+    return function() { document.getElementById('ms-val').value = v; msPush(); };
+  });
+  ops.push(function(){msGetMin();});
+  ops.push(function(){msPop();});
+  ops.push(function(){msGetMin();});
+  var idx = 0;
+  function tick() { if (idx < ops.length) { ops[idx++](); msAutoT = setTimeout(tick, 700); } }
+  setTimeout(tick, 200);
+}
+msRender();
+
+/* ===== QUEUE VIA TWO STACKS DEMO ===== */
+var qsIn = [], qsOut = [], qsAutoT = null;
+
+function qsLog(msg, cls) {
+  var log = document.getElementById('qs-log');
+  var d = document.createElement('div');
+  d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function qsRender() {
+  var si = document.getElementById('sv-inbox');
+  var so = document.getElementById('sv-outbox');
+  if (!qsIn.length) si.innerHTML = '<div class="sv-empty">비어 있음</div>';
+  else si.innerHTML = qsIn.map(function(v,i){
+    var isTop = i === qsIn.length-1;
+    return '<div class="sv-cell ' + (isTop?'ctop':'cnorm') + '" style="border-color:var(--em-m);background:var(--em-l);color:var(--em);">' + v + '</div>';
+  }).join('');
+  if (!qsOut.length) so.innerHTML = '<div class="sv-empty">비어 있음</div>';
+  else so.innerHTML = qsOut.map(function(v,i){
+    var isTop = i === qsOut.length-1;
+    return '<div class="sv-cell ' + (isTop?'ctop':'cnorm') + '" style="border-color:var(--or-m);background:var(--or-l);color:var(--or);">' + v + (isTop?' ← front':'') + '</div>';
+  }).join('');
+  document.getElementById('qs-size').textContent = qsIn.length + qsOut.length;
+  var front = qsOut.length ? qsOut[qsOut.length-1] : (qsIn.length ? qsIn[0] : '-');
+  document.getElementById('qs-front').textContent = front;
+}
+
+function qsEnq() {
+  var v = parseInt(document.getElementById('qs-val').value);
+  if (isNaN(v)) return;
+  if (qsIn.length + qsOut.length >= 8) { qsLog('큐가 가득 찼어!', 'li'); return; }
+  qsIn.push(v);
+  qsRender();
+  qsLog('enqueue(' + v + ') → inbox.push(' + v + ')', 'lem');
+}
+
+function qsDeq() {
+  if (!qsIn.length && !qsOut.length) { qsLog('큐가 비어있어!', 'li'); return; }
+  if (!qsOut.length) {
+    qsLog('outbox 비어있음 → inbox 전부 이동! (' + qsIn.length + '개)', 'lor');
+    while (qsIn.length) qsOut.push(qsIn.pop());
+    qsRender();
+  }
+  var v = qsOut.pop();
+  qsRender();
+  qsLog('dequeue() = ' + v + ' (FIFO ✓)', 'lvi');
+}
+
+function qsReset() {
+  qsIn = []; qsOut = [];
+  qsRender();
+  document.getElementById('qs-log').innerHTML = '<span class="li">↺ 초기화됨!</span>';
+}
+qsRender();
+
+/* ===== QUIZ ===== */
+var QUIZ = [
+  { q: 'STL stack에서 pop()이 반환하는 것은?',
+    opts: ['제거된 원소', 'void (반환값 없음)', 'top 원소의 참조', 'bool'], ans: 1,
+    fb: 'pop()은 제거만 해! 값이 필요하면 top()으로 먼저 읽고 pop()으로 제거해. int v=stk.top(); stk.pop();' },
+  { q: '정올에서 성능상 가장 추천되는 stack 선언은?',
+    opts: ['stack<int> s', 'stack<int, list<int>> s', 'stack<int, vector<int>> s', 'stack<int, deque<int>> s'], ans: 2,
+    fb: 'vector 기반이 캐시 친화적! stack<int, vector<int>> s 를 사용해.' },
+  { q: '#include <bits/stdc++.h> 를 쓰면 별도로 <stack>을 include해야 하나?',
+    opts: ['항상 해야 함', '필요없음 — 모두 포함', 'stack 사용시만 필요', '컴파일러마다 다름'], ans: 1,
+    fb: 'bits/stdc++.h는 모든 표준 헤더를 포함해. 단, 정식 코드에서는 각 헤더를 명시하는 게 좋은 습관!' },
+  { q: '단조 감소 스택에서 pop 조건은?',
+    opts: ['a[top] > a[i]', 'a[top] < a[i]', 'a[top] == a[i]', 'stk.size() > 1'], ans: 1,
+    fb: '단조 감소 유지: 현재 값이 top보다 크면(a[top] < a[i]) pop! 이게 오큰수(NGE) 탐색의 핵심.' },
+  { q: '히스토그램 문제에서 스택이 비었을 때 너비는?',
+    opts: ['0', 'idx', 'i', 'i - stk.top() - 1'], ans: 2,
+    fb: '스택이 비어있으면 왼쪽 경계 없음 → 인덱스 0부터 i-1까지 → 너비 = i!' },
+  { q: 'STL stack에서 size()의 반환 타입은?',
+    opts: ['int', 'long long', 'size_t (unsigned)', 'ptrdiff_t'], ans: 2,
+    fb: 'size_t (unsigned 타입). size() > 0 대신 !empty()를 쓰는 게 더 명확해!' },
+  { q: 'Min Stack에서 pop할 때 minStk도 같이 pop하는 이유는?',
+    opts: ['속도 때문', 'main·minStk 크기가 항상 같아야 getMin이 정확', '메모리 절약', 'STL 규칙'], ans: 1,
+    fb: '두 스택 크기가 같아야 minStk.top()이 "현재 스택의 최솟값"을 정확히 나타내!' },
+  { q: '두 스택으로 큐 구현 시 dequeue의 분할 상환 복잡도는?',
+    opts: ['O(n)','O(1)','O(log n)','O(n²)'], ans: 1,
+    fb: '각 원소는 inbox push 1번 + outbox push 1번 + pop 1번 = 최대 3번. n번 연산 = 3n → 분할 상환 O(1)!' },
+  { q: 'C++17 구조적 바인딩으로 pair<int,int> top을 꺼내는 코드는?',
+    opts: ['auto p = stk.top(); int a=p.first, b=p.second;', 'auto [a,b] = stk.top();', 'int a,b = stk.top();', 'tie(a,b) = stk.top();'], ans: 1,
+    fb: 'C++17의 auto [a,b] = stk.top(); 가 가장 깔끔해! C++11이면 auto p=stk.top(); 후 p.first, p.second 사용.' },
+  { q: 'stack<int> stk에서 emplace와 push의 차이는?',
+    opts: ['없음', 'emplace는 객체를 직접 생성해서 복사 없음', 'push가 더 빠름', 'emplace는 pair만 가능'], ans: 1,
+    fb: 'emplace는 스택 안에서 직접 생성 (인플레이스 생성). 복잡한 객체일수록 성능 이득. int에서는 차이 없음.' },
+  { q: 'push(5), push(3), push(8) 후 top()은?',
+    opts: ['5', '3', '8', '16'], ans: 2,
+    fb: 'LIFO! 마지막에 push(8)했으므로 top()=8. size()=3.' },
+  { q: 'DFS 스택에서 이웃을 역순으로 push하는 이유는?',
+    opts: ['메모리 절약', '재귀 DFS와 방문 순서를 맞추기 위해', '필수 규칙', '속도 향상'], ans: 1,
+    fb: 'LIFO 특성상 마지막 push가 먼저 pop돼. 역순 push → 작은 번호가 top에 → 오름차순 방문 (재귀와 동일)!' }
+];
+
+var qScore = 0, qDone = 0;
+function renderQuiz() {
+  var box = document.getElementById('quiz-box');
+  box.innerHTML = '';
+  QUIZ.forEach(function(q, qi) {
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'qc' + qi;
+    var txt = document.createElement('div');
+    txt.className = 'qtext';
+    txt.textContent = 'Q' + (qi+1) + '. ' + q.q;
+    card.appendChild(txt);
+    var opts = document.createElement('div');
+    opts.className = 'qopts';
+    q.opts.forEach(function(o, oi) {
+      var opt = document.createElement('div');
+      opt.className = 'qopt';
+      opt.id = 'qo' + qi + '_' + oi;
+      opt.textContent = String.fromCharCode(65+oi) + '. ' + o;
+      opt.setAttribute('data-qi', qi);
+      opt.setAttribute('data-oi', oi);
+      opt.onclick = function() { ansQ(parseInt(this.getAttribute('data-qi')), parseInt(this.getAttribute('data-oi'))); };
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+    var fb = document.createElement('div');
+    fb.className = 'qfb';
+    fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    box.appendChild(card);
+  });
+}
+
+function ansQ(qi, oi) {
+  if (document.getElementById('qo' + qi + '_0').classList.contains('locked')) return;
+  var q = QUIZ[qi];
+  for (var i = 0; i < q.opts.length; i++)
+    document.getElementById('qo' + qi + '_' + i).classList.add('locked');
+  document.getElementById('qo' + qi + '_' + oi).classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi !== q.ans) document.getElementById('qo' + qi + '_' + q.ans).classList.add('correct');
+  if (oi === q.ans) { qScore++; document.getElementById('qscore').textContent = qScore; }
+  var fb = document.getElementById('qfb' + qi);
+  fb.className = 'qfb show ' + (oi === q.ans ? 'ok' : 'bad');
+  fb.textContent = (oi === q.ans ? '\u2713 \uc815\ub2f5! ' : '\u2717 \uc624\ub2f5. ') + q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width = Math.round(qDone / QUIZ.length * 100) + '%';
+  document.getElementById('qplbl').textContent = qDone + ' / ' + QUIZ.length + ' \ud480\uc774';
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
