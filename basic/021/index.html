@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>중등올림피아드 이진탐색 인터렉티브 수업실습</title>
+<style>
+  :root{
+    --bg:#f7fbff; --card:#ffffff; --ink:#102033; --muted:#516173;
+    --blue:#2563eb; --green:#059669; --red:#dc2626; --orange:#f97316;
+    --purple:#7c3aed; --line:#d8e3f0; --soft:#eaf3ff; --yellow:#fff4c2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Malgun Gothic',Arial,sans-serif;background:linear-gradient(180deg,#f7fbff,#eef7ff);color:var(--ink);font-size:19px;line-height:1.7}
+  .wrap{max-width:1200px;margin:0 auto;padding:26px}
+  header{background:linear-gradient(135deg,#1d4ed8,#60a5fa);color:white;border-radius:24px;padding:34px;box-shadow:0 12px 30px rgba(37,99,235,.22)}
+  h1{margin:0 0 10px;font-size:40px;letter-spacing:-1px}
+  h2{font-size:30px;margin:34px 0 14px;border-left:10px solid var(--blue);padding-left:14px}
+  h3{font-size:24px;margin:22px 0 10px;color:#12325a}
+  .subtitle{font-size:22px;opacity:.95;margin:0}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:24px;margin:22px 0;box-shadow:0 8px 18px rgba(15,23,42,.06)}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  @media(max-width:850px){.grid,.grid3{grid-template-columns:1fr} h1{font-size:31px}.wrap{padding:14px}}
+  .pill{display:inline-block;background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:5px 12px;border-radius:999px;font-weight:800;margin:4px 4px 4px 0}
+  .note{background:#fff7ed;border:2px solid #fed7aa;border-radius:18px;padding:18px}
+  .formula{font-size:25px;text-align:center;background:#eff6ff;border:2px dashed #93c5fd;border-radius:18px;padding:18px;margin:14px 0;font-weight:900;color:#1e3a8a}
+  code,pre{font-family:Consolas,'Courier New',monospace}
+  pre{background:#0f172a;color:#e5e7eb;border-radius:18px;padding:20px;overflow:auto;font-size:16px;line-height:1.55;border:4px solid #334155}
+  .controls label{font-weight:900;display:block;margin:8px 0 6px}
+  input,select,button,textarea{font:inherit;border-radius:14px;border:2px solid #cbd5e1;padding:12px;background:white;color:var(--ink)}
+  textarea{width:100%;min-height:92px;resize:vertical}
+  button{background:#2563eb;color:white;border:none;font-weight:900;cursor:pointer;box-shadow:0 7px 0 #1e40af;transition:.08s;padding:12px 18px}
+  button:hover{filter:brightness(1.05)} button:active{transform:translateY(5px);box-shadow:0 2px 0 #1e40af}
+  button.secondary{background:#059669;box-shadow:0 7px 0 #047857}
+  button.warn{background:#f97316;box-shadow:0 7px 0 #c2410c}
+  button.gray{background:#475569;box-shadow:0 7px 0 #334155}
+  .array{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:center;margin:20px 0;min-height:100px}
+  .cell{min-width:58px;text-align:center;border:3px solid #94a3b8;border-radius:16px;background:white;overflow:hidden;position:relative;box-shadow:0 6px 12px rgba(15,23,42,.08)}
+  .idx{background:#e2e8f0;color:#334155;font-size:14px;font-weight:900;padding:2px 4px}
+  .val{font-size:27px;font-weight:900;padding:12px 8px}
+  .cell.left{border-color:var(--green);background:#ecfdf5}
+  .cell.right{border-color:var(--orange);background:#fff7ed}
+  .cell.mid{border-color:var(--blue);background:#dbeafe;transform:translateY(-8px)}
+  .cell.found{border-color:var(--red);background:#fee2e2;animation:pulse .8s infinite alternate}
+  .cell.out{opacity:.35;background:#f1f5f9}
+  @keyframes pulse{from{transform:translateY(-8px) scale(1)}to{transform:translateY(-8px) scale(1.08)}}
+  .legend span{display:inline-flex;align-items:center;gap:6px;margin:4px 10px 4px 0;font-weight:800}
+  .box{width:20px;height:20px;border-radius:6px;border:2px solid #64748b;display:inline-block}.bL{background:#ecfdf5;border-color:var(--green)}.bM{background:#dbeafe;border-color:var(--blue)}.bR{background:#fff7ed;border-color:var(--orange)}.bF{background:#fee2e2;border-color:var(--red)}
+  table{width:100%;border-collapse:collapse;background:white;border-radius:16px;overflow:hidden;margin-top:12px;font-size:17px}
+  th{background:#1e3a8a;color:white} th,td{border:1px solid #cbd5e1;padding:10px;text-align:center} tr:nth-child(even) td{background:#f8fafc}
+  .bigResult{font-size:24px;font-weight:900;background:#f0fdf4;border:2px solid #86efac;color:#065f46;border-radius:18px;padding:16px;text-align:center;margin:12px 0}
+  .fail{background:#fef2f2;border-color:#fecaca;color:#991b1b}.hide{display:none}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.tab{background:#e2e8f0;color:#0f172a;box-shadow:none}.tab.active{background:#2563eb;color:white}
+  .quizItem{border:2px solid #dbeafe;border-radius:16px;padding:15px;margin:12px 0;background:#f8fbff}.answer{display:none;background:#f0fdf4;border-left:8px solid #16a34a;padding:12px;border-radius:12px;margin-top:10px}.answer.show{display:block}
+  .stepbox{background:#f8fafc;border:2px solid #e2e8f0;border-radius:18px;padding:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>중등올림피아드 이진탐색 Binary Search</h1>
+  <p class="subtitle">정렬된 자료에서 절반씩 줄이며 빠르게 찾는 알고리즘을 직접 실습합니다.</p>
+</header>
+
+<section class="card">
+  <h2>1. 이진탐색이란?</h2>
+  <p>이진탐색은 <b>정렬된 배열</b>에서 원하는 값을 찾을 때 사용하는 매우 빠른 탐색 방법입니다.</p>
+  <div class="formula">가운데 값을 확인하고, 찾을 범위를 절반으로 줄인다.</div>
+  <div class="grid3">
+    <div class="note"><b>1단계</b><br>왼쪽 끝을 <b>left</b>, 오른쪽 끝을 <b>right</b>로 정합니다.</div>
+    <div class="note"><b>2단계</b><br>가운데 위치 <b>mid</b>를 계산합니다.</div>
+    <div class="note"><b>3단계</b><br>가운데 값과 찾는 값을 비교해서 왼쪽 또는 오른쪽 절반을 버립니다.</div>
+  </div>
+  <p><span class="pill">중요 조건</span> 배열은 반드시 정렬되어 있어야 합니다.</p>
+</section>
+
+<section class="card">
+  <h2>2. 왜 빠를까?</h2>
+  <p>처음부터 하나씩 찾는 방법을 <b>순차탐색</b>이라고 합니다. 자료가 1,000개라면 최악의 경우 1,000번 확인해야 합니다.</p>
+  <p>하지만 이진탐색은 한 번 확인할 때마다 범위가 절반으로 줄어듭니다.</p>
+  <table>
+    <tr><th>자료 개수</th><th>순차탐색 최악</th><th>이진탐색 대략</th></tr>
+    <tr><td>10개</td><td>10번</td><td>4번 정도</td></tr>
+    <tr><td>100개</td><td>100번</td><td>7번 정도</td></tr>
+    <tr><td>1,000개</td><td>1,000번</td><td>10번 정도</td></tr>
+    <tr><td>1,000,000개</td><td>1,000,000번</td><td>20번 정도</td></tr>
+  </table>
+  <div class="formula">시간복잡도: O(log N)</div>
+</section>
+
+<section class="card controls">
+  <h2>3. 이진탐색 직접 실습하기</h2>
+  <div class="grid">
+    <div>
+      <label>정렬된 숫자 배열</label>
+      <textarea id="arrInput">2 5 8 12 16 23 38 45 56 72 91</textarea>
+    </div>
+    <div>
+      <label>찾을 값 target</label>
+      <input id="targetInput" type="number" value="38" style="width:100%" />
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="resetSearch()">처음부터 보기</button>
+        <button class="secondary" onclick="nextStep()">한 단계 진행</button>
+        <button class="warn" onclick="autoRun()">자동 실행</button>
+        <button class="gray" onclick="makeExample()">예제 바꾸기</button>
+      </div>
+    </div>
+  </div>
+  <p class="legend"><span><i class="box bL"></i>left</span><span><i class="box bM"></i>mid</span><span><i class="box bR"></i>right</span><span><i class="box bF"></i>찾음</span></p>
+  <div id="arrayView" class="array"></div>
+  <div id="result" class="bigResult">처음부터 보기를 누르세요.</div>
+  <table id="logTable"><thead><tr><th>단계</th><th>left</th><th>right</th><th>mid</th><th>arr[mid]</th><th>판단</th><th>다음 범위</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section class="card">
+  <h2>4. 코드 작성 단계</h2>
+  <div class="stepbox"><b>1단계. 시작 범위 정하기</b><br><code>left = 0</code>, <code>right = n - 1</code>로 시작합니다.</div>
+  <div class="stepbox"><b>2단계. 반복 조건 만들기</b><br><code>left <= right</code>인 동안 찾을 수 있습니다.</div>
+  <div class="stepbox"><b>3단계. 가운데 위치 계산하기</b><br><code>mid = (left + right) / 2</code><br>큰 수에서는 안전하게 <code>mid = left + (right - left) / 2</code>를 사용합니다.</div>
+  <div class="stepbox"><b>4단계. 가운데 값 비교하기</b><br>같으면 찾은 것입니다. 작으면 오른쪽으로, 크면 왼쪽으로 범위를 줄입니다.</div>
+  <div class="stepbox"><b>5단계. 끝까지 못 찾으면 -1</b><br>반복이 끝났는데 못 찾으면 배열에 없는 값입니다.</div>
+</section>
+
+<section class="card">
+  <h2>5. C 코드 구현</h2>
+  <pre><code>#include &lt;stdio.h&gt;
+
+int binarySearch(int arr[], int n, int target) {
+    int left = 0;
+    int right = n - 1;
+
+    while (left &lt;= right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] == target) {
+            return mid;
+        }
+        else if (arr[mid] &lt; target) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+
+    return -1;
+}
+
+int main() {
+    int arr[] = {2, 5, 8, 12, 16, 23, 38, 45, 56, 72, 91};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int target = 38;
+
+    int result = binarySearch(arr, n, target);
+
+    if (result == -1) {
+        printf("찾는 값이 없습니다.\n");
+    } else {
+        printf("%d는 %d번째 위치에 있습니다.\n", target, result);
+    }
+
+    return 0;
+}</code></pre>
+</section>
+
+<section class="card">
+  <h2>6. Python 코드 구현</h2>
+  <pre><code>def binary_search(arr, target):
+    left = 0
+    right = len(arr) - 1
+
+    while left <= right:
+        mid = left + (right - left) // 2
+
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1
+
+arr = [2, 5, 8, 12, 16, 23, 38, 45, 56, 72, 91]
+target = 38
+
+result = binary_search(arr, target)
+
+if result == -1:
+    print("찾는 값이 없습니다.")
+else:
+    print(target, "는", result, "번째 위치에 있습니다.")</code></pre>
+</section>
+
+<section class="card">
+  <h2>7. 올림피아드에서 자주 나오는 이진탐색 유형</h2>
+  <div class="grid">
+    <div class="note"><b>유형 1. 값 찾기</b><br>정렬된 배열에서 특정 숫자가 있는지 찾습니다.</div>
+    <div class="note"><b>유형 2. lower_bound</b><br>target 이상이 처음 나오는 위치를 찾습니다.</div>
+    <div class="note"><b>유형 3. upper_bound</b><br>target보다 큰 값이 처음 나오는 위치를 찾습니다.</div>
+    <div class="note"><b>유형 4. 매개변수 탐색</b><br>정답이 될 수 있는 범위를 이진탐색합니다. 예: 랜선 자르기, 나무 자르기, 용량 정하기</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>8. lower_bound 실습</h2>
+  <p><b>lower_bound</b>는 정렬된 배열에서 <b>target 이상이 처음 나오는 위치</b>를 찾는 방법입니다.</p>
+  <div class="formula">arr[index] ≥ target 인 가장 작은 index</div>
+  <pre><code>int lowerBound(int arr[], int n, int target) {
+    int left = 0;
+    int right = n;
+
+    while (left &lt; right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] &gt;= target) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+}</code></pre>
+</section>
+
+<section class="card">
+  <h2>9. 확인 문제</h2>
+  <div class="quizItem"><b>문제 1.</b> 이진탐색을 사용하려면 배열은 어떤 상태여야 하나요?<div class="answer">정답: 정렬되어 있어야 합니다. 이진탐색은 가운데 값을 기준으로 왼쪽 또는 오른쪽을 버리기 때문입니다.</div></div>
+  <div class="quizItem"><b>문제 2.</b> 배열 [1, 3, 5, 7, 9]에서 7을 찾을 때 처음 mid 위치는 어디인가요?<div class="answer">정답: index 2입니다. left=0, right=4이므로 mid=(0+4)/2=2입니다.</div></div>
+  <div class="quizItem"><b>문제 3.</b> arr[mid] &lt; target이면 다음에는 어느 쪽을 탐색해야 하나요?<div class="answer">정답: 오른쪽입니다. 가운데 값이 너무 작으므로 left = mid + 1로 바꿉니다.</div></div>
+  <div class="quizItem"><b>문제 4.</b> 이진탐색의 시간복잡도는 무엇인가요?<div class="answer">정답: O(log N)입니다. 한 번 비교할 때마다 탐색 범위가 절반으로 줄어듭니다.</div></div>
+  <button onclick="showAnswers()">정답과 해설 보기</button>
+</section>
+
+<section class="card">
+  <h2>10. 수업 정리</h2>
+  <p>이진탐색은 단순히 코드를 외우는 알고리즘이 아닙니다. 핵심은 <b>정렬된 자료에서 가운데를 기준으로 탐색 범위를 절반씩 줄이는 생각</b>입니다.</p>
+  <p><span class="pill">left</span><span class="pill">right</span><span class="pill">mid</span> 세 변수가 어떻게 움직이는지 표로 추적하면 코드를 훨씬 쉽게 이해할 수 있습니다.</p>
+</section>
+</div>
+
+<script>
+let arr=[], target=0, left=0, right=0, step=0, finished=false, timer=null, logs=[];
+function parseArr(){
+  const raw=document.getElementById('arrInput').value.trim();
+  let a=raw.split(/[\s,]+/).filter(Boolean).map(Number).filter(x=>!Number.isNaN(x));
+  a=[...new Set(a)].sort((x,y)=>x-y);
+  document.getElementById('arrInput').value=a.join(' ');
+  return a;
+}
+function resetSearch(){
+  clearInterval(timer); timer=null;
+  arr=parseArr(); target=Number(document.getElementById('targetInput').value);
+  left=0; right=arr.length-1; step=0; finished=false; logs=[];
+  document.querySelector('#logTable tbody').innerHTML='';
+  document.getElementById('result').className='bigResult';
+  document.getElementById('result').textContent='탐색 준비 완료! 한 단계 진행을 눌러 보세요.';
+  renderArray(null);
+}
+function renderArray(mid, foundIndex=-1){
+  const view=document.getElementById('arrayView'); view.innerHTML='';
+  arr.forEach((v,i)=>{
+    const c=document.createElement('div'); c.className='cell';
+    if(i<left||i>right)c.classList.add('out');
+    if(i===left)c.classList.add('left');
+    if(i===right)c.classList.add('right');
+    if(i===mid)c.classList.add('mid');
+    if(i===foundIndex)c.classList.add('found');
+    c.innerHTML=`<div class="idx">index ${i}</div><div class="val">${v}</div>`;
+    view.appendChild(c);
+  });
+}
+function addLog(mid, decision, range){
+  const tb=document.querySelector('#logTable tbody');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${step}</td><td>${left}</td><td>${right}</td><td>${mid}</td><td>${arr[mid] ?? '-'}</td><td>${decision}</td><td>${range}</td>`;
+  tb.appendChild(tr);
+}
+function nextStep(){
+  if(arr.length===0 || (step===0 && document.querySelector('#logTable tbody').children.length===0 && !finished)) { if(arr.length===0) resetSearch(); }
+  if(finished)return;
+  if(left>right){
+    finished=true;
+    document.getElementById('result').className='bigResult fail';
+    document.getElementById('result').textContent=`${target}은 배열 안에 없습니다. 결과: -1`;
+    renderArray(null);return;
+  }
+  step++;
+  const mid=left+Math.floor((right-left)/2);
+  renderArray(mid);
+  let decision='', range='';
+  if(arr[mid]===target){
+    decision=`arr[mid] == target, 찾았다!`;
+    range=`정답 index ${mid}`;
+    addLog(mid,decision,range);
+    renderArray(mid,mid);
+    document.getElementById('result').className='bigResult';
+    document.getElementById('result').textContent=`성공! ${target}은 index ${mid}에 있습니다.`;
+    finished=true; clearInterval(timer); timer=null;
+  }else if(arr[mid]<target){
+    decision=`arr[mid] < target, 오른쪽 탐색`;
+    const old=left; left=mid+1; range=`left: ${old} → ${left}`;
+    addLog(mid,decision,range);
+    document.getElementById('result').textContent=`가운데 값 ${arr[mid]}은 ${target}보다 작습니다. 오른쪽으로 이동합니다.`;
+    setTimeout(()=>renderArray(null),350);
+  }else{
+    decision=`arr[mid] > target, 왼쪽 탐색`;
+    const old=right; right=mid-1; range=`right: ${old} → ${right}`;
+    addLog(mid,decision,range);
+    document.getElementById('result').textContent=`가운데 값 ${arr[mid]}은 ${target}보다 큽니다. 왼쪽으로 이동합니다.`;
+    setTimeout(()=>renderArray(null),350);
+  }
+}
+function autoRun(){
+  if(timer){clearInterval(timer);timer=null;return;}
+  if(step===0 && document.querySelector('#logTable tbody').children.length===0) resetSearch();
+  timer=setInterval(()=>{ if(finished){clearInterval(timer);timer=null;} else nextStep(); },900);
+}
+function makeExample(){
+  const examples=[
+    {a:'1 4 7 10 15 21 28 36 45 55',t:21},
+    {a:'3 6 9 12 18 24 30 42 60',t:25},
+    {a:'5 11 17 23 29 35 41 47 53',t:47},
+    {a:'2 8 16 32 64 128 256 512',t:128}
+  ];
+  const e=examples[Math.floor(Math.random()*examples.length)];
+  document.getElementById('arrInput').value=e.a; document.getElementById('targetInput').value=e.t; resetSearch();
+}
+function showAnswers(){document.querySelectorAll('.answer').forEach(x=>x.classList.add('show'));}
+resetSearch();
+</script>
+</body>
+</html>
