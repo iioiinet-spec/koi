@@ -41,6 +41,7 @@ basic
  main
    01. 다익스트라(Dijkstra)
     011. 정올 3163 정기권
+    012. 다익스트라(Dijkstra)-STL
    02. 정올 8605 거울
    03. 정올 8608 가방
    04. Binary Lifting
