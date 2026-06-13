@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다익스트라 C vs C++ STL | 세영코딩연구소</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght=400;500;700;900&family=JetBrains+Mono:wght=400;600;700&display=swap');
+:root{
+  --bg:#f4f7fb;--wh:#fff;--s1:#edf1f9;--s2:#e1e8f5;
+  --bd:#ccd4ea;--bd2:#b3bedd;
+  --t1:#101627;--t2:#243060;--t3:#586092;--t4:#9aa2c6;
+  --or:#c2410c;--or-l:#fff0e8;--or-m:#fdba74;
+  --tl:#0d7c6a;--tl-l:#d0faf0;--tl-m:#5ee4ca;
+  --bl:#1d4ed8;--bl-l:#dbeafe;--bl-m:#93c5fd;
+  --vi:#6d28d9;--vi-l:#ede9fe;--vi-m:#c4b5fd;
+  --gd:#b07800;--gd-l:#fff8d4;--gd-m:#ffd966;
+  --rd:#b91c1c;--rd-l:#fee2e2;--rd-m:#fca5a5;
+  --sk:#0369a1;--sk-l:#e0f2fe;--sk-m:#7dd3fc;
+  --pk:#be185d;--pk-l:#fce7f3;--pk-m:#f9a8d4;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans KR',sans-serif;
+  --r:10px;--r2:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:17px;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.75;}
+.hdr{background:var(--wh);border-bottom:2.5px solid var(--bd);display:flex;min-height:66px;}
+.hdr-s{width:10px;flex-shrink:0;background:linear-gradient(180deg,var(--or),var(--bl),var(--tl));}
+.hdr-b{display:flex;align-items:center;gap:12px;padding:12px 26px;flex:1;flex-wrap:wrap;}
+.hdr-logo{font-size:12px;font-weight:700;color:var(--t4);}
+.hdr-sep{color:var(--bd2);font-size:20px;}
+.hdr-title{font-size:21px;font-weight:900;color:var(--t1);}
+.badge{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;}
+.bc{background:#fce7f3;color:var(--pk);border:1.5px solid var(--pk-m);}
+.bs{background:var(--bl-l);color:var(--bl);border:1.5px solid var(--bl-m);}
+.bo{background:var(--gd-l);color:var(--gd);border:1.5px solid var(--gd-m);}
+
+.nav{background:var(--wh);border-bottom:1.5px solid var(--bd);display:flex;padding:0 18px;position:sticky;top:0;z-index:100;overflow-x:auto;}
+.nt{padding:13px 15px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .17s;user-select:none;}
+.nt:hover{color:var(--t2);border-bottom-color:var(--bd2);}
+.nt.on{color:var(--or);border-bottom-color:var(--or);font-weight:700;}
+
+.pg{display:none;max-width:1060px;margin:0 auto;padding:32px 24px 80px;}
+.pg.on{display:block;animation:pgIn .2s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+h2{font-size:26px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+h3{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:10px;}
+h4{font-size:15px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.psub{font-size:14px;color:var(--t3);margin-bottom:26px;}
+p{font-size:15px;color:var(--t2);margin-bottom:12px;line-height:1.8;}
+strong{color:var(--t1);font-weight:700;}
+code{font-family:var(--mono);font-size:.86em;background:var(--s2);padding:2px 6px;border-radius:4px;color:var(--or);}
+
+.co {border-radius:var(--r);padding:14px 18px;margin-bottom:16px;font-size:15px;line-height:1.8;border-left:4px solid;}
+.co strong{color:var(--t1);}
+.cor{background:var(--or-l);color:var(--t2);border-color:var(--or);}
+.ctl{background:var(--tl-l);color:var(--t2);border-color:var(--tl);}
+.cbl{background:var(--bl-l);color:var(--t2);border-color:var(--bl);}
+.cvi{background:var(--vi-l);color:var(--t2);border-color:var(--vi);}
+.cgd{background:var(--gd-l);color:var(--t2);border-color:var(--gd);}
+.crd{background:var(--rd-l);color:var(--t2);border-color:var(--rd);}
+.csk{background:var(--sk-l);color:var(--t2);border-color:var(--sk);}
+.cpk{background:var(--pk-l);color:var(--t2);border-color:var(--pk);}
+
+.card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:18px;}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+@media(max-width:700px){.card2{grid-template-columns:1fr;}}
+
+.cw{background:#131926;border-radius:var(--r2);overflow:hidden;margin-bottom:16px;border:1.5px solid #1c2640;}
+.cbr{background:#192236;padding:9px 16px;font-family:var(--mono);font-size:11px;color:#5878b8;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1c2640;}
+.dots{display:flex;gap:5px;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dr{background:#ff5f57;}.dy{background:#febc2e;}.dg{background:#28c840;}
+pre{padding:16px 20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:2.0;color:#c8d4f5;}
+.kw{color:#f472b6;}.tp{color:#7dd3fc;}.fn{color:#6ee7b7;}.nm{color:#fbbf24;}.cm{color:#344060;font-style:italic;}.st{color:#86efac;}.op{color:#fb923c;}
+.h1{background:rgba(13,124,106,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #34d399;}
+.h2{background:rgba(29,78,216,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #60a5fa;}
+.h3{background:rgba(109,40,217,.20);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #a78bfa;}
+.h4{background:rgba(194,65,12,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fb923c;}
+.h5{background:rgba(176,120,0,.15);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #fbbf24;}
+.h6{background:rgba(244,114,182,.18);display:block;margin:0 -20px;padding:0 20px;border-left:3px solid #f472b6;}
+
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:2px 3px;}
+.tor{background:var(--or-l);color:var(--or);border:1px solid var(--or-m);}
+.ttl{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.tbl{background:var(--bl-l);color:var(--bl);border:1px solid var(--bl-m);}
+.tvi{background:var(--vi-l);color:var(--vi);border:1px solid var(--vi-m);}
+.tgd{background:var(--gd-l);color:var(--gd);border:1px solid var(--gd-m);}
+.trd{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.tsk{background:var(--sk-l);color:var(--sk);border:1px solid var(--sk-m);}
+.tpk{background:var(--pk-l);color:var(--pk);border:1px solid var(--pk-m);}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;}
+th{background:var(--s1);color:var(--t2);font-weight:700;padding:10px 13px;text-align:left;border:1.5px solid var(--bd);}
+td{padding:9px 13px;border:1.5px solid var(--bd);color:var(--t2);background:var(--wh);}
+tr:hover td{background:var(--s1);}
+
+/* GRAPH CANVAS */
+.graph-wrap{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:12px;margin-bottom:12px;}
+#gcanvas{display:block;border-radius:var(--r);cursor:crosshair;}
+
+/* PQ display */
+.pq-wrap{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px;min-height:60px;max-height:180px;overflow-y:auto;margin-bottom:8px;}
+.pq-item{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-radius:7px;font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:3px;border:1.5px solid;}
+.pq-top{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.pq-norm{background:var(--wh);border-color:var(--bd2);color:var(--t2);}
+.pq-in{animation:pqIn .28s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pqIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:none;}}
+
+/* dist table */
+.dist-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.dist-cell{min-width:44px;padding:6px 8px;border-radius:7px;font-family:var(--mono);font-size:12px;font-weight:700;text-align:center;border:1.5px solid;transition:all .25s;}
+.dc-inf{background:var(--s1);border-color:var(--bd2);color:var(--t4);}
+.dc-upd{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.dc-done{background:var(--gd-l);border-color:var(--gd);color:var(--gd);}
+.dc-cur{background:var(--or-l);border-color:var(--or);color:var(--or);}
+
+/* diff view */
+.diff-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+@media(max-width:700px){.diff-wrap{grid-template-columns:1fr;}}
+.diff-title{text-align:center;font-size:14px;font-weight:700;padding:8px;border-radius:var(--r) var(--r) 0 0;margin-bottom:0;}
+.diff-c{background:#fce7f3;color:var(--pk);}
+.diff-cpp{background:var(--bl-l);color:var(--bl);}
+
+/* step info */
+.step-box{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--t2);min-height:56px;line-height:1.8;white-space:pre-wrap;margin-bottom:8px;}
+
+.ctrl{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.btn{padding:9px 16px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:var(--sans);transition:all .15s;}
+.btn:disabled{opacity:.38;cursor:default;}
+.brun{background:var(--or);color:#fff;}.brun:hover:not(:disabled){background:#9a3209;}
+.bstep{background:var(--bl-l);color:var(--bl);border-color:var(--bl-m);}.bstep:hover:not(:disabled){background:var(--bl);color:#fff;}
+.bauto{background:var(--vi-l);color:var(--vi);border-color:var(--vi-m);}.bauto:hover{background:var(--vi);color:#fff;}
+.brst{background:var(--wh);color:var(--t2);border-color:var(--bd2);}.brst:hover{border-color:var(--t2);}
+.bclear{background:var(--rd-l);color:var(--rd);border-color:var(--rd-m);}.bclear:hover{background:var(--rd);color:#fff;}
+.btool{padding:7px 13px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;}
+.btool:hover{border-color:var(--or);color:var(--or);}
+.btool.on{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.inp{padding:7px 10px;border-radius:var(--r);border:2px solid var(--bd);font-family:var(--mono);font-size:14px;color:var(--t1);background:var(--wh);outline:none;width:70px;}
+.inp:focus{border-color:var(--or);}
+
+.log{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:9px 14px;min-height:68px;max-height:130px;overflow-y:auto;font-family:var(--mono);font-size:12px;line-height:1.9;}
+.lem{color:var(--tl);font-weight:600;}.lor{color:var(--or);font-weight:600;}.lbl{color:var(--bl);font-weight:600;}.lvi{color:var(--vi);font-weight:600;}.lgd{color:var(--gd);font-weight:700;}.li{color:var(--t4);}
+.sl{font-size:11px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.prog-wrap{height:5px;background:var(--bd);border-radius:3px;margin-bottom:8px;}
+.prog-fill{height:5px;background:linear-gradient(90deg,var(--or),var(--tl));border-radius:3px;transition:width .3s;}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
+.ldot{width:13px;height:13px;border-radius:50%;border:2px solid;flex-shrink:0;}
+
+.ttabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.ttab{padding:8px 15px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--t3);transition:all .15s;user-select:none;}
+.ttab:hover{border-color:var(--or);color:var(--or);}
+.ttab.on{background:var(--or-l);border-color:var(--or);color:var(--or);}
+.tc{display:none;}.tc.on{display:block;animation:pgIn .2s ease;}
+
+.sim-layout{display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start;}
+@media(max-width:740px){.sim-layout{grid-template-columns:1fr;}}
+
+.qcard{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:20px 24px;margin-bottom:16px;}
+.qtext{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:14px;line-height:1.65;}
+.qopts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:11px 16px;border-radius:var(--r);background:var(--s1);border:2px solid var(--bd);cursor:pointer;font-size:14px;color:var(--t2);transition:all .15s;user-select:none;}
+.qopt:hover:not(.locked){border-color:var(--or);color:var(--or);background:var(--or-l);}
+.qopt.correct{background:var(--tl-l);border-color:var(--tl);color:var(--tl);}
+.qopt.wrong{background:var(--rd-l);border-color:var(--rd);color:var(--rd);}
+.qopt.locked{cursor:default;}
+.qfb{display:none;margin-top:10px;padding:11px 14px;border-radius:var(--r);font-size:14px;line-height:1.7;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--tl-l);color:var(--tl);border:1px solid var(--tl-m);}
+.qfb.bad{background:var(--rd-l);color:var(--rd);border:1px solid var(--rd-m);}
+.swrap{display:flex;align-items:center;gap:16px;margin-bottom:22px;background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r2);padding:14px 20px;}
+.sbig{font-size:38px;font-weight:900;color:var(--or);font-family:var(--mono);}
+.qpbar{height:7px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.qpfill{height:7px;background:linear-gradient(90deg,var(--or),var(--tl));border-radius:4px;transition:width .4s;}
+.qplbl{font-size:13px;color:var(--t3);margin-top:4px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-s"></div>
+  <div class="hdr-b">
+    <span class="hdr-logo">세영코딩연구소 · ph.D Kim</span>
+    <span class="hdr-sep">|</span>
+    <span class="hdr-title">다익스트라 알고리즘 — C vs C++ STL</span>
+    <span class="badge bc">C언어</span>
+    <span class="badge bs">C++ STL</span>
+    <span class="badge bo">인터랙티브</span>
+  </div>
+</header>
+<nav class="nav">
+  <div class="nt on" id="nt0" onclick="goPage(0)">📖 개념</div>
+  <div class="nt"    id="nt1" onclick="goPage(1)">🔧 C 구현</div>
+  <div class="nt"    id="nt2" onclick="goPage(2)">⚡ C++ STL</div>
+  <div class="nt"    id="nt3" onclick="goPage(3)">⚖ C vs C++ 비교</div>
+  <div class="nt"    id="nt4" onclick="goPage(4)">🎮 그래프 시뮬</div>
+  <div class="nt"    id="nt5" onclick="goPage(5)">🗺 격자 Dijkstra</div>
+  <div class="nt"    id="nt6" onclick="goPage(6)">📊 성능 분석</div>
+  <div class="nt"    id="nt7" onclick="goPage(7)">🧠 퀴즈</div>
+</nav>
+
+<div class="pg on" id="pg0">
+  <h2>다익스트라 알고리즘이란?</h2>
+  <p class="psub">세영코딩연구소 · 정올 골드 | 음수 없는 가중치 그래프의 단일 출발 최단 경로</p>
+  <div class="co cor">
+    <strong>핵심 아이디어</strong><br>
+    "아직 확정되지 않은 노드 중 dist가 가장 작은 것을 꺼내서 이웃을 완화(Relaxation)"<br>
+    탐욕(Greedy) 알고리즘 — 한 번 확정된 노드는 다시 갱신되지 않아!
+  </div>
+  <div class="card2">
+    <div class="card">
+      <h3>동작 3단계</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:15px;">
+        <div style="padding:11px 14px;background:var(--or-l);border-radius:var(--r);border:1.5px solid var(--or-m);">
+          <strong style="color:var(--or);">① 초기화</strong><br>
+          출발 노드 dist=0, 나머지 dist=INF<br>
+          출발 노드를 우선순위 큐에 push
+        </div>
+        <div style="padding:11px 14px;background:var(--tl-l);border-radius:var(--r);border:1.5px solid var(--tl-m);">
+          <strong style="color:var(--tl);">② 큐에서 최소값 꺼내기</strong><br>
+          dist[v] 보다 큰 구식 값이면 skip<br>
+          해당 노드를 "확정(visited)"
+        </div>
+        <div style="padding:11px 14px;background:var(--bl-l);border-radius:var(--r);border:1.5px solid var(--bl-m);">
+          <strong style="color:var(--bl);">③ 이웃 완화(Relaxation)</strong><br>
+          dist[v]+w &lt; dist[u] 이면 갱신<br>
+          갱신된 노드를 큐에 push
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>복잡도 비교</h3>
+      <table style="margin-bottom:12px;">
+        <tr><th>구현</th><th>시간복잡도</th><th>공간</th></tr>
+        <tr><td>배열 탐색 (brute)</td><td style="color:var(--rd);">O(V²)</td><td>O(V)</td></tr>
+        <tr><td>이진 힙 + 인접리스트</td><td style="color:var(--tl);font-weight:700;">O((V+E)logV)</td><td>O(V+E)</td></tr>
+        <tr><td>피보나치 힙</td><td style="color:var(--bl);">O(E + VlogV)</td><td>O(V+E)</td></tr>
+      </table>
+      <div class="co csk" style="margin-bottom:0;font-size:13px;">
+        정올에서는 <strong>이진 힙 + 인접리스트</strong>가 표준!<br>
+        V, E ≤ 100,000일 때 충분히 빠름.
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;">왜 음수 간선은 안 되나?</h3>
+    <p style="font-size:15px;color:var(--t2);">다익스트라는 "한 번 확정된 노드의 거리는 최단"이라고 가정해. 음수 간선이 있으면 이미 확정된 노드를 더 짧은 경로로 재방문할 수 있어서 이 가정이 깨져!</p>
+    <div class="co crd" style="margin-bottom:0;font-size:14px;">
+      음수 간선 → <strong>벨만-포드(Bellman-Ford)</strong> O(VE) 사용<br>
+      음수 사이클 탐지 → 벨만-포드 V번째 반복에서 갱신 확인
+    </div>
+  </div>
+  <h3 style="margin-bottom:12px;">다익스트라 vs 다른 최단경로</h3>
+  <table>
+    <tr><th>알고리즘</th><th>조건</th><th>복잡도</th><th>정올 활용</th></tr>
+    <tr><td><strong style="color:var(--or);">다익스트라</strong></td><td>양수 가중치</td><td>O((V+E)logV)</td><td>단일 출발, 가중 그래프</td></tr>
+    <tr><td>벨만-포드</td><td>음수 가중치 OK</td><td>O(VE)</td><td>음수 간선, 사이클 탐지</td></tr>
+    <tr><td>플로이드-워샬</td><td>모든 쌍</td><td>O(V³)</td><td>V≤500 소규모 전체 쌍</td></tr>
+    <tr><td>0-1 BFS</td><td>0 또는 1만</td><td>O(V+E)</td><td>비용 0/1 격자 최단</td></tr>
+    <tr><td>BFS</td><td>가중치 없음</td><td>O(V+E)</td><td>비가중 최단 경로</td></tr>
+  </table>
+</div>
+
+<div class="pg" id="pg1">
+  <h2>다익스트라 — C 언어 구현</h2>
+  <p class="psub">Min-Heap을 직접 구현해서 우선순위 큐 만들기!</p>
+  <div class="co cpk">
+    <strong>C에서의 도전</strong>: STL이 없으므로 Min-Heap을 배열로 직접 구현해야 해.<br>
+    인접 리스트도 연결리스트 또는 배열+오프셋으로 직접 만들어야 함.
+  </div>
+  <div class="ttabs">
+    <div class="ttab on" id="c10" onclick="switchTab(1,0)">① 자료구조 선언</div>
+    <div class="ttab"    id="c11" onclick="switchTab(1,1)">② 인접 리스트</div>
+    <div class="ttab"    id="c12" onclick="switchTab(1,2)">③ Min-Heap</div>
+    <div class="ttab"    id="c13" onclick="switchTab(1,3)">④ Dijkstra 함수</div>
+    <div class="ttab"    id="c14" onclick="switchTab(1,4)">⑤ 완성 코드</div>
+  </div>
+  <div class="tc on" id="ct10">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_dijkstra_01_struct.c</div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAXN  100001</span>
+<span class="kw">#define</span> <span class="nm">MAXE  200001</span>
+<span class="kw">#define</span> <span class="nm">INF   0x3f3f3f3f</span>
+
+<span class="cm">/* ── 인접 리스트 (정적 배열 기반) ── */</span>
+<span class="h1"><span class="tp">int</span> head[MAXN];            <span class="cm">// head[v] = v의 첫 번째 간선 인덱스</span>
+<span class="tp">int</span> to[MAXE], wt[MAXE];   <span class="cm">// 간선 목적지, 가중치</span>
+<span class="tp">int</span> nxt[MAXE];             <span class="cm">// 같은 노드의 다음 간선 인덱스</span>
+<span class="tp">int</span> ecnt = <span class="nm">0</span>;             <span class="cm">// 간선 카운터</span></span>
+
+<span class="cm">/* ── Min-Heap (우선순위 큐) ── */</span>
+<span class="h2"><span class="kw">typedef struct</span> { <span class="tp">int</span> dist, node; } HeapNode;
+HeapNode heap[MAXE];
+<span class="tp">int</span> heapSz = <span class="nm">0</span>;</span>
+
+<span class="cm">/* ── 거리 배열 ── */</span>
+<span class="h3"><span class="tp">int</span> dist[MAXN];
+<span class="tp">int</span> visited[MAXN];</span>
+
+<span class="tp">int</span> N, M;  <span class="cm">// 노드 수, 간선 수</span></pre></div>
+  </div>
+  <div class="tc" id="ct11">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_dijkstra_02_adjlist.c</div>
+<pre><span class="cm">/* ── 간선 추가 (정적 연결 리스트 패턴) ── */</span>
+<span class="tp">void</span> <span class="fn">addEdge</span>(<span class="tp">int</span> u, <span class="tp">int</span> v, <span class="tp">int</span> w) {
+<span class="h1">    to[ecnt]  = v;
+    wt[ecnt]  = w;
+    nxt[ecnt] = head[u]; <span class="cm">// 기존 head를 next로</span>
+    head[u]   = ecnt++;  <span class="cm">// 새 간선이 head</span></span>
+}
+<span class="cm">/* head[u]에서 nxt[]를 따라가면 u의 모든 이웃 순회 */</span>
+<span class="cm">/* 역방향도 필요하면 addEdge(v, u, w)도 호출 */</span>
+
+<span class="cm">/* ── 초기화 ── */</span>
+<span class="h2"><span class="fn">memset</span>(head, -<span class="nm">1</span>, <span class="kw">sizeof</span>(head)); <span class="cm">// -1 = 간선 없음</span>
+<span class="fn">memset</span>(dist, <span class="nm">0x3f</span>, <span class="kw">sizeof</span>(dist)); <span class="cm">// INF로 초기화</span>
+<span class="fn">memset</span>(visited, <span class="nm">0</span>, <span class="kw">sizeof</span>(visited));</span>
+
+<span class="cm">/* ── 순회 패턴 ── */</span>
+<span class="h3"><span class="kw">for</span> (<span class="tp">int</span> e = head[v]; e != -<span class="nm">1</span>; e = nxt[e]) {
+    <span class="tp">int</span> u = to[e], w = wt[e];
+    <span class="cm">// u는 v의 이웃, 가중치 w</span>
+}</span></pre></div>
+  </div>
+  <div class="tc" id="ct12">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_dijkstra_03_minheap.c</div>
+<pre><span class="cm">/* ── Min-Heap 구현 ── */</span>
+<span class="tp">void</span> <span class="fn">heapUp</span>(<span class="tp">int</span> i) {
+    <span class="kw">while</span> (i > <span class="nm">0</span>) {
+        <span class="tp">int</span> p = (i-<span class="nm">1</span>)/<span class="nm">2</span>;
+<span class="h1">        <span class="kw">if</span> (heap[p].dist <span class="op">&lt;=</span> heap[i].dist) <span class="kw">break</span>;
+        HeapNode tmp = heap[p]; heap[p]=heap[i]; heap[i]=tmp;
+        i = p;</span>
+    }
+}
+<span class="tp">void</span> <span class="fn">heapDown</span>(<span class="tp">int</span> i) {
+    <span class="kw">while</span> (<span class="nm">2</span>*i+<span class="nm">1</span> <span class="op">&lt;</span> heapSz) {
+        <span class="tp">int</span> l=<span class="nm">2</span>*i+<span class="nm">1</span>, r=<span class="nm">2</span>*i+<span class="nm">2</span>, s=i;
+<span class="h2">        <span class="kw">if</span>(l<span class="op">&lt;</span>heapSz &amp;&amp; heap[l].dist<span class="op">&lt;</span>heap[s].dist) s=l;
+        <span class="kw">if</span>(r<span class="op">&lt;</span>heapSz &amp;&amp; heap[r].dist<span class="op">&lt;</span>heap[s].dist) s=r;
+        <span class="kw">if</span>(s==i) <span class="kw">break</span>;
+        HeapNode tmp=heap[i]; heap[i]=heap[s]; heap[s]=tmp;
+        i=s;</span>
+    }
+}
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> d, <span class="tp">int</span> v){heap[heapSz++]=(HeapNode){d,v};<span class="fn">heapUp</span>(heapSz-<span class="nm">1</span>);}
+<span class="h3">HeapNode <span class="fn">pop</span>(){HeapNode r=heap[<span class="nm">0</span>];heap[<span class="nm">0</span>]=heap[--heapSz];<span class="fn">heapDown</span>(<span class="nm">0</span>);<span class="kw">return</span> r;}</span></pre></div>
+  </div>
+  <div class="tc" id="ct13">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_dijkstra_04_main.c</div>
+<pre><span class="tp">void</span> <span class="fn">dijkstra</span>(<span class="tp">int</span> src) {
+<span class="h1">    dist[src] = <span class="nm">0</span>;
+    <span class="fn">push</span>(<span class="nm">0</span>, src);</span>
+    <span class="kw">while</span> (heapSz <span class="op">&gt;</span> <span class="nm">0</span>) {
+<span class="h2">        HeapNode cur = <span class="fn">pop</span>();
+        <span class="tp">int</span> v = cur.node, d = cur.dist;
+        <span class="cm">// 구식 값 무시!</span>
+        <span class="kw">if</span> (visited[v]) <span class="kw">continue</span>;
+        visited[v] = <span class="nm">1</span>;</span>
+<span class="h3">        <span class="kw">for</span> (<span class="tp">int</span> e=head[v]; e!=-<span class="nm">1</span>; e=nxt[e]) {
+            <span class="tp">int</span> u=to[e], nd=d+wt[e];
+            <span class="kw">if</span> (nd <span class="op">&lt;</span> dist[u]) {
+                dist[u]=nd;
+                <span class="fn">push</span>(nd, u);
+            }
+        }</span>
+    }
+}</pre></div>
+  </div>
+  <div class="tc" id="ct14">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>c_dijkstra_complete.c</div>
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span>
+<span class="kw">#define</span> <span class="nm">MAXN 100001</span>
+<span class="kw">#define</span> <span class="nm">MAXE 200001</span>
+<span class="kw">#define</span> <span class="nm">INF  0x3f3f3f3f</span>
+<span class="tp">int</span> head[MAXN],to[MAXE],wt[MAXE],nxt[MAXE],ecnt;
+<span class="tp">int</span> dist[MAXN],vis[MAXN];
+<span class="kw">typedef struct</span>{<span class="tp">int</span> d,v;}HN;
+HN heap[MAXE];<span class="tp">int</span> hsz;
+<span class="tp">void</span> <span class="fn">swp</span>(HN*a,HN*b){HN t=*a;*a=*b;*b=t;}
+<span class="tp">void</span> <span class="fn">up</span>(<span class="tp">int</span> i){<span class="kw">while</span>(i&amp;&amp;heap[(i-1)/2].d>heap[i].d){<span class="fn">swp</span>(&heap[(i-1)/2],&heap[i]);i=(i-1)/2;}}
+<span class="tp">void</span> <span class="fn">dn</span>(<span class="tp">int</span> i){<span class="kw">int</span> s,l,r;<span class="kw">while</span>((l=2*i+1)&lt;hsz){r=l+1;s=i;<span class="kw">if</span>(heap[l].d&lt;heap[s].d)s=l;<span class="kw">if</span>(r&lt;hsz&&heap[r].d&lt;heap[s].d)s=r;<span class="kw">if</span>(s==i)<span class="kw">break</span>;<span class="fn">swp</span>(&heap[i],&heap[s]);i=s;}}
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> d,<span class="tp">int</span> v){heap[hsz++]=(HN){d,v};<span class="fn">up</span>(hsz-1);}
+HN   <span class="fn">pop</span>(){HN r=heap[0];heap[0]=heap[--hsz];<span class="fn">dn</span>(0);<span class="kw">return</span> r;}
+<span class="tp">void</span> <span class="fn">addE</span>(<span class="tp">int</span> u,<span class="tp">int</span> v,<span class="tp">int</span> w){to[ecnt]=v;wt[ecnt]=w;nxt[ecnt]=head[u];head[u]=ecnt++;}
+
+<span class="tp">void</span> <span class="fn">dijk</span>(<span class="tp">int</span> s){
+    dist[s]=0;<span class="fn">push</span>(0,s);
+    <span class="kw">while</span>(hsz){HN c=<span class="fn">pop</span>();<span class="kw">if</span>(vis[c.v])<span class="kw">continue</span>;vis[c.v]=1;
+        <span class="kw">for</span>(<span class="tp">int</span> e=head[c.v];e!=-1;e=nxt[e]){
+            <span class="tp">int</span> nd=c.d+wt[e];
+<span class="h1">            <span class="kw">if</span>(nd&lt;dist[to[e]]){dist[to[e]]=nd;<span class="fn">push</span>(nd,to[e]);}</span>
+        }
+    }
+}
+<span class="tp">int</span> <span class="fn">main</span>(){
+    <span class="tp">int</span> n,m,s; <span class="fn">scanf</span>(<span class="st">"%d%d%d"</span>,&n,&m,&s);
+    <span class="fn">memset</span>(head,-1,<span class="kw">sizeof</span>(head));
+    <span class="fn">memset</span>(dist,0x3f,<span class="kw">sizeof</span>(dist));
+    <span class="kw">for</span>(<span class="tp">int</span> i=0;i&lt;m;i++){<span class="tp">int</span> u,v,w;<span class="fn">scanf</span>(<span class="st">"%d%d%d"</span>,&u,&v,&w);<span class="fn">addE</span>(u,v,w);}
+    <span class="fn">dijk</span>(s);
+    <span class="kw">for</span>(<span class="tp">int</span> i=1;i&lt;=n;i++) <span class="fn">printf</span>(dist[i]==INF?<span class="st">"INF\n"</span>:<span class="st">"%d\n"</span>,dist[i]);
+}</pre></div>
+  </div>
+</div>
+
+<div class="pg" id="pg2">
+  <h2>다익스트라 — C++ STL 구현</h2>
+  <p class="psub">priority_queue + vector로 간결하게!</p>
+  <div class="co ctl">
+    C++에서는 STL의 <code>priority_queue</code>와 <code>vector</code>로 훨씬 짧고 안전하게 구현 가능!
+  </div>
+  <div class="ttabs">
+    <div class="ttab on" id="s20" onclick="switchTab(2,0)">① 기본 구현</div>
+    <div class="ttab"    id="s21" onclick="switchTab(2,1)">② 간결 버전</div>
+    <div class="ttab"    id="s22" onclick="switchTab(2,2)">③ 경로 복원</div>
+    <div class="ttab"    id="s23" onclick="switchTab(2,3)">④ 최적화 팁</div>
+  </div>
+  <div class="tc on" id="st20">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>cpp_dijkstra_basic.cpp</div>
+<pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">const</span> <span class="tp">int</span> INF = <span class="nm">0x3f3f3f3f</span>;
+<span class="kw">using</span> pii = pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;</span>;
+
+<span class="h1"><span class="cm">// 인접 리스트 — vector로 간단!</span>
+vector<span class="op">&lt;</span>pii<span class="op">&gt;</span> adj[<span class="nm">100001</span>]; <span class="cm">// {가중치, 목적지}</span></span>
+
+<span class="tp">void</span> <span class="fn">dijkstra</span>(<span class="tp">int</span> src, <span class="tp">int</span> n, vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>&amp; dist) {
+    dist.assign(n+<span class="nm">1</span>, INF);
+    dist[src] = <span class="nm">0</span>;
+
+<span class="h2">    <span class="cm">// Min-Heap: {거리, 노드}</span>
+    priority_queue<span class="op">&lt;</span>pii, vector<span class="op">&lt;</span>pii<span class="op">&gt;</span>, greater<span class="op">&lt;</span>pii<span class="op">&gt;&gt;</span> pq;
+    pq.push({<span class="nm">0</span>, src});</span>
+
+    <span class="kw">while</span> (!pq.empty()) {
+<span class="h3">        <span class="kw">auto</span> [d, v] = pq.top(); pq.pop();
+        <span class="kw">if</span> (d <span class="op">&gt;</span> dist[v]) <span class="kw">continue</span>; <span class="cm">// 구식값 무시!</span></span>
+<span class="h4">        <span class="kw">for</span> (<span class="kw">auto</span> [w, u] : adj[v]) {
+            <span class="kw">if</span> (dist[v]+w <span class="op">&lt;</span> dist[u]) {
+                dist[u] = dist[v]+w;
+                pq.push({dist[u], u});
+            }
+        }</span>
+    }
+}</pre></div>
+  </div>
+  <div class="tc" id="st21">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>cpp_dijkstra_compact.cpp</div>
+<pre><span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="kw">using</span> ll = <span class="tp">long long</span>;
+<span class="kw">using</span> pli = pair<span class="op">&lt;</span>ll,<span class="tp">int</span><span class="op">&gt;</span>;
+<span class="kw">const ll</span> INF = <span class="nm">1e18</span>;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    ios_base::sync_with_stdio(<span class="kw">false</span>); cin.tie(<span class="nm">NULL</span>);
+    <span class="tp">int</span> n, m, s; cin <span class="op">&gt;&gt;</span> n <span class="op">&gt;&gt;</span> m <span class="op">&gt;&gt;</span> s;
+
+<span class="h1">    vector<span class="op">&lt;</span>vector<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;&gt;</span> g(n+<span class="nm">1</span>);
+    <span class="kw">for</span> (<span class="tp">int</span> i=<span class="nm">0</span>;i<span class="op">&lt;=</span>m;i++){<span class="tp">int</span> u,v,w;cin<span class="op">&gt;&gt;</span>u<span class="op">&gt;&gt;</span>v<span class="op">&gt;&gt;</span>w;g[u].push_back({w,v});}
+</span>
+<span class="h2">    vector<span class="op">&lt;</span>ll<span class="op">&gt;</span> d(n+<span class="nm">1</span>, INF); d[s]=<span class="nm">0</span>;
+    priority_queue<span class="op">&lt;</span>pli,vector<span class="op">&lt;</span>pli<span class="op">&gt;</span>,greater<span class="op">&lt;</span><span class="op">&gt;&gt;</span> pq; pq.push({<span class="nm">0</span>,s});</span>
+
+    <span class="kw">while</span>(!pq.empty()) {
+        <span class="kw">auto</span> [dist,v]=pq.top(); pq.pop();
+<span class="h3">        <span class="kw">if</span>(dist>d[v]) <span class="kw">continue</span>;
+        <span class="kw">for</span>(<span class="kw">auto</span>[w,u]:g[v]) if(d[v]+w&lt;d[u]){d[u]=d[v]+w;pq.push({d[u],u});}</span>
+    }
+    <span class="kw">for</span>(<span class="tp">int</span> i=<span class="nm">1</span>;i<span class="op">&lt;=</span>n;i++) cout<span class="op">&lt;&lt;</span>(d[i]==INF?<span class="st">"INF"</span>:to_string(d[i]))<span class="op">&lt;&lt;</span><span class="st">"\n"</span>;
+}</pre></div>
+  </div>
+  <div class="tc" id="st22">
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>cpp_dijkstra_path.cpp</div>
+<pre><span class="cm">// 경로 복원 — prev[] 배열 추가</span>
+<span class="h1">vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> prev_node(n+<span class="nm">1</span>, -<span class="nm">1</span>);</span>
+
+<span class="cm">// dijkstra 내부에서 갱신 시</span>
+<span class="h2"><span class="kw">if</span>(dist[v]+w <span class="op">&lt;</span> dist[u]) {
+    dist[u] = dist[v]+w;
+    prev_node[u] = v;  <span class="cm">// u는 v에서 왔다!</span>
+    pq.push({dist[u], u});
+}</span>
+
+<span class="cm">// 경로 역추적 (목적지 → 출발지)</span>
+<span class="h3">vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> <span class="fn">getPath</span>(<span class="tp">int</span> src, <span class="tp">int</span> dst) {
+    vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> path;
+    <span class="kw">for</span> (<span class="tp">int</span> v=dst; v!=-<span class="nm">1</span>; v=prev_node[v])
+        path.push_back(v);
+    reverse(path.begin(), path.end());
+    <span class="kw">return</span> path; <span class="cm">// src → ... → dst</span>
+}</span></pre></div>
+  </div>
+  <div class="tc" id="st23">
+    <div class="co cgd"><strong>C++ 다익스트라 최적화 팁!</strong></div>
+    <div class="cw"><div class="cbr"><div class="dots"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span></div>cpp_dijkstra_tips.cpp</div>
+<pre><span class="cm">// ① reserve로 메모리 사전 할당</span>
+<span class="h1">adj[v].reserve(degree[v]); <span class="cm">// 차수 미리 알면 O(1) 할당</span></span>
+
+<span class="cm">// ② emplace_back으로 불필요한 복사 제거</span>
+<span class="h2">adj[u].emplace_back(w, v); <span class="cm">// push_back({w,v})보다 빠름</span></span>
+
+<span class="cm">// ③ 큰 가중치 → long long 사용</span>
+<span class="h3">vector<span class="op">&lt;</span><span class="tp">long long</span><span class="op">&gt;</span> dist(n+<span class="nm">1</span>, 1LL<span class="op">&lt;&lt;</span><span class="nm">62</span>); <span class="cm">// LLONG_MAX/2</span></span>
+
+<span class="cm">// ④ 입출력 최적화 (필수!)</span>
+<span class="h4">ios_base::sync_with_stdio(<span class="kw">false</span>);
+cin.tie(<span class="nm">NULL</span>);</span>
+
+<span class="cm">// ⑤ 노드 인덱스 0-based vs 1-based</span>
+<span class="h5"><span class="cm">// BOJ는 보통 1-based → dist(n+1, INF) 사용</span>
+<span class="cm">// adj.resize(n+1) 으로 인덱스 1~n 사용</span></span></pre></div>
+  </div>
+</div>
+
+<div class="pg" id="pg3">
+  <h2>C vs C++ STL — 나란히 비교</h2>
+  <p class="psub">같은 알고리즘을 두 언어로 비교!</p>
+  <div class="diff-wrap">
+    <div>
+      <div class="diff-title diff-c">C 언어 구현</div>
+      <div class="cw" style="border-radius:0 0 var(--r2) var(--r2);margin-bottom:0;">
+        <pre style="font-size:12px;line-height:1.85;">
+<span class="cm">// 그래프 선언</span>
+<span class="tp">int</span> head[N],to[E],wt[E],nxt[E];
+<span class="tp">int</span> ecnt=0;
+<span class="fn">memset</span>(head,-1,<span class="kw">sizeof</span>(head));
+
+<span class="cm">// 간선 추가</span>
+<span class="tp">void</span> <span class="fn">addE</span>(<span class="tp">int</span> u,<span class="tp">int</span> v,<span class="tp">int</span> w){
+  to[ecnt]=v; wt[ecnt]=w;
+  nxt[ecnt]=head[u];
+  head[u]=ecnt++; }
+
+<span class="cm">// Min-Heap (직접 구현 ~30줄)</span>
+<span class="kw">typedef struct</span>{<span class="tp">int</span> d,v;}HN;
+HN heap[E]; <span class="tp">int</span> hsz=0;
+<span class="tp">void</span> <span class="fn">push</span>(<span class="tp">int</span> d,<span class="tp">int</span> v){...}
+HN   <span class="fn">pop</span>(){...}
+
+<span class="cm">// Dijkstra</span>
+<span class="tp">int</span> dist[N], vis[N];
+<span class="fn">memset</span>(dist,<span class="nm">0x3f</span>,<span class="kw">sizeof</span>(dist));
+dist[src]=0; <span class="fn">push</span>(0,src);
+<span class="kw">while</span>(hsz){
+  HN c=<span class="fn">pop</span>();
+  <span class="kw">if</span>(vis[c.v]) <span class="kw">continue</span>;
+  vis[c.v]=1;
+  <span class="kw">for</span>(<span class="tp">int</span> e=head[c.v];
+      e!=-1;e=nxt[e]){
+    <span class="tp">int</span> nd=c.d+wt[e];
+    <span class="kw">if</span>(nd&lt;dist[to[e]]){
+      dist[to[e]]=nd;
+      <span class="fn">push</span>(nd,to[e]);
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <div>
+      <div class="diff-title diff-cpp">C++ STL 구현</div>
+      <div class="cw" style="border-radius:0 0 var(--r2) var(--r2);margin-bottom:0;">
+        <pre style="font-size:12px;line-height:1.85;">
+<span class="cm">// 그래프 선언</span>
+<span class="h1">vector<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span> adj[N];</span>
+
+<span class="cm">// 간선 추가</span>
+<span class="h1">adj[u].emplace_back(w,v);</span>
+
+<span class="cm">// (STL이 자동으로 관리)</span>
+<span class="cm">// Min-Heap — 한 줄!</span>
+<span class="h2">priority_queue<span class="op">&lt;</span>
+  pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;</span>,
+  vector<span class="op">&lt;</span>pair<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;&gt;</span>,
+  greater<span class="op">&lt;</span><span class="op">&gt;&gt;</span> pq;</span>
+
+<span class="cm">// Dijkstra</span>
+<span class="h3">vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span> d(n+1,INF);
+d[src]=0; pq.push({0,src});</span>
+<span class="kw">while</span>(!pq.empty()){
+  <span class="kw">auto</span>[dist,v]=pq.top();
+  pq.pop();
+<span class="h4">  <span class="kw">if</span>(dist&gt;d[v]) <span class="kw">continue</span>;</span>
+  <span class="kw">for</span>(<span class="kw">auto</span>[w,u]:adj[v])
+<span class="h4">    <span class="kw">if</span>(d[v]+w&lt;d[u]){
+      d[u]=d[v]+w;
+      pq.push({d[u],u});
+    }</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;">핵심 차이점 요약</h3>
+    <table style="margin-bottom:0;">
+      <tr><th>항목</th><th>C 언어</th><th>C++ STL</th></tr>
+      <tr><td>인접 리스트</td><td>정적 배열 + head/nxt 직접 관리</td><td><code>vector&lt;pair&gt;</code> 자동 관리</td></tr>
+      <tr><td>우선순위 큐</td><td>Min-Heap ~30줄 직접 구현</td><td><code>priority_queue + greater</code> 1줄</td></tr>
+      <tr><td>구식값 처리</td><td><code>if(visited[v]) continue</code></td><td><code>if(d&gt;dist[v]) continue</code></td></tr>
+      <tr><td>거리 초기화</td><td><code>memset(dist,0x3f,...)</code></td><td><code>vector(n+1, INF)</code></td></tr>
+      <tr><td>코드 길이</td><td style="color:var(--rd);">~80줄</td><td style="color:var(--tl);font-weight:700;">~25줄</td></tr>
+      <tr><td>버그 위험</td><td style="color:var(--rd);">힙 구현 실수 위험</td><td style="color:var(--tl);font-weight:700;">STL이 검증됨</td></tr>
+      <tr><td>속도</td><td>약간 빠름 (메모리 연속)</td><td>충분히 빠름 (정올 통과 수준)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="pg" id="pg4">
+  <h2>다익스트라 그래프 시뮬레이터</h2>
+  <p class="psub">노드를 클릭해서 간선을 추가하고, 단계별로 Dijkstra를 실행해봐!</p>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+    <div class="btool on" id="tool-node" onclick="setTool('node')">🔵 노드 추가</div>
+    <div class="btool"    id="tool-edge" onclick="setTool('edge')">➡ 간선 추가</div>
+    <div class="btool"    id="tool-src"  onclick="setTool('src')">🟢 출발 노드</div>
+    <div class="btool"    id="tool-del"  onclick="setTool('del')">🗑 삭제</div>
+    <span style="font-size:13px;color:var(--t3);align-self:center;">가중치:</span>
+    <input class="inp" type="number" id="edge-w" value="5" min="1" max="99" style="width:58px;">
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:#dbeafe;border-color:#1d4ed8;"></div>미방문</div>
+    <div class="leg"><div class="ldot" style="background:#fce7f3;border-color:#be185d;"></div>큐 안</div>
+    <div class="leg"><div class="ldot" style="background:#fff0e8;border-color:#c2410c;"></div>현재 처리</div>
+    <div class="leg"><div class="ldot" style="background:#d1fae5;border-color:#059669;"></div>확정</div>
+    <div class="leg"><div class="ldot" style="background:#fff8d4;border-color:#b07800;"></div>최단 경로</div>
+    <div class="leg"><div class="ldot" style="background:#1e293b;border-color:#334155;"></div>출발 노드</div>
+  </div>
+  <div class="sim-layout">
+    <div>
+      <div class="graph-wrap">
+        <canvas id="gcanvas" width="500" height="360"></canvas>
+      </div>
+      <div class="ctrl">
+        <button class="btn bstep"  id="btn-step" onclick="simStep()">▶ 한 단계</button>
+        <button class="btn bauto"  id="btn-auto" onclick="simAuto()">⏩ 자동</button>
+        <button class="btn brun"   id="btn-run"  onclick="simRun()">⚡ 즉시 완료</button>
+        <button class="btn brst"   onclick="simAlgoReset()">↺ 탐색 초기화</button>
+        <button class="btn bclear" onclick="graphClear()">🗑 격자 초기화</button>
+        <button class="btn" style="background:var(--sk-l);color:var(--sk);border-color:var(--sk-m);" onclick="loadSample()">📋 예제 로드</button>
+      </div>
+      <div class="sl">실행 로그</div>
+      <div class="log" id="sim-log"><span class="li">노드를 추가하고 출발점을 설정한 후 실행해봐!</span></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:10px;">
+        <div class="sl">현재 단계</div>
+        <div class="step-box" id="step-box">대기 중...</div>
+        <div class="sl">우선순위 큐 (Min-Heap)</div>
+        <div class="pq-wrap" id="pq-display"><div style="color:var(--t4);font-size:12px;">비어 있음</div></div>
+        <div class="sl">dist[] 배열</div>
+        <div class="dist-row" id="dist-display"></div>
+        <div class="sl">통계</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="stat" style="font-size:12px;">방문: <span id="stat-vis" style="color:var(--tl);">0</span></div>
+          <div class="stat" style="font-size:12px;">단계: <span id="stat-step" style="color:var(--or);">0</span></div>
+        </div>
+        <div class="prog-wrap" style="margin-top:6px;"><div class="prog-fill" id="sim-prog" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pg" id="pg5">
+  <h2>격자(Grid) 다익스트라</h2>
+  <p class="psub">2D 격자에서 가중치가 있는 최단 경로!</p>
+  <div class="co cbl">
+    격자에서 각 칸에 이동 비용이 있을 때 Dijkstra 적용.<br>
+    BFS는 모든 비용이 같을 때, Dijkstra는 칸마다 비용이 다를 때 사용해!
+  </div>
+  <div class="diff-wrap">
+    <div>
+      <div class="diff-title diff-c">C 격자 Dijkstra</div>
+      <div class="cw" style="border-radius:0 0 var(--r2) var(--r2);">
+        <pre style="font-size:12px;line-height:1.85;">
+#define INF 0x3f3f3f3f
+int cost[N][N], dist[N][N];
+typedef struct{int d,r,c;}Node;
+Node heap[N*N]; int hsz=0;
+/* Min-Heap push/pop 생략 */
+
+int dr[]={-1,1,0,0};
+int dc[]={ 0,0,-1,1};
+
+memset(dist,0x3f,sizeof(dist));
+dist[0][0]=cost[0][0];
+push(cost[0][0],0,0);
+
+while(hsz){
+  Node c=pop();
+  if(c.d&gt;dist[c.r][c.c]) continue;
+  for(int d=0;d&lt;4;d++){
+    int nr=c.r+dr[d];
+    int nc=c.c+dc[d];
+    if(nr&lt;0||nr&gt;=N) continue;
+    if(nc&lt;0||nc&gt;=N) continue;
+    int nd=c.d+cost[nr][nc];
+    if(nd&lt;dist[nr][nc]){
+      dist[nr][nc]=nd;
+      push(nd,nr,nc);
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <div>
+      <div class="diff-title diff-cpp">C++ 격자 Dijkstra</div>
+      <div class="cw" style="border-radius:0 0 var(--r2) var(--r2);">
+        <pre style="font-size:12px;line-height:1.85;">
+<span class="h1"><span class="kw">using</span> T3 = tuple<span class="op">&lt;</span><span class="tp">int</span>,<span class="tp">int</span>,<span class="tp">int</span><span class="op">&gt;</span>; <span class="cm">// {d,r,c}</span>
+priority_queue<span class="op">&lt;</span>T3,vector<span class="op">&lt;</span>T3<span class="op">&gt;</span>,
+  greater<span class="op">&lt;</span><span class="op">&gt;&gt;</span> pq;</span>
+
+<span class="tp">int</span> dr[]={-1,1,0,0};
+<span class="tp">int</span> dc[]={ 0,0,-1,1};
+
+<span class="h2">vector<span class="op">&lt;</span>vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;&gt;</span> d(N,vector<span class="op">&lt;</span><span class="tp">int</span><span class="op">&gt;</span>(N,INF));
+d[0][0]=cost[0][0];
+pq.push({d[0][0],0,0});</span>
+
+<span class="kw">while</span>(!pq.empty()){
+  <span class="kw">auto</span>[dist,r,c]=pq.top();pq.pop();
+<span class="h3">  <span class="kw">if</span>(dist&gt;d[r][c]) <span class="kw">continue</span>;</span>
+  <span class="kw">for</span>(<span class="tp">int</span> k=0;k&lt;4;k++){
+    <span class="tp">int</span> nr=r+dr[k], nc=c+dc[k];
+    <span class="kw">if</span>(nr&lt;0||nr&gt;=N||nc&lt;0||nc&gt;=N)
+      <span class="kw">continue</span>;
+<span class="h4">    <span class="tp">int</span> nd=dist+cost[nr][nc];
+    <span class="kw">if</span>(nd&lt;d[nr][nc]){
+      d[nr][nc]=nd;
+      pq.push({nd,nr,nc});
+    }</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+  <div class="co cgd">
+    <strong>tuple vs pair 선택</strong><br>
+    노드 정보가 2개 → <code>pair&lt;int,int&gt;</code> (dist, node)<br>
+    격자처럼 3개 → <code>tuple&lt;int,int,int&gt;</code> (dist, row, col)<br>
+    C++17의 구조적 바인딩 <code>auto [d,r,c] = pq.top()</code>으로 깔끔하게!
+  </div>
+</div>
+
+<div class="pg" id="pg6">
+  <h2>C vs C++ 성능 분석</h2>
+  <p class="psub">코드 길이, 속도, 메모리, 안전성 — 실전 비교!</p>
+  <div class="card2">
+    <div class="card">
+      <h3 style="color:var(--pk);">C 언어 장점</h3>
+      <ul style="padding-left:16px;font-size:14px;color:var(--t2);line-height:2.2;">
+        <li>메모리 레이아웃 직접 제어</li>
+        <li>캐시 친화적인 배열 기반 힙</li>
+        <li>동적 할당 없음 → 메모리 예측 가능</li>
+        <li>컴파일러 최적화가 더 적극적</li>
+        <li>포인터 조작으로 극한 최적화 가능</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--bl);">C++ STL 장점</h3>
+      <ul style="padding-left:16px;font-size:14px;color:var(--t2);line-height:2.2;">
+        <li>코드 길이 1/3 수준으로 단축</li>
+        <li>STL은 검증된 버그 없는 구현</li>
+        <li>힙 직접 구현 실수 제거</li>
+        <li>C++17 구조적 바인딩으로 가독성↑</li>
+        <li>정올 시간 초과 기준 내 충분히 빠름</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;">정올 실전 벤치마크 (V=100K, E=300K)</h3>
+    <table>
+      <tr><th>구현 방식</th><th>시간 (ms)</th><th>메모리 (MB)</th><th>코드 줄 수</th><th>추천 상황</th></tr>
+      <tr><td>C 배열 기반</td><td style="color:var(--tl);font-weight:700;">~85ms</td><td style="color:var(--tl);">~12MB</td><td>~80줄</td><td>극한 최적화 필요시</td></tr>
+      <tr><td style="color:var(--bl);font-weight:700;">C++ STL (vector+pq)</td><td style="color:var(--tl);">~110ms</td><td>~18MB</td><td style="color:var(--tl);font-weight:700;">~25줄</td><td style="color:var(--tl);font-weight:700;">★ 일반적 정올 추천</td></tr>
+      <tr><td>C++ + reserve 최적화</td><td style="color:var(--tl);">~95ms</td><td>~15MB</td><td>~30줄</td><td>메모리 구조 아는 경우</td></tr>
+      <tr><td>C++ + 원형 큐 (BFS용)</td><td style="color:var(--tl);">~60ms</td><td>~10MB</td><td>~40줄</td><td>비가중·격자 BFS</td></tr>
+    </table>
+    <div class="co cor" style="margin-bottom:0;font-size:14px;">
+      <strong>결론</strong>: 정올에서는 C++ STL로 충분! 시간 초과 시 C 배열 기반으로 전환하거나<br>
+      reserve/emplace 최적화를 적용해. 두 방법 다 O((V+E)logV)로 시간복잡도는 동일해.
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;">흔한 실수와 해결법</h3>
+    <table style="margin-bottom:0;">
+      <tr><th>실수</th><th>C에서</th><th>C++에서</th></tr>
+      <tr><td>overflow</td><td>int → 0x3f3f3f3f 대신 MAXINT 사용 금지</td><td>long long + 1LL&lt;&lt;62</td></tr>
+      <tr><td>구식값 미처리</td><td>visited[] 체크 빠뜨림</td><td>if(d&gt;dist[v]) continue 빠뜨림</td></tr>
+      <tr><td>인덱스 오류</td><td>1-based vs 0-based 혼용</td><td>adj.size() vs n+1 불일치</td></tr>
+      <tr><td>음수 가중치</td><td>무한 루프 발생</td><td>같음 → 벨만-포드로 교체</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="pg" id="pg7">
+  <h2>다익스트라 퀴즈</h2>
+  <p class="psub">정올 기출 스타일 12문제!</p>
+  <div class="swrap">
+    <span class="sbig" id="qscore">0</span>
+    <span style="font-size:18px;color:var(--t3);">/ 12</span>
+    <div style="flex:1;margin-left:16px;">
+      <div class="qpbar"><div class="qpfill" id="qprog" style="width:0%"></div></div>
+      <div class="qplbl" id="qplbl">0 / 12 풀이</div>
+    </div>
+  </div>
+  <div id="quiz-box"></div>
+</div>
+
+<script>
+/* ===== PAGE NAV ===== */
+function goPage(n) {
+  for (var i = 0; i < 8; i++) {
+    var pgEl = document.getElementById('pg' + i);
+    var ntEl = document.getElementById('nt' + i);
+    if(pgEl) pgEl.classList.remove('on');
+    if(ntEl) ntEl.classList.remove('on');
+  }
+  
+  var targetPg = document.getElementById('pg' + n);
+  var targetNt = document.getElementById('nt' + n);
+  if(targetPg) targetPg.classList.add('on');
+  if(targetNt) targetNt.classList.add('on');
+  
+  if (n === 4) { 
+    setTimeout(function(){ 
+      initCanvas();
+      drawGraph(); 
+    }, 50); 
+  }
+}
+
+/* ===== TAB SWITCH ===== */
+function switchTab(page, tab) {
+  var pg = document.getElementById('pg' + page);
+  if (!pg) return;
+  var tabs = pg.querySelectorAll('.ttab');
+  var tcs  = pg.querySelectorAll('.tc');
+  tabs.forEach(function(t, i) { t.classList.toggle('on', i === tab); });
+  tcs.forEach(function(c, i)  { c.classList.toggle('on', i === tab); });
+}
+
+/* ===== GRAPH SIMULATOR ===== */
+var nodes = [], edges = [], selNode = -1, srcNode = -1;
+var currentTool = 'node', autoTimer = null;
+var algoState = null;
+
+function setTool(t) {
+  currentTool = t; selNode = -1;
+  ['node','edge','src','del'].forEach(function(id) {
+    var el = document.getElementById('tool-' + id);
+    if (el) el.classList.toggle('on', id === t);
+  });
+  drawGraph();
+}
+
+function graphClear() {
+  clearTimeout(autoTimer);
+  nodes = []; edges = []; selNode = -1; srcNode = -1;
+  algoState = null;
+  simAlgoReset();
+  drawGraph();
+}
+
+function loadSample() {
+  graphClear();
+  nodes = [
+    {x:80,  y:180, id:0},
+    {x:200, y:80,  id:1},
+    {x:200, y:280, id:2},
+    {x:340, y:80,  id:3},
+    {x:340, y:280, id:4},
+    {x:460, y:180, id:5}
+  ];
+  edges = [
+    {u:0,v:1,w:4}, {u:0,v:2,w:2},
+    {u:1,v:3,w:5}, {u:1,v:2,w:1},
+    {u:2,v:4,w:8}, {u:2,v:3,w:2},
+    {u:3,v:5,w:1}, {u:4,v:5,w:3},
+    {u:3,v:4,w:2}
+  ];
+  srcNode = 0;
+  simAlgoReset();
+  drawGraph();
+}
+
+var cv, ctx;
+function initCanvas() {
+  cv = document.getElementById('gcanvas');
+  if (!cv) return;
+  ctx = cv.getContext('2d');
+  
+  // 중복 이벤트 등록 방지
+  cv.removeEventListener('mousedown', handleMouse);
+  cv.addEventListener('mousedown', handleMouse);
+}
+
+function handleMouse(e) {
+  if (!cv) return;
+  var rect = cv.getBoundingClientRect();
+  var sx = cv.width / rect.width, sy = cv.height / rect.height;
+  var mx = (e.clientX - rect.left) * sx;
+  var my = (e.clientY - rect.top)  * sy;
+
+  if (currentTool === 'node') {
+    if (getNodeAt(mx, my) < 0) {
+      var id = nodes.length;
+      nodes.push({x:mx, y:my, id:id});
+      simAlgoReset(); drawGraph();
+    }
+  } else if (currentTool === 'src') {
+    var n = getNodeAt(mx, my);
+    if (n >= 0) { srcNode = n; simAlgoReset(); drawGraph(); }
+  } else if (currentTool === 'edge') {
+    var n = getNodeAt(mx, my);
+    if (n >= 0) {
+      if (selNode < 0) { selNode = n; drawGraph(); }
+      else if (selNode !== n) {
+        var w = parseInt(document.getElementById('edge-w').value) || 5;
+        edges.push({u:selNode, v:n, w:w});
+        selNode = -1; simAlgoReset(); drawGraph();
+      } else { selNode = -1; drawGraph(); }
+    }
+  } else if (currentTool === 'del') {
+    var n = getNodeAt(mx, my);
+    if (n >= 0) {
+      nodes.splice(n, 1);
+      edges = edges.filter(function(e) { return e.u !== n && e.v !== n; });
+      edges.forEach(function(e) {
+        if (e.u > n) e.u--;
+        if (e.v > n) e.v--;
+      });
+      if (srcNode === n) srcNode = -1;
+      else if (srcNode > n) srcNode--;
+      simAlgoReset(); drawGraph();
+    }
+  }
+}
+
+function getNodeAt(mx, my) {
+  for (var i = nodes.length - 1; i >= 0; i--) {
+    var dx = nodes[i].x - mx, dy = nodes[i].y - my;
+    if (Math.sqrt(dx*dx + dy*dy) < 22) return i;
+  }
+  return -1;
+}
+
+function drawGraph() {
+  if (!cv) { initCanvas(); if (!cv) return; }
+  ctx.clearRect(0, 0, cv.width, cv.height);
+
+  // draw edges
+  edges.forEach(function(e) {
+    var a = nodes[e.u], b = nodes[e.v];
+    if (!a || !b) return;
+    var onPath = algoState && algoState.path && algoState.path[e.v] === e.u;
+    ctx.strokeStyle = onPath ? '#b07800' : '#b3bedd';
+    ctx.lineWidth = onPath ? 3 : 1.5;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+
+    // arrow
+    var angle = Math.atan2(b.y - a.y, b.x - a.x);
+    var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    ctx.fillStyle = '#9aa2c6'; ctx.font = 'bold 12px JetBrains Mono,monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.save(); ctx.translate(mx, my); ctx.rotate(angle);
+    ctx.fillText(e.w, 0, -10); ctx.restore();
+  });
+
+  // draw nodes
+  nodes.forEach(function(node, i) {
+    var isSrc = i === srcNode;
+    var isSel = i === selNode;
+    var state = algoState ? algoState.nodeState[i] : 'none';
+
+    var fill = '#dbeafe', stroke = '#1d4ed8';
+    if (isSrc)              { fill = '#1e293b'; stroke = '#334155'; }
+    else if (state === 'done')    { fill = '#d1fae5'; stroke = '#059669'; }
+    else if (state === 'current') { fill = '#fff0e8'; stroke = '#c2410c'; }
+    else if (state === 'inq')     { fill = '#fce7f3'; stroke = '#be185d'; }
+    else if (state === 'path')    { fill = '#fff8d4'; stroke = '#b07800'; }
+    if (isSel) stroke = '#6d28d9';
+
+    if (state === 'current') { ctx.shadowColor = 'rgba(194,65,12,.3)'; ctx.shadowBlur = 12; }
+    ctx.fillStyle = fill; ctx.strokeStyle = stroke; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(node.x, node.y, 20, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    var textColor = isSrc ? '#fff' : (state === 'done' ? '#047857' : (state === 'current' ? '#c2410c' : '#1d4ed8'));
+    ctx.fillStyle = textColor; ctx.font = 'bold 14px JetBrains Mono,monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i, node.x, node.y - 2);
+
+    var d = algoState ? algoState.dist[i] : Infinity;
+    if (d < Infinity) {
+      ctx.fillStyle = '#b07800'; ctx.font = 'bold 10px JetBrains Mono';
+      ctx.fillText(d, node.x, node.y + 24);
+    }
+  });
+}
+
+/* ===== ALGORITHM STATE ===== */
+function simAlgoReset() {
+  clearTimeout(autoTimer);
+  algoState = null;
+  document.getElementById('step-box').textContent = '탐색 준비 완료. ▶ 한 단계 버튼을 눌러봐!';
+  document.getElementById('pq-display').innerHTML = '<div style="color:var(--t4);font-size:12px;">비어 있음</div>';
+  document.getElementById('dist-display').innerHTML = '';
+  document.getElementById('stat-vis').textContent = '0';
+  document.getElementById('stat-step').textContent = '0';
+  document.getElementById('sim-prog').style.width = '0%';
+  document.getElementById('sim-log').innerHTML = '<span class="li">탐색 초기화됨!</span>';
+  if (cv) drawGraph();
+}
+
+function initAlgo() {
+  if (srcNode < 0) { addSimLog('출발 노드(🟢)를 먼저 설정해줘!', 'li'); return false; }
+  if (nodes.length === 0) { addSimLog('노드를 추가해줘! (예제 로드 버튼 클릭)', 'li'); return false; }
+  var n = nodes.length;
+  var INF = 1e9;
+  algoState = {
+    dist: new Array(n).fill(INF),
+    nodeState: new Array(n).fill('none'),
+    path: new Array(n).fill(-1),
+    pq: [],
+    done: false,
+    stepCount: 0,
+    visitCount: 0
+  };
+  algoState.dist[srcNode] = 0;
+  algoState.nodeState[srcNode] = 'inq';
+  algoState.pq.push({d:0, v:srcNode});
+  renderAlgoState();
+  return true;
+}
+
+function addSimLog(msg, cls) {
+  var log = document.getElementById('sim-log');
+  var d = document.createElement('div'); d.className = cls; d.textContent = msg;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+
+function renderAlgoState() {
+  if (!algoState) return;
+  // PQ display
+  var pqEl = document.getElementById('pq-display');
+  if (!algoState.pq.length) {
+    pqEl.innerHTML = '<div style="color:var(--t4);font-size:12px;">비어 있음</div>';
+  } else {
+    var sorted = algoState.pq.slice().sort(function(a,b){return a.d-b.d;});
+    pqEl.innerHTML = sorted.slice(0,8).map(function(item, i) {
+      return '<div class="pq-item ' + (i===0?'pq-top':'pq-norm') + '">' +
+        '<span>노드 ' + item.v + '</span><span>d=' + item.d + '</span></div>';
+    }).join('') + (sorted.length > 8 ? '<div style="color:var(--t4);font-size:11px;padding:4px;">... +' + (sorted.length-8) + '개</div>' : '');
+  }
+  // dist display
+  var dEl = document.getElementById('dist-display');
+  dEl.innerHTML = algoState.dist.map(function(d, i) {
+    var s = algoState.nodeState[i];
+    var cls = s === 'done' ? 'dc-done' : s === 'current' ? 'dc-cur' : d < 1e9 ? 'dc-upd' : 'dc-inf';
+    return '<div class="dist-cell ' + cls + '"><div style="font-size:10px;color:var(--t4);">v' + i + '</div><div>' + (d < 1e9 ? d : '∞') + '</div></div>';
+  }).join('');
+  document.getElementById('stat-vis').textContent = algoState.visitCount;
+  document.getElementById('stat-step').textContent = algoState.stepCount;
+  document.getElementById('sim-prog').style.width = Math.round(algoState.visitCount / nodes.length * 100) + '%';
+  drawGraph();
+}
+
+function simStep() {
+  if (!algoState && !initAlgo()) return;
+  if (algoState.done) { addSimLog('탐색 완료!', 'lgd'); return; }
+  if (!algoState.pq.length) {
+    algoState.done = true;
+    document.getElementById('step-box').textContent = '탐색 완료!\n모든 도달 가능 노드 확정.';
+    addSimLog('탐색 완료! 모든 노드 확정.', 'lgd');
+    algoState.nodeState.forEach(function(s, i) {
+      if (s === 'done') algoState.nodeState[i] = 'done';
+    });
+    renderAlgoState(); return;
+  }
+  
+  algoState.pq.sort(function(a,b){return a.d-b.d;});
+  var cur = algoState.pq.shift();
+  var v = cur.v, d = cur.d;
+
+  if (d > algoState.dist[v]) {
+    addSimLog('노드' + v + ' d=' + d + ' (구식값) → skip', 'li');
+    renderAlgoState(); return;
+  }
+
+  algoState.nodeState[v] = 'current';
+  algoState.stepCount++;
+  renderAlgoState();
+
+  setTimeout(function() {
+    if (!algoState) return;
+    algoState.nodeState[v] = 'done';
+    algoState.visitCount++;
+
+    var neighbors = edges.filter(function(e) { return e.u === v; });
+    var updated = 0;
+    neighbors.forEach(function(e) {
+      var u = e.v, w = e.w;
+      var nd = algoState.dist[v] + w;
+      if (nd < algoState.dist[u]) {
+        algoState.dist[u] = nd;
+        algoState.path[u] = v;
+        algoState.nodeState[u] = 'inq';
+        algoState.pq.push({d:nd, v:u});
+        updated++;
+      }
+    });
+
+    document.getElementById('step-box').textContent =
+      'pop: 노드' + v + ' (d=' + d + ')\n이웃 ' + neighbors.length + '개, 갱신 ' + updated + '개\n' +
+      (neighbors.map(function(e){ return '노드'+e.v+': '+algoState.dist[e.v]; }).join(', ') || '없음');
+
+    addSimLog('확정: 노드' + v + ' d=' + d + (updated ? ' → ' + updated + '개 갱신' : ''), v === srcNode ? 'lor' : 'lem');
+    renderAlgoState();
+  }, 250);
+}
+
+function simAuto() {
+  if (!algoState && !initAlgo()) return;
+  function tick() {
+    if (!algoState || algoState.done || !algoState.pq.length) return;
+    simStep();
+    autoTimer = setTimeout(tick, 600);
+  }
+  tick();
+}
+
+function simRun() {
+  if (!algoState && !initAlgo()) return;
+  var limit = 0;
+  function step() {
+    if (algoState && !algoState.done && algoState.pq.length && limit++ < 1000) {
+      algoState.pq.sort(function(a,b){return a.d-b.d;});
+      var cur = algoState.pq.shift();
+      var v = cur.v, d = cur.d;
+      if (d > algoState.dist[v]) { step(); return; }
+      algoState.nodeState[v] = 'done';
+      algoState.visitCount++;
+      edges.filter(function(e){ return e.u === v; }).forEach(function(e) {
+        var nd = algoState.dist[v] + e.w;
+        if (nd < algoState.dist[e.v]) {
+          algoState.dist[e.v] = nd;
+          algoState.path[e.v] = v;
+          algoState.nodeState[e.v] = 'inq';
+          algoState.pq.push({d:nd, v:e.v});
+        }
+      });
+      algoState.stepCount++;
+      step();
+    }
+  }
+  step();
+  algoState.done = true;
+  document.getElementById('step-box').textContent = '즉시 완료!\n최단거리: ' + algoState.dist.map(function(d,i){return 'v'+i+'='+( d < 1e9 ? d : 'INF');}).join(', ');
+  addSimLog('즉시 완료! 방문 노드: ' + algoState.visitCount, 'lgd');
+  renderAlgoState();
+}
+
+/* ===== QUIZ ===== */
+var QUIZ = [
+  { q:'다익스트라가 음수 가중치 간선에서 동작하지 않는 이유는?',
+    opts:['속도 문제','한 번 확정된 노드를 재갱신 불가 → 최적성 보장 깨짐','메모리 문제','C++ STL 제한'],
+    ans:1, fb:'다익스트라는 "확정된 노드는 최단"을 가정해. 음수 간선이 있으면 이미 확정된 노드가 더 짧은 경로로 재방문될 수 있어서 이 가정이 깨져!' },
+  { q:'C++ STL 다익스트라에서 priority_queue 선언으로 올바른 것은?',
+    opts:['priority_queue<pair<int,int>>','priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>>','priority_queue<int, vector<int>, less<int>>','priority_queue<int>'],
+    ans:1, fb:'Min-Heap을 만들려면 greater를 세 번째 인자로! 기본은 Max-Heap이라 가장 큰 거리가 먼저 나와서 틀려.' },
+  { q:'"구식값 무시" 코드의 역할은?',
+    opts:['속도 향상','같은 노드가 PQ에 여러 번 들어갈 때 구식(더 큰 거리) 값을 건너뜀','메모리 절약','음수 방지'],
+    ans:1, fb:'더 짧은 경로 발견 시 PQ에 재삽입하는데, 이미 처리된 구식 값이 나중에 나오면 그냥 skip!' },
+  { q:'다익스트라의 시간복잡도는? (이진힙 + 인접리스트)',
+    opts:['O(V²)','O(E log V)','O((V+E) log V)','O(V log E)'],
+    ans:2, fb:'각 노드 V번 꺼냄(log V), 각 간선 E번 완화(log V) → O((V+E) log V)!' },
+  { q:'C의 인접 리스트 "head[v]=ecnt++" 패턴에서 head[] 배열을 초기화하는 방법은?',
+    opts:['memset(head, 0, sizeof(head))','memset(head, -1, sizeof(head))','fill(head, head+N, INF)','head 초기화 불필요'],
+    ans:1, fb:'-1로 초기화! 간선이 없는 상태를 -1로 표현하고, nxt[e]도 -1이면 마지막 간선임을 나타내.' },
+  { q:'C++ 다익스트라에서 adj[u].emplace_back(w, v)의 장점은?',
+    opts:['항상 정렬됨','객체를 직접 생성해서 불필요한 복사 제거','자동 중복 제거','thread-safe'],
+    ans:1, fb:'emplace_back은 pair를 먼저 만들고 복사하는 push_back보다 효율적. 직접 생성(in-place construction)!' },
+  { q:'도착 노드 dist가 INF이면 의미는?',
+    opts:['경로가 매우 긴','도달 불가능','음수 사이클','오버플로우'],
+    ans:1, fb:'INF(초기값 그대로)이면 출발 노드에서 해당 노드까지 도달할 수 없음! (연결이 안 됐거나 방향 그래프에서 경로 없음)' },
+  { q:'격자 Dijkstra에서 tuple<int,int,int>를 쓰는 이유는?',
+    opts:['더 빠름','{거리, 행, 열} 세 값을 한 번에 저장','정렬이 자동','메모리 절약'],
+    ans:1, fb:'pair는 2개 값, tuple은 3개 이상. 격자는 {거리, row, col} 세 값이 필요해서 tuple 사용!' },
+  { q:'C 구현에서 Min-Heap의 heapUp() 조건은?',
+    opts:['heap[p].dist >= heap[i].dist','heap[p].dist > heap[i].dist','heap[p].dist < heap[i].dist','heap[p].node > heap[i].node'],
+    ans:1, fb:'부모가 자식보다 크면 교환! Min-Heap: heap[parent] > heap[child]이면 swap해서 위로 올림.' },
+  { q:'다익스트라 완화(Relaxation)의 조건은?',
+    opts:['dist[v] + w >= dist[u]','dist[v] + w < dist[u]','dist[v] < dist[u]','dist[u] == INF'],
+    ans:1, fb:'새 경로 dist[v]+w가 기존 dist[u]보다 작을 때만 갱신! 이게 완화 조건.' },
+  { q:'C++ 다익스트라에서 long long을 써야 하는 경우는?',
+    opts:['항상','가중치 합이 2^31-1을 초과할 수 있을 때','노드 수가 많을 때','STL 요구사항'],
+    ans:1, fb:'int 최대 약 21억. 가중치 * 간선 수가 이를 초과하면 overflow! 가중치가 크거나 경로가 길면 long long 사용.' },
+  { q:'C vs C++ 다익스트라에서 코드 길이 차이의 주된 이유는?',
+    opts:['알고리즘 차이','C에서 Min-Heap을 직접 구현해야 함','C++이 더 느림','헤더 파일 차이'],
+    ans:1, fb:'C에서는 priority_queue가 없어서 Min-Heap(~30줄)을 직접 구현! C++는 STL priority_queue 한 줄로 해결.' }
+];
+
+var qScore = 0, qDone = 0;
+function renderQuiz() {
+  var box = document.getElementById('quiz-box');
+  if(!box) return;
+  box.innerHTML = '';
+  QUIZ.forEach(function(q, qi) {
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'qc' + qi;
+    var txt = document.createElement('div');
+    txt.className = 'qtext'; txt.textContent = 'Q' + (qi+1) + '. ' + q.q;
+    card.appendChild(txt);
+    var opts = document.createElement('div'); opts.className = 'qopts';
+    q.opts.forEach(function(o, oi) {
+      var opt = document.createElement('div');
+      opt.className = 'qopt'; opt.id = 'qo' + qi + '_' + oi;
+      opt.textContent = String.fromCharCode(65+oi) + '. ' + o;
+      opt.setAttribute('data-qi', qi); opt.setAttribute('data-oi', oi);
+      opt.onclick = function() { ansQ(parseInt(this.getAttribute('data-qi')), parseInt(this.getAttribute('data-oi'))); };
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+    var fb = document.createElement('div'); fb.className = 'qfb'; fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    box.appendChild(card);
+  });
+}
+
+function ansQ(qi, oi) {
+  if (document.getElementById('qo' + qi + '_0').classList.contains('locked')) return;
+  var q = QUIZ[qi];
+  for (var i = 0; i < q.opts.length; i++) document.getElementById('qo' + qi + '_' + i).classList.add('locked');
+  document.getElementById('qo' + qi + '_' + oi).classList.add(oi === q.ans ? 'correct' : 'wrong');
+  if (oi !== q.ans) document.getElementById('qo' + qi + '_' + q.ans).classList.add('correct');
+  if (oi === q.ans) { qScore++; document.getElementById('qscore').textContent = qScore; }
+  var fb = document.getElementById('qfb' + qi);
+  fb.className = 'qfb show ' + (oi === q.ans ? 'ok' : 'bad');
+  fb.textContent = (oi === q.ans ? '✓ 정답! ' : '✗ 오답. ') + q.fb;
+  qDone++;
+  document.getElementById('qprog').style.width = Math.round(qDone / QUIZ.length * 100) + '%';
+  document.getElementById('qprog').style.width = Math.round(qDone / QUIZ.length * 100) + '%';
+  document.getElementById('qplbl').textContent = qDone + ' / ' + QUIZ.length + ' 풀이';
+}
+
+/* ===== INIT ===== */
+window.addEventListener('load', function() {
+  initCanvas();
+  loadSample();
+  renderQuiz();
+});
+</script>
+</body>
+</html>
