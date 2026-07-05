@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>펜윅 트리(BIT) 완전정복 — 정올/KOI 대비</title>
+<style>
+:root{
+  --bg:#081426;
+  --panel:#0f2036;
+  --panel2:#132a45;
+  --line:#1e3a5f;
+  --teal:#2dd4bf;
+  --teal-dim:#14b8a6;
+  --teal-deep:#0d9488;
+  --amber:#fbbf24;
+  --text:#dbe7f3;
+  --muted:#8aa3bf;
+  --red:#f87171;
+  --green:#4ade80;
+  --code-bg:#0a1a30;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Pretendard Variable",Pretendard,"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  font-size:17px;
+  line-height:1.7;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 20px 80px;}
+
+/* ===== header ===== */
+header{
+  text-align:center;
+  padding:36px 16px 28px;
+  border-bottom:2px solid var(--line);
+  background:linear-gradient(180deg,#0b1b33 0%,var(--bg) 100%);
+}
+.badge{
+  display:inline-block;
+  background:var(--teal-deep);
+  color:#eafffb;
+  font-weight:700;
+  font-size:14px;
+  padding:4px 14px;
+  border-radius:999px;
+  letter-spacing:1px;
+  margin-bottom:14px;
+}
+header h1{
+  font-size:clamp(28px,5vw,40px);
+  font-weight:800;
+  color:#fff;
+  letter-spacing:-0.5px;
+}
+header h1 .hl{color:var(--teal);}
+header p.sub{color:var(--muted);margin-top:10px;font-size:16px;}
+
+/* ===== tabs ===== */
+nav.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  margin:26px 0 30px;
+  position:sticky;
+  top:0;
+  background:rgba(8,20,38,0.95);
+  padding:12px 0;
+  z-index:50;
+  border-bottom:1px solid var(--line);
+}
+nav.tabs button{
+  background:var(--panel);
+  color:var(--muted);
+  border:1px solid var(--line);
+  padding:10px 18px;
+  border-radius:10px;
+  font-size:15.5px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+nav.tabs button:hover{border-color:var(--teal-dim);color:var(--text);}
+nav.tabs button.active{
+  background:var(--teal-deep);
+  color:#fff;
+  border-color:var(--teal);
+}
+nav.tabs button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+section.tab{display:none;}
+section.tab.active{display:block;animation:fadein .25s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion: reduce){
+  section.tab.active{animation:none;}
+  *{transition:none !important;animation:none !important;}
+}
+
+/* ===== content blocks ===== */
+h2{
+  font-size:26px;
+  color:#fff;
+  margin:34px 0 14px;
+  padding-left:14px;
+  border-left:5px solid var(--teal);
+}
+h3{font-size:20px;color:var(--teal);margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px 22px;
+  margin:16px 0;
+}
+.card.accent{border-left:5px solid var(--teal);}
+.card.warn{border-left:5px solid var(--amber);}
+.card.danger{border-left:5px solid var(--red);}
+.kw{color:var(--teal);font-weight:700;}
+.am{color:var(--amber);font-weight:700;}
+ul,ol{margin:10px 0 10px 24px;}
+li{margin:6px 0;}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0;
+  font-size:15.5px;
+}
+th,td{
+  border:1px solid var(--line);
+  padding:10px 12px;
+  text-align:left;
+}
+th{background:var(--panel2);color:var(--teal);}
+td{background:var(--panel);}
+td.mono, th.mono{font-family:Consolas,"D2Coding",monospace;}
+code.inline{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:2px 7px;
+  font-family:Consolas,"D2Coding",monospace;
+  font-size:15px;
+  color:var(--amber);
+}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px 20px;
+  overflow-x:auto;
+  margin:14px 0;
+  font-family:Consolas,"D2Coding",monospace;
+  font-size:14.5px;
+  line-height:1.6;
+  color:#cfe3f7;
+}
+pre .c{color:#6b8aa8;}
+pre .k{color:#7dd3fc;}
+pre .s{color:#fbbf24;}
+pre .hl-line{background:rgba(45,212,191,0.12);display:block;}
+.codehead{
+  display:inline-block;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-bottom:none;
+  border-radius:10px 10px 0 0;
+  padding:6px 16px;
+  font-size:14px;
+  font-weight:700;
+  color:var(--teal);
+  margin-bottom:-14px;
+}
+
+/* ===== simulator ===== */
+.sim-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.6fr) minmax(250px,1fr);
+  gap:18px;
+  margin-top:18px;
+}
+@media(max-width:860px){.sim-grid{grid-template-columns:1fr;}}
+.sim-svgbox{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px;
+}
+.sim-svgbox svg{width:100%;height:auto;display:block;}
+.sim-side{display:flex;flex-direction:column;gap:14px;}
+.sim-panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:15px;
+}
+.sim-panel h4{
+  color:var(--teal);
+  font-size:15px;
+  margin-bottom:8px;
+  letter-spacing:.5px;
+}
+.sim-msg{
+  min-height:74px;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-left:5px solid var(--teal);
+  border-radius:12px;
+  padding:14px 16px;
+  margin-top:16px;
+  font-size:16px;
+  white-space:pre-line;
+}
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+  justify-content:center;
+}
+.controls button, .opbar button{
+  background:var(--panel2);
+  border:1px solid var(--teal-dim);
+  color:var(--text);
+  padding:10px 20px;
+  border-radius:10px;
+  font-size:15.5px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+}
+.controls button:hover:not(:disabled), .opbar button:hover:not(:disabled){background:var(--teal-deep);color:#fff;}
+.controls button:disabled, .opbar button:disabled{opacity:.35;cursor:not-allowed;}
+.controls button.primary{background:var(--teal-deep);border-color:var(--teal);color:#fff;}
+.controls button:focus-visible, .opbar button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+.opbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-top:16px;
+}
+.opbar .grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.opbar .lbl{color:var(--muted);font-size:14px;font-weight:700;margin-right:2px;}
+.opbar button.mode.sel, .opbar button.idx.sel{
+  background:var(--teal-deep);
+  border-color:var(--teal);
+  color:#fff;
+}
+.opbar button.idx{padding:8px 13px;font-family:Consolas,"D2Coding",monospace;}
+.opbar input[type=number]{
+  width:76px;
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  color:var(--amber);
+  border-radius:8px;
+  padding:9px 10px;
+  font-size:15.5px;
+  font-weight:700;
+  font-family:Consolas,"D2Coding",monospace;
+}
+.stat-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line);gap:8px;}
+.stat-row:last-child{border-bottom:none;}
+.stat-row .v{font-family:Consolas,"D2Coding",monospace;color:var(--text);}
+.stat-row b{color:var(--amber);font-size:18px;font-family:Consolas,"D2Coding",monospace;}
+.visit-list{list-style:none;margin:0;padding:0;}
+.visit-list li{
+  padding:5px 10px;
+  border-radius:8px;
+  margin:4px 0;
+  font-family:Consolas,"D2Coding",monospace;
+  font-size:14.5px;
+  background:var(--panel2);
+  color:var(--muted);
+  border:1px solid transparent;
+}
+.visit-list li.now{
+  background:rgba(251,191,36,0.14);
+  border-color:var(--amber);
+  color:var(--amber);
+  font-weight:700;
+}
+.visit-list li.done{color:var(--teal);border-color:var(--line);}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:14px;color:var(--muted);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.lg{display:inline-block;width:22px;height:14px;border-radius:4px;border:2px solid #33507a;background:var(--panel2);}
+.lg.now{border-color:var(--amber);background:rgba(251,191,36,0.25);}
+.lg.done{border-color:var(--teal);background:rgba(45,212,191,0.2);}
+
+/* ===== quiz ===== */
+.quiz-item{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px 22px;
+  margin:18px 0;
+}
+.quiz-item .qnum{
+  display:inline-block;
+  background:var(--teal-deep);
+  color:#fff;
+  font-weight:800;
+  border-radius:8px;
+  padding:2px 12px;
+  font-size:14px;
+  margin-bottom:10px;
+}
+.quiz-item .qtext{font-size:17.5px;font-weight:700;color:#fff;margin-bottom:14px;white-space:pre-line;}
+.opt{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  color:var(--text);
+  border-radius:10px;
+  padding:11px 16px;
+  margin:8px 0;
+  font-size:16px;
+  cursor:pointer;
+  font-family:inherit;
+}
+.opt:hover:not(:disabled){border-color:var(--teal-dim);}
+.opt:disabled{cursor:default;}
+.opt.correct{background:rgba(74,222,128,0.15);border-color:var(--green);color:var(--green);font-weight:700;}
+.opt.wrong{background:rgba(248,113,113,0.13);border-color:var(--red);color:var(--red);}
+.opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+.exp{
+  display:none;
+  margin-top:12px;
+  background:var(--code-bg);
+  border-left:4px solid var(--teal);
+  border-radius:0 10px 10px 0;
+  padding:12px 16px;
+  font-size:15.5px;
+  color:var(--muted);
+  white-space:pre-line;
+}
+.exp.show{display:block;}
+.scorebar{
+  position:sticky;
+  bottom:14px;
+  background:var(--panel2);
+  border:1px solid var(--teal-dim);
+  border-radius:12px;
+  padding:12px 20px;
+  text-align:center;
+  font-size:17px;
+  font-weight:700;
+  box-shadow:0 4px 18px rgba(0,0,0,.45);
+  margin-top:24px;
+}
+.scorebar b{color:var(--amber);font-size:22px;}
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  margin-top:60px;
+  border-top:1px solid var(--line);
+  padding-top:20px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">정올 · KOI 자료구조</div>
+  <h1>펜윅 트리 <span class="hl">Fenwick Tree (BIT)</span> 완전정복</h1>
+  <p class="sub">비트 하나로 구간 합과 값 갱신을 모두 O(log N)에 — Binary Indexed Tree</p>
+</header>
+
+<div class="wrap">
+
+<nav class="tabs" id="tabNav">
+  <button class="active" data-tab="tab-concept">1. 개념 이해</button>
+  <button data-tab="tab-sim">2. 단계별 시뮬레이터</button>
+  <button data-tab="tab-code">3. 코드 구현</button>
+  <button data-tab="tab-mistake">4. 실수 포인트</button>
+  <button data-tab="tab-quiz">5. 도전 퀴즈</button>
+</nav>
+
+<!-- ================= 1. 개념 ================= -->
+<section class="tab active" id="tab-concept">
+
+  <h2>왜 펜윅 트리가 필요할까?</h2>
+  <div class="card accent">
+    <p>배열에서 <b>"구간 합 질의"</b>와 <b>"값 갱신"</b>이 섞여서 M번 들어오는 문제(대표: 백준 2042 구간 합 구하기)를 생각해 봅시다.</p>
+    <table>
+      <tr><th>방법</th><th>구간 합 질의</th><th>값 갱신</th><th>M번 처리 총 시간</th></tr>
+      <tr><td>그냥 배열</td><td>O(N)</td><td>O(1)</td><td>O(NM) — 시간 초과</td></tr>
+      <tr><td>누적 합(prefix sum)</td><td>O(1)</td><td><span class="am">O(N)</span> (뒤를 전부 다시 계산)</td><td>O(NM) — 시간 초과</td></tr>
+      <tr><td><b>펜윅 트리</b></td><td><span class="kw">O(log N)</span></td><td><span class="kw">O(log N)</span></td><td>O(M log N) — 통과!</td></tr>
+    </table>
+    <p>누적 합은 질의가 빠르지만 갱신이 느리고, 배열은 그 반대입니다. 펜윅 트리는 <span class="am">둘 사이의 균형점</span>입니다.</p>
+  </div>
+
+  <h2>핵심 열쇠: lowbit — <code class="inline">i &amp; -i</code></h2>
+  <div class="card">
+    <p><span class="kw">lowbit(i)</span>는 i를 이진수로 썼을 때 <b>가장 낮은(오른쪽) 1비트가 나타내는 값</b>입니다.</p>
+    <ul>
+      <li>lowbit(6) : 6 = 0110₂ → 가장 낮은 1비트는 <b>2</b>의 자리 → lowbit = 2</li>
+      <li>lowbit(12) : 12 = 1100₂ → <b>4</b></li>
+      <li>lowbit(8) : 8 = 1000₂ → <b>8</b>, lowbit(7) : 0111₂ → <b>1</b></li>
+    </ul>
+    <p>코드로는 <code class="inline">i &amp; -i</code> 한 줄입니다. 컴퓨터는 음수를 <b>2의 보수</b>로 표현하는데, -i는 i의 비트를 뒤집고 1을 더한 것이라 <b>가장 낮은 1비트와 그 아래만 일치</b>합니다. 그래서 AND를 하면 딱 그 비트만 남습니다.</p>
+    <p>예: i = 6 = 0110₂, -6 = 1010₂(4비트 기준) → 0110 &amp; 1010 = 0010₂ = 2 ✓</p>
+  </div>
+
+  <h2>tree[i]는 무엇을 저장하나? — 담당 구간</h2>
+  <div class="card accent">
+    <p>펜윅 트리의 <code class="inline">tree[i]</code>는 원본 배열의 <span class="am">구간 [ i − lowbit(i) + 1 , i ]</span>의 합을 저장합니다. 즉 <b>각 인덱스가 자기 lowbit 길이만큼의 구간을 담당</b>합니다.</p>
+    <p>예제 배열 <code class="inline">a = [3, 2, 5, 1, 4, 6, 2, 7]</code> (1번부터)일 때:</p>
+    <table>
+      <tr><th>i</th><th class="mono">이진수</th><th>lowbit</th><th>담당 구간</th><th>tree[i] 저장 값</th></tr>
+      <tr><td>1</td><td class="mono">0001</td><td>1</td><td>a[1]</td><td>3</td></tr>
+      <tr><td>2</td><td class="mono">0010</td><td>2</td><td>a[1..2]</td><td>3+2 = 5</td></tr>
+      <tr><td>3</td><td class="mono">0011</td><td>1</td><td>a[3]</td><td>5</td></tr>
+      <tr><td>4</td><td class="mono">0100</td><td>4</td><td>a[1..4]</td><td>3+2+5+1 = 11</td></tr>
+      <tr><td>5</td><td class="mono">0101</td><td>1</td><td>a[5]</td><td>4</td></tr>
+      <tr><td>6</td><td class="mono">0110</td><td>2</td><td>a[5..6]</td><td>4+6 = 10</td></tr>
+      <tr><td>7</td><td class="mono">0111</td><td>1</td><td>a[7]</td><td>2</td></tr>
+      <tr><td>8</td><td class="mono">1000</td><td>8</td><td>a[1..8]</td><td>전체 합 = 30</td></tr>
+    </table>
+    <p>배열 하나(<code class="inline">tree[1..N]</code>)만으로 트리 구조를 표현하므로 메모리도 세그먼트 트리(약 4N)보다 훨씬 적습니다.</p>
+  </div>
+
+  <h2>질의 query(i): lowbit를 <span class="am">빼며</span> 내려간다</h2>
+  <div class="card">
+    <p>구간 [1..i]의 합은, i에서 시작해 <code class="inline">i -= i &amp; -i</code> 를 반복하며 만나는 tree 값들을 모두 더하면 됩니다. 담당 구간들이 겹치지 않고 [1..i]를 정확히 덮기 때문입니다.</p>
+    <p><b>예: query(7)</b> — 구간 [1..7]의 합</p>
+    <ul>
+      <li>i = 7 (0111₂) : tree[7] = a[7] 더함 → i = 7 − 1 = 6</li>
+      <li>i = 6 (0110₂) : tree[6] = a[5..6] 더함 → i = 6 − 2 = 4</li>
+      <li>i = 4 (0100₂) : tree[4] = a[1..4] 더함 → i = 4 − 4 = 0, 종료</li>
+    </ul>
+    <p>합 = 2 + 10 + 11 = <span class="am">23</span>. 방문 횟수 = i의 이진수에서 <b>1의 개수</b> ≤ log₂N → <span class="kw">O(log N)</span></p>
+  </div>
+
+  <h2>갱신 update(i, +d): lowbit를 <span class="am">더하며</span> 올라간다</h2>
+  <div class="card">
+    <p>a[i]가 바뀌면 <b>i를 담당 구간에 포함하는 모든 tree 노드</b>를 고쳐야 합니다. 그런 노드들은 <code class="inline">i += i &amp; -i</code> 를 반복하며 정확히 찾아집니다 (i ≤ N인 동안).</p>
+    <p><b>예: update(3, +5)</b> — a[3]에 5를 더하기</p>
+    <ul>
+      <li>i = 3 : tree[3] += 5 → i = 3 + 1 = 4</li>
+      <li>i = 4 : tree[4] += 5 → i = 4 + 4 = 8</li>
+      <li>i = 8 : tree[8] += 5 → i = 8 + 8 = 16 &gt; N, 종료</li>
+    </ul>
+    <p>질의와 갱신이 <b>완벽히 대칭</b>입니다: 질의는 빼기(↓), 갱신은 더하기(↑).</p>
+  </div>
+
+  <h2>임의 구간 [l..r]의 합</h2>
+  <div class="card warn">
+    <p>펜윅 트리의 query는 항상 <b>[1..i] 접두사 합</b>입니다. 임의 구간은 두 번의 질의로 계산합니다:</p>
+    <p style="text-align:center;font-size:19px;"><code class="inline">sum(l..r) = query(r) − query(l − 1)</code></p>
+    <p><span class="am">query(l)이 아니라 query(l − 1)</span>을 빼야 a[l]이 살아남습니다. 정올 단골 실수!</p>
+  </div>
+
+  <h2>펜윅 트리 vs 세그먼트 트리</h2>
+  <table>
+    <tr><th></th><th>펜윅 트리 (BIT)</th><th>세그먼트 트리</th></tr>
+    <tr><td>구현 길이</td><td><b>약 10줄</b> — 대회에서 빠르고 실수 적음</td><td>수십 줄 (재귀/반복)</td></tr>
+    <tr><td>메모리</td><td>N + 1</td><td>약 4N</td></tr>
+    <tr><td>지원 연산</td><td>합·XOR 등 <span class="kw">역원이 있는 연산</span></td><td>최솟값/최댓값/GCD 등 <b>무엇이든</b></td></tr>
+    <tr><td>속도(상수)</td><td>매우 빠름</td><td>상대적으로 느림</td></tr>
+  </table>
+  <div class="card accent">
+    <p><b>선택 기준:</b> "구간 <span class="kw">합</span> + 점 갱신"이면 무조건 펜윅. 구간 <b>최솟값/최댓값</b>처럼 뺄셈으로 되돌릴 수 없는 연산이면 세그먼트 트리를 씁니다.</p>
+  </div>
+
+</section>
+
+<!-- ================= 2. 시뮬레이터 ================= -->
+<section class="tab" id="tab-sim">
+  <h2>비트가 움직이는 걸 눈으로 보기</h2>
+  <p>예제 배열 <code class="inline">a = [3, 2, 5, 1, 4, 6, 2, 7]</code> (N = 8) 위에 펜윅 트리가 그려져 있습니다. 각 상자는 <code class="inline">tree[i]</code>이고, <b>가로 폭이 곧 담당 구간</b>입니다. 연산과 인덱스를 고르고 [시작]을 누른 뒤 한 단계씩 진행해 보세요. <b>갱신 결과는 트리에 누적</b>되므로, 갱신 후 질의를 해서 값이 반영되는 것도 확인할 수 있습니다.</p>
+
+  <div class="opbar" id="opBar">
+    <div class="grp"><span class="lbl">연산</span>
+      <button class="mode sel" id="modeQuery">구간 합 query(1..i)</button>
+      <button class="mode" id="modeUpdate">값 갱신 update(i, +d)</button>
+    </div>
+    <div class="grp"><span class="lbl">인덱스 i</span><span id="idxBtns"></span></div>
+    <div class="grp" id="deltaGrp" style="display:none;"><span class="lbl">더할 값 d</span>
+      <input type="number" id="deltaInput" value="5" min="-99" max="99">
+    </div>
+    <div class="grp"><button id="btnStart" style="background:var(--teal-deep);border-color:var(--teal);color:#fff;">▶ 시작</button></div>
+  </div>
+
+  <div class="sim-grid">
+    <div>
+      <div class="sim-svgbox" id="svgBox"></div>
+      <div class="legend">
+        <span><span class="lg now"></span> 지금 처리 중인 노드</span>
+        <span><span class="lg done"></span> 이번 연산에서 방문 완료</span>
+        <span><span class="lg"></span> 일반 노드</span>
+      </div>
+      <div class="sim-msg" id="simMsg"></div>
+      <div class="controls">
+        <button id="btnReset">⏮ 처음으로</button>
+        <button id="btnPrev">◀ 이전</button>
+        <button id="btnNext" class="primary">다음 ▶</button>
+        <button id="btnAuto">▶▶ 자동 재생</button>
+        <button id="btnResetAll">🔄 트리 초기화</button>
+      </div>
+    </div>
+    <div class="sim-side">
+      <div class="sim-panel">
+        <h4>진행 상태</h4>
+        <div class="stat-row"><span>연산</span><span class="v" id="stOp">–</span></div>
+        <div class="stat-row"><span>현재 i</span><span class="v" id="stI">–</span></div>
+        <div class="stat-row"><span>이진수</span><span class="v" id="stBin">–</span></div>
+        <div class="stat-row"><span>lowbit(i) = i &amp; -i</span><span class="v" id="stLb">–</span></div>
+        <div class="stat-row"><span id="stAccLabel">누적 합</span><b id="stAcc">–</b></div>
+      </div>
+      <div class="sim-panel">
+        <h4>방문 경로</h4>
+        <ul class="visit-list" id="visitList"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. 코드 ================= -->
+<section class="tab" id="tab-code">
+  <h2>C++ 표준 구현 — 백준 2042 스타일</h2>
+  <span class="codehead">fenwick.cpp</span>
+<pre><span class="k">#include</span> &lt;bits/stdc++.h&gt;
+<span class="k">using namespace</span> std;
+
+<span class="k">int</span> N;
+<span class="k">long long</span> tree[1000001];      <span class="c">// 1-indexed! tree[0]은 사용하지 않음</span>
+<span class="k">long long</span> a[1000001];         <span class="c">// 원본 값 보관 ("값을 x로 변경" 처리용)</span>
+
+<span class="k">void</span> update(<span class="k">int</span> i, <span class="k">long long</span> d) {   <span class="c">// a[i] += d</span>
+<span class="hl-line">    <span class="k">for</span> (; i &lt;= N; i += i &amp; -i)      <span class="c">// lowbit를 더하며 위로</span></span>
+        tree[i] += d;
+}
+
+<span class="k">long long</span> query(<span class="k">int</span> i) {             <span class="c">// [1..i]의 합</span>
+<span class="hl-line">    <span class="k">long long</span> s = 0;
+    <span class="k">for</span> (; i &gt; 0; i -= i &amp; -i)       <span class="c">// lowbit를 빼며 아래로</span></span>
+        s += tree[i];
+    <span class="k">return</span> s;
+}
+
+<span class="k">long long</span> rangeSum(<span class="k">int</span> l, <span class="k">int</span> r) {   <span class="c">// [l..r]의 합</span>
+    <span class="k">return</span> query(r) - query(l - 1);  <span class="c">// ★ l-1 주의!</span>
+}
+
+<span class="k">int</span> main() {
+    <span class="k">int</span> M; scanf(<span class="s">"%d %d"</span>, &amp;N, &amp;M);
+    <span class="k">for</span> (<span class="k">int</span> i = 1; i &lt;= N; i++) {
+        scanf(<span class="s">"%lld"</span>, &amp;a[i]);
+        update(i, a[i]);              <span class="c">// 초기 트리 구성: O(N log N)</span>
+    }
+    <span class="k">while</span> (M--) {
+        <span class="k">int</span> t; scanf(<span class="s">"%d"</span>, &amp;t);
+        <span class="k">if</span> (t == 1) {                 <span class="c">// a[i]를 x로 "변경"</span>
+            <span class="k">int</span> i; <span class="k">long long</span> x; scanf(<span class="s">"%d %lld"</span>, &amp;i, &amp;x);
+<span class="hl-line">            update(i, x - a[i]);      <span class="c">// ★ 차이만큼 더한다</span></span>
+            a[i] = x;
+        } <span class="k">else</span> {                      <span class="c">// [l..r] 구간 합 출력</span>
+            <span class="k">int</span> l, r; scanf(<span class="s">"%d %d"</span>, &amp;l, &amp;r);
+            printf(<span class="s">"%lld\n"</span>, rangeSum(l, r));
+        }
+    }
+}</pre>
+
+  <div class="card accent">
+    <p><b>핵심 두 줄만 외우세요:</b> 갱신은 <code class="inline">i += i &amp; -i</code> (i ≤ N 동안), 질의는 <code class="inline">i -= i &amp; -i</code> (i &gt; 0 동안). 나머지는 전부 이 대칭에서 나옵니다.</p>
+  </div>
+
+  <h2>Python 구현</h2>
+  <span class="codehead">fenwick.py</span>
+<pre><span class="k">import</span> sys
+input = sys.stdin.readline
+
+N, M = map(<span class="k">int</span>, input().split())
+tree = [0] * (N + 1)          <span class="c"># 1-indexed</span>
+
+<span class="k">def</span> update(i, d):
+    <span class="k">while</span> i &lt;= N:
+        tree[i] += d
+        i += i &amp; -i
+
+<span class="k">def</span> query(i):                 <span class="c"># [1..i] 합</span>
+    s = 0
+    <span class="k">while</span> i &gt; 0:
+        s += tree[i]
+        i -= i &amp; -i
+    <span class="k">return</span> s
+
+a = [0] * (N + 1)
+<span class="k">for</span> i <span class="k">in</span> range(1, N + 1):
+    a[i] = <span class="k">int</span>(input())
+    update(i, a[i])
+
+<span class="k">for</span> _ <span class="k">in</span> range(M):
+    t, x, y = map(<span class="k">int</span>, input().split())
+    <span class="k">if</span> t == 1:                <span class="c"># a[x]를 y로 변경</span>
+        update(x, y - a[x])
+        a[x] = y
+    <span class="k">else</span>:                     <span class="c"># [x..y] 구간 합</span>
+        print(query(y) - query(x - 1))</pre>
+
+  <h2>응용: 구간 갱신 + 점 질의 (차이 배열 트릭)</h2>
+  <div class="card">
+    <p>"[l..r] 전체에 d 더하기 + a[i] 하나의 값 묻기" 유형은 <span class="kw">차이(계차) 배열</span>에 펜윅을 씌우면 됩니다.</p>
+<pre><span class="c">// 구간 [l, r]에 d 더하기</span>
+update(l, d);  update(r + 1, -d);
+<span class="c">// a[i]의 현재 값 = 처음 값 + query(i)</span></pre>
+    <p>구간 갱신 + <b>구간</b> 질의까지 필요하면 펜윅 트리 2개를 쓰는 확장이 있지만, 정올 수준에서는 위 두 형태(점 갱신+구간 합, 구간 갱신+점 질의)가 대부분입니다.</p>
+  </div>
+
+  <h2>추천 연습 문제</h2>
+  <table>
+    <tr><th>문제</th><th>유형</th></tr>
+    <tr><td>백준 2042 — 구간 합 구하기</td><td>점 갱신 + 구간 합 (기본형, 위 코드 그대로)</td></tr>
+    <tr><td>백준 11658 — 구간 합 구하기 3</td><td>2차원 펜윅 트리</td></tr>
+    <tr><td>백준 1275 — 커피숍2</td><td>값 변경(차이 갱신) 연습</td></tr>
+    <tr><td>백준 2517 — 달리기</td><td>좌표 압축 + 펜윅으로 순위 세기 (정올 빈출 패턴)</td></tr>
+  </table>
+</section>
+
+<!-- ================= 4. 실수 ================= -->
+<section class="tab" id="tab-mistake">
+  <h2>정올에서 자주 나오는 실수 6가지</h2>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">① 0번 인덱스 사용</h3>
+    <p>lowbit(0) = 0이라 <code class="inline">i += i &amp; -i</code>가 <b>영원히 제자리</b> — 무한 루프에 빠지거나 tree[0]만 계속 갱신됩니다. 펜윅 트리는 반드시 <span class="am">1-indexed</span>로! 입력이 0-indexed라면 전부 +1 해서 넣으세요.</p>
+  </div>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">② 구간 합을 query(r) − query(l)로 계산</h3>
+    <p>이러면 a[l]이 빠집니다. 정답은 <code class="inline">query(r) − query(l − 1)</code>. "l의 <b>왼쪽 끝을 살리려면</b> l−1까지를 뺀다"로 기억하세요.</p>
+  </div>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">③ "값을 x로 변경"인데 x를 그대로 더함</h3>
+    <p>펜윅의 update는 <b>더하기(+d)</b>입니다. 변경 문제(백준 2042 등)에서는 <code class="inline">update(i, x − a[i]); a[i] = x;</code> 처럼 <span class="am">차이만큼</span> 더해야 합니다. 원본 배열 a를 따로 유지하는 것을 잊지 마세요.</p>
+  </div>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">④ 루프 경계 실수</h3>
+    <p>갱신은 <code class="inline">i &lt;= N</code>인 동안(N 넘으면 종료), 질의는 <code class="inline">i &gt; 0</code>인 동안입니다. 방향과 조건이 뒤바뀌면 배열 범위 밖 접근이나 무한 루프가 납니다.</p>
+<pre><span class="c">// ✗ 틀림 — 방향 반대</span>
+<span class="k">void</span> update(<span class="k">int</span> i, <span class="k">long long</span> d){ <span class="k">for</span>(; i &gt; 0; i -= i &amp; -i) tree[i] += d; }
+<span class="c">// ✓ 맞음</span>
+<span class="k">void</span> update(<span class="k">int</span> i, <span class="k">long long</span> d){ <span class="k">for</span>(; i &lt;= N; i += i &amp; -i) tree[i] += d; }</pre>
+  </div>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">⑤ int 오버플로</h3>
+    <p>N ≤ 10⁶, |값| ≤ 10⁹이면 합이 최대 10¹⁵로 int 범위를 훨씬 넘습니다. <code class="inline">tree</code>, 누적 합, 출력 모두 <span class="am">long long</span>(%lld)으로!</p>
+  </div>
+
+  <div class="card danger">
+    <h3 style="margin-top:0;">⑥ tree 배열 크기를 N으로 선언</h3>
+    <p>1-indexed이므로 <code class="inline">tree[N + 1]</code> 크기가 필요합니다. 전역 배열이면 문제 최대 크기 + 1로 넉넉하게 선언하세요. (지역 변수로 큰 배열을 만들면 스택 오버플로 — 전역 또는 vector로!)</p>
+  </div>
+
+  <div class="card warn">
+    <p><b>암기 카드:</b> "<span class="am">1-indexed</span> · <span class="am">query(l−1) 빼기</span> · <span class="am">변경은 차이로</span> · <span class="am">갱신 ↑ i≤N, 질의 ↓ i&gt;0</span> · <span class="am">long long</span> · <span class="am">크기 N+1</span>" — 여섯 개만 지키면 펜윅은 10줄 무기입니다!</p>
+  </div>
+</section>
+
+<!-- ================= 5. 퀴즈 ================= -->
+<section class="tab" id="tab-quiz">
+  <h2>도전 퀴즈 (10문항)</h2>
+  <p>각 문항의 보기를 클릭하면 즉시 채점되고 해설이 표시됩니다.</p>
+  <div id="quizBox"></div>
+  <div class="scorebar" id="scoreBar">점수: <b id="scoreNow">0</b> / <span id="scoreTotal">0</span> &nbsp;·&nbsp; 푼 문제: <span id="solvedNow">0</span>개
+    <div style="margin-top:8px;"><button class="opt" id="btnRetry" style="display:inline-block;width:auto;padding:8px 22px;">🔄 처음부터 다시 풀기</button></div>
+  </div>
+</section>
+
+<footer>세영코딩연구소 · 정올/KOI 자료구조 시리즈 — 펜윅 트리(BIT)</footer>
+</div>
+
+<!-- ===== 한글 데이터: JSON 블록 (JS 문자열 파싱 오류 방지) ===== -->
+<script type="application/json" id="dataBlock">
+{
+  "msgs": {
+    "pick": "위에서 연산과 인덱스 i를 고른 뒤 [시작]을 누르세요. 갱신(update)을 하면 트리에 누적되어, 이후 질의(query)에서 바뀐 값이 반영됩니다.",
+    "qstart": "query({q}) 시작 — 구간 [1..{q}]의 합을 구합니다.\ni = {q} 에서 출발해 lowbit를 빼며 내려갑니다.",
+    "qstep": "i = {i} ({bin}) : tree[{i}] = {v} 를 더합니다 → 누적 합 {s}\nlowbit({i}) = {lb} 이므로 다음 i = {i} − {lb} = {n}",
+    "qdone": "i = 0 도달, 종료!\n구간 [1..{q}]의 합 = {s} — 방문한 노드 {k}개 = {q}의 이진수 1의 개수 (O(log N))",
+    "ustart": "update({u}, {d}) 시작 — a[{u}]에 {d}를 더합니다.\ni = {u} 에서 출발해 lowbit를 더하며, {u}를 담당하는 모든 노드를 찾아 올라갑니다.",
+    "ustep": "i = {i} ({bin}) : tree[{i}] {o} → {v} ({d} 반영)\nlowbit({i}) = {lb} 이므로 다음 i = {i} + {lb} = {n}",
+    "udone": "다음 i = {n} 은 N = 8 을 넘으므로 종료!\n노드 {k}개 갱신 완료. a[{u}] : {o} → {v} (트리에 누적되었습니다 — 이제 query로 확인해 보세요)",
+    "reset": "배열과 트리를 초기값 a = [3, 2, 5, 1, 4, 6, 2, 7] 로 되돌렸습니다."
+  },
+  "quiz": [
+    {
+      "q": "lowbit(12) = 12 & (-12) 의 값은? (12 = 1100₂)",
+      "opts": ["1", "2", "4", "12"],
+      "answer": 2,
+      "exp": "가장 낮은 1비트는 4의 자리(0100)입니다. 2의 보수로 -12의 하위 비트가 12와 0100 자리에서만 일치하므로 AND 결과는 4입니다."
+    },
+    {
+      "q": "N = 8인 펜윅 트리에서 tree[6]이 저장하는 값은?",
+      "opts": ["a[6] 하나", "a[5..6]의 합", "a[1..6]의 합", "a[6..8]의 합"],
+      "answer": 1,
+      "exp": "tree[i]는 [i − lowbit(i) + 1, i]를 담당합니다. lowbit(6) = 2이므로 [6−2+1, 6] = [5, 6], 즉 a[5] + a[6]입니다."
+    },
+    {
+      "q": "N = 8에서 update(3, +5)를 하면 갱신되는 tree 인덱스를 순서대로 나열한 것은?",
+      "opts": ["3 → 4 → 8", "3 → 6 → 8", "3 → 4 → 5 → 6 → 7 → 8", "3 하나만"],
+      "answer": 0,
+      "exp": "i += lowbit(i) 반복: 3(+1)→4, 4(+4)→8, 8(+8)→16 > 8 종료. 따라서 tree[3], tree[4], tree[8]이 갱신됩니다."
+    },
+    {
+      "q": "N = 8에서 query(7)이 방문하는 tree 인덱스를 순서대로 나열한 것은?",
+      "opts": ["7 → 6 → 5 → 4 → 3 → 2 → 1", "7 → 6 → 4", "7 → 3 → 1", "8 → 4 → 2 → 1"],
+      "answer": 1,
+      "exp": "i -= lowbit(i) 반복: 7(−1)→6, 6(−2)→4, 4(−4)→0 종료. tree[7] + tree[6] + tree[4] = a[7] + a[5..6] + a[1..4] = [1..7] 전체를 정확히 덮습니다."
+    },
+    {
+      "q": "구간 [l..r]의 합을 펜윅 트리로 구하는 올바른 식은?",
+      "opts": ["query(r) − query(l)", "query(r) − query(l − 1)", "query(r) + query(l)", "query(r − l + 1)"],
+      "answer": 1,
+      "exp": "query는 접두사 합 [1..i]입니다. [1..r]에서 [1..l−1]을 빼야 a[l]부터 a[r]까지가 남습니다. query(l)을 빼면 a[l]이 사라지는 단골 실수!"
+    },
+    {
+      "q": "펜윅 트리에서 update와 query 한 번의 시간 복잡도는?",
+      "opts": ["O(1)", "O(log N)", "O(√N)", "O(N)"],
+      "answer": 1,
+      "exp": "두 연산 모두 비트 하나씩을 처리하며 이동하므로 반복 횟수가 최대 log₂N번입니다. M번 연산 전체는 O(M log N)."
+    },
+    {
+      "q": "펜윅 트리를 0-indexed로 쓰면(인덱스 0에 update) 생기는 문제는?",
+      "opts": ["답이 2배가 된다", "lowbit(0) = 0이라 i가 전진하지 못해 무한 루프에 빠진다", "메모리를 2배 사용한다", "아무 문제 없다"],
+      "answer": 1,
+      "exp": "0 & (-0) = 0이므로 i += lowbit에서 i가 그대로입니다. 펜윅 트리는 반드시 1-indexed로 사용해야 하며, 0-indexed 입력은 +1 해서 넣습니다."
+    },
+    {
+      "q": "\"a[i]의 값을 x로 변경하라\"는 질의(백준 2042 유형)의 올바른 처리는?",
+      "opts": ["update(i, x)", "update(i, x − a[i]) 후 a[i] = x", "query(i) 후 update(i, x)", "tree[i] = x 로 직접 대입"],
+      "answer": 1,
+      "exp": "펜윅의 update는 '더하기'만 지원합니다. 새 값과 기존 값의 차이(x − a[i])를 더하고, 원본 배열 a[i]도 x로 갱신해 두어야 다음 변경도 올바르게 처리됩니다."
+    },
+    {
+      "q": "세그먼트 트리 대신 펜윅 트리를 쓰기 어려운 경우는?",
+      "opts": ["구간 합 + 점 갱신", "구간 XOR + 점 갱신", "구간 최솟값 질의", "접두사 합 질의"],
+      "answer": 2,
+      "exp": "펜윅의 구간 질의는 query(r) − query(l−1)처럼 '빼기(역원)'에 의존합니다. min은 역원이 없어(한 번 작아진 값을 되돌릴 수 없어) 기본 펜윅으로는 임의 구간 최솟값을 구할 수 없습니다. 이때는 세그먼트 트리를 씁니다."
+    },
+    {
+      "q": "N ≤ 1,000,000, |a[i]| ≤ 10⁹ 인 구간 합 문제에서 반드시 필요한 것은?",
+      "opts": ["unsigned int 사용", "tree와 합 변수를 long long으로 선언", "double로 계산", "int로 충분하다"],
+      "answer": 1,
+      "exp": "합의 최댓값이 약 10⁶ × 10⁹ = 10¹⁵로 int(약 2.1×10⁹)를 훨씬 초과합니다. tree 배열, 누적 변수, 출력 포맷(%lld) 모두 long long이어야 합니다."
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("dataBlock").textContent);
+
+  /* ---------- tabs ---------- */
+  var nav = document.getElementById("tabNav");
+  var tabBtns = nav.querySelectorAll("button");
+  function switchTab(id){
+    var i, secs = document.querySelectorAll("section.tab");
+    for(i = 0; i < secs.length; i++) secs[i].classList.remove("active");
+    for(i = 0; i < tabBtns.length; i++) tabBtns[i].classList.remove("active");
+    document.getElementById(id).classList.add("active");
+    for(i = 0; i < tabBtns.length; i++)
+      if(tabBtns[i].getAttribute("data-tab") === id) tabBtns[i].classList.add("active");
+  }
+  nav.addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if(b) switchTab(b.getAttribute("data-tab"));
+  });
+
+  /* ---------- fenwick state ---------- */
+  var N = 8;
+  var INIT_A = [0, 3, 2, 5, 1, 4, 6, 2, 7]; // 1-indexed
+  var A, T;
+
+  function lowbit(i){ return i & -i; }
+  function bin4(i){
+    var s = i.toString(2);
+    while(s.length < 4) s = "0" + s;
+    return s + "\u2082"; // subscript 2
+  }
+  function rebuild(){
+    A = INIT_A.slice();
+    T = new Array(N + 1).fill(0);
+    for(var i = 1; i <= N; i++)
+      for(var j = i - lowbit(i) + 1; j <= i; j++) T[i] += A[j];
+  }
+  rebuild();
+
+  function fmt(t, map){
+    return t.replace(/\{(\w+)\}/g, function(_, k){ return map[k]; });
+  }
+
+  /* ---------- step building ---------- */
+  var STEPS = [];
+  var cur = 0;
+  var autoTimer = null;
+  var mode = "query";     // "query" | "update"
+  var selIdx = 6;
+
+  function snap(extra){
+    var s = { A: A.slice(), T: T.slice(), active: -1, visited: [], acc: "", msg: "" };
+    for(var k in extra) s[k] = extra[k];
+    return s;
+  }
+
+  function buildQuerySteps(q){
+    var steps = [];
+    steps.push(snap({ msg: fmt(DATA.msgs.qstart, {q: q}), op: "query(" + q + ")" }));
+    var i = q, sum = 0, visited = [];
+    while(i > 0){
+      sum += T[i];
+      visited.push(i);
+      var lb = lowbit(i), nxt = i - lb;
+      steps.push(snap({
+        active: i, visited: visited.slice(0, -1).concat([]), acc: String(sum),
+        curI: i, op: "query(" + q + ")",
+        msg: fmt(DATA.msgs.qstep, {i: i, bin: bin4(i), v: T[i], s: sum, lb: lb, n: nxt})
+      }));
+      steps[steps.length - 1].visited = visited.slice();
+      i = nxt;
+    }
+    steps.push(snap({
+      visited: visited.slice(), acc: String(sum), op: "query(" + q + ")",
+      msg: fmt(DATA.msgs.qdone, {q: q, s: sum, k: visited.length})
+    }));
+    return steps;
+  }
+
+  function buildUpdateSteps(u, d){
+    var steps = [];
+    var oldA = A[u];
+    steps.push(snap({ msg: fmt(DATA.msgs.ustart, {u: u, d: (d >= 0 ? "+" + d : d)}), op: "update(" + u + ", " + (d >= 0 ? "+" + d : d) + ")" }));
+    var i = u, visited = [];
+    while(i <= N){
+      var oldT = T[i];
+      T[i] += d;
+      visited.push(i);
+      var lb = lowbit(i), nxt = i + lb;
+      steps.push(snap({
+        active: i, visited: visited.slice(), acc: visited.length + "\uAC1C",
+        op: "update(" + u + ", " + (d >= 0 ? "+" + d : d) + ")",
+        msg: fmt(DATA.msgs.ustep, {i: i, bin: bin4(i), o: oldT, v: T[i], d: (d >= 0 ? "+" + d : d), lb: lb, n: nxt})
+      }));
+      i = nxt;
+    }
+    A[u] += d;
+    steps.push(snap({
+      visited: visited.slice(), acc: visited.length + "\uAC1C",
+      op: "update(" + u + ", " + (d >= 0 ? "+" + d : d) + ")",
+      msg: fmt(DATA.msgs.udone, {n: i, k: visited.length, u: u, o: oldA, v: A[u]})
+    }));
+    return steps;
+  }
+
+  /* ---------- SVG rendering (createElementNS) ---------- */
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var svgBox = document.getElementById("svgBox");
+  var X0 = 26, CW = 80, BW = 72; // column origin/width, box width
+
+  function el(name, attrs){
+    var e = document.createElementNS(SVGNS, name);
+    for(var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function colX(j){ return X0 + (j - 1) * CW; }
+
+  function renderSVG(s){
+    while(svgBox.firstChild) svgBox.removeChild(svgBox.firstChild);
+    var svg = el("svg", {viewBox: "0 0 680 350", role: "img",
+      "aria-label": "\uD3B0\uC719 \uD2B8\uB9AC \uAD6C\uC870 \uC2DC\uBBAC\uB808\uC774\uC158"});
+
+    var visitedSet = {};
+    s.visited.forEach(function(v){ visitedSet[v] = true; });
+
+    var LEVEL_Y = {1: 200, 2: 142, 4: 84, 8: 26}; // by lowbit
+    var BH = 46;
+
+    // tree nodes
+    for(var i = 1; i <= N; i++){
+      var lb = lowbit(i);
+      var startCol = i - lb + 1;
+      var x = colX(startCol), w = lb * CW - (CW - BW);
+      var y = LEVEL_Y[lb];
+      var isNow = (s.active === i);
+      var isDone = !isNow && visitedSet[i];
+      var rect = el("rect", {x: x, y: y, width: w, height: BH, rx: 9,
+        fill: isNow ? "rgba(251,191,36,0.22)" : (isDone ? "rgba(45,212,191,0.16)" : "#132a45"),
+        stroke: isNow ? "#fbbf24" : (isDone ? "#2dd4bf" : "#33507a"),
+        "stroke-width": isNow ? "3" : "2"});
+      svg.appendChild(rect);
+      var t1 = el("text", {x: x + w / 2, y: y + 20, "text-anchor": "middle",
+        "font-size": "12.5", fill: isNow ? "#fbbf24" : (isDone ? "#2dd4bf" : "#8aa3bf"),
+        "font-weight": "700", "font-family": "Consolas, monospace"});
+      t1.textContent = "t[" + i + "]";
+      svg.appendChild(t1);
+      var t2 = el("text", {x: x + w / 2, y: y + 39, "text-anchor": "middle",
+        "font-size": "17", "font-weight": "800",
+        fill: isNow ? "#fbbf24" : (isDone ? "#2dd4bf" : "#dbe7f3"),
+        "font-family": "Consolas, monospace"});
+      t2.textContent = String(s.T[i]);
+      svg.appendChild(t2);
+    }
+
+    // array cells
+    var AY = 276;
+    for(var j = 1; j <= N; j++){
+      var ax = colX(j);
+      var isUpd = (mode === "update" && s.op && s.op.indexOf("update(" + selIdx) === 0 && j === selIdx);
+      var r = el("rect", {x: ax, y: AY, width: BW, height: 44, rx: 8,
+        fill: isUpd ? "rgba(251,191,36,0.14)" : "#0a1a30",
+        stroke: isUpd ? "#fbbf24" : "#1e3a5f", "stroke-width": "2"});
+      svg.appendChild(r);
+      var tv = el("text", {x: ax + BW / 2, y: AY + 28, "text-anchor": "middle",
+        "font-size": "18", "font-weight": "800", fill: isUpd ? "#fbbf24" : "#dbe7f3",
+        "font-family": "Consolas, monospace"});
+      tv.textContent = String(s.A[j]);
+      svg.appendChild(tv);
+      var ti = el("text", {x: ax + BW / 2, y: AY + 62, "text-anchor": "middle",
+        "font-size": "13", fill: "#8aa3bf", "font-family": "Consolas, monospace"});
+      ti.textContent = "a[" + j + "]";
+      svg.appendChild(ti);
+    }
+
+    svgBox.appendChild(svg);
+  }
+
+  /* ---------- panels ---------- */
+  function renderPanels(s, idx){
+    document.getElementById("simMsg").textContent = s.msg;
+    document.getElementById("stOp").textContent = s.op || "\u2013";
+    var accL = document.getElementById("stAccLabel");
+    accL.textContent = (mode === "query") ? "\uB204\uC801 \uD569" : "\uAC31\uC2E0\uD55C \uB178\uB4DC";
+    document.getElementById("stAcc").textContent = s.acc || "\u2013";
+    if(s.active > 0){
+      document.getElementById("stI").textContent = String(s.active);
+      document.getElementById("stBin").textContent = bin4(s.active);
+      document.getElementById("stLb").textContent = String(lowbit(s.active));
+    } else {
+      document.getElementById("stI").textContent = "\u2013";
+      document.getElementById("stBin").textContent = "\u2013";
+      document.getElementById("stLb").textContent = "\u2013";
+    }
+
+    var list = document.getElementById("visitList");
+    while(list.firstChild) list.removeChild(list.firstChild);
+    if(!s.visited.length){
+      var li0 = document.createElement("li");
+      li0.textContent = "\u2013";
+      list.appendChild(li0);
+    } else {
+      s.visited.forEach(function(v){
+        var li = document.createElement("li");
+        li.className = (v === s.active) ? "now" : "done";
+        li.textContent = "tree[" + v + "]  (" + bin4(v) + ", lowbit " + lowbit(v) + ")";
+        list.appendChild(li);
+      });
+    }
+
+    var hasSteps = STEPS.length > 0;
+    document.getElementById("btnPrev").disabled = !hasSteps || idx === 0;
+    document.getElementById("btnNext").disabled = !hasSteps || idx === STEPS.length - 1;
+    document.getElementById("btnReset").disabled = !hasSteps;
+    document.getElementById("btnAuto").disabled = !hasSteps;
+  }
+
+  function idleSnap(){
+    return snap({ msg: DATA.msgs.pick });
+  }
+
+  function show(idx){
+    if(!STEPS.length){
+      var s0 = idleSnap();
+      renderSVG(s0); renderPanels(s0, 0);
+      return;
+    }
+    cur = Math.max(0, Math.min(STEPS.length - 1, idx));
+    renderSVG(STEPS[cur]);
+    renderPanels(STEPS[cur], cur);
+  }
+
+  function stopAuto(){
+    if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
+    document.getElementById("btnAuto").textContent = "\u25B6\u25B6 \uC790\uB3D9 \uC7AC\uC0DD";
+  }
+
+  /* ---------- op bar ---------- */
+  var idxWrap = document.getElementById("idxBtns");
+  var idxBtnEls = [];
+  (function(){
+    for(var i = 1; i <= N; i++){
+      var b = document.createElement("button");
+      b.className = "idx" + (i === selIdx ? " sel" : "");
+      b.textContent = String(i);
+      (function(v, btn){
+        btn.addEventListener("click", function(){
+          selIdx = v;
+          idxBtnEls.forEach(function(x){ x.classList.remove("sel"); });
+          btn.classList.add("sel");
+        });
+      })(i, b);
+      idxBtnEls.push(b);
+      idxWrap.appendChild(b);
+    }
+  })();
+
+  var mq = document.getElementById("modeQuery");
+  var mu = document.getElementById("modeUpdate");
+  function setMode(m){
+    mode = m;
+    mq.classList.toggle("sel", m === "query");
+    mu.classList.toggle("sel", m === "update");
+    document.getElementById("deltaGrp").style.display = (m === "update") ? "flex" : "none";
+  }
+  mq.addEventListener("click", function(){ setMode("query"); });
+  mu.addEventListener("click", function(){ setMode("update"); });
+
+  document.getElementById("btnStart").addEventListener("click", function(){
+    stopAuto();
+    if(mode === "query"){
+      STEPS = buildQuerySteps(selIdx);
+    } else {
+      var d = parseInt(document.getElementById("deltaInput").value, 10);
+      if(isNaN(d)) d = 5;
+      if(d === 0) d = 5;
+      STEPS = buildUpdateSteps(selIdx, d);
+    }
+    show(0);
+  });
+
+  document.getElementById("btnNext").addEventListener("click", function(){ stopAuto(); show(cur + 1); });
+  document.getElementById("btnPrev").addEventListener("click", function(){ stopAuto(); show(cur - 1); });
+  document.getElementById("btnReset").addEventListener("click", function(){ stopAuto(); show(0); });
+  document.getElementById("btnAuto").addEventListener("click", function(){
+    if(autoTimer){ stopAuto(); return; }
+    if(!STEPS.length) return;
+    this.textContent = "\u23F8 \uC77C\uC2DC\uC815\uC9C0";
+    if(cur === STEPS.length - 1) show(0);
+    autoTimer = setInterval(function(){
+      if(cur >= STEPS.length - 1){ stopAuto(); return; }
+      show(cur + 1);
+    }, 2000);
+  });
+  document.getElementById("btnResetAll").addEventListener("click", function(){
+    stopAuto();
+    rebuild();
+    STEPS = [];
+    var s0 = idleSnap();
+    s0.msg = DATA.msgs.reset;
+    renderSVG(s0); renderPanels(s0, 0);
+  });
+
+  show(0);
+
+  /* ---------- quiz (createElement, data from JSON block) ---------- */
+  var quizBox = document.getElementById("quizBox");
+  var score = 0, solved = 0;
+
+  function buildQuiz(){
+    while(quizBox.firstChild) quizBox.removeChild(quizBox.firstChild);
+    score = 0; solved = 0;
+    updateScore();
+
+    DATA.quiz.forEach(function(q, qi){
+      var item = document.createElement("div");
+      item.className = "quiz-item";
+
+      var num = document.createElement("span");
+      num.className = "qnum";
+      num.textContent = "Q" + (qi + 1);
+      item.appendChild(num);
+
+      var qt = document.createElement("div");
+      qt.className = "qtext";
+      qt.textContent = q.q;
+      item.appendChild(qt);
+
+      var btns = [];
+      var exp = document.createElement("div");
+      exp.className = "exp";
+      exp.textContent = "\uD83D\uDCA1 " + q.exp;
+
+      q.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt";
+        b.textContent = (oi + 1) + ") " + optText;
+        b.addEventListener("click", function(){
+          btns.forEach(function(x){ x.disabled = true; });
+          if(oi === q.answer){
+            b.classList.add("correct");
+            score++;
+          } else {
+            b.classList.add("wrong");
+            btns[q.answer].classList.add("correct");
+          }
+          solved++;
+          exp.classList.add("show");
+          updateScore();
+        });
+        btns.push(b);
+        item.appendChild(b);
+      });
+
+      item.appendChild(exp);
+      quizBox.appendChild(item);
+    });
+  }
+
+  function updateScore(){
+    document.getElementById("scoreNow").textContent = String(score);
+    document.getElementById("scoreTotal").textContent = String(DATA.quiz.length);
+    document.getElementById("solvedNow").textContent = String(solved);
+  }
+
+  document.getElementById("btnRetry").addEventListener("click", buildQuiz);
+  buildQuiz();
+})();
+</script>
+</body>
+</html>
