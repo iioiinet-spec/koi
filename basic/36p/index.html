@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다항식의 사칙연산 — C &amp; 파이썬 나란히 배우기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF6EF;
+  --ink:#2A2320;
+  --sub:#6B6157;
+  --accent:#5B3FA8;
+  --accent-deep:#432E80;
+  --accent-soft:#EFE9FA;
+  --accent-line:#D8CCF2;
+  --card:#FFFFFF;
+  --line:#E6DECD;
+  --c-col:#1E6FB8;
+  --c-soft:#E7F1FB;
+  --py-col:#1F7A4D;
+  --py-soft:#E6F4EC;
+  --code-bg:#241E38;
+  --code-ink:#EDE8F7;
+  --code-kw:#C9B8FF;
+  --code-com:#948BB3;
+  --code-num:#FFD08A;
+  --code-str:#A8E6B0;
+  --warn-bg:#FBEFE7;
+  --warn-line:#E8C9B0;
+  --ok:#1F7A4D;
+  --no:#C0392B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:19px;
+  line-height:1.75;
+  padding-bottom:80px;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+
+/* ───── 헤더 ───── */
+header{
+  border-bottom:3px solid var(--accent);
+  background:linear-gradient(180deg,#F4EEFB 0%,var(--bg) 100%);
+  padding:38px 0 26px;
+}
+.series{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:15px;font-weight:700;
+  color:var(--accent-deep);
+  background:var(--accent-soft);
+  border:1.5px solid var(--accent-line);
+  border-radius:999px;
+  padding:4px 16px;letter-spacing:.5px;
+}
+h1.title{
+  font-size:44px;font-weight:900;line-height:1.25;
+  margin-top:14px;letter-spacing:-1px;
+}
+h1.title .hl{color:var(--accent)}
+.subtitle{font-size:20px;color:var(--sub);margin-top:8px;font-weight:500}
+
+/* ───── 탭 내비게이션 ───── */
+nav.tabs{
+  position:sticky;top:0;z-index:50;
+  background:var(--bg);
+  border-bottom:2px solid var(--line);
+  padding:12px 0;
+}
+nav.tabs .wrap{display:flex;flex-wrap:wrap;gap:8px}
+.tabbtn{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:17px;font-weight:700;
+  color:var(--ink);
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:12px;
+  padding:9px 16px;cursor:pointer;
+  transition:all .15s;
+}
+.tabbtn .no{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;color:var(--accent);
+  margin-right:6px;font-weight:700;
+}
+.tabbtn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tabbtn.on{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+}
+.tabbtn.on .no{color:#E4D9FF}
+
+/* ───── 페이지 공통 ───── */
+.page{display:none;padding-top:34px}
+.page.on{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+h2.sec{
+  font-size:33px;font-weight:900;letter-spacing:-.5px;
+  padding-left:16px;border-left:8px solid var(--accent);
+  margin:38px 0 16px;
+}
+h2.sec:first-child{margin-top:0}
+h3.sub{
+  font-size:24px;font-weight:700;color:var(--accent-deep);
+  margin:28px 0 10px;
+}
+p.body{margin:10px 0;font-size:19.5px}
+strong{font-weight:700;color:var(--accent-deep)}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.card{
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:22px 26px;margin:16px 0;
+}
+.card.tint{background:var(--accent-soft);border-color:var(--accent-line)}
+
+.bigformula{
+  font-family:'JetBrains Mono',monospace;
+  font-size:26px;font-weight:700;text-align:center;
+  color:var(--accent-deep);
+  background:var(--accent-soft);
+  border:2px dashed var(--accent);
+  border-radius:14px;
+  padding:18px 12px;margin:18px 0;
+  letter-spacing:.5px;
+}
+
+.point{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--accent-soft);
+  border-left:8px solid var(--accent);
+  border-radius:0 14px 14px 0;
+  padding:16px 20px;margin:18px 0;
+  font-size:19.5px;
+}
+.point .ico{font-size:26px;line-height:1.4}
+.warn{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--warn-bg);
+  border-left:8px solid #D07030;
+  border-radius:0 14px 14px 0;
+  padding:16px 20px;margin:18px 0;
+  font-size:19.5px;
+}
+.warn .ico{font-size:26px;line-height:1.4}
+
+/* ───── 배열 그림 ───── */
+.arrfig{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.arrname{
+  font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;
+  color:var(--accent-deep);padding-bottom:34px;
+}
+.cellcol{display:flex;flex-direction:column;align-items:center;gap:6px}
+.cell{
+  width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;
+  background:var(--card);border:2.5px solid var(--ink);border-radius:12px;
+}
+.cell.hlA{background:#FFF3C8;border-color:#C89B12}
+.cell.hlB{background:var(--c-soft);border-color:var(--c-col)}
+.cell.hlC{background:var(--accent-soft);border-color:var(--accent)}
+.idx{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--sub)}
+.deg{font-size:15px;color:var(--accent);font-weight:700}
+
+/* ───── C / Python 듀오 패널 ───── */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.pane{border-radius:16px;overflow:hidden;border:2px solid var(--line);background:var(--card)}
+.pane .phead{
+  display:flex;align-items:center;gap:10px;
+  font-weight:900;font-size:19px;color:#fff;
+  padding:10px 18px;
+}
+.pane.c .phead{background:var(--c-col)}
+.pane.py .phead{background:var(--py-col)}
+.pane .phead .tag{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  background:rgba(255,255,255,.22);border-radius:6px;padding:2px 8px;
+}
+pre.code{
+  background:var(--code-bg);color:var(--code-ink);
+  font-family:'JetBrains Mono',monospace;
+  font-size:15.5px;line-height:1.65;
+  padding:18px 20px;overflow-x:auto;
+  tab-size:4;
+}
+pre.code .k{color:var(--code-kw);font-weight:700}
+pre.code .c{color:var(--code-com);font-style:italic}
+pre.code .n{color:var(--code-num)}
+pre.code .s{color:var(--code-str)}
+.out{
+  font-family:'JetBrains Mono',monospace;font-size:15.5px;
+  background:#171226;color:#9BE8AE;
+  padding:12px 20px;border-top:1.5px solid #3B3358;
+}
+.out .lab{color:#8B82A8;font-size:13px;display:block;margin-bottom:2px}
+
+/* ───── 표 ───── */
+table.tb{width:100%;border-collapse:collapse;margin:16px 0;background:var(--card);font-size:19px}
+table.tb th{
+  background:var(--accent);color:#fff;font-weight:700;
+  padding:10px 14px;border:2px solid var(--accent-deep);
+}
+table.tb td{
+  padding:10px 14px;border:2px solid var(--line);text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:19px;
+}
+table.tb td.l{text-align:left;font-family:'Noto Sans KR',sans-serif}
+table.tb tr td.rowh{background:var(--accent-soft);font-weight:700;color:var(--accent-deep)}
+
+/* ───── 장제법 단계 카드 ───── */
+.stepcard{
+  background:var(--card);border:2px solid var(--line);border-radius:16px;
+  padding:20px 24px;margin:14px 0;
+  display:flex;gap:18px;align-items:flex-start;
+}
+.stepnum{
+  flex:none;width:46px;height:46px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;
+}
+.stepbody{flex:1}
+.stepbody .st{font-weight:900;font-size:21px;margin-bottom:6px}
+.stepbody .calc{
+  font-family:'JetBrains Mono',monospace;font-size:19px;
+  background:var(--accent-soft);border-radius:10px;
+  padding:10px 16px;margin-top:8px;color:var(--accent-deep);font-weight:700;
+}
+
+/* ───── 시뮬레이터 ───── */
+.simbox{
+  background:var(--card);border:2.5px solid var(--accent);
+  border-radius:18px;padding:26px;margin:18px 0;
+}
+.simrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0;justify-content:center}
+.simlab{
+  font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;width:180px;
+}
+.simformula{
+  font-family:'JetBrains Mono',monospace;
+  font-size:22px;font-weight:700;text-align:center;
+  color:var(--accent-deep);
+  background:var(--accent-soft);
+  border-radius:12px;padding:14px;margin:16px 0;
+  min-height:58px;
+}
+.simctrl{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+button.btn{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:18px;font-weight:700;
+  border:none;border-radius:12px;
+  padding:11px 24px;cursor:pointer;
+  background:var(--accent);color:#fff;
+  transition:all .15s;
+}
+button.btn:hover{background:var(--accent-deep);transform:translateY(-1px)}
+button.btn.ghost{
+  background:var(--card);color:var(--accent);border:2px solid var(--accent);
+}
+button.btn.ghost:hover{background:var(--accent-soft)}
+.simprog{
+  text-align:center;font-family:'JetBrains Mono',monospace;
+  font-size:17px;color:var(--sub);margin-top:10px;font-weight:500;
+}
+
+/* ───── 계산 놀이터 ───── */
+.playbox{
+  background:var(--card);border:2.5px solid var(--accent);
+  border-radius:18px;padding:26px;margin:18px 0;
+}
+.pin{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;align-items:center}
+.pin label{font-weight:700;font-size:19px;width:220px}
+.pin input{
+  flex:1;min-width:220px;
+  font-family:'JetBrains Mono',monospace;font-size:20px;
+  border:2px solid var(--line);border-radius:10px;
+  padding:10px 14px;background:var(--bg);color:var(--ink);
+}
+.pin input:focus{outline:none;border-color:var(--accent)}
+.pin .hint{font-size:15px;color:var(--sub);width:100%}
+.opbtns{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.opbtns .btn{font-size:21px;min-width:88px}
+.presult{
+  font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;
+  background:var(--accent-soft);border:2px dashed var(--accent);
+  border-radius:12px;padding:16px 20px;margin-top:10px;
+  white-space:pre-wrap;line-height:1.9;color:var(--accent-deep);
+  min-height:60px;
+}
+
+/* ───── 퀴즈 ───── */
+.qz{
+  background:var(--card);border:2px solid var(--line);border-radius:16px;
+  padding:22px 26px;margin:18px 0;
+}
+.qz .qt{font-size:21px;font-weight:900;margin-bottom:14px}
+.qz .qt .qno{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  font-family:'JetBrains Mono',monospace;font-size:18px;margin-right:10px;
+}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{
+  font-family:'JetBrains Mono',monospace;
+  font-size:19px;font-weight:500;text-align:left;
+  background:var(--bg);border:2px solid var(--line);border-radius:12px;
+  padding:12px 16px;cursor:pointer;color:var(--ink);
+  transition:all .15s;
+}
+.opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.opt.ok{background:#E3F5EA;border-color:var(--ok);color:var(--ok);font-weight:700}
+.opt.no{background:#FBE8E5;border-color:var(--no);color:var(--no);font-weight:700}
+.qz.done .opt{cursor:default}
+.qz.done .opt:hover{transform:none}
+.expl{
+  display:none;margin-top:14px;
+  background:var(--accent-soft);border-left:6px solid var(--accent);
+  border-radius:0 12px 12px 0;
+  padding:13px 18px;font-size:18.5px;
+}
+.expl.show{display:block}
+.scorebox{
+  text-align:center;font-size:24px;font-weight:900;
+  background:var(--accent-soft);border:2.5px solid var(--accent);
+  border-radius:16px;padding:18px;margin:20px 0;color:var(--accent-deep);
+}
+.scorebox .mono{font-size:30px}
+
+/* ───── 하단 이동 ───── */
+.pgnav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;border-top:2px dashed var(--line);padding-top:22px}
+
+@media (max-width:860px){
+  h1.title{font-size:32px}
+  .duo{grid-template-columns:1fr}
+  .opts{grid-template-columns:1fr}
+  .cell{width:52px;height:52px;font-size:20px}
+  .simlab{width:auto}
+  body{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="series">C &amp; 파이썬 나란히 배우기 · 다항식 편</span>
+    <h1 class="title">다항식의 사칙연산<br><span class="hl">정의부터 코드까지, 한 걸음씩</span></h1>
+    <p class="subtitle">다항식이 무엇인지부터 시작해서, 계수 배열로 표현하고 덧셈 · 뺄셈 · 곱셈 · 나눗셈을 직접 코딩합니다.</p>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button class="tabbtn on" id="tab0" onclick="goPage(0)"><span class="no">0</span>다항식이란?</button>
+    <button class="tabbtn" id="tab1" onclick="goPage(1)"><span class="no">1</span>덧셈 · 뺄셈</button>
+    <button class="tabbtn" id="tab2" onclick="goPage(2)"><span class="no">2</span>곱셈</button>
+    <button class="tabbtn" id="tab3" onclick="goPage(3)"><span class="no">3</span>나눗셈</button>
+    <button class="tabbtn" id="tab4" onclick="goPage(4)"><span class="no">4</span>시뮬레이터</button>
+    <button class="tabbtn" id="tab5" onclick="goPage(5)"><span class="no">5</span>퀴즈</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ═══════════════ 0. 다항식이란? ═══════════════ -->
+<section class="page on" id="pg0">
+  <h2 class="sec">다항식(Polynomial)이란?</h2>
+  <p class="body"><strong>다항식</strong>은 문자 x의 거듭제곱에 숫자를 곱한 <strong>항(term)</strong>들을 더해 놓은 식입니다. 일반적인 모양은 다음과 같습니다.</p>
+
+  <div class="bigformula">P(x) = a<sub>n</sub>x<sup>n</sup> + a<sub>n-1</sub>x<sup>n-1</sup> + ··· + a<sub>1</sub>x + a<sub>0</sub></div>
+
+  <div class="card">
+    <h3 class="sub" style="margin-top:0">용어 3가지만 기억하세요</h3>
+    <table class="tb">
+      <tr><th style="width:170px">용어</th><th>뜻</th><th style="width:280px">P(x) = 2x² + 3x + 1 에서</th></tr>
+      <tr><td class="rowh">항 (term)</td><td class="l">덧셈으로 연결된 각 조각</td><td>2x² , 3x , 1</td></tr>
+      <tr><td class="rowh">계수 (coefficient)</td><td class="l">각 항에서 x 앞에 곱해진 수</td><td>2 , 3 , 1</td></tr>
+      <tr><td class="rowh">차수 (degree)</td><td class="l">x가 곱해진 횟수 중 가장 큰 것</td><td>2 (최고차항이 x²)</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec">컴퓨터는 다항식을 어떻게 저장할까?</h2>
+  <p class="body">핵심 아이디어는 딱 하나입니다. <strong>배열의 인덱스(index)를 차수로, 배열의 값을 계수로</strong> 쓰는 것입니다. 즉 <span class="mono">a[i]</span>는 <span class="mono">x<sup>i</sup></span>의 계수입니다.</p>
+
+  <div class="point"><span class="ico">💡</span><div><strong>a[i] = x<sup>i</sup>의 계수.</strong> 이 약속 하나면 다항식 전체를 배열 하나로 표현할 수 있고, 사칙연산은 전부 "배열 계산"이 됩니다.</div></div>
+
+  <div class="card tint">
+    <p class="body" style="text-align:center;font-weight:700;font-size:22px">P(x) = 2x² + 3x + 1 &nbsp;⟶&nbsp; 배열 <span class="mono">A = [1, 3, 2]</span></p>
+    <div class="arrfig">
+      <div class="arrname">A</div>
+      <div class="cellcol"><div class="cell hlA">1</div><div class="idx">A[0]</div><div class="deg">상수항 (x⁰)</div></div>
+      <div class="cellcol"><div class="cell hlA">3</div><div class="idx">A[1]</div><div class="deg">x의 계수</div></div>
+      <div class="cellcol"><div class="cell hlA">2</div><div class="idx">A[2]</div><div class="deg">x²의 계수</div></div>
+    </div>
+    <p class="body" style="text-align:center;color:var(--sub);font-size:17.5px">배열 길이 − 1 = 다항식의 차수. 중간에 없는 항(예: x항이 없는 x²+5)은 계수를 0으로 채웁니다 → [5, 0, 1]</p>
+  </div>
+
+  <h3 class="sub">C와 파이썬으로 선언하고, 값을 계산해 보기</h3>
+  <p class="body">다항식을 배열로 만들고, x = 2를 대입한 값 P(2) = 2·4 + 3·2 + 1 = <strong>15</strong>를 계산해 봅니다.</p>
+
+  <div class="duo">
+    <div class="pane c">
+      <div class="phead">C <span class="tag">poly.c</span></div>
+      <pre class="code"><span class="k">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+
+<span class="k">int</span> main(<span class="k">void</span>) {
+    <span class="c">/* 2x^2 + 3x + 1 : 인덱스 = 차수 */</span>
+    <span class="k">int</span> A[] = {<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>};
+    <span class="k">int</span> d = <span class="n">2</span>;          <span class="c">/* 차수 */</span>
+    <span class="k">int</span> x = <span class="n">2</span>;
+
+    <span class="c">/* P(x) 값 계산: a[i] * x^i 를 모두 더한다 */</span>
+    <span class="k">int</span> val = <span class="n">0</span>, pw = <span class="n">1</span>;   <span class="c">/* pw = x^i */</span>
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= d; i++) {
+        val += A[i] * pw;
+        pw  *= x;
+    }
+    printf(<span class="s">"P(2) = %d\n"</span>, val);
+    <span class="k">return</span> <span class="n">0</span>;
+}</pre>
+      <div class="out"><span class="lab">실행 결과</span>P(2) = 15</div>
+    </div>
+    <div class="pane py">
+      <div class="phead">Python <span class="tag">poly.py</span></div>
+      <pre class="code"><span class="c"># 2x² + 3x + 1 : 인덱스 = 차수</span>
+A = [<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>]
+x = <span class="n">2</span>
+
+<span class="c"># P(x) 값 계산: a[i] * x**i 를 모두 더한다</span>
+val = <span class="n">0</span>
+<span class="k">for</span> i <span class="k">in</span> range(len(A)):
+    val += A[i] * x**i
+
+<span class="k">print</span>(<span class="s">"P(2) ="</span>, val)</pre>
+      <div class="out"><span class="lab">실행 결과</span>P(2) = 15</div>
+    </div>
+  </div>
+
+  <div class="warn"><span class="ico">⚠️</span><div><strong>왜 낮은 차수를 앞(인덱스 0)에 둘까?</strong> "인덱스 = 차수"가 되어 곱셈 공식 <span class="mono">c[i+j] += a[i]*b[j]</span>가 그대로 성립하기 때문입니다. 높은 차수를 앞에 두면 항마다 차수를 따로 계산해야 해서 코드가 복잡해집니다.</div></div>
+
+  <div class="pgnav">
+    <span></span>
+    <button class="btn" onclick="goPage(1)">다음: 덧셈 · 뺄셈 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════ 1. 덧셈 · 뺄셈 ═══════════════ -->
+<section class="page" id="pg1">
+  <h2 class="sec">덧셈 · 뺄셈의 원리 — 같은 차수끼리!</h2>
+  <p class="body">수학 시간에 배운 그대로입니다. <strong>같은 차수의 항끼리(=동류항끼리)</strong> 계수를 더하거나 뺍니다. 배열로 말하면 <strong>같은 인덱스끼리</strong> 더하고 빼면 끝입니다.</p>
+
+  <div class="bigformula">c[i] = a[i] + b[i] &nbsp;&nbsp;(뺄셈은 a[i] − b[i])</div>
+
+  <div class="card tint">
+    <p class="body" style="font-weight:700;text-align:center;font-size:21px">A(x) = 2x² + 3x + 1,&nbsp;&nbsp; B(x) = x + 2 를 더하면?</p>
+    <table class="tb">
+      <tr><th></th><th>x² 자리 (i=2)</th><th>x 자리 (i=1)</th><th>상수 자리 (i=0)</th></tr>
+      <tr><td class="rowh">A</td><td>2</td><td>3</td><td>1</td></tr>
+      <tr><td class="rowh">B</td><td>0 <span style="color:var(--sub);font-size:15px">(없으면 0)</span></td><td>1</td><td>2</td></tr>
+      <tr><td class="rowh">A + B</td><td><strong>2</strong></td><td><strong>4</strong></td><td><strong>3</strong></td></tr>
+    </table>
+    <p class="body" style="text-align:center;font-weight:700">⟶ A + B = 2x² + 4x + 3 = <span class="mono">[3, 4, 2]</span> &nbsp;·&nbsp; A − B = 2x² + 2x − 1 = <span class="mono">[-1, 2, 2]</span></p>
+  </div>
+
+  <div class="point"><span class="ico">💡</span><div>두 다항식의 길이가 다르면 <strong>짧은 쪽에 없는 항은 계수 0</strong>으로 취급합니다. 결과 배열의 길이는 <span class="mono">max(두 길이)</span>로 잡으면 안전합니다.</div></div>
+
+  <h3 class="sub">코드로 구현하기</h3>
+  <div class="duo">
+    <div class="pane c">
+      <div class="phead">C <span class="tag">poly_add.c</span></div>
+      <pre class="code"><span class="k">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+
+<span class="k">int</span> maxi(<span class="k">int</span> x, <span class="k">int</span> y) { <span class="k">return</span> x &gt; y ? x : y; }
+
+<span class="c">/* c = a + b (sign=+1), a - b (sign=-1)
+   da, db : 각 다항식의 차수 / 반환값 : c의 차수 */</span>
+<span class="k">int</span> polyAddSub(<span class="k">int</span> a[], <span class="k">int</span> da,
+               <span class="k">int</span> b[], <span class="k">int</span> db,
+               <span class="k">int</span> c[], <span class="k">int</span> sign) {
+    <span class="k">int</span> d = maxi(da, db);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= d; i++) {
+        <span class="k">int</span> x = (i &lt;= da) ? a[i] : <span class="n">0</span>;  <span class="c">/* 없으면 0 */</span>
+        <span class="k">int</span> y = (i &lt;= db) ? b[i] : <span class="n">0</span>;
+        c[i] = x + sign * y;
+    }
+    <span class="k">while</span> (d &gt; <span class="n">0</span> &amp;&amp; c[d] == <span class="n">0</span>) d--;  <span class="c">/* 최고차 0 정리 */</span>
+    <span class="k">return</span> d;
+}
+
+<span class="k">int</span> main(<span class="k">void</span>) {
+    <span class="k">int</span> A[] = {<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>};  <span class="c">/* 2x^2 + 3x + 1 */</span>
+    <span class="k">int</span> B[] = {<span class="n">2</span>, <span class="n">1</span>};     <span class="c">/* x + 2 */</span>
+    <span class="k">int</span> C[<span class="n">10</span>];
+
+    <span class="k">int</span> dc = polyAddSub(A, <span class="n">2</span>, B, <span class="n">1</span>, C, +<span class="n">1</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dc; i++) printf(<span class="s">"%d "</span>, C[i]);
+    printf(<span class="s">"\n"</span>);
+
+    dc = polyAddSub(A, <span class="n">2</span>, B, <span class="n">1</span>, C, -<span class="n">1</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dc; i++) printf(<span class="s">"%d "</span>, C[i]);
+    printf(<span class="s">"\n"</span>);
+    <span class="k">return</span> <span class="n">0</span>;
+}</pre>
+      <div class="out"><span class="lab">실행 결과 (덧셈 / 뺄셈)</span>3 4 2<br>-1 2 2</div>
+    </div>
+    <div class="pane py">
+      <div class="phead">Python <span class="tag">poly_add.py</span></div>
+      <pre class="code"><span class="k">def</span> poly_add_sub(a, b, sign=<span class="n">1</span>):
+    <span class="s">"""sign=1이면 a+b, sign=-1이면 a-b"""</span>
+    n = max(len(a), len(b))
+    c = [<span class="n">0</span>] * n
+    <span class="k">for</span> i <span class="k">in</span> range(n):
+        x = a[i] <span class="k">if</span> i &lt; len(a) <span class="k">else</span> <span class="n">0</span>  <span class="c"># 없으면 0</span>
+        y = b[i] <span class="k">if</span> i &lt; len(b) <span class="k">else</span> <span class="n">0</span>
+        c[i] = x + sign * y
+    <span class="k">while</span> len(c) &gt; <span class="n">1</span> <span class="k">and</span> c[-<span class="n">1</span>] == <span class="n">0</span>:
+        c.pop()                <span class="c"># 최고차 0 정리</span>
+    <span class="k">return</span> c
+
+A = [<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>]   <span class="c"># 2x² + 3x + 1</span>
+B = [<span class="n">2</span>, <span class="n">1</span>]      <span class="c"># x + 2</span>
+
+<span class="k">print</span>(poly_add_sub(A, B, +<span class="n">1</span>))
+<span class="k">print</span>(poly_add_sub(A, B, -<span class="n">1</span>))</pre>
+      <div class="out"><span class="lab">실행 결과 (덧셈 / 뺄셈)</span>[3, 4, 2]<br>[-1, 2, 2]</div>
+    </div>
+  </div>
+
+  <div class="warn"><span class="ico">⚠️</span><div><strong>최고차항이 사라지는 경우를 조심!</strong> 예를 들어 (2x² + x) − (2x² + 5) = x − 5 처럼 뺄셈 후 최고차항의 계수가 0이 될 수 있습니다. 그래서 마지막에 <span class="mono">while</span> 문으로 <strong>맨 뒤의 0을 지워 차수를 줄여</strong> 주는 것입니다.</div></div>
+
+  <div class="point"><span class="ico">⏱️</span><div><strong>시간 복잡도: O(max(n, m))</strong> — 배열을 한 번만 훑으면 되므로 매우 빠릅니다.</div></div>
+
+  <div class="pgnav">
+    <button class="btn ghost" onclick="goPage(0)">← 이전: 다항식이란?</button>
+    <button class="btn" onclick="goPage(2)">다음: 곱셈 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════ 2. 곱셈 ═══════════════ -->
+<section class="page" id="pg2">
+  <h2 class="sec">곱셈의 원리 — 분배법칙, 그리고 차수의 덧셈</h2>
+  <p class="body">곱셈은 <strong>분배법칙</strong>으로 모든 항을 서로 곱한 뒤, 같은 차수끼리 모으는 것입니다. 여기서 결정적인 성질이 나옵니다.</p>
+
+  <div class="bigformula">x<sup>i</sup> × x<sup>j</sup> = x<sup>i+j</sup> &nbsp;&nbsp;⟶&nbsp;&nbsp; c[i+j] += a[i] × b[j]</div>
+
+  <p class="body"><span class="mono">a[i]</span>(x<sup>i</sup>의 계수)와 <span class="mono">b[j]</span>(x<sup>j</sup>의 계수)를 곱하면 그 결과는 <strong>x<sup>i+j</sup>의 계수에 더해집니다</strong>. 이중 for문 하나로 곱셈이 끝나는 이유입니다.</p>
+
+  <div class="card tint">
+    <p class="body" style="font-weight:700;text-align:center;font-size:21px">(2x² + 3x + 1) × (x + 2) 를 표로 펼치면?</p>
+    <table class="tb">
+      <tr><th>×</th><th>x &nbsp;(b[1])</th><th>2 &nbsp;(b[0])</th></tr>
+      <tr><td class="rowh">2x² (a[2])</td><td>2x³</td><td>4x²</td></tr>
+      <tr><td class="rowh">3x (a[1])</td><td>3x²</td><td>6x</td></tr>
+      <tr><td class="rowh">1 (a[0])</td><td>x</td><td>2</td></tr>
+    </table>
+    <p class="body" style="text-align:center;font-weight:700">같은 차수끼리 모으면 ⟶ 2x³ + (4+3)x² + (6+1)x + 2 = <strong>2x³ + 7x² + 7x + 2</strong> = <span class="mono">[2, 7, 7, 2]</span></p>
+  </div>
+
+  <div class="point"><span class="ico">💡</span><div><strong>결과의 차수 = 두 차수의 합.</strong> 차수 da와 db인 다항식을 곱하면 결과는 차수 da+db, 배열 길이는 <span class="mono">len(a) + len(b) − 1</span>입니다. 결과 배열은 반드시 <strong>0으로 초기화</strong>한 뒤 누적(+=)해야 합니다.</div></div>
+
+  <h3 class="sub">코드로 구현하기</h3>
+  <div class="duo">
+    <div class="pane c">
+      <div class="phead">C <span class="tag">poly_mul.c</span></div>
+      <pre class="code"><span class="k">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+
+<span class="c">/* c = a * b, 반환값 : c의 차수 */</span>
+<span class="k">int</span> polyMul(<span class="k">int</span> a[], <span class="k">int</span> da,
+            <span class="k">int</span> b[], <span class="k">int</span> db, <span class="k">int</span> c[]) {
+    <span class="k">int</span> dc = da + db;            <span class="c">/* 차수의 합 */</span>
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dc; i++) c[i] = <span class="n">0</span>;
+
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= da; i++)
+        <span class="k">for</span> (<span class="k">int</span> j = <span class="n">0</span>; j &lt;= db; j++)
+            c[i + j] += a[i] * b[j];  <span class="c">/* 핵심! */</span>
+    <span class="k">return</span> dc;
+}
+
+<span class="k">int</span> main(<span class="k">void</span>) {
+    <span class="k">int</span> A[] = {<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>};  <span class="c">/* 2x^2 + 3x + 1 */</span>
+    <span class="k">int</span> B[] = {<span class="n">2</span>, <span class="n">1</span>};     <span class="c">/* x + 2 */</span>
+    <span class="k">int</span> C[<span class="n">10</span>];
+
+    <span class="k">int</span> dc = polyMul(A, <span class="n">2</span>, B, <span class="n">1</span>, C);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dc; i++) printf(<span class="s">"%d "</span>, C[i]);
+    printf(<span class="s">"\n"</span>);
+    <span class="k">return</span> <span class="n">0</span>;
+}</pre>
+      <div class="out"><span class="lab">실행 결과</span>2 7 7 2</div>
+    </div>
+    <div class="pane py">
+      <div class="phead">Python <span class="tag">poly_mul.py</span></div>
+      <pre class="code"><span class="k">def</span> poly_mul(a, b):
+    <span class="c"># 결과 길이 = len(a) + len(b) - 1, 0으로 초기화</span>
+    c = [<span class="n">0</span>] * (len(a) + len(b) - <span class="n">1</span>)
+    <span class="k">for</span> i <span class="k">in</span> range(len(a)):
+        <span class="k">for</span> j <span class="k">in</span> range(len(b)):
+            c[i + j] += a[i] * b[j]   <span class="c"># 핵심!</span>
+    <span class="k">return</span> c
+
+A = [<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>]   <span class="c"># 2x² + 3x + 1</span>
+B = [<span class="n">2</span>, <span class="n">1</span>]      <span class="c"># x + 2</span>
+
+<span class="k">print</span>(poly_mul(A, B))</pre>
+      <div class="out"><span class="lab">실행 결과</span>[2, 7, 7, 2]</div>
+    </div>
+  </div>
+
+  <div class="point"><span class="ico">⏱️</span><div><strong>시간 복잡도: O(n × m)</strong> — 모든 항의 쌍을 한 번씩 곱하기 때문입니다. 참고로 KOI 상급 문제에서는 이보다 빠른 <strong>FFT(고속 푸리에 변환)</strong>로 O(n log n)에 곱하기도 하지만, 지금은 이 이중 for문을 완벽히 이해하는 것이 먼저입니다.</div></div>
+
+  <div class="point"><span class="ico">🎮</span><div>이 곱셈이 실제로 <strong>한 단계씩 어떻게 진행되는지</strong>는 <strong>4번 탭 시뮬레이터</strong>에서 직접 눌러보며 확인할 수 있습니다.</div></div>
+
+  <div class="pgnav">
+    <button class="btn ghost" onclick="goPage(1)">← 이전: 덧셈 · 뺄셈</button>
+    <button class="btn" onclick="goPage(3)">다음: 나눗셈 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════ 3. 나눗셈 ═══════════════ -->
+<section class="page" id="pg3">
+  <h2 class="sec">나눗셈의 원리 — 다항식 항등식</h2>
+  <p class="body">정수 나눗셈 17 ÷ 5 = 몫 3, 나머지 2 (17 = 5×3 + 2)와 완전히 같은 구조입니다. 다항식 A(x)를 B(x)로 나누면 <strong>몫 Q(x)와 나머지 R(x)</strong>가 나옵니다.</p>
+
+  <div class="bigformula">A(x) = B(x) · Q(x) + R(x) &nbsp;&nbsp;(단, R의 차수 &lt; B의 차수)</div>
+
+  <div class="point"><span class="ico">💡</span><div><strong>나머지의 차수는 반드시 나누는 식보다 작아야</strong> 합니다. 정수 나눗셈에서 나머지가 나누는 수보다 작아야 하는 것과 같은 조건입니다. 그리고 <strong>몫의 차수 = A의 차수 − B의 차수</strong>입니다.</div></div>
+
+  <h2 class="sec">장제법(긴 나눗셈) 단계별로 따라가기</h2>
+  <p class="body">예제: <strong>(x³ + 2x² − 5x + 6) ÷ (x − 1)</strong>. 매 단계 규칙은 하나뿐입니다 — <strong>"최고차항끼리 나눠 몫의 항을 정하고, (그 항 × 나누는 식)을 빼서 차수를 낮춘다."</strong></p>
+
+  <div class="stepcard">
+    <div class="stepnum">1</div>
+    <div class="stepbody">
+      <div class="st">최고차항끼리 나누기: x³ ÷ x = <span style="color:var(--accent)">x²</span></div>
+      몫의 첫 항은 x². 이제 x²·(x−1) = x³ − x² 을 A에서 뺍니다.
+      <div class="calc">(x³ + 2x² − 5x + 6) − (x³ − x²) = 3x² − 5x + 6</div>
+    </div>
+  </div>
+  <div class="stepcard">
+    <div class="stepnum">2</div>
+    <div class="stepbody">
+      <div class="st">남은 식의 최고차항: 3x² ÷ x = <span style="color:var(--accent)">3x</span></div>
+      몫에 +3x를 추가. 3x·(x−1) = 3x² − 3x 를 뺍니다.
+      <div class="calc">(3x² − 5x + 6) − (3x² − 3x) = −2x + 6</div>
+    </div>
+  </div>
+  <div class="stepcard">
+    <div class="stepnum">3</div>
+    <div class="stepbody">
+      <div class="st">남은 식의 최고차항: −2x ÷ x = <span style="color:var(--accent)">−2</span></div>
+      몫에 −2를 추가. −2·(x−1) = −2x + 2 를 뺍니다.
+      <div class="calc">(−2x + 6) − (−2x + 2) = 4 &nbsp;← 차수 0 &lt; 1 이므로 여기서 끝!</div>
+    </div>
+  </div>
+
+  <div class="card tint">
+    <p class="body" style="text-align:center;font-weight:900;font-size:22px">몫 Q(x) = x² + 3x − 2, &nbsp;나머지 R(x) = 4</p>
+    <p class="body" style="text-align:center">검산: (x − 1)(x² + 3x − 2) + 4 = x³ + 2x² − 5x + 6 ✓</p>
+  </div>
+
+  <h3 class="sub">코드로 구현하기</h3>
+  <p class="body">코드에서는 위 과정을 그대로 옮깁니다. 나머지 배열 <span class="mono">rem</span>을 A의 복사본으로 시작해서, 몫의 항을 <strong>높은 차수부터</strong> 하나씩 결정하며 빼 나갑니다. 예제는 앞에서 쓰던 <span class="mono">A = 2x²+3x+1</span>, <span class="mono">B = x+2</span>입니다. (몫 2x−1, 나머지 3)</p>
+
+  <div class="duo">
+    <div class="pane c">
+      <div class="phead">C <span class="tag">poly_div.c</span></div>
+      <pre class="code"><span class="k">#include</span> <span class="s">&lt;stdio.h&gt;</span>
+
+<span class="c">/* a ÷ b → 몫 q(차수 *dq), 나머지 r(차수 *dr)
+   몫이 분수가 될 수 있으므로 double 사용
+   (단, da >= db 라고 가정) */</span>
+<span class="k">void</span> polyDiv(<span class="k">double</span> a[], <span class="k">int</span> da,
+             <span class="k">double</span> b[], <span class="k">int</span> db,
+             <span class="k">double</span> q[], <span class="k">int</span> *dq,
+             <span class="k">double</span> r[], <span class="k">int</span> *dr) {
+    <span class="k">double</span> rem[<span class="n">50</span>];
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= da; i++) rem[i] = a[i];
+
+    *dq = da - db;               <span class="c">/* 몫의 차수 */</span>
+    <span class="k">for</span> (<span class="k">int</span> k = *dq; k &gt;= <span class="n">0</span>; k--) {
+        <span class="c">/* 1) 최고차항끼리 나누기 */</span>
+        <span class="k">double</span> coef = rem[db + k] / b[db];
+        q[k] = coef;
+        <span class="c">/* 2) coef * x^k * B 를 빼기 */</span>
+        <span class="k">for</span> (<span class="k">int</span> j = <span class="n">0</span>; j &lt;= db; j++)
+            rem[j + k] -= coef * b[j];
+    }
+    <span class="c">/* 남은 낮은 차수 부분이 나머지 */</span>
+    *dr = db - <span class="n">1</span>;
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= *dr; i++) r[i] = rem[i];
+    <span class="k">while</span> (*dr &gt; <span class="n">0</span> &amp;&amp; r[*dr] == <span class="n">0</span>) (*dr)--;
+}
+
+<span class="k">int</span> main(<span class="k">void</span>) {
+    <span class="k">double</span> A[] = {<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>};  <span class="c">/* 2x^2+3x+1 */</span>
+    <span class="k">double</span> B[] = {<span class="n">2</span>, <span class="n">1</span>};     <span class="c">/* x+2 */</span>
+    <span class="k">double</span> Q[<span class="n">10</span>], R[<span class="n">10</span>];
+    <span class="k">int</span> dq, dr;
+
+    polyDiv(A, <span class="n">2</span>, B, <span class="n">1</span>, Q, &amp;dq, R, &amp;dr);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dq; i++) printf(<span class="s">"%g "</span>, Q[i]);
+    printf(<span class="s">"\n"</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt;= dr; i++) printf(<span class="s">"%g "</span>, R[i]);
+    printf(<span class="s">"\n"</span>);
+    <span class="k">return</span> <span class="n">0</span>;
+}</pre>
+      <div class="out"><span class="lab">실행 결과 (몫 / 나머지)</span>-1 2<br>3</div>
+    </div>
+    <div class="pane py">
+      <div class="phead">Python <span class="tag">poly_div.py</span></div>
+      <pre class="code"><span class="k">def</span> poly_div(a, b):
+    <span class="s">"""a ÷ b → (몫, 나머지). len(a) >= len(b) 가정"""</span>
+    rem = a[:]                  <span class="c"># A의 복사본에서 시작</span>
+    dq = len(a) - len(b)        <span class="c"># 몫의 차수</span>
+    q = [<span class="n">0</span>] * (dq + <span class="n">1</span>)
+
+    <span class="k">for</span> k <span class="k">in</span> range(dq, -<span class="n">1</span>, -<span class="n">1</span>):   <span class="c"># 높은 차수부터</span>
+        coef = rem[len(b)-<span class="n">1</span> + k] / b[-<span class="n">1</span>]  <span class="c"># 최고차항끼리</span>
+        q[k] = coef
+        <span class="k">for</span> j <span class="k">in</span> range(len(b)):     <span class="c"># coef·x^k·B 빼기</span>
+            rem[j + k] -= coef * b[j]
+
+    r = rem[:len(b)-<span class="n">1</span>] <span class="k">if</span> len(b) &gt; <span class="n">1</span> <span class="k">else</span> [<span class="n">0</span>]
+    <span class="k">while</span> len(r) &gt; <span class="n">1</span> <span class="k">and</span> r[-<span class="n">1</span>] == <span class="n">0</span>:
+        r.pop()
+    <span class="k">return</span> q, r
+
+Q, R = poly_div([<span class="n">1</span>, <span class="n">3</span>, <span class="n">2</span>], [<span class="n">2</span>, <span class="n">1</span>])
+<span class="k">print</span>(Q)
+<span class="k">print</span>(R)</pre>
+      <div class="out"><span class="lab">실행 결과 (몫 / 나머지)</span>[-1.0, 2.0]<br>[3.0]</div>
+    </div>
+  </div>
+
+  <div class="warn"><span class="ico">⚠️</span><div><strong>두 가지 주의점.</strong> ① 정수 계수끼리 나눠도 몫은 분수가 될 수 있으므로(예: 2x² ÷ 3x) <span class="mono">double</span>/실수 나눗셈을 씁니다. ② 코드는 <strong>A의 차수 ≥ B의 차수</strong>를 가정합니다. A의 차수가 더 작으면 몫은 0, 나머지는 A 그대로입니다.</div></div>
+
+  <div class="point"><span class="ico">🎯</span><div><strong>나머지정리 미리보기:</strong> A(x)를 (x − 1)로 나눈 나머지는 A(1)과 같습니다. 위 예제에서 A(1) = 1 + 2 − 5 + 6 = 4 — 장제법 결과와 일치하죠! 코드 검증에 아주 유용한 성질입니다.</div></div>
+
+  <div class="pgnav">
+    <button class="btn ghost" onclick="goPage(2)">← 이전: 곱셈</button>
+    <button class="btn" onclick="goPage(4)">다음: 시뮬레이터 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════ 4. 시뮬레이터 ═══════════════ -->
+<section class="page" id="pg4">
+  <h2 class="sec">곱셈 스텝 시뮬레이터</h2>
+  <p class="body">(2x² + 3x + 1) × (x + 2) 의 이중 for문이 실행되는 과정을 한 단계씩 눌러 보세요. <strong>노란색 = a[i]</strong>, <strong>파란색 = b[j]</strong>, <strong>보라색 = 값이 더해지는 c[i+j]</strong> 입니다.</p>
+
+  <div class="simbox">
+    <div class="simrow"><div class="simlab">A = 2x²+3x+1</div><div id="simArrA" style="display:flex;gap:10px"></div></div>
+    <div class="simrow"><div class="simlab">B = x+2</div><div id="simArrB" style="display:flex;gap:10px"></div></div>
+    <div class="simrow"><div class="simlab">C = A × B</div><div id="simArrC" style="display:flex;gap:10px"></div></div>
+    <div class="simformula" id="simFormula">「다음 단계」 버튼을 눌러 시작하세요</div>
+    <div class="simctrl">
+      <button class="btn ghost" id="simFirstBtn">⟲ 처음부터</button>
+      <button class="btn ghost" id="simPrevBtn">← 이전 단계</button>
+      <button class="btn" id="simNextBtn">다음 단계 →</button>
+    </div>
+    <div class="simprog" id="simProg"></div>
+  </div>
+
+  <h2 class="sec">사칙연산 계산 놀이터</h2>
+  <p class="body">계수를 <strong>낮은 차수부터 쉼표로</strong> 입력하고 연산 버튼을 눌러 보세요. 이 강의의 코드와 똑같은 알고리즘이 결과를 계산합니다.</p>
+
+  <div class="playbox">
+    <div class="pin">
+      <label for="inA">다항식 A의 계수</label>
+      <input type="text" id="inA" value="1, 3, 2">
+      <span class="hint">예: 1, 3, 2 → 2x² + 3x + 1 (인덱스 = 차수)</span>
+    </div>
+    <div class="pin">
+      <label for="inB">다항식 B의 계수</label>
+      <input type="text" id="inB" value="2, 1">
+      <span class="hint">예: 2, 1 → x + 2</span>
+    </div>
+    <div class="opbtns">
+      <button class="btn" id="opAdd">A + B</button>
+      <button class="btn" id="opSub">A − B</button>
+      <button class="btn" id="opMul">A × B</button>
+      <button class="btn" id="opDiv">A ÷ B</button>
+    </div>
+    <div class="presult" id="playOut">여기에 결과가 표시됩니다</div>
+  </div>
+
+  <div class="point"><span class="ico">🧪</span><div><strong>실험 아이디어:</strong> ① A = 0,0,1 (x²), B = 0,1 (x) 로 나누면? ② A와 B를 곱한 결과를 다시 B로 나누면 몫이 A로 돌아오는지 확인해 보세요. A = B·Q + R 항등식을 눈으로 검증할 수 있습니다.</div></div>
+
+  <div class="pgnav">
+    <button class="btn ghost" onclick="goPage(3)">← 이전: 나눗셈</button>
+    <button class="btn" onclick="goPage(5)">다음: 퀴즈 →</button>
+  </div>
+</section>
+
+<!-- ═══════════════ 5. 퀴즈 ═══════════════ -->
+<section class="page" id="pg5">
+  <h2 class="sec">확인 퀴즈 — 7문제</h2>
+  <p class="body">보기를 클릭하면 바로 채점됩니다. 초록색이 정답, 빨간색이 오답입니다.</p>
+  <div class="scorebox">맞힌 개수: <span class="mono" id="scoreNum">0</span> / <span class="mono">7</span></div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">1</span>배열 [4, 0, 3] 이 나타내는 다항식은? (인덱스 = 차수)</div>
+    <div class="opts">
+      <button class="opt">4x² + 3</button>
+      <button class="opt" data-ok="1">3x² + 4</button>
+      <button class="opt">4x² + 3x</button>
+      <button class="opt">3x² + 4x</button>
+    </div>
+    <div class="expl">인덱스 0 → 상수항 4, 인덱스 1 → x의 계수 0, 인덱스 2 → x²의 계수 3. 따라서 3x² + 4 입니다.</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">2</span>차수 3인 다항식과 차수 2인 다항식을 곱하면 결과의 차수는?</div>
+    <div class="opts">
+      <button class="opt">2</button>
+      <button class="opt">3</button>
+      <button class="opt" data-ok="1">5</button>
+      <button class="opt">6</button>
+    </div>
+    <div class="expl">x³ × x² = x⁵. 곱셈에서 결과의 차수는 두 차수의 <strong>합</strong>입니다 (3 + 2 = 5).</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">3</span>P(x) = x² + 2x, Q(x) = −x² + x + 5 일 때 P + Q 는?</div>
+    <div class="opts">
+      <button class="opt" data-ok="1">3x + 5</button>
+      <button class="opt">x² + 3x + 5</button>
+      <button class="opt">2x² + 3x + 5</button>
+      <button class="opt">3x² + 5</button>
+    </div>
+    <div class="expl">x² 항: 1 + (−1) = 0 으로 사라집니다! 그래서 덧셈 코드 마지막에 최고차의 0을 지우는 while문이 필요한 것입니다.</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">4</span>곱셈 코드에서 a[i] * b[j] 는 결과 배열의 어느 칸에 더해질까?</div>
+    <div class="opts">
+      <button class="opt">c[i]</button>
+      <button class="opt">c[j]</button>
+      <button class="opt">c[i * j]</button>
+      <button class="opt" data-ok="1">c[i + j]</button>
+    </div>
+    <div class="expl">x^i × x^j = x^(i+j) 이므로 차수가 i+j인 칸, 즉 c[i+j]에 누적됩니다.</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">5</span>A(x)를 B(x)로 나눌 때, 나머지 R(x)가 만족해야 하는 조건은?</div>
+    <div class="opts">
+      <button class="opt">R의 차수 = B의 차수</button>
+      <button class="opt" data-ok="1">R의 차수 &lt; B의 차수</button>
+      <button class="opt">R의 차수 &gt; B의 차수</button>
+      <button class="opt">R은 항상 상수</button>
+    </div>
+    <div class="expl">나머지의 차수가 나누는 식보다 작아질 때까지 계속 나눕니다. 정수 나눗셈에서 나머지 &lt; 나누는 수와 같은 조건입니다.</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">6</span>(x³ + 2x² − 5x + 6) ÷ (x − 1) 의 나머지는?</div>
+    <div class="opts">
+      <button class="opt">0</button>
+      <button class="opt">2</button>
+      <button class="opt" data-ok="1">4</button>
+      <button class="opt">6</button>
+    </div>
+    <div class="expl">3번 탭의 장제법 결과 그대로 4입니다. 나머지정리로도 확인 가능: A(1) = 1 + 2 − 5 + 6 = 4.</div>
+  </div>
+
+  <div class="qz">
+    <div class="qt"><span class="qno">7</span>길이 n, m인 두 다항식 곱셈(이중 for문)의 시간 복잡도는?</div>
+    <div class="opts">
+      <button class="opt">O(n + m)</button>
+      <button class="opt" data-ok="1">O(n × m)</button>
+      <button class="opt">O(n log n)</button>
+      <button class="opt">O(n²m²)</button>
+    </div>
+    <div class="expl">모든 항의 쌍 n×m개를 각각 한 번씩 곱하므로 O(n × m)입니다. FFT를 쓰면 O(n log n)까지 빨라집니다.</div>
+  </div>
+
+  <div class="pgnav">
+    <button class="btn ghost" onclick="goPage(4)">← 이전: 시뮬레이터</button>
+    <button class="btn" onclick="goPage(0)">⟲ 처음으로</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ───────── 탭 이동 ───────── */
+function goPage(n){
+  for(var i=0;i<6;i++){
+    document.getElementById('pg'+i).classList.toggle('on', i===n);
+    document.getElementById('tab'+i).classList.toggle('on', i===n);
+  }
+  window.scrollTo(0,0);
+}
+
+/* ───────── 곱셈 스텝 시뮬레이터 ───────── */
+var simA=[1,3,2], simB=[2,1];
+var simSteps=[];
+(function(){
+  var c=[0,0,0,0];
+  for(var i=0;i<simA.length;i++){
+    for(var j=0;j<simB.length;j++){
+      var before=c[i+j];
+      c[i+j]+=simA[i]*simB[j];
+      simSteps.push({i:i,j:j,k:i+j,prod:simA[i]*simB[j],before:before,after:c[i+j],snap:c.slice()});
+    }
+  }
+})();
+var simPos=-1;
+
+function makeCells(containerId, arr, name){
+  var box=document.getElementById(containerId);
+  while(box.firstChild) box.removeChild(box.firstChild);
+  for(var i=0;i<arr.length;i++){
+    var col=document.createElement('div');
+    col.className='cellcol';
+    var cell=document.createElement('div');
+    cell.className='cell';
+    cell.id=containerId+'_'+i;
+    cell.textContent=String(arr[i]);
+    var idx=document.createElement('div');
+    idx.className='idx';
+    idx.textContent=name+'['+i+']';
+    col.appendChild(cell);
+    col.appendChild(idx);
+    box.appendChild(col);
+  }
+}
+
+function simRender(){
+  var cState=(simPos<0)?[0,0,0,0]:simSteps[simPos].snap;
+  makeCells('simArrA', simA, 'a');
+  makeCells('simArrB', simB, 'b');
+  makeCells('simArrC', cState, 'c');
+  var f=document.getElementById('simFormula');
+  var prog=document.getElementById('simProg');
+  if(simPos<0){
+    f.textContent='c 배열을 0으로 초기화했습니다. 「다음 단계」를 눌러 시작!';
+    prog.textContent='준비 (0 / '+simSteps.length+' 단계)';
+  }else{
+    var s=simSteps[simPos];
+    document.getElementById('simArrA_'+s.i).classList.add('hlA');
+    document.getElementById('simArrB_'+s.j).classList.add('hlB');
+    document.getElementById('simArrC_'+s.k).classList.add('hlC');
+    f.textContent='c['+s.k+'] += a['+s.i+'] \u00D7 b['+s.j+']  \u2192  '+s.before+' + ('+simA[s.i]+' \u00D7 '+simB[s.j]+') = '+s.after;
+    if(simPos===simSteps.length-1){
+      prog.textContent='완료! C = [2, 7, 7, 2] = 2x\u00B3 + 7x\u00B2 + 7x + 2';
+    }else{
+      prog.textContent='단계 '+(simPos+1)+' / '+simSteps.length+'  (i='+s.i+', j='+s.j+')';
+    }
+  }
+}
+
+/* ───────── 다항식 연산 (놀이터) ───────── */
+function trimPoly(c){
+  var r=c.slice();
+  while(r.length>1 && Math.abs(r[r.length-1])<1e-9) r.pop();
+  return r;
+}
+function pAddSub(a,b,sign){
+  var n=Math.max(a.length,b.length), c=[];
+  for(var i=0;i<n;i++){
+    var x=(i<a.length)?a[i]:0, y=(i<b.length)?b[i]:0;
+    c.push(x+sign*y);
+  }
+  return trimPoly(c);
+}
+function pMul(a,b){
+  var c=[];
+  for(var i=0;i<a.length+b.length-1;i++) c.push(0);
+  for(var i=0;i<a.length;i++)
+    for(var j=0;j<b.length;j++)
+      c[i+j]+=a[i]*b[j];
+  return trimPoly(c);
+}
+function pDiv(a,b){
+  a=trimPoly(a); b=trimPoly(b);
+  if(b.length===1 && Math.abs(b[0])<1e-9) return null; /* 0으로 나누기 */
+  if(a.length<b.length) return {q:[0], r:trimPoly(a)};
+  var rem=a.slice();
+  var dq=a.length-b.length;
+  var q=[];
+  for(var i=0;i<=dq;i++) q.push(0);
+  for(var k=dq;k>=0;k--){
+    var coef=rem[b.length-1+k]/b[b.length-1];
+    q[k]=coef;
+    for(var j=0;j<b.length;j++) rem[j+k]-=coef*b[j];
+  }
+  var r=(b.length>1)?rem.slice(0,b.length-1):[0];
+  return {q:trimPoly(q), r:trimPoly(r)};
+}
+
+var SUP={'0':'\u2070','1':'\u00B9','2':'\u00B2','3':'\u00B3','4':'\u2074','5':'\u2075','6':'\u2076','7':'\u2077','8':'\u2078','9':'\u2079'};
+function toSup(n){
+  var s=String(n), out='';
+  for(var i=0;i<s.length;i++) out+=SUP[s[i]]||s[i];
+  return out;
+}
+function fmtNum(v){
+  var r=Math.round(v*10000)/10000;
+  if(Math.abs(r)<1e-9) r=0;
+  return String(r);
+}
+function polyToStr(c){
+  var parts=[];
+  for(var i=c.length-1;i>=0;i--){
+    var v=c[i];
+    if(Math.abs(v)<1e-9) continue;
+    var av=Math.abs(v);
+    var body;
+    if(i===0) body=fmtNum(av);
+    else{
+      var co=(Math.abs(av-1)<1e-9)?'':fmtNum(av);
+      body=co + ((i===1)?'x':'x'+toSup(i));
+    }
+    parts.push({neg:v<0, body:body});
+  }
+  if(parts.length===0) return '0';
+  var s=(parts[0].neg?'\u2212':'')+parts[0].body;
+  for(var k=1;k<parts.length;k++){
+    s+=(parts[k].neg?' \u2212 ':' + ')+parts[k].body;
+  }
+  return s;
+}
+function arrToStr(c){
+  var out=[];
+  for(var i=0;i<c.length;i++) out.push(fmtNum(c[i]));
+  return '['+out.join(', ')+']';
+}
+function parseCoef(id){
+  var raw=document.getElementById(id).value;
+  var toks=raw.split(',');
+  var arr=[];
+  for(var i=0;i<toks.length;i++){
+    var t=toks[i].trim();
+    if(t==='') continue;
+    var v=Number(t);
+    if(isNaN(v)) return null;
+    arr.push(v);
+  }
+  if(arr.length===0) return null;
+  return arr;
+}
+function playCalc(op){
+  var out=document.getElementById('playOut');
+  var a=parseCoef('inA'), b=parseCoef('inB');
+  if(a===null || b===null){
+    out.textContent='\u26A0 입력 오류: 쉼표로 구분된 숫자를 입력하세요. 예) 1, 3, 2';
+    return;
+  }
+  var line1, line2='';
+  if(op==='add'){
+    var c=pAddSub(a,b,1);
+    line1='A + B = '+arrToStr(c);
+    line2='      = '+polyToStr(c);
+  }else if(op==='sub'){
+    var c2=pAddSub(a,b,-1);
+    line1='A \u2212 B = '+arrToStr(c2);
+    line2='      = '+polyToStr(c2);
+  }else if(op==='mul'){
+    var c3=pMul(a,b);
+    line1='A \u00D7 B = '+arrToStr(c3);
+    line2='      = '+polyToStr(c3);
+  }else{
+    var res=pDiv(a,b);
+    if(res===null){
+      out.textContent='\u26A0 0으로 나눌 수 없습니다.';
+      return;
+    }
+    line1='몫 Q = '+arrToStr(res.q)+'  =  '+polyToStr(res.q);
+    line2='나머지 R = '+arrToStr(res.r)+'  =  '+polyToStr(res.r);
+  }
+  out.textContent=line1+'\n'+line2;
+}
+
+/* ───────── 퀴즈 ───────── */
+var quizScore=0;
+function initQuiz(){
+  var qzs=document.querySelectorAll('.qz');
+  for(var i=0;i<qzs.length;i++){
+    (function(qz){
+      var opts=qz.querySelectorAll('.opt');
+      for(var j=0;j<opts.length;j++){
+        opts[j].addEventListener('click', function(){
+          if(qz.classList.contains('done')) return;
+          qz.classList.add('done');
+          var isOk=this.getAttribute('data-ok')==='1';
+          if(isOk){
+            this.classList.add('ok');
+            quizScore++;
+            document.getElementById('scoreNum').textContent=String(quizScore);
+          }else{
+            this.classList.add('no');
+            var right=qz.querySelector('.opt[data-ok="1"]');
+            if(right) right.classList.add('ok');
+          }
+          var ex=qz.querySelector('.expl');
+          if(ex) ex.classList.add('show');
+        });
+      }
+    })(qzs[i]);
+  }
+}
+
+/* ───────── 초기화 ───────── */
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('simFirstBtn').addEventListener('click', function(){ simPos=-1; simRender(); });
+  document.getElementById('simPrevBtn').addEventListener('click', function(){ if(simPos>-1) simPos--; simRender(); });
+  document.getElementById('simNextBtn').addEventListener('click', function(){ if(simPos<simSteps.length-1) simPos++; simRender(); });
+  document.getElementById('opAdd').addEventListener('click', function(){ playCalc('add'); });
+  document.getElementById('opSub').addEventListener('click', function(){ playCalc('sub'); });
+  document.getElementById('opMul').addEventListener('click', function(){ playCalc('mul'); });
+  document.getElementById('opDiv').addEventListener('click', function(){ playCalc('div'); });
+  simRender();
+  initQuiz();
+});
+</script>
+</body>
+</html>
