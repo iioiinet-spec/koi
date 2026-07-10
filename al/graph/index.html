@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>그래프 완전정복 — C로 배우는 입력과 탐색</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a1120;
+  --bg-2:#0d1626;
+  --surface:#111c30;
+  --surface-2:#16223b;
+  --surface-3:#1b2a48;
+  --border:#28375c;
+  --border-soft:#1c2844;
+  --text:#e9eefb;
+  --text-dim:#93a5c7;
+  --text-faint:#5c6d92;
+  --cyan:#4fd8cf;
+  --cyan-dim:#2a7a72;
+  --amber:#f7b955;
+  --purple:#a596ff;
+  --coral:#ff7a7a;
+  --green:#6fe3a4;
+  --radius:12px;
+  --mono:'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+  --sans:'Noto Sans KR', system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+body{
+  margin:0;
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 800px 500px at 15% -10%, rgba(79,216,207,0.10), transparent),
+    radial-gradient(ellipse 700px 500px at 100% 10%, rgba(165,150,255,0.08), transparent);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(79,216,207,0.3); color:#fff;}
+a{color:var(--cyan);}
+h1,h2,h3,h4{font-family:var(--sans); font-weight:900; margin:0; letter-spacing:-0.01em;}
+code, .mono{font-family:var(--mono);}
+:focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:4px;}
+
+/* ---------- layout shell ---------- */
+main{max-width:1040px; margin:0 auto; padding:0 24px 40px;}
+.step{padding:96px 0 40px; border-top:1px solid var(--border-soft); scroll-margin-top:20px;}
+.step:first-of-type{border-top:none;}
+.step-head{display:flex; align-items:baseline; gap:18px; margin-bottom:28px; flex-wrap:wrap;}
+.step-num{font-family:var(--mono); font-size:15px; color:var(--cyan); letter-spacing:0.15em; border:1px solid var(--cyan-dim); padding:4px 10px; border-radius:20px; background:rgba(79,216,207,0.06); flex:none;}
+.step-head h2{font-size:clamp(24px,3.4vw,34px);}
+.lead{color:var(--text-dim); font-size:17px; max-width:70ch; margin:0 0 26px;}
+p{color:var(--text-dim); font-size:15.5px;}
+.tight{margin:0 0 12px;}
+
+/* ---------- rail nav ---------- */
+.rail{position:fixed; left:20px; top:50%; transform:translateY(-50%); z-index:50; display:flex; flex-direction:column; gap:16px;}
+.rail button{background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:4px 0; color:var(--text-faint); font-family:var(--mono); font-size:11px;}
+.rail .dot{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--text-faint); transition:all .25s;}
+.rail .lbl{opacity:0; transform:translateX(-6px); transition:all .2s; white-space:nowrap; background:var(--surface); border:1px solid var(--border); padding:3px 8px; border-radius:6px;}
+.rail button:hover .lbl{opacity:1; transform:translateX(0);}
+.rail button.active .dot{background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 0 3px rgba(79,216,207,0.15);}
+.rail button.active{color:var(--cyan);}
+@media (max-width:1180px){ .rail{display:none;} }
+
+/* ---------- hero ---------- */
+.hero{position:relative; min-height:92vh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding:60px 24px;}
+.hero-inner{max-width:1040px; margin:0 auto; width:100%; position:relative; z-index:2;}
+.eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:0.25em; color:var(--cyan); text-transform:uppercase; margin-bottom:18px; display:flex; align-items:center; gap:10px;}
+.eyebrow::before{content:''; width:26px; height:1px; background:var(--cyan);}
+.hero h1{font-size:clamp(40px,7vw,78px); line-height:1.04; margin-bottom:22px;}
+.hero h1 span{color:var(--cyan);}
+.hero p.sub{color:var(--text-dim); font-size:clamp(15px,1.8vw,19px); max-width:56ch; margin-bottom:34px;}
+.hero-cta{display:flex; gap:14px; flex-wrap:wrap;}
+.btn{font-family:var(--mono); font-size:13.5px; font-weight:600; padding:13px 22px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:.18s;}
+.btn:hover{border-color:var(--cyan); color:var(--cyan); transform:translateY(-1px);}
+.btn.primary{background:var(--cyan); color:#04211d; border-color:var(--cyan);}
+.btn.primary:hover{background:#6be6dc; color:#04211d;}
+.hero-bg{position:absolute; inset:0; z-index:1; opacity:0.55;}
+.hero-bg svg{width:100%; height:100%;}
+.hero-bg .n{fill:var(--surface-2); stroke:var(--cyan-dim); stroke-width:1.4;}
+.hero-bg .e{stroke:var(--border); stroke-width:1.2;}
+.hero-bg .pulse{animation:pulse 3.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.35;} 50%{opacity:1;}}
+.hero-bg .draw{stroke-dasharray:400; stroke-dashoffset:400; animation:draw 2.6s ease forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+
+/* ---------- terms grid ---------- */
+.term-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:26px 0;}
+.term-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 18px;}
+.term-card .t-name{font-family:var(--mono); color:var(--cyan); font-size:13px; margin-bottom:6px; letter-spacing:.02em;}
+.term-card .t-desc{font-size:13.6px; color:var(--text-dim);}
+
+/* ---------- mode toggle + demo svg ---------- */
+.toggle-row{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+.toggle-row button{font-family:var(--mono); font-size:12.5px; padding:9px 16px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); cursor:pointer; transition:.15s;}
+.toggle-row button.on{background:rgba(79,216,207,0.12); border-color:var(--cyan); color:var(--cyan);}
+.demo-panel{display:grid; grid-template-columns:1.1fr 0.9fr; gap:20px; align-items:stretch;}
+@media(max-width:760px){.demo-panel{grid-template-columns:1fr;}}
+.svg-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:14px;}
+.svg-card svg{width:100%; height:auto; display:block;}
+.info-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:18px 20px; font-size:14px; color:var(--text-dim); display:flex; flex-direction:column; justify-content:center;}
+.info-card b{color:var(--text);}
+#s1 .gnode{fill:var(--surface-3); stroke:var(--text-faint); stroke-width:1.6; cursor:pointer; transition:.15s;}
+#s1 .gnode:hover{stroke:var(--cyan);}
+#s1 .gnode.sel{stroke:var(--amber); fill:rgba(247,185,89,0.18);}
+#s1 .glabel{fill:var(--text); font-family:var(--mono); font-size:13px; text-anchor:middle; pointer-events:none;}
+#s1 .gedge{stroke:var(--text-faint); stroke-width:2; transition:.15s;}
+#s1 .gedge.hi{stroke:var(--amber); stroke-width:3;}
+#s1 .wlabel{fill:var(--amber); font-family:var(--mono); font-size:11px; display:none; text-anchor:middle;}
+#s1.mode-weighted .wlabel{display:block;}
+
+/* ---------- section 2 builder ---------- */
+.builder-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+@media(max-width:760px){.builder-grid{grid-template-columns:1fr;}}
+.builder-node{fill:var(--surface-3); stroke:var(--text-faint); stroke-width:1.6; cursor:pointer; transition:.12s;}
+.builder-node:hover{stroke:var(--cyan);}
+.builder-node.picked{stroke:var(--amber); fill:rgba(247,185,89,0.2);}
+.builder-edge{stroke:var(--cyan); stroke-width:2.4;}
+.matrix-wrap, .list-wrap{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 18px;}
+table.matrix{border-collapse:collapse; width:100%; font-family:var(--mono); font-size:13px; text-align:center;}
+table.matrix th,table.matrix td{border:1px solid var(--border-soft); width:34px; height:30px; color:var(--text-dim);}
+table.matrix th{color:var(--cyan); background:var(--surface-2);}
+table.matrix td.one{color:var(--amber); font-weight:700;}
+.adj-line{font-family:var(--mono); font-size:13.5px; color:var(--text-dim); padding:5px 0; border-bottom:1px dashed var(--border-soft);}
+.adj-line b{color:var(--cyan); margin-right:8px;}
+.hint{font-size:12.5px; color:var(--text-faint); margin-top:10px;}
+.compare-table{width:100%; border-collapse:collapse; margin-top:26px; font-size:13.8px;}
+.compare-table th, .compare-table td{border:1px solid var(--border-soft); padding:10px 14px; text-align:left; color:var(--text-dim);}
+.compare-table th{color:var(--text); font-family:var(--mono); font-size:12.5px; background:var(--surface-2);}
+.compare-table td b{color:var(--text);}
+
+/* ---------- code blocks ---------- */
+.tabs{display:flex; gap:6px; margin-bottom:18px;}
+.tabs button{font-family:var(--mono); font-size:13px; padding:10px 18px; border-radius:9px 9px 0 0; border:1px solid var(--border-soft); border-bottom:none; background:var(--bg-2); color:var(--text-faint); cursor:pointer;}
+.tabs button.on{background:var(--surface); color:var(--cyan); border-color:var(--border);}
+.code-block{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;}
+.code-block .cb-head{display:flex; justify-content:space-between; align-items:center; padding:9px 16px; background:var(--surface-2); border-bottom:1px solid var(--border-soft); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.05em;}
+.code-lines{padding:12px 0; overflow-x:auto;}
+.code-line{display:flex; white-space:pre; padding:1.5px 18px; font-family:var(--mono); font-size:13.4px; line-height:1.65;}
+.code-line .ln{color:var(--text-faint); width:26px; flex:none; user-select:none; text-align:right; margin-right:16px; opacity:.6;}
+.code-line.hl{background:rgba(247,185,89,0.14); box-shadow:inset 3px 0 0 var(--amber);}
+.tk-kw{color:#7fb4ff;} .tk-num{color:var(--amber);} .tk-str{color:var(--green);} .tk-cmt{color:var(--text-faint); font-style:italic;} .tk-pre{color:var(--purple);} .tk-id{color:var(--text);} .tk-punct{color:var(--text-dim);} .tk-op{color:var(--coral);}
+
+.step-reveal{display:flex; flex-direction:column; gap:0;}
+.reveal-item{display:none;}
+.reveal-item.shown{display:block; animation:fadein .4s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+.step-badge{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--purple); margin:22px 0 10px;}
+.step-badge .num{width:22px; height:22px; border-radius:50%; background:rgba(165,150,255,0.15); border:1px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px;}
+.next-btn{margin:16px 0 6px;}
+.full-toggle{background:none; border:1px dashed var(--border); color:var(--text-dim); font-family:var(--mono); font-size:12.5px; padding:9px 16px; border-radius:8px; cursor:pointer; margin-top:8px;}
+.full-toggle:hover{border-color:var(--cyan); color:var(--cyan);}
+.full-code{display:none; margin-top:14px;}
+.full-code.shown{display:block;}
+
+/* ---------- debugger widget ---------- */
+.dbg{display:grid; grid-template-columns:1.15fr 1fr; gap:18px;}
+@media(max-width:880px){.dbg{grid-template-columns:1fr;}}
+.dbg-left{display:flex; flex-direction:column; gap:14px;}
+.graph-svg-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:12px;}
+.graph-svg-card svg{width:100%; height:auto; display:block;}
+.gv-node{stroke-width:2; transition:fill .2s, stroke .2s;}
+.gv-node.default{fill:var(--surface-3); stroke:var(--text-faint);}
+.gv-node.visited{fill:rgba(165,150,255,0.22); stroke:var(--purple);}
+.gv-node.current{fill:rgba(247,185,89,0.28); stroke:var(--amber);}
+.gv-label{fill:var(--text); font-family:var(--mono); font-size:13px; text-anchor:middle; pointer-events:none;}
+.gv-edge{stroke:var(--border); stroke-width:2; transition:.2s;}
+.gv-edge.used{stroke:var(--purple); stroke-width:2.6;}
+.gv-edge.active{stroke:var(--amber); stroke-width:3;}
+
+.controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:12px 14px;}
+.controls button{font-family:var(--mono); font-size:12.5px; padding:8px 14px; border-radius:7px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); cursor:pointer;}
+.controls button:hover{border-color:var(--cyan); color:var(--cyan);}
+.controls button:disabled{opacity:.35; cursor:not-allowed;}
+.controls .spacer{flex:1;}
+.controls select{font-family:var(--mono); font-size:12px; background:var(--surface-2); color:var(--text-dim); border:1px solid var(--border); border-radius:6px; padding:6px 8px;}
+.status-line{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:13px 16px; font-family:var(--mono); font-size:13px; color:var(--cyan); min-height:20px;}
+
+.dbg-right{display:flex; flex-direction:column; gap:14px;}
+.panel{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px;}
+.panel h4{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; color:var(--text-faint); text-transform:uppercase; margin-bottom:12px;}
+.stack-list{display:flex; flex-direction:column-reverse; gap:6px; min-height:60px;}
+.stack-list .box, .queue-list .box{font-family:var(--mono); font-size:13.5px; padding:8px 12px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); color:var(--text); text-align:center;}
+.stack-list .box:last-child, .queue-list .box:last-child{border-color:var(--amber); color:var(--amber);}
+.queue-list{display:flex; flex-direction:row; gap:6px; min-height:40px; flex-wrap:wrap;}
+.order-track{display:flex; gap:6px; flex-wrap:wrap; min-height:30px;}
+.order-track .chip{font-family:var(--mono); font-size:12.5px; padding:5px 10px; border-radius:14px; background:rgba(165,150,255,0.14); border:1px solid var(--purple); color:var(--purple);}
+.empty-hint{color:var(--text-faint); font-size:12.5px; font-family:var(--mono);}
+
+/* ---------- summary ---------- */
+.quiz-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin-bottom:14px;}
+.quiz-card .q{font-weight:700; margin-bottom:12px; font-size:15px;}
+.quiz-opts{display:flex; flex-direction:column; gap:8px;}
+.quiz-opts button{text-align:left; font-family:var(--sans); font-size:14px; padding:10px 14px; border-radius:8px; border:1px solid var(--border-soft); background:var(--surface-2); color:var(--text-dim); cursor:pointer;}
+.quiz-opts button:hover{border-color:var(--cyan);}
+.quiz-opts button.correct{border-color:var(--green); background:rgba(111,227,164,0.12); color:var(--green);}
+.quiz-opts button.wrong{border-color:var(--coral); background:rgba(255,122,122,0.1); color:var(--coral);}
+.quiz-fb{font-size:13px; color:var(--text-faint); margin-top:10px; display:none;}
+.quiz-fb.shown{display:block;}
+
+footer{text-align:center; padding:40px 24px 60px; color:var(--text-faint); font-family:var(--mono); font-size:12px;}
+.back-top{color:var(--cyan); text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-label="목차">
+  <button data-target="s1"><span class="dot"></span><span class="lbl">01 그래프란</span></button>
+  <button data-target="s2"><span class="dot"></span><span class="lbl">02 표현 방법</span></button>
+  <button data-target="s3"><span class="dot"></span><span class="lbl">03 C로 입력받기</span></button>
+  <button data-target="s4"><span class="dot"></span><span class="lbl">04 DFS 탐색</span></button>
+  <button data-target="s5"><span class="dot"></span><span class="lbl">05 BFS 탐색</span></button>
+  <button data-target="s6"><span class="dot"></span><span class="lbl">06 정리 &amp; 퀴즈</span></button>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"><svg id="heroSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"></svg></div>
+  <div class="hero-inner">
+    <div class="eyebrow">GRAPH · DATA STRUCTURE · C LANGUAGE</div>
+    <h1>정점과 간선으로<br>세상을 <span>연결</span>하는 법</h1>
+    <p class="sub">그래프의 개념부터 인접 행렬·인접 리스트 표현, C 코드로 직접 입력받는 방법, 그리고 DFS·BFS 탐색까지 — 코드 한 줄 한 줄을 그래프 위에서 눈으로 확인하며 배웁니다.</p>
+    <div class="hero-cta">
+      <a href="#s1" class="btn primary">시작하기 →</a>
+      <a href="#s4" class="btn">탐색 디버거로 바로가기</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= SECTION 1 ================= -->
+  <section id="s1" class="step">
+    <div class="step-head"><span class="step-num">01</span><h2>그래프란 무엇인가</h2></div>
+    <p class="lead">그래프(Graph)는 <b style="color:var(--text)">정점(Vertex)</b>과 그 정점들을 잇는 <b style="color:var(--text)">간선(Edge)</b>으로 이루어진 자료구조입니다. 지하철 노선도, SNS 친구 관계, 도로망처럼 "무언가와 무언가가 서로 연결되어 있다"는 상황은 모두 그래프로 표현할 수 있습니다.</p>
+
+    <div class="toggle-row">
+      <button class="on" data-mode="undirected">무방향 그래프</button>
+      <button data-mode="directed">방향 그래프</button>
+      <button data-mode="weighted">가중치 그래프</button>
+    </div>
+
+    <div class="demo-panel">
+      <div class="svg-card">
+        <svg id="s1svg" viewBox="0 0 320 260"></svg>
+      </div>
+      <div class="info-card" id="s1info">
+        정점을 클릭하면 그 정점과 연결된 간선과 <b>차수(degree)</b>가 표시됩니다. 위의 버튼으로 그래프 종류를 바꿔보세요.
+      </div>
+    </div>
+
+    <div class="term-grid">
+      <div class="term-card"><div class="t-name">정점 Vertex</div><div class="t-desc">그래프를 구성하는 하나의 점. 노드(Node)라고도 부릅니다.</div></div>
+      <div class="term-card"><div class="t-name">간선 Edge</div><div class="t-desc">두 정점을 연결하는 선. 방향이 있을 수도, 없을 수도 있습니다.</div></div>
+      <div class="term-card"><div class="t-name">차수 Degree</div><div class="t-desc">한 정점에 연결된 간선의 개수.</div></div>
+      <div class="term-card"><div class="t-name">경로 Path</div><div class="t-desc">간선을 따라 정점들을 순서대로 이동한 경로.</div></div>
+      <div class="term-card"><div class="t-name">사이클 Cycle</div><div class="t-desc">시작 정점과 끝 정점이 같은 경로.</div></div>
+      <div class="term-card"><div class="t-name">가중치 Weight</div><div class="t-desc">간선에 매겨진 비용, 거리, 시간 등의 값.</div></div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 2 ================= -->
+  <section id="s2" class="step">
+    <div class="step-head"><span class="step-num">02</span><h2>그래프를 어떻게 저장할까</h2></div>
+    <p class="lead">그래프를 컴퓨터 메모리에 저장하는 대표적인 방법은 두 가지입니다: <b style="color:var(--text)">인접 행렬(Adjacency Matrix)</b>과 <b style="color:var(--text)">인접 리스트(Adjacency List)</b>. 아래 그래프의 정점을 두 번 클릭해서 간선을 직접 추가·삭제해보고, 오른쪽 표현이 어떻게 바뀌는지 확인해보세요.</p>
+
+    <div class="builder-grid">
+      <div class="svg-card">
+        <svg id="builderSvg" viewBox="0 0 300 300"></svg>
+        <div class="hint">정점 두 개를 순서대로 클릭 → 간선 토글</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="matrix-wrap">
+          <h4 style="font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.08em; margin:0 0 10px;">인접 행렬</h4>
+          <table class="matrix" id="matrixTable"></table>
+        </div>
+        <div class="list-wrap">
+          <h4 style="font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.08em; margin:0 0 10px;">인접 리스트</h4>
+          <div id="listOutput"></div>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <tr><th></th><th>인접 행렬</th><th>인접 리스트</th></tr>
+      <tr><td><b>공간 복잡도</b></td><td>O(V²) — 정점 수의 제곱</td><td>O(V+E) — 정점 수 + 간선 수</td></tr>
+      <tr><td><b>간선 존재 확인</b></td><td>O(1) — matrix[u][v] 바로 확인</td><td>O(V) — 리스트를 순회해야 함</td></tr>
+      <tr><td><b>인접 정점 순회</b></td><td>O(V) — 한 행 전체 확인</td><td>O(간선 수) — 필요한 만큼만</td></tr>
+      <tr><td><b>적합한 경우</b></td><td>정점이 적고 간선이 촘촘한 <b>밀집 그래프</b></td><td>정점은 많고 간선이 적은 <b>희소 그래프</b></td></tr>
+    </table>
+  </section>
+
+  <!-- ================= SECTION 3 ================= -->
+  <section id="s3" class="step">
+    <div class="step-head"><span class="step-num">03</span><h2>C로 그래프 입력받기</h2></div>
+    <p class="lead">정점 개수 <code class="mono">n</code>, 간선 개수 <code class="mono">m</code>을 입력받은 뒤, <code class="mono">m</code>번에 걸쳐 간선 정보를 입력받아 저장합니다. 아래 탭에서 인접 행렬 방식과 인접 리스트 방식을 비교해보세요.</p>
+
+    <div class="tabs">
+      <button class="on" data-tab="matrix">인접 행렬로 입력받기</button>
+      <button data-tab="list">인접 리스트로 입력받기</button>
+    </div>
+
+    <div id="tab-matrix" class="tab-pane">
+      <div class="step-reveal" id="reveal-matrix"></div>
+      <button class="btn next-btn" id="nextMatrix">다음 단계 보기 →</button>
+      <button class="full-toggle" data-full="full-matrix">전체 코드 한 번에 보기</button>
+      <div class="code-block full-code" id="full-matrix"></div>
+    </div>
+
+    <div id="tab-list" class="tab-pane" style="display:none;">
+      <div class="step-reveal" id="reveal-list"></div>
+      <button class="btn next-btn" id="nextList">다음 단계 보기 →</button>
+      <button class="full-toggle" data-full="full-list">전체 코드 한 번에 보기</button>
+      <div class="code-block full-code" id="full-list"></div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4 : DFS ================= -->
+  <section id="s4" class="step">
+    <div class="step-head"><span class="step-num">04</span><h2>DFS — 깊이 우선 탐색</h2></div>
+    <p class="lead">DFS(Depth-First Search)는 한 방향으로 갈 수 있는 데까지 깊이 들어간 뒤, 더 갈 곳이 없으면 되돌아오는(백트래킹) 탐색입니다. 재귀 호출이 곧 <b style="color:var(--text)">스택(Stack)</b> 구조를 흉내내고 있다는 점이 핵심입니다. 아래에서 <b style="color:var(--text)">재생</b> 버튼을 눌러 코드와 그래프, 호출 스택이 함께 움직이는 것을 확인해보세요.</p>
+
+    <div class="dbg">
+      <div class="dbg-left">
+        <div class="graph-svg-card"><svg id="dfsGraph" viewBox="0 0 620 430"></svg></div>
+        <div class="controls">
+          <button id="dfsReset" title="처음으로">⟲ 리셋</button>
+          <button id="dfsStep">▸ 한 단계</button>
+          <button id="dfsPlay">▶ 재생</button>
+          <span class="spacer"></span>
+          <label class="mono" style="font-size:12px; color:var(--text-faint);">속도</label>
+          <select id="dfsSpeed"><option value="900">느리게</option><option value="500" selected>보통</option><option value="220">빠르게</option></select>
+        </div>
+        <div class="status-line" id="dfsStatus">▶ 재생을 눌러 정점 0부터 DFS 탐색을 시작하세요.</div>
+      </div>
+      <div class="dbg-right">
+        <div class="code-block">
+          <div class="cb-head"><span>dfs.c</span><span>재귀 함수</span></div>
+          <div class="code-lines" id="dfsCode"></div>
+        </div>
+        <div class="panel">
+          <h4>호출 스택 (Call Stack)</h4>
+          <div class="stack-list" id="dfsStack"><span class="empty-hint">비어 있음</span></div>
+        </div>
+        <div class="panel">
+          <h4>방문 순서</h4>
+          <div class="order-track" id="dfsOrder"><span class="empty-hint">아직 없음</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 5 : BFS ================= -->
+  <section id="s5" class="step">
+    <div class="step-head"><span class="step-num">05</span><h2>BFS — 너비 우선 탐색</h2></div>
+    <p class="lead">BFS(Breadth-First Search)는 가까운 정점부터 한 겹씩 넓게 퍼져나가며 탐색합니다. 방문할 정점을 <b style="color:var(--text)">큐(Queue)</b>에 넣고, 먼저 들어온 정점부터 꺼내 처리하는 FIFO 구조가 핵심입니다. 같은 그래프에서 DFS와 방문 순서가 어떻게 다른지 비교해보세요.</p>
+
+    <div class="dbg">
+      <div class="dbg-left">
+        <div class="graph-svg-card"><svg id="bfsGraph" viewBox="0 0 620 430"></svg></div>
+        <div class="controls">
+          <button id="bfsReset" title="처음으로">⟲ 리셋</button>
+          <button id="bfsStep">▸ 한 단계</button>
+          <button id="bfsPlay">▶ 재생</button>
+          <span class="spacer"></span>
+          <label class="mono" style="font-size:12px; color:var(--text-faint);">속도</label>
+          <select id="bfsSpeed"><option value="900">느리게</option><option value="500" selected>보통</option><option value="220">빠르게</option></select>
+        </div>
+        <div class="status-line" id="bfsStatus">▶ 재생을 눌러 정점 0부터 BFS 탐색을 시작하세요.</div>
+      </div>
+      <div class="dbg-right">
+        <div class="code-block">
+          <div class="cb-head"><span>bfs.c</span><span>큐 기반 반복문</span></div>
+          <div class="code-lines" id="bfsCode"></div>
+        </div>
+        <div class="panel">
+          <h4>큐 (Queue) — 왼쪽이 먼저 나감</h4>
+          <div class="queue-list" id="bfsQueue"><span class="empty-hint">비어 있음</span></div>
+        </div>
+        <div class="panel">
+          <h4>방문 순서</h4>
+          <div class="order-track" id="bfsOrder"><span class="empty-hint">아직 없음</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 6 ================= -->
+  <section id="s6" class="step">
+    <div class="step-head"><span class="step-num">06</span><h2>정리 &amp; 퀴즈</h2></div>
+    <p class="lead">같은 그래프라도 DFS와 BFS는 서로 다른 목적에 쓰입니다. 아래 표로 정리하고, 짧은 퀴즈로 개념을 점검해보세요.</p>
+
+    <table class="compare-table">
+      <tr><th></th><th>DFS</th><th>BFS</th></tr>
+      <tr><td><b>자료구조</b></td><td>스택 (또는 재귀)</td><td>큐</td></tr>
+      <tr><td><b>탐색 방식</b></td><td>한 방향으로 끝까지 깊게</td><td>가까운 정점부터 넓게</td></tr>
+      <tr><td><b>대표 용도</b></td><td>경로 존재 여부, 사이클 탐지, 위상 정렬</td><td>가중치 없는 그래프의 최단 경로, 레벨 탐색</td></tr>
+      <tr><td><b>메모리 사용 경향</b></td><td>깊이가 깊으면 스택이 커짐</td><td>너비가 넓으면 큐가 커짐</td></tr>
+    </table>
+
+    <div id="quizArea" style="margin-top:32px;"></div>
+
+    <footer style="padding:40px 0 0;">
+      <a href="#" class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">↑ 맨 위로</a>
+    </footer>
+  </section>
+
+</main>
+
+<script>
+(function(){
+
+/* ============================================================
+   UTIL: C code syntax highlighter (line-based)
+============================================================ */
+const KEYWORDS = new Set(['int','void','if','else','for','while','return','struct','char','float','double','const','static','break','continue','sizeof']);
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hlLine(line){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|(#\w+)|(\b\d+\b)|(\s+)|(\b[A-Za-z_]\w*\b)|([{}()\[\];,.:])|(\S)/g;
+  let out=''; let m;
+  while((m = re.exec(line))){
+    const [,cmt,str,pre,num,ws,ident,punct,other] = m;
+    if(cmt) out += `<span class="tk-cmt">${esc(cmt)}</span>`;
+    else if(str) out += `<span class="tk-str">${esc(str)}</span>`;
+    else if(pre) out += `<span class="tk-pre">${esc(pre)}</span>`;
+    else if(num) out += `<span class="tk-num">${esc(num)}</span>`;
+    else if(ws) out += ws;
+    else if(ident) out += KEYWORDS.has(ident) ? `<span class="tk-kw">${esc(ident)}</span>` : `<span class="tk-id">${esc(ident)}</span>`;
+    else if(punct) out += `<span class="tk-punct">${esc(punct)}</span>`;
+    else out += `<span class="tk-op">${esc(other)}</span>`;
+  }
+  return out;
+}
+function renderCode(container, lines, idPrefix){
+  container.innerHTML = lines.map((l,i)=>
+    `<div class="code-line" id="${idPrefix}-l${i+1}" data-line="${i+1}"><span class="ln">${i+1}</span><code>${hlLine(l)}</code></div>`
+  ).join('');
+}
+function highlightLine(idPrefix, n, root){
+  root.querySelectorAll('.code-line').forEach(el=>el.classList.remove('hl'));
+  if(n){
+    const el = root.querySelector(`#${idPrefix}-l${n}`);
+    if(el){ el.classList.add('hl'); el.scrollIntoView({block:'nearest'}); }
+  }
+}
+
+/* ============================================================
+   RAIL NAV — scroll-spy + click to scroll
+============================================================ */
+const railBtns = document.querySelectorAll('.rail button');
+railBtns.forEach(b=>b.addEventListener('click',()=>{
+  document.getElementById(b.dataset.target).scrollIntoView({behavior:'smooth'});
+}));
+const sections = ['s1','s2','s3','s4','s5','s6'].map(id=>document.getElementById(id));
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const id = en.target.id;
+      railBtns.forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+    }
+  });
+},{rootMargin:'-40% 0px -50% 0px'});
+sections.forEach(s=>io.observe(s));
+
+/* ============================================================
+   HERO background mini graph
+============================================================ */
+(function(){
+  const svg = document.getElementById('heroSvg');
+  const pts = [[500,120],[280,220],[720,220],[160,380],[420,380],[600,380],[860,380],[500,500]];
+  const edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[4,5],[3,4],[5,6],[4,7],[5,7]];
+  let s = '';
+  edges.forEach(([a,b],i)=>{
+    s += `<line class="e draw" x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" style="animation-delay:${i*0.09}s"/>`;
+  });
+  pts.forEach((p,i)=>{
+    s += `<circle class="n pulse" cx="${p[0]}" cy="${p[1]}" r="7" style="animation-delay:${i*0.25}s"/>`;
+  });
+  svg.innerHTML = s;
+})();
+
+/* ============================================================
+   SECTION 1 — mode toggle demo
+============================================================ */
+(function(){
+  const svgEl = document.getElementById('s1svg');
+  const info = document.getElementById('s1info');
+  const nodes = [{id:0,x:60,y:60,label:'A'},{id:1,x:260,y:60,label:'B'},{id:2,x:260,y:200,label:'C'},{id:3,x:60,y:200,label:'D'}];
+  const edges = [{a:0,b:1,w:4},{a:1,b:2,w:7},{a:2,b:3,w:2},{a:3,b:0,w:5},{a:0,b:2,w:9}];
+  let mode='undirected';
+
+  function mid(a,b){ return [(a.x+b.x)/2,(a.y+b.y)/2]; }
+
+  function draw(){
+    let s = `<defs><marker id="arrow1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="var(--amber)"/></marker></defs>`;
+    edges.forEach((e,i)=>{
+      const a=nodes[e.a], b=nodes[e.b];
+      const m = mid(a,b);
+      s += `<line class="gedge" id="s1e${i}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" ${mode==='directed'?'marker-end="url(#arrow1)"':''}/>`;
+      s += `<text class="wlabel" x="${m[0]}" y="${m[1]-6}">${e.w}</text>`;
+    });
+    nodes.forEach(n=>{
+      s += `<circle class="gnode" id="s1n${n.id}" cx="${n.x}" cy="${n.y}" r="18" data-id="${n.id}"/>`;
+      s += `<text class="glabel" x="${n.x}" y="${n.y+5}">${n.label}</text>`;
+    });
+    svgEl.setAttribute('class','mode-'+mode);
+    svgEl.innerHTML = s;
+    svgEl.querySelectorAll('.gnode').forEach(el=>{
+      el.addEventListener('click', ()=>selectNode(+el.dataset.id));
+    });
+  }
+  function selectNode(id){
+    svgEl.querySelectorAll('.gnode').forEach(el=>el.classList.toggle('sel', +el.dataset.id===id));
+    const deg = edges.filter(e=>e.a===id||e.b===id);
+    svgEl.querySelectorAll('.gedge').forEach((el,i)=>{
+      el.classList.toggle('hi', edges[i].a===id||edges[i].b===id);
+    });
+    const label = nodes[id].label;
+    const neighborLabels = deg.map(e=> nodes[e.a===id?e.b:e.a].label).join(', ');
+    info.innerHTML = `정점 <b>${label}</b>의 차수는 <b>${deg.length}</b>입니다.<br>연결된 정점: <b>${neighborLabels}</b>`;
+  }
+  document.querySelectorAll('.toggle-row button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.toggle-row button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      mode = btn.dataset.mode;
+      draw();
+    });
+  });
+  draw();
+})();
+
+/* ============================================================
+   SECTION 2 — adjacency matrix / list builder
+============================================================ */
+(function(){
+  const svgEl = document.getElementById('builderSvg');
+  const matrixTable = document.getElementById('matrixTable');
+  const listOutput = document.getElementById('listOutput');
+  const labels = ['A','B','C','D','E'];
+  const n = 5;
+  const cx=150, cy=150, r=105;
+  const pos = labels.map((_,i)=>{
+    const ang = -Math.PI/2 + i*(2*Math.PI/n);
+    return [cx+r*Math.cos(ang), cy+r*Math.sin(ang)];
+  });
+  let adj = Array.from({length:n},()=>Array(n).fill(0));
+  // seed a starting example
+  adj[0][1]=adj[1][0]=1; adj[1][2]=adj[2][1]=1; adj[0][3]=adj[3][0]=1;
+  let picked = null;
+
+  function drawGraph(){
+    let s='';
+    for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+      if(adj[i][j]) s += `<line class="builder-edge" x1="${pos[i][0]}" y1="${pos[i][1]}" x2="${pos[j][0]}" y2="${pos[j][1]}"/>`;
+    }
+    pos.forEach((p,i)=>{
+      s += `<circle class="builder-node ${picked===i?'picked':''}" cx="${p[0]}" cy="${p[1]}" r="20" data-i="${i}"/>`;
+      s += `<text class="glabel" x="${p[0]}" y="${p[1]+5}">${labels[i]}</text>`;
+    });
+    svgEl.innerHTML = s;
+    svgEl.querySelectorAll('.builder-node').forEach(el=>{
+      el.addEventListener('click', ()=> onPick(+el.dataset.i));
+    });
+  }
+  function onPick(i){
+    if(picked===null){ picked=i; drawGraph(); return; }
+    if(picked!==i){ adj[picked][i]^=1; adj[i][picked]^=1; }
+    picked=null;
+    drawGraph(); drawTables();
+  }
+  function drawTables(){
+    let h = '<tr><th></th>'+labels.map(l=>`<th>${l}</th>`).join('')+'</tr>';
+    for(let i=0;i<n;i++){
+      h += `<tr><th>${labels[i]}</th>`;
+      for(let j=0;j<n;j++) h += `<td class="${adj[i][j]?'one':''}">${adj[i][j]}</td>`;
+      h += '</tr>';
+    }
+    matrixTable.innerHTML = h;
+    let lst='';
+    for(let i=0;i<n;i++){
+      const neigh = adj[i].map((v,j)=>v?labels[j]:null).filter(Boolean);
+      lst += `<div class="adj-line"><b>${labels[i]} →</b>${neigh.length? neigh.join(', ') : '<span style="color:var(--text-faint)">(연결 없음)</span>'}</div>`;
+    }
+    listOutput.innerHTML = lst;
+  }
+  drawGraph(); drawTables();
+})();
+
+/* ============================================================
+   SECTION 3 — C input code (step reveal + tabs)
+============================================================ */
+const MATRIX_STEPS = [
+  {title:'정점 개수 n, 간선 개수 m 입력받기', code:[
+    '#include <stdio.h>',
+    '',
+    'int n, m;   // n: 정점 개수, m: 간선 개수',
+    '',
+    'int main(void) {',
+    '    scanf("%d %d", &n, &m);',
+    '    return 0;',
+    '}'
+  ], note:'가장 먼저 그래프의 크기(정점 수)와 간선이 몇 개 들어올지(간선 수)를 입력받습니다.'},
+  {title:'인접 행렬 배열 선언 및 초기화', code:[
+    '#define MAX 100',
+    '',
+    'int adjMatrix[MAX][MAX] = {0};',
+    '// 모든 칸을 0(간선 없음)으로 초기화'
+  ], note:'정점 수만큼의 정사각형 배열을 만들고, 처음에는 모든 간선이 "없음(0)" 상태로 시작합니다.'},
+  {title:'간선 정보를 m번 입력받아 행렬에 표시', code:[
+    'for (int i = 0; i < m; i++) {',
+    '    int u, v;',
+    '    scanf("%d %d", &u, &v);',
+    '    adjMatrix[u][v] = 1;   // u -> v 간선 존재',
+    '    adjMatrix[v][u] = 1;   // 무방향이므로 반대 방향도 표시',
+    '}'
+  ], note:'간선 하나당 두 정점 u, v를 입력받아 행렬의 해당 칸을 1로 바꿉니다. 무방향 그래프이므로 대칭으로 채웁니다.'}
+];
+const LIST_STEPS = [
+  {title:'정점 개수 n, 간선 개수 m 입력받기', code:[
+    '#include <stdio.h>',
+    '',
+    'int n, m;   // n: 정점 개수, m: 간선 개수',
+    '',
+    'int main(void) {',
+    '    scanf("%d %d", &n, &m);',
+    '    return 0;',
+    '}'
+  ], note:'인접 리스트 방식도 입력 형식은 동일합니다.'},
+  {title:'인접 리스트용 배열 선언', code:[
+    '#define MAX 100',
+    '',
+    'int adj[MAX][MAX];       // adj[v][k] = v번 정점의 k번째 이웃',
+    'int adjSize[MAX] = {0};  // 각 정점의 이웃 개수'
+  ], note:'진짜 연결 리스트 대신, 배열로 흉내낸 간단한 인접 리스트입니다. adjSize[v]는 v의 이웃이 몇 개 저장됐는지를 기억합니다.'},
+  {title:'간선 정보를 입력받아 리스트에 추가', code:[
+    'for (int i = 0; i < m; i++) {',
+    '    int u, v;',
+    '    scanf("%d %d", &u, &v);',
+    '    adj[u][adjSize[u]++] = v;',
+    '    adj[v][adjSize[v]++] = u;',
+    '}'
+  ], note:'u의 이웃 목록 맨 뒤에 v를, v의 이웃 목록 맨 뒤에 u를 추가합니다. adjSize[u]++는 "추가하고 개수를 1 늘린다"는 뜻입니다.'}
+];
+
+function buildRevealSection(steps, containerId, nextBtnId, fullId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = steps.map((st,i)=>`
+    <div class="reveal-item ${i===0?'shown':''}" data-i="${i}">
+      <div class="step-badge"><span class="num">${i+1}</span>${st.title}</div>
+      <div class="code-block"><div class="code-lines" id="${containerId}-c${i}"></div></div>
+      <p style="margin-top:-4px;">${st.note}</p>
+    </div>`).join('');
+  steps.forEach((st,i)=> renderCode(document.getElementById(`${containerId}-c${i}`), st.code, `${containerId}-c${i}`));
+  let shownCount = 1;
+  const nextBtn = document.getElementById(nextBtnId);
+  function refreshBtn(){
+    if(shownCount>=steps.length){ nextBtn.style.display='none'; }
+  }
+  refreshBtn();
+  nextBtn.addEventListener('click', ()=>{
+    if(shownCount<steps.length){
+      container.querySelector(`.reveal-item[data-i="${shownCount}"]`).classList.add('shown');
+      shownCount++;
+      refreshBtn();
+    }
+  });
+  // full code toggle
+  const fullEl = document.getElementById(fullId);
+  const allLines = steps.flatMap(st=>st.code.concat(['']));
+  allLines.pop();
+  fullEl.innerHTML = `<div class="cb-head"><span>전체 코드</span><span>full listing</span></div><div class="code-lines" id="${fullId}-lines"></div>`;
+  renderCode(document.getElementById(`${fullId}-lines`), allLines, fullId);
+}
+buildRevealSection(MATRIX_STEPS,'reveal-matrix','nextMatrix','full-matrix');
+buildRevealSection(LIST_STEPS,'reveal-list','nextList','full-list');
+
+document.querySelectorAll('.full-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const el = document.getElementById(btn.dataset.full);
+    el.classList.toggle('shown');
+    btn.textContent = el.classList.contains('shown') ? '전체 코드 접기' : '전체 코드 한 번에 보기';
+  });
+});
+document.querySelectorAll('.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const tabsRow = btn.parentElement;
+    tabsRow.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const pane1 = document.getElementById('tab-matrix');
+    const pane2 = document.getElementById('tab-list');
+    if(btn.dataset.tab==='matrix'){ pane1.style.display='block'; pane2.style.display='none'; }
+    else{ pane1.style.display='none'; pane2.style.display='block'; }
+  });
+});
+
+/* ============================================================
+   SHARED DEMO GRAPH (8 nodes) for DFS / BFS
+============================================================ */
+const GADJ = { 0:[1,2], 1:[0,3,4], 2:[0,4], 3:[1,5], 4:[1,2,5,6], 5:[3,4,7], 6:[4,7], 7:[5,6] };
+const GPOS = { 0:[320,50], 1:[170,150], 2:[470,150], 3:[90,270], 4:[320,270], 6:[550,270], 5:[190,390], 7:[430,390] };
+const GEDGES = [[0,1],[0,2],[1,3],[1,4],[2,4],[3,5],[4,5],[4,6],[5,7],[6,7]];
+
+function drawGraphBase(svgId){
+  const svg = document.getElementById(svgId);
+  let s='';
+  GEDGES.forEach(([a,b],i)=>{
+    s += `<line class="gv-edge" id="${svgId}-e${a}-${b}" x1="${GPOS[a][0]}" y1="${GPOS[a][1]}" x2="${GPOS[b][0]}" y2="${GPOS[b][1]}"/>`;
+    s += `<line class="gv-edge" id="${svgId}-e${b}-${a}" x1="${GPOS[a][0]}" y1="${GPOS[a][1]}" x2="${GPOS[b][0]}" y2="${GPOS[b][1]}" style="display:none"/>`;
+  });
+  Object.keys(GADJ).forEach(k=>{
+    const p = GPOS[k];
+    s += `<circle class="gv-node default" id="${svgId}-n${k}" cx="${p[0]}" cy="${p[1]}" r="22"/>`;
+    s += `<text class="gv-label" x="${p[0]}" y="${p[1]+5}">${k}</text>`;
+  });
+  svg.innerHTML = s;
+}
+function setNodeState(svgId, id, state){
+  const el = document.getElementById(`${svgId}-n${id}`);
+  if(el) el.setAttribute('class', 'gv-node '+state);
+}
+function setEdgeState(svgId, a, b, state){
+  const e1 = document.getElementById(`${svgId}-e${a}-${b}`);
+  const e2 = document.getElementById(`${svgId}-e${b}-${a}`);
+  [e1,e2].forEach(e=>{ if(e) e.setAttribute('class','gv-edge '+state); });
+}
+function resetGraphVisual(svgId){
+  Object.keys(GADJ).forEach(k=> setNodeState(svgId,k,'default'));
+  GEDGES.forEach(([a,b])=> setEdgeState(svgId,a,b,''));
+}
+
+/* ============================================================
+   DFS engine
+============================================================ */
+const DFS_CODE = [
+  'void dfs(int v) {',
+  '    visited[v] = 1;',
+  '    printf("%d ", v);',
+  '    for (int i = 0; i < adjSize[v]; i++) {',
+  '        int next = adj[v][i];',
+  '        if (!visited[next]) {',
+  '            dfs(next);',
+  '        }',
+  '    }',
+  '}'
+];
+
+function* dfsGen(start){
+  const visited = new Set();
+  const order = [];
+  const callstack = [];
+  function* rec(v){
+    visited.add(v); callstack.push(v);
+    yield {line:2, kind:'visit', v, visited:new Set(visited), stack:[...callstack], order:[...order],
+      msg:`정점 ${v}를 방문 처리합니다 (visited[${v}] = 1)`};
+    order.push(v);
+    yield {line:3, kind:'print', v, visited:new Set(visited), stack:[...callstack], order:[...order],
+      msg:`정점 ${v}를 방문 순서에 기록합니다`};
+    for(let i=0;i<GADJ[v].length;i++){
+      yield {line:4, kind:'loop', v, i, visited:new Set(visited), stack:[...callstack], order:[...order],
+        msg:`정점 ${v}의 이웃을 확인합니다 (${i+1}/${GADJ[v].length}번째)`};
+      const next = GADJ[v][i];
+      yield {line:5, kind:'next', v, next, visited:new Set(visited), stack:[...callstack], order:[...order],
+        msg:`이웃 정점은 ${next}입니다`};
+      const already = visited.has(next);
+      yield {line:6, kind:'check', v, next, taken:!already, visited:new Set(visited), stack:[...callstack], order:[...order],
+        msg: already ? `${next}는 이미 방문했으므로 건너뜁니다` : `${next}는 아직 방문하지 않았습니다 → 재귀 호출!`};
+      if(!already){
+        yield {line:7, kind:'recurse', v, next, visited:new Set(visited), stack:[...callstack], order:[...order],
+          msg:`dfs(${next})를 호출합니다 — 스택에 ${next} 추가`};
+        yield* rec(next);
+      }
+    }
+    callstack.pop();
+    yield {line:10, kind:'return', v, visited:new Set(visited), stack:[...callstack], order:[...order],
+      msg:`정점 ${v}의 이웃을 모두 확인했습니다 → 함수 종료, 스택에서 제거 (백트래킹)`};
+  }
+  yield* rec(start);
+  yield {line:null, kind:'done', visited:new Set(visited), stack:[], order:[...order], msg:`탐색 완료! 방문 순서: ${order.join(' → ')}`};
+}
+
+function setupDebugger(prefix, codeLines, genFn, panelsFn){
+  const svgId = prefix+'Graph';
+  drawGraphBase(svgId);
+  renderCode(document.getElementById(prefix+'Code'), codeLines, prefix+'code');
+  let iterator = null;
+  let playing = false;
+  let timer = null;
+  const statusEl = document.getElementById(prefix+'Status');
+  const speedEl = document.getElementById(prefix+'Speed');
+  const playBtn = document.getElementById(prefix+'Play');
+  const stepBtn = document.getElementById(prefix+'Step');
+  const resetBtn = document.getElementById(prefix+'Reset');
+  let lastEv = null;
+
+  function apply(ev){
+    highlightLine(prefix+'code', ev.line, document.getElementById(prefix+'Code'));
+    resetGraphVisual(svgId);
+    ev.visited.forEach(v=> setNodeState(svgId, v, 'visited'));
+    if(ev.v!==undefined) setNodeState(svgId, ev.v, 'current');
+    GEDGES.forEach(([a,b])=>{
+      if(ev.visited.has(a) && ev.visited.has(b)) setEdgeState(svgId,a,b,'used');
+    });
+    if(ev.next!==undefined){
+      setNodeState(svgId, ev.next, ev.visited.has(ev.next) && ev.kind!=='next' ? 'visited':'current');
+      setEdgeState(svgId, ev.v, ev.next, 'active');
+    }
+    statusEl.textContent = (ev.kind==='done'?'✓ ':'▶ ') + ev.msg;
+    panelsFn(ev);
+    lastEv = ev;
+    if(ev.kind==='done'){ playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; stepBtn.disabled=true; }
+  }
+  function nextStep(){
+    if(!iterator) iterator = genFn(0);
+    const r = iterator.next();
+    if(r.done){ stepBtn.disabled=true; playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; return; }
+    apply(r.value);
+  }
+  function reset(){
+    iterator = null; playing=false; clearTimeout(timer);
+    resetGraphVisual(svgId);
+    highlightLine(prefix+'code', null, document.getElementById(prefix+'Code'));
+    statusEl.textContent = '▶ 재생을 눌러 정점 0부터 탐색을 시작하세요.';
+    stepBtn.disabled=false; playBtn.textContent='▶ 재생';
+    panelsFn(null);
+  }
+  function tick(){
+    nextStep();
+    if(playing && !(lastEv && lastEv.kind==='done')){
+      timer = setTimeout(tick, +speedEl.value);
+    } else { playing=false; playBtn.textContent='▶ 재생'; }
+  }
+  playBtn.addEventListener('click', ()=>{
+    playing = !playing;
+    playBtn.textContent = playing ? '⏸ 일시정지' : '▶ 재생';
+    if(playing) tick();
+    else clearTimeout(timer);
+  });
+  stepBtn.addEventListener('click', ()=>{ clearTimeout(timer); playing=false; playBtn.textContent='▶ 재생'; nextStep(); });
+  resetBtn.addEventListener('click', reset);
+  reset();
+}
+
+function dfsPanels(ev){
+  const stackEl = document.getElementById('dfsStack');
+  const orderEl = document.getElementById('dfsOrder');
+  if(!ev){ stackEl.innerHTML='<span class="empty-hint">비어 있음</span>'; orderEl.innerHTML='<span class="empty-hint">아직 없음</span>'; return; }
+  stackEl.innerHTML = ev.stack.length ? ev.stack.map(v=>`<div class="box">dfs(${v})</div>`).join('') : '<span class="empty-hint">비어 있음</span>';
+  orderEl.innerHTML = ev.order.length ? ev.order.map(v=>`<span class="chip">${v}</span>`).join('') : '<span class="empty-hint">아직 없음</span>';
+}
+setupDebugger('dfs', DFS_CODE, dfsGen, dfsPanels);
+
+/* ============================================================
+   BFS engine
+============================================================ */
+const BFS_CODE = [
+  'void bfs(int start) {',
+  '    int queue[MAX], front = 0, rear = 0;',
+  '    visited[start] = 1;',
+  '    queue[rear++] = start;',
+  '    while (front < rear) {',
+  '        int v = queue[front++];',
+  '        printf("%d ", v);',
+  '        for (int i = 0; i < adjSize[v]; i++) {',
+  '            int next = adj[v][i];',
+  '            if (!visited[next]) {',
+  '                visited[next] = 1;',
+  '                queue[rear++] = next;',
+  '            }',
+  '        }',
+  '    }',
+  '}'
+];
+
+function* bfsGen(start){
+  const visited = new Set();
+  const queue = [];
+  const order = [];
+  visited.add(start); queue.push(start);
+  yield {line:3, kind:'visit', v:start, visited:new Set(visited), queue:[...queue], order:[...order],
+    msg:`시작 정점 ${start}를 방문 처리합니다`};
+  yield {line:4, kind:'enqueue', v:start, visited:new Set(visited), queue:[...queue], order:[...order],
+    msg:`정점 ${start}를 큐에 넣습니다`};
+  while(queue.length){
+    yield {line:5, kind:'whilecheck', visited:new Set(visited), queue:[...queue], order:[...order],
+      msg:`큐가 비어있지 않으므로 계속 진행합니다 (남은 ${queue.length}개)`};
+    const v = queue.shift();
+    yield {line:6, kind:'dequeue', v, visited:new Set(visited), queue:[...queue], order:[...order],
+      msg:`큐에서 정점 ${v}를 꺼냅니다`};
+    order.push(v);
+    yield {line:7, kind:'print', v, visited:new Set(visited), queue:[...queue], order:[...order],
+      msg:`정점 ${v}를 방문 순서에 기록합니다`};
+    for(let i=0;i<GADJ[v].length;i++){
+      yield {line:8, kind:'loop', v, i, visited:new Set(visited), queue:[...queue], order:[...order],
+        msg:`정점 ${v}의 이웃을 확인합니다 (${i+1}/${GADJ[v].length}번째)`};
+      const next = GADJ[v][i];
+      yield {line:9, kind:'next', v, next, visited:new Set(visited), queue:[...queue], order:[...order],
+        msg:`이웃 정점은 ${next}입니다`};
+      const already = visited.has(next);
+      yield {line:10, kind:'check', v, next, visited:new Set(visited), queue:[...queue], order:[...order],
+        msg: already ? `${next}는 이미 방문했으므로 건너뜁니다` : `${next}는 아직 방문하지 않았습니다 → 큐에 추가!`};
+      if(!already){
+        visited.add(next);
+        yield {line:11, kind:'markvisit', v, next, visited:new Set(visited), queue:[...queue], order:[...order],
+          msg:`${next}를 방문 처리합니다`};
+        queue.push(next);
+        yield {line:12, kind:'enqueue2', v, next, visited:new Set(visited), queue:[...queue], order:[...order],
+          msg:`${next}를 큐 맨 뒤에 추가합니다`};
+      }
+    }
+  }
+  yield {line:null, kind:'done', visited:new Set(visited), queue:[], order:[...order], msg:`탐색 완료! 방문 순서: ${order.join(' → ')}`};
+}
+
+function bfsPanels(ev){
+  const qEl = document.getElementById('bfsQueue');
+  const orderEl = document.getElementById('bfsOrder');
+  if(!ev){ qEl.innerHTML='<span class="empty-hint">비어 있음</span>'; orderEl.innerHTML='<span class="empty-hint">아직 없음</span>'; return; }
+  qEl.innerHTML = ev.queue.length ? ev.queue.map(v=>`<div class="box">${v}</div>`).join('') : '<span class="empty-hint">비어 있음</span>';
+  orderEl.innerHTML = ev.order.length ? ev.order.map(v=>`<span class="chip">${v}</span>`).join('') : '<span class="empty-hint">아직 없음</span>';
+}
+setupDebugger('bfs', BFS_CODE, bfsGen, bfsPanels);
+
+/* ============================================================
+   SECTION 6 — quiz
+============================================================ */
+const QUIZ = [
+  {q:'Q1. 정점이 많고 간선이 상대적으로 적은 "희소 그래프"를 저장할 때 메모리 측면에서 더 적합한 방식은?', opts:['인접 행렬','인접 리스트'], correct:1,
+   fb:'인접 리스트는 O(V+E)의 공간만 사용하므로, 간선이 적은 희소 그래프에서 훨씬 효율적입니다.'},
+  {q:'Q2. 재귀 호출을 이용해 구현하는 탐색 방법은?', opts:['BFS','DFS'], correct:1,
+   fb:'DFS는 재귀 호출(또는 명시적 스택)로 구현합니다. 함수를 호출할 때마다 호출 스택에 쌓이는 원리와 같습니다.'},
+  {q:'Q3. 가중치가 없는 그래프에서 두 정점 사이의 최단 경로(간선 개수 기준)를 구하고 싶다면?', opts:['DFS를 사용한다','BFS를 사용한다'], correct:1,
+   fb:'BFS는 가까운 정점부터 한 겹씩 탐색하므로, 처음 방문했을 때의 깊이가 곧 최단 거리가 됩니다.'}
+];
+const quizArea = document.getElementById('quizArea');
+quizArea.innerHTML = QUIZ.map((item,qi)=>`
+  <div class="quiz-card">
+    <div class="q">${item.q}</div>
+    <div class="quiz-opts">
+      ${item.opts.map((o,oi)=>`<button data-q="${qi}" data-o="${oi}">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-fb" id="fb-${qi}">${item.fb}</div>
+  </div>
+`).join('');
+quizArea.querySelectorAll('.quiz-opts button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const qi = +btn.dataset.q, oi = +btn.dataset.o;
+    const item = QUIZ[qi];
+    const group = btn.parentElement.querySelectorAll('button');
+    group.forEach((b,i)=>{
+      b.classList.remove('correct','wrong');
+      if(i===item.correct) b.classList.add('correct');
+      else if(i===oi) b.classList.add('wrong');
+    });
+    document.getElementById('fb-'+qi).classList.add('shown');
+  });
+});
+
+})();
+</script>
+</body>
+</html>
