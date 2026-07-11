@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 379 절점 찾기 - 인터랙티브 강의</title>
+<style>
+:root{--bg:#f5fbff;--panel:#fff;--line:#cfe1ef;--text:#17364d;--blue:#2678c9;--green:#1aa37a;--orange:#ed8b3a;--red:#e45c5c;--purple:#7a67d8;--node:#e7f3fb;--visited:#a8e6cf;--current:#ffb38a;--cut:#ff7676;--shadow:0 12px 30px rgba(40,110,160,.12)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#edf8ff,#fff 48%,#f7fbff);color:var(--text);font-family:Arial,"Noto Sans KR",sans-serif;font-size:18px;line-height:1.65} header{padding:34px 20px;text-align:center;color:#fff;background:linear-gradient(135deg,#2678c9,#1aa37a)} header h1{margin:0 0 8px;font-size:clamp(30px,5vw,48px)} header p{margin:0}.wrap{max-width:1220px;margin:auto;padding:22px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0;box-shadow:var(--shadow)} h2{font-size:30px;color:#165f9f;margin:0 0 16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step{padding:13px 15px;margin:10px 0;background:#f7fbfe;border:1px solid var(--line);border-radius:12px}.note{background:#eef8ff;border-left:6px solid var(--blue);border-radius:12px;padding:16px}.warn{background:#fff4ea;border-left:6px solid var(--orange);border-radius:12px;padding:16px} textarea,select,button{font:inherit;border-radius:11px;border:1px solid #a9c9df;padding:10px 13px} textarea{width:100%;min-height:220px;resize:vertical;font-family:Consolas,monospace;background:#fbfdff} button{border:none;color:#fff;background:var(--blue);font-weight:800;cursor:pointer} button.green{background:var(--green)}button.orange{background:var(--orange)}button.gray{background:#61798a}button.purple{background:var(--purple)}.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}.status{min-height:58px;background:#eff9f6;border:1px solid #acd9cc;border-radius:12px;padding:13px 15px;font-weight:700}.statbox{text-align:center;padding:16px;border:1px solid var(--line);border-radius:14px;background:#f8fbfd}.statbox b{display:block;font-size:28px;color:#155f9e}#graphWrap{background:#eef6fb;border-radius:18px;min-height:560px;overflow:hidden;border:1px solid var(--line)}#graphCanvas{width:100%;height:560px;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}.legend span::before{content:"";display:inline-block;width:18px;height:18px;border-radius:50%;margin-right:6px;vertical-align:-3px}.lg-normal::before{background:var(--node)}.lg-visited::before{background:var(--visited)}.lg-current::before{background:var(--current)}.lg-cut::before{background:var(--cut)} pre{background:#102637;color:#ebf7ff;padding:18px;border-radius:14px;overflow:auto;font-family:Consolas,monospace;font-size:16px;line-height:1.55;white-space:pre}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tabbtn{background:#dfeef9;color:#17435f}.tabbtn.active{background:var(--blue);color:#fff}.tabpane{display:none}.tabpane.active{display:block}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccdeea;padding:10px;text-align:center}th{background:#eaf5fc}.scroll{overflow:auto}.quiz label{display:block;padding:9px;margin:8px 0;background:#f7fbfe;border-radius:10px}footer{text-align:center;color:#61798a;padding:30px}@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}.card{padding:17px}#graphCanvas{height:480px}}
+</style>
+</head>
+<body>
+<header><h1>정올 379 · 절점 찾기</h1><p>DFS Low-Link로 절점을 찾는 과정을 직접 실행하는 인터랙티브 강의</p></header>
+<main class="wrap">
+<section class="card"><h2>1. 핵심 개념</h2><div class="grid2"><div><div class="step"><b>1.</b> 정점 하나를 제거했을 때 그래프가 분리되면 절점입니다.</div><div class="step"><b>2.</b> <code>disc[u]</code>는 DFS 방문 순서입니다.</div><div class="step"><b>3.</b> <code>low[u]</code>는 서브트리에서 도달 가능한 최소 방문 순서입니다.</div><div class="step"><b>4.</b> 일반 정점은 <code>low[child] ≥ disc[u]</code>이면 절점입니다.</div></div><div class="warn"><b>루트는 예외</b><br>DFS 루트의 자식 수가 2개 이상이면 절점입니다.</div></div></section>
+<section class="card"><h2>2. 예제 그래프 실행</h2><div class="grid2"><div><textarea id="graphInput">9 10
+1 2
+2 8
+8 9
+9 1
+2 3
+3 4
+4 7
+3 7
+4 5
+7 6</textarea><div class="controls"><button onclick="loadGraph()">그래프 적용</button><button class="green" onclick="runOneStep()">한 단계 실행</button><button class="orange" onclick="runAll()">전체 실행</button><button class="purple" onclick="showCutVertices()">절점 강조</button><button class="gray" onclick="resetSimulation()">초기화</button></div><div class="controls"><label>속도 <select id="speed"><option value="900">느리게</option><option value="450" selected>보통</option><option value="140">빠르게</option><option value="0">즉시</option></select></label></div><div class="status" id="status">그래프를 적용한 뒤 DFS를 실행하세요.</div><div class="legend"><span class="lg-normal">미방문</span><span class="lg-visited">방문</span><span class="lg-current">현재 정점</span><span class="lg-cut">절점</span></div></div><div><div id="graphWrap"><canvas id="graphCanvas"></canvas></div></div></div><div class="grid3" style="margin-top:18px"><div class="statbox">현재 정점<b id="currentStat">-</b></div><div class="statbox">방문 순서<b id="orderStat">0</b></div><div class="statbox">발견 절점<b id="cutStat">없음</b></div></div></section>
+<section class="card"><h2>3. disc / low 표</h2><div class="scroll"><table id="stateTable"><thead><tr><th>정점</th><th>disc</th><th>low</th><th>부모</th><th>DFS 자식 수</th><th>절점 여부</th></tr></thead><tbody></tbody></table></div></section>
+<section class="card"><h2>4. 판정 과정</h2><div class="note" id="ruleBox">아직 DFS를 시작하지 않았습니다.</div></section>
+<section class="card"><h2>5. 코드 작성 단계</h2><div class="tabs"><button class="tabbtn active" onclick="openTab(0)">1. 방문</button><button class="tabbtn" onclick="openTab(1)">2. 역방향</button><button class="tabbtn" onclick="openTab(2)">3. 일반 절점</button><button class="tabbtn" onclick="openTab(3)">4. 루트 절점</button></div><div class="tabpane active"><pre>disc[v] = ++order;
+low[v] = disc[v];
+parent[v] = u;</pre></div><div class="tabpane"><pre>if (disc[v] &lt; low[u]) {
+    low[u] = disc[v];
+}</pre></div><div class="tabpane"><pre>if (parent[u] != 0 &amp;&amp;
+    low[v] &gt;= disc[u]) {
+    isCut[u] = 1;
+}</pre></div><div class="tabpane"><pre>if (parent[root] == 0 &amp;&amp;
+    childCount[root] &gt;= 2) {
+    isCut[root] = 1;
+}</pre></div></section>
+<section class="card"><h2>6. 핵심 C 코드</h2><pre id="fullCode">/* 일반 정점 */
+if (parent[u] != 0 &amp;&amp; low[v] &gt;= disc[u]) {
+    isCut[u] = 1;
+}
+
+/* DFS 루트 */
+if (parent[root] == 0 &amp;&amp; childCount[root] &gt;= 2) {
+    isCut[root] = 1;
+}</pre><button onclick="copyCode()">코드 복사</button></section>
+<section class="card quiz"><h2>7. 확인 문제</h2><p><b>1.</b> 일반 정점의 절점 조건은?</p><label><input type="radio" name="q1" value="1"> 어떤 자식 v에 대해 low[v] ≥ disc[u]</label><label><input type="radio" name="q1" value="0"> low[v] &lt; disc[u]</label><p><b>2.</b> DFS 루트의 절점 조건은?</p><label><input type="radio" name="q2" value="1"> DFS 자식 수가 2개 이상</label><label><input type="radio" name="q2" value="0"> 차수가 1 이상</label><button onclick="checkQuiz()">정답 확인</button><div class="status" id="quizResult">두 문제를 선택하세요.</div></section>
+</main><footer>세영코딩연구소 · 정올 379 절점 찾기 인터랙티브 강의자료</footer>
+<script>
+let n=0,m=0,edges=[],adj=[],positions=[],disc=[],low=[],parent=[],childCount=[],isCut=[],steps=[],stepIndex=0,running=false,currentNode=-1;
+const canvas=document.getElementById('graphCanvas'),ctx=canvas.getContext('2d');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)); const speed=()=>Number(document.getElementById('speed').value); const setStatus=t=>document.getElementById('status').textContent=t;
+function parseGraph(){const t=document.getElementById('graphInput').value.trim().split(/\s+/).map(Number);let p=0;if(t.length<2)throw Error('첫 줄에 n m을 입력하세요.');const N=t[p++],M=t[p++],es=[];for(let i=0;i<M;i++){if(p+1>=t.length)throw Error('간선 데이터가 부족합니다.');es.push([t[p++],t[p++]])}return{N,M,es}}
+function loadGraph(){try{const x=parseGraph();n=x.N;m=x.M;edges=x.es;adj=Array.from({length:n+1},()=>[]);for(const [u,v] of edges){adj[u].push(v);adj[v].push(u)}for(let i=1;i<=n;i++)adj[i].sort((a,b)=>a-b);makePositions();buildSteps();resetStateOnly();resizeCanvas();setStatus('그래프가 적용되었습니다.')}catch(e){setStatus('입력 오류: '+e.message)}}
+function makePositions(){positions=Array(n+1);const w=canvas.clientWidth||600,h=canvas.clientHeight||560,cx=w/2,cy=h/2,r=Math.min(w,h)*.36;for(let i=1;i<=n;i++){const a=-Math.PI/2+2*Math.PI*(i-1)/n;positions[i]={x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}}}
+function buildSteps(){steps=[];const D=Array(n+1).fill(0),L=Array(n+1).fill(0),P=Array(n+1).fill(0),CC=Array(n+1).fill(0),CUT=Array(n+1).fill(false);let order=0;function push(type,u,v,msg){steps.push({type,u,v,disc:D.slice(),low:L.slice(),parent:P.slice(),child:CC.slice(),cut:CUT.slice(),msg})}function dfs(u,root){D[u]=L[u]=++order;push('visit',u,0,`정점 ${u} 방문: disc와 low를 ${D[u]}로 설정`);for(const v of adj[u]){if(!D[v]){P[v]=u;CC[u]++;push('tree',u,v,`트리 간선 ${u} → ${v}`);dfs(v,root);const old=L[u];L[u]=Math.min(L[u],L[v]);push('return',u,v,`low[${u}] = min(${old}, ${L[v]}) = ${L[u]}`);if(u!==root&&L[v]>=D[u]){CUT[u]=true;push('cut',u,v,`low[${v}] = ${L[v]} ≥ disc[${u}] = ${D[u]}, ${u}는 절점`)}}else if(v!==P[u]){const old=L[u];L[u]=Math.min(L[u],D[v]);if(old!==L[u])push('back',u,v,`역방향 간선으로 low[${u}]를 ${L[u]}로 갱신`)}}if(u===root&&CC[u]>=2){CUT[u]=true;push('rootcut',u,0,`루트 ${u}의 DFS 자식이 ${CC[u]}개이므로 절점`)}}for(let i=1;i<=n;i++)if(!D[i])dfs(i,i);push('done',-1,0,'DFS 완료')}
+function resetStateOnly(){disc=Array(n+1).fill(0);low=Array(n+1).fill(0);parent=Array(n+1).fill(0);childCount=Array(n+1).fill(0);isCut=Array(n+1).fill(false);stepIndex=0;currentNode=-1;updateTable();updateStats();drawGraph();document.getElementById('ruleBox').textContent='아직 DFS를 시작하지 않았습니다.'}
+function applyStep(s){disc=s.disc;low=s.low;parent=s.parent;childCount=s.child;isCut=s.cut;currentNode=s.u;setStatus(s.msg);document.getElementById('ruleBox').textContent=s.msg;updateTable();updateStats();drawGraph(s)}
+function runOneStep(){if(stepIndex>=steps.length)return setStatus('모든 단계가 완료되었습니다.');applyStep(steps[stepIndex++])}
+async function runAll(){if(running)return;running=true;while(stepIndex<steps.length){applyStep(steps[stepIndex++]);await sleep(speed())}running=false}
+function showCutVertices(){applyStep(steps[steps.length-1]);stepIndex=steps.length;const a=[];for(let i=1;i<=n;i++)if(isCut[i])a.push(i);setStatus(a.length?'절점: '+a.join(' '):'절점이 없습니다.')}
+function resetSimulation(){resetStateOnly();setStatus('초기 상태로 되돌렸습니다.')}
+function updateStats(){document.getElementById('currentStat').textContent=currentNode>0?currentNode:'-';document.getElementById('orderStat').textContent=Math.max(0,...disc);const a=[];for(let i=1;i<=n;i++)if(isCut[i])a.push(i);document.getElementById('cutStat').textContent=a.length?a.join(', '):'없음'}
+function updateTable(){const tb=document.querySelector('#stateTable tbody');tb.innerHTML='';for(let i=1;i<=n;i++){const tr=document.createElement('tr');tr.innerHTML=`<td>${i}</td><td>${disc[i]||'-'}</td><td>${low[i]||'-'}</td><td>${parent[i]||'-'}</td><td>${childCount[i]||0}</td><td>${isCut[i]?'절점':'-'}</td>`;tb.appendChild(tr)}}
+function resizeCanvas(){const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawGraph()}
+function drawGraph(step=null){const w=canvas.clientWidth||600,h=canvas.clientHeight||560;ctx.clearRect(0,0,w,h);for(const [u,v] of edges){const a=positions[u],b=positions[v];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=step&&step.u&&step.v&&((step.u===u&&step.v===v)||(step.u===v&&step.v===u))?(step.type==='back'?'#8f6fd1':'#2f80ed'):'#9eb8c8';ctx.lineWidth=step&&step.u&&step.v&&((step.u===u&&step.v===v)||(step.u===v&&step.v===u))?5:2;ctx.stroke()}for(let i=1;i<=n;i++){const p=positions[i];ctx.beginPath();ctx.arc(p.x,p.y,24,0,Math.PI*2);let fill='#e7f3fb';if(disc[i])fill='#a8e6cf';if(i===currentNode)fill='#ffb38a';if(isCut[i])fill='#ff7676';ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#41677d';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#17364d';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i,p.x,p.y);if(disc[i]){ctx.font='12px Arial';ctx.fillText(`d:${disc[i]} l:${low[i]}`,p.x,p.y+36)}}}
+function openTab(i){document.querySelectorAll('.tabbtn').forEach((b,j)=>b.classList.toggle('active',i===j));document.querySelectorAll('.tabpane').forEach((p,j)=>p.classList.toggle('active',i===j))}
+function copyCode(){navigator.clipboard.writeText(document.getElementById('fullCode').innerText).then(()=>alert('코드가 복사되었습니다.'))}
+function checkQuiz(){const a=document.querySelector('input[name=q1]:checked'),b=document.querySelector('input[name=q2]:checked'),o=document.getElementById('quizResult');if(!a||!b)return o.textContent='두 문제를 모두 선택하세요.';const s=Number(a.value)+Number(b.value);o.textContent=s===2?'정답입니다!':'2문제 중 '+s+'문제 정답입니다.'}
+window.addEventListener('resize',()=>{makePositions();resizeCanvas()});loadGraph();
+</script>
+</body>
+</html>
