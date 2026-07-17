@@ -115,7 +115,9 @@ p{color:var(--text-dim); font-size:15.5px;}
 #s1 .gedge{stroke:var(--text-faint); stroke-width:2; transition:.15s;}
 #s1 .gedge.hi{stroke:var(--amber); stroke-width:3;}
 #s1 .wlabel{fill:var(--amber); font-family:var(--mono); font-size:11px; display:none; text-anchor:middle;}
-#s1.mode-weighted .wlabel{display:block;}
+
+/* [수정] 클래스가 s1svg에 부여되므로, 이에 호응하도록 선택자 수정 */
+#s1svg.mode-weighted .wlabel{display:block;}
 
 /* ---------- section 2 builder ---------- */
 .builder-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
@@ -152,6 +154,7 @@ table.matrix td.one{color:var(--amber); font-weight:700;}
 .step-reveal{display:flex; flex-direction:column; gap:0;}
 .reveal-item{display:none;}
 .reveal-item.shown{display:block; animation:fadein .4s ease;}
+@media(max-width:760px){.reveal-item.shown{display:block;}}
 @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
 .step-badge{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--purple); margin:22px 0 10px;}
 .step-badge .num{width:22px; height:22px; border-radius:50%; background:rgba(165,150,255,0.15); border:1px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px;}
@@ -499,11 +502,25 @@ sections.forEach(s=>io.observe(s));
   function mid(a,b){ return [(a.x+b.x)/2,(a.y+b.y)/2]; }
 
   function draw(){
-    let s = `<defs><marker id="arrow1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="var(--amber)"/></marker></defs>`;
+    /* [수정] marker-end가 원형 노드의 중심에 닿지 않고 경계면에 깔끔하게 끝나도록 refX 및 d 조정 */
+    let s = `<defs><marker id="arrow1" markerWidth="10" markerHeight="10" refX="22" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="var(--amber)"/></marker></defs>`;
     edges.forEach((e,i)=>{
       const a=nodes[e.a], b=nodes[e.b];
       const m = mid(a,b);
-      s += `<line class="gedge" id="s1e${i}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" ${mode==='directed'?'marker-end="url(#arrow1)"':''}/>`;
+      /* [수정] 방향 그래프일 때 간선 끝점 보정: 노드 반지름인 18px 직전까지만 라인을 그려 화살표가 노드와 겹치지 않게 조절 */
+      let x2 = b.x;
+      let y2 = b.y;
+      if (mode === 'directed') {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len > 0) {
+          x2 = a.x + dx * (len - 18) / len;
+          y2 = a.y + dy * (len - 18) / len;
+        }
+      }
+      
+      s += `<line class="gedge" id="s1e${i}" x1="${a.x}" y1="${a.y}" x2="${x2}" y2="${y2}" ${mode==='directed'?'marker-end="url(#arrow1)"':''}/>`;
       s += `<text class="wlabel" x="${m[0]}" y="${m[1]-6}">${e.w}</text>`;
     });
     nodes.forEach(n=>{
