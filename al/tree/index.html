@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>트리 완전정복 — C로 배우는 입력과 순회</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a1120; --bg-2:#0d1626;
+  --surface:#111c30; --surface-2:#16223b; --surface-3:#1b2a48;
+  --border:#28375c; --border-soft:#1c2844;
+  --text:#e9eefb; --text-dim:#93a5c7; --text-faint:#5c6d92;
+  --cyan:#4fd8cf; --cyan-dim:#2a7a72; --amber:#f7b955; --purple:#a596ff; --coral:#ff7a7a; --green:#6fe3a4;
+  --radius:12px; --mono:'JetBrains Mono', ui-monospace, 'Courier New', monospace; --sans:'Noto Sans KR', system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+body{margin:0; background:var(--bg);
+  background-image:radial-gradient(ellipse 800px 500px at 15% -10%, rgba(79,216,207,0.10), transparent), radial-gradient(ellipse 700px 500px at 100% 10%, rgba(165,150,255,0.08), transparent);
+  color:var(--text); font-family:var(--sans); line-height:1.7; -webkit-font-smoothing:antialiased;}
+::selection{background:rgba(79,216,207,0.3); color:#fff;}
+a{color:var(--cyan);}
+h1,h2,h3,h4{font-family:var(--sans); font-weight:900; margin:0; letter-spacing:-0.01em;}
+code,.mono{font-family:var(--mono);}
+:focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:4px;}
+
+main{max-width:1040px; margin:0 auto; padding:0 24px 40px;}
+.step{padding:96px 0 40px; border-top:1px solid var(--border-soft); scroll-margin-top:20px;}
+.step:first-of-type{border-top:none;}
+.step-head{display:flex; align-items:baseline; gap:18px; margin-bottom:28px; flex-wrap:wrap;}
+.step-num{font-family:var(--mono); font-size:15px; color:var(--cyan); letter-spacing:0.15em; border:1px solid var(--cyan-dim); padding:4px 10px; border-radius:20px; background:rgba(79,216,207,0.06); flex:none;}
+.step-head h2{font-size:clamp(24px,3.4vw,34px);}
+.lead{color:var(--text-dim); font-size:17px; max-width:70ch; margin:0 0 26px;}
+p{color:var(--text-dim); font-size:15.5px;}
+
+.rail{position:fixed; left:20px; top:50%; transform:translateY(-50%); z-index:50; display:flex; flex-direction:column; gap:16px;}
+.rail button{background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:4px 0; color:var(--text-faint); font-family:var(--mono); font-size:11px;}
+.rail .dot{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--text-faint); transition:all .25s;}
+.rail .lbl{opacity:0; transform:translateX(-6px); transition:all .2s; white-space:nowrap; background:var(--surface); border:1px solid var(--border); padding:3px 8px; border-radius:6px;}
+.rail button:hover .lbl{opacity:1; transform:translateX(0);}
+.rail button.active .dot{background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 0 3px rgba(79,216,207,0.15);}
+.rail button.active{color:var(--cyan);}
+@media (max-width:1180px){ .rail{display:none;} }
+
+.hero{position:relative; min-height:92vh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding:60px 24px;}
+.hero-inner{max-width:1040px; margin:0 auto; width:100%; position:relative; z-index:2;}
+.eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:0.25em; color:var(--cyan); text-transform:uppercase; margin-bottom:18px; display:flex; align-items:center; gap:10px;}
+.eyebrow::before{content:''; width:26px; height:1px; background:var(--cyan);}
+.hero h1{font-size:clamp(40px,7vw,78px); line-height:1.04; margin-bottom:22px;}
+.hero h1 span{color:var(--cyan);}
+.hero p.sub{color:var(--text-dim); font-size:clamp(15px,1.8vw,19px); max-width:56ch; margin-bottom:34px;}
+.hero-cta{display:flex; gap:14px; flex-wrap:wrap;}
+.btn{font-family:var(--mono); font-size:13.5px; font-weight:600; padding:13px 22px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:.18s;}
+.btn:hover{border-color:var(--cyan); color:var(--cyan); transform:translateY(-1px);}
+.btn.primary{background:var(--cyan); color:#04211d; border-color:var(--cyan);}
+.btn.primary:hover{background:#6be6dc; color:#04211d;}
+.hero-bg{position:absolute; inset:0; z-index:1; opacity:0.55;}
+.hero-bg svg{width:100%; height:100%;}
+.hero-bg .n{fill:var(--surface-2); stroke:var(--cyan-dim); stroke-width:1.4;}
+.hero-bg .e{stroke:var(--border); stroke-width:1.2;}
+.hero-bg .pulse{animation:pulse 3.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.35;} 50%{opacity:1;}}
+.hero-bg .draw{stroke-dasharray:400; stroke-dashoffset:400; animation:draw 2.6s ease forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+
+.term-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:26px 0;}
+.term-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 18px;}
+.term-card .t-name{font-family:var(--mono); color:var(--cyan); font-size:13px; margin-bottom:6px; letter-spacing:.02em;}
+.term-card .t-desc{font-size:13.6px; color:var(--text-dim);}
+
+.toggle-row{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+.toggle-row button{font-family:var(--mono); font-size:12.5px; padding:9px 16px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); cursor:pointer; transition:.15s;}
+.toggle-row button.on{background:rgba(79,216,207,0.12); border-color:var(--cyan); color:var(--cyan);}
+.demo-panel{display:grid; grid-template-columns:1.1fr 0.9fr; gap:20px; align-items:stretch;}
+@media(max-width:760px){.demo-panel{grid-template-columns:1fr;}}
+.svg-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:14px;}
+.svg-card svg{width:100%; height:auto; display:block;}
+.info-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:18px 20px; font-size:14px; color:var(--text-dim); display:flex; flex-direction:column; justify-content:center;}
+.info-card b{color:var(--text);}
+.tnode{fill:var(--surface-3); stroke:var(--text-faint); stroke-width:1.6; cursor:pointer; transition:.15s;}
+.tnode:hover{stroke:var(--cyan);}
+.tnode.sel{stroke:var(--amber); fill:rgba(247,185,89,0.18);}
+.tlabel{fill:var(--text); font-family:var(--mono); font-size:13px; text-anchor:middle; pointer-events:none;}
+.tedge{stroke:var(--text-faint); stroke-width:2;}
+.tedge.hi{stroke:var(--amber); stroke-width:3;}
+
+.builder-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+@media(max-width:760px){.builder-grid{grid-template-columns:1fr;}}
+.array-scroll{overflow-x:auto; padding-bottom:6px;}
+.array-cells{display:flex; gap:4px; min-width:max-content;}
+.array-cell{width:44px; flex:none; text-align:center;}
+.array-cell .idx{font-family:var(--mono); font-size:10.5px; color:var(--text-faint); margin-bottom:4px;}
+.array-cell .val{font-family:var(--mono); font-size:13.5px; border:1px solid var(--border-soft); border-radius:6px; padding:8px 0; color:var(--text-dim); background:var(--surface-2);}
+.array-cell.used .val{color:var(--amber); border-color:var(--amber); background:rgba(247,185,89,0.1); font-weight:700;}
+.array-cell.hi .val{outline:2px solid var(--cyan);}
+.struct-box{display:flex; gap:0; border:1px solid var(--border-soft); border-radius:8px; overflow:hidden; margin-bottom:8px; font-family:var(--mono); font-size:12.5px;}
+.struct-box.hi{border-color:var(--amber);}
+.struct-box .f{padding:9px 12px; border-right:1px solid var(--border-soft); flex:1;}
+.struct-box .f:last-child{border-right:none;}
+.struct-box .flabel{color:var(--text-faint); font-size:10px; display:block; margin-bottom:3px;}
+.struct-box .fval{color:var(--text);}
+.struct-box .fval.null{color:var(--text-faint);}
+.struct-box .fval.ptr{color:var(--purple);}
+.matrix-wrap, .list-wrap{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 18px;}
+.hint{font-size:12.5px; color:var(--text-faint); margin-top:10px;}
+.compare-table{width:100%; border-collapse:collapse; margin-top:26px; font-size:13.8px;}
+.compare-table th,.compare-table td{border:1px solid var(--border-soft); padding:10px 14px; text-align:left; color:var(--text-dim);}
+.compare-table th{color:var(--text); font-family:var(--mono); font-size:12.5px; background:var(--surface-2);}
+.compare-table td b{color:var(--text);}
+
+.tabs{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
+.tabs button{font-family:var(--mono); font-size:13px; padding:10px 18px; border-radius:9px 9px 0 0; border:1px solid var(--border-soft); border-bottom:none; background:var(--bg-2); color:var(--text-faint); cursor:pointer;}
+.tabs button.on{background:var(--surface); color:var(--cyan); border-color:var(--border);}
+.code-block{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;}
+.code-block .cb-head{display:flex; justify-content:space-between; align-items:center; padding:9px 16px; background:var(--surface-2); border-bottom:1px solid var(--border-soft); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.05em;}
+.code-lines{padding:12px 0; overflow-x:auto;}
+.code-line{display:flex; white-space:pre; padding:1.5px 18px; font-family:var(--mono); font-size:13.4px; line-height:1.65;}
+.code-line .ln{color:var(--text-faint); width:26px; flex:none; user-select:none; text-align:right; margin-right:16px; opacity:.6;}
+.code-line.hl{background:rgba(247,185,89,0.14); box-shadow:inset 3px 0 0 var(--amber);}
+.tk-kw{color:#7fb4ff;} .tk-num{color:var(--amber);} .tk-str{color:var(--green);} .tk-cmt{color:var(--text-faint); font-style:italic;} .tk-pre{color:var(--purple);} .tk-id{color:var(--text);} .tk-punct{color:var(--text-dim);} .tk-op{color:var(--coral);}
+
+.step-reveal{display:flex; flex-direction:column; gap:0;}
+.reveal-item{display:none;}
+.reveal-item.shown{display:block; animation:fadein .4s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+.step-badge{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--purple); margin:22px 0 10px;}
+.step-badge .num{width:22px; height:22px; border-radius:50%; background:rgba(165,150,255,0.15); border:1px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px;}
+.next-btn{margin:16px 0 6px;}
+.full-toggle{background:none; border:1px dashed var(--border); color:var(--text-dim); font-family:var(--mono); font-size:12.5px; padding:9px 16px; border-radius:8px; cursor:pointer; margin-top:8px;}
+.full-toggle:hover{border-color:var(--cyan); color:var(--cyan);}
+.full-code{display:none; margin-top:14px;}
+.full-code.shown{display:block;}
+
+.dbg{display:grid; grid-template-columns:1.15fr 1fr; gap:18px;}
+@media(max-width:880px){.dbg{grid-template-columns:1fr;}}
+.dbg-left{display:flex; flex-direction:column; gap:14px;}
+.graph-svg-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:12px;}
+.graph-svg-card svg{width:100%; height:auto; display:block;}
+.gv-node{stroke-width:2; transition:fill .2s, stroke .2s;}
+.gv-node.default{fill:var(--surface-3); stroke:var(--text-faint);}
+.gv-node.oncall{fill:rgba(247,185,89,0.14); stroke:var(--amber); stroke-dasharray:4 3;}
+.gv-node.printed{fill:rgba(165,150,255,0.22); stroke:var(--purple);}
+.gv-node.current{fill:rgba(247,185,89,0.28); stroke:var(--amber);}
+.gv-label{fill:var(--text); font-family:var(--mono); font-size:13px; text-anchor:middle; pointer-events:none;}
+.gv-edge{stroke:var(--border); stroke-width:2; transition:.2s;}
+.gv-edge.used{stroke:var(--purple); stroke-width:2.6;}
+.gv-edge.active{stroke:var(--amber); stroke-width:3;}
+
+.controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:12px 14px;}
+.controls button{font-family:var(--mono); font-size:12.5px; padding:8px 14px; border-radius:7px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); cursor:pointer;}
+.controls button:hover{border-color:var(--cyan); color:var(--cyan);}
+.controls button:disabled{opacity:.35; cursor:not-allowed;}
+.controls .spacer{flex:1;}
+.controls select{font-family:var(--mono); font-size:12px; background:var(--surface-2); color:var(--text-dim); border:1px solid var(--border); border-radius:6px; padding:6px 8px;}
+.status-line{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:13px 16px; font-family:var(--mono); font-size:13px; color:var(--cyan); min-height:20px;}
+
+.dbg-right{display:flex; flex-direction:column; gap:14px;}
+.panel{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px;}
+.panel h4{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; color:var(--text-faint); text-transform:uppercase; margin-bottom:12px;}
+.stack-list{display:flex; flex-direction:column-reverse; gap:6px; min-height:60px;}
+.stack-list .box,.queue-list .box{font-family:var(--mono); font-size:13.5px; padding:8px 12px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); color:var(--text); text-align:center;}
+.stack-list .box:last-child,.queue-list .box:last-child{border-color:var(--amber); color:var(--amber);}
+.queue-list{display:flex; flex-direction:row; gap:6px; min-height:40px; flex-wrap:wrap;}
+.order-track{display:flex; gap:6px; flex-wrap:wrap; min-height:30px;}
+.order-track .chip{font-family:var(--mono); font-size:12.5px; padding:5px 10px; border-radius:14px; background:rgba(165,150,255,0.14); border:1px solid var(--purple); color:var(--purple);}
+.empty-hint{color:var(--text-faint); font-size:12.5px; font-family:var(--mono);}
+
+.quiz-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin-bottom:14px;}
+.quiz-card .q{font-weight:700; margin-bottom:12px; font-size:15px;}
+.quiz-opts{display:flex; flex-direction:column; gap:8px;}
+.quiz-opts button{text-align:left; font-family:var(--sans); font-size:14px; padding:10px 14px; border-radius:8px; border:1px solid var(--border-soft); background:var(--surface-2); color:var(--text-dim); cursor:pointer;}
+.quiz-opts button:hover{border-color:var(--cyan);}
+.quiz-opts button.correct{border-color:var(--green); background:rgba(111,227,164,0.12); color:var(--green);}
+.quiz-opts button.wrong{border-color:var(--coral); background:rgba(255,122,122,0.1); color:var(--coral);}
+.quiz-fb{font-size:13px; color:var(--text-faint); margin-top:10px; display:none;}
+.quiz-fb.shown{display:block;}
+
+footer{text-align:center; padding:40px 24px 60px; color:var(--text-faint); font-family:var(--mono); font-size:12px;}
+.back-top{color:var(--cyan); text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-label="목차">
+  <button data-target="s1"><span class="dot"></span><span class="lbl">01 트리란</span></button>
+  <button data-target="s2"><span class="dot"></span><span class="lbl">02 표현 방법</span></button>
+  <button data-target="s3"><span class="dot"></span><span class="lbl">03 C로 입력받기</span></button>
+  <button data-target="s4"><span class="dot"></span><span class="lbl">04 전위·중위·후위</span></button>
+  <button data-target="s5"><span class="dot"></span><span class="lbl">05 레벨 순회</span></button>
+  <button data-target="s6"><span class="dot"></span><span class="lbl">06 정리 &amp; 퀴즈</span></button>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"><svg id="heroSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"></svg></div>
+  <div class="hero-inner">
+    <div class="eyebrow">TREE · DATA STRUCTURE · C LANGUAGE</div>
+    <h1>뿌리에서 뻗어나가는<br><span>트리</span> 구조 배우기</h1>
+    <p class="sub">트리의 개념과 용어부터 배열·포인터 표현, C 구조체로 트리를 입력받는 방법, 그리고 전위·중위·후위·레벨 순회까지 — 재귀 호출과 큐가 트리 위에서 어떻게 움직이는지 눈으로 확인하며 배웁니다.</p>
+    <div class="hero-cta">
+      <a href="#s1" class="btn primary">시작하기 →</a>
+      <a href="#s4" class="btn">순회 디버거로 바로가기</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= SECTION 1 ================= -->
+  <section id="s1" class="step">
+    <div class="step-head"><span class="step-num">01</span><h2>트리란 무엇인가</h2></div>
+    <p class="lead">트리(Tree)는 <b style="color:var(--text)">노드(Node)</b>들이 <b style="color:var(--text)">부모-자식 관계</b>로 연결된, 사이클이 없는 계층 구조입니다. 컴퓨터의 폴더 구조, 회사 조직도, 토너먼트 대진표가 모두 트리의 예입니다. 자식이 최대 2개까지만 허용되는 트리를 특별히 <b style="color:var(--text)">이진 트리(Binary Tree)</b>라고 부릅니다.</p>
+
+    <div class="toggle-row">
+      <button class="on" data-mode="general">일반 트리</button>
+      <button data-mode="binary">이진 트리</button>
+    </div>
+
+    <div class="demo-panel">
+      <div class="svg-card"><svg id="s1svg" viewBox="0 0 320 260"></svg></div>
+      <div class="info-card" id="s1info">노드를 클릭하면 깊이(depth)·자식 수·부모 정보가 표시됩니다. 위 버튼으로 일반 트리와 이진 트리를 비교해보세요.</div>
+    </div>
+
+    <div class="term-grid">
+      <div class="term-card"><div class="t-name">루트 Root</div><div class="t-desc">부모가 없는 맨 위의 노드. 트리는 하나의 루트에서 시작합니다.</div></div>
+      <div class="term-card"><div class="t-name">부모 / 자식</div><div class="t-desc">직접 연결된 위/아래 노드 관계.</div></div>
+      <div class="term-card"><div class="t-name">리프 Leaf</div><div class="t-desc">자식이 하나도 없는 노드. 단말 노드라고도 합니다.</div></div>
+      <div class="term-card"><div class="t-name">형제 Sibling</div><div class="t-desc">같은 부모를 공유하는 노드들.</div></div>
+      <div class="term-card"><div class="t-name">깊이 Depth</div><div class="t-desc">루트에서 해당 노드까지의 간선 수.</div></div>
+      <div class="term-card"><div class="t-name">높이 Height</div><div class="t-desc">해당 노드에서 가장 먼 리프까지의 간선 수.</div></div>
+      <div class="term-card"><div class="t-name">서브트리 Subtree</div><div class="t-desc">어떤 노드와 그 아래 자손들로만 이루어진 트리.</div></div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 2 ================= -->
+  <section id="s2" class="step">
+    <div class="step-head"><span class="step-num">02</span><h2>트리를 어떻게 저장할까</h2></div>
+    <p class="lead">트리를 메모리에 저장하는 두 가지 방법을 같은 이진 트리로 비교해봅니다: <b style="color:var(--text)">배열 기반</b>과 <b style="color:var(--text)">연결 리스트(포인터) 기반</b>. 배열에서는 노드 i의 왼쪽 자식이 <code class="mono">2i+1</code>, 오른쪽 자식이 <code class="mono">2i+2</code> 위치에 저장됩니다.</p>
+
+    <div class="toggle-row">
+      <button class="on" data-view="array">배열로 보기</button>
+      <button data-view="pointer">포인터로 보기</button>
+    </div>
+
+    <div class="builder-grid">
+      <div class="svg-card">
+        <svg id="s2svg" viewBox="0 0 320 260"></svg>
+        <div class="hint">노드를 클릭하면 오른쪽에서 해당 위치가 강조됩니다</div>
+      </div>
+      <div id="s2right" class="matrix-wrap"></div>
+    </div>
+
+    <table class="compare-table">
+      <tr><th></th><th>배열 기반</th><th>연결 리스트(포인터) 기반</th></tr>
+      <tr><td><b>자식 찾기</b></td><td>O(1) — 인덱스 계산 (2i+1, 2i+2)</td><td>O(1) — left, right 포인터 바로 접근</td></tr>
+      <tr><td><b>메모리 효율</b></td><td>완전 이진 트리가 아니면 빈 칸이 낭비됨</td><td>실제 존재하는 노드만큼만 사용</td></tr>
+      <tr><td><b>삽입 / 삭제</b></td><td>구조가 바뀌면 인덱스 재계산이 번거로움</td><td>포인터만 바꾸면 되어 유연함</td></tr>
+      <tr><td><b>적합한 경우</b></td><td>힙처럼 완전 이진 트리 형태가 보장될 때</td><td>노드 수가 자주 바뀌는 일반적인 트리</td></tr>
+    </table>
+  </section>
+
+  <!-- ================= SECTION 3 ================= -->
+  <section id="s3" class="step">
+    <div class="step-head"><span class="step-num">03</span><h2>C로 트리 입력받기</h2></div>
+    <p class="lead">표현 방식이 다르면 입력받는 방법도 달라집니다. 아래 탭에서 포인터 기반과 배열 기반, 두 가지 입력 방법을 비교해보세요.</p>
+
+    <div class="tabs">
+      <button class="on" data-tab="ptr">포인터 기반으로 입력받기</button>
+      <button data-tab="arr">배열 기반으로 입력받기</button>
+    </div>
+
+    <div id="tab-ptr" class="tab-pane">
+      <div class="step-reveal" id="reveal-ptr"></div>
+      <button class="btn next-btn" id="nextPtr">다음 단계 보기 →</button>
+      <button class="full-toggle" data-full="full-ptr">전체 코드 한 번에 보기</button>
+      <div class="code-block full-code" id="full-ptr"></div>
+    </div>
+
+    <div id="tab-arr" class="tab-pane" style="display:none;">
+      <div class="step-reveal" id="reveal-arr"></div>
+      <button class="btn next-btn" id="nextArr">다음 단계 보기 →</button>
+      <button class="full-toggle" data-full="full-arr">전체 코드 한 번에 보기</button>
+      <div class="code-block full-code" id="full-arr"></div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4 : preorder/inorder/postorder ================= -->
+  <section id="s4" class="step">
+    <div class="step-head"><span class="step-num">04</span><h2>전위·중위·후위 순회</h2></div>
+    <p class="lead">세 순회 모두 재귀 함수 하나로 구현하며, 차이는 딱 하나입니다 — <b style="color:var(--text)">"내 값을 언제 출력하느냐"</b>입니다. 전위: 나→왼쪽→오른쪽, 중위: 왼쪽→나→오른쪽, 후위: 왼쪽→오른쪽→나. 아래에서 탭을 바꿔가며 같은 트리, 다른 순서를 비교해보세요.</p>
+
+    <div class="tabs">
+      <button class="on" data-order="pre">전위 순회 (Preorder)</button>
+      <button data-order="in">중위 순회 (Inorder)</button>
+      <button data-order="post">후위 순회 (Postorder)</button>
+    </div>
+
+    <div class="dbg">
+      <div class="dbg-left">
+        <div class="graph-svg-card"><svg id="dfsGraph" viewBox="0 0 620 400"></svg></div>
+        <div class="controls">
+          <button id="dfsReset" title="처음으로">⟲ 리셋</button>
+          <button id="dfsStep">▸ 한 단계</button>
+          <button id="dfsPlay">▶ 재생</button>
+          <span class="spacer"></span>
+          <label class="mono" style="font-size:12px; color:var(--text-faint);">속도</label>
+          <select id="dfsSpeed"><option value="900">느리게</option><option value="500" selected>보통</option><option value="220">빠르게</option></select>
+        </div>
+        <div class="status-line" id="dfsStatus">▶ 재생을 눌러 루트 노드부터 순회를 시작하세요.</div>
+      </div>
+      <div class="dbg-right">
+        <div class="code-block">
+          <div class="cb-head"><span id="dfsCodeTitle">preorder.c</span><span>재귀 함수</span></div>
+          <div class="code-lines" id="dfsCode"></div>
+        </div>
+        <div class="panel">
+          <h4>호출 스택 (Call Stack)</h4>
+          <div class="stack-list" id="dfsStack"><span class="empty-hint">비어 있음</span></div>
+        </div>
+        <div class="panel">
+          <h4>출력 순서</h4>
+          <div class="order-track" id="dfsOrder"><span class="empty-hint">아직 없음</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 5 : level order ================= -->
+  <section id="s5" class="step">
+    <div class="step-head"><span class="step-num">05</span><h2>레벨 순회 — 너비 우선</h2></div>
+    <p class="lead">레벨 순회(Level-order Traversal)는 트리를 한 층(레벨)씩 위에서 아래로 훑습니다. 그래프의 BFS와 원리가 같으며, <b style="color:var(--text)">큐(Queue)</b>에 자식을 순서대로 넣고 먼저 들어온 노드부터 꺼내 처리합니다.</p>
+
+    <div class="dbg">
+      <div class="dbg-left">
+        <div class="graph-svg-card"><svg id="bfsGraph" viewBox="0 0 620 400"></svg></div>
+        <div class="controls">
+          <button id="bfsReset" title="처음으로">⟲ 리셋</button>
+          <button id="bfsStep">▸ 한 단계</button>
+          <button id="bfsPlay">▶ 재생</button>
+          <span class="spacer"></span>
+          <label class="mono" style="font-size:12px; color:var(--text-faint);">속도</label>
+          <select id="bfsSpeed"><option value="900">느리게</option><option value="500" selected>보통</option><option value="220">빠르게</option></select>
+        </div>
+        <div class="status-line" id="bfsStatus">▶ 재생을 눌러 루트 노드부터 레벨 순회를 시작하세요.</div>
+      </div>
+      <div class="dbg-right">
+        <div class="code-block">
+          <div class="cb-head"><span>levelorder.c</span><span>큐 기반 반복문</span></div>
+          <div class="code-lines" id="bfsCode"></div>
+        </div>
+        <div class="panel">
+          <h4>큐 (Queue) — 왼쪽이 먼저 나감</h4>
+          <div class="queue-list" id="bfsQueue"><span class="empty-hint">비어 있음</span></div>
+        </div>
+        <div class="panel">
+          <h4>출력 순서</h4>
+          <div class="order-track" id="bfsOrder"><span class="empty-hint">아직 없음</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 6 ================= -->
+  <section id="s6" class="step">
+    <div class="step-head"><span class="step-num">06</span><h2>정리 &amp; 퀴즈</h2></div>
+    <p class="lead">같은 트리라도 순회 방식에 따라 쓰임새가 다릅니다. 아래 표로 정리하고, 짧은 퀴즈로 개념을 점검해보세요.</p>
+
+    <table class="compare-table">
+      <tr><th></th><th>전위 (Pre)</th><th>중위 (In)</th><th>후위 (Post)</th><th>레벨 (Level)</th></tr>
+      <tr><td><b>자료구조</b></td><td>스택/재귀</td><td>스택/재귀</td><td>스택/재귀</td><td>큐</td></tr>
+      <tr><td><b>방문 순서</b></td><td>나→왼→오</td><td>왼→나→오</td><td>왼→오→나</td><td>위→아래, 한 층씩</td></tr>
+      <tr><td><b>대표 활용</b></td><td>트리 복사·직렬화</td><td>이진 탐색 트리 정렬 출력</td><td>트리 삭제, 하위 크기 계산</td><td>최소 깊이 탐색, 층별 처리</td></tr>
+    </table>
+
+    <div id="quizArea" style="margin-top:32px;"></div>
+
+    <footer style="padding:40px 0 0;">
+      <a href="#" class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">↑ 맨 위로</a>
+    </footer>
+  </section>
+
+</main>
+
+<script>
+(function(){
+
+/* ============================================================
+   UTIL: C code syntax highlighter (line-based)
+============================================================ */
+const KEYWORDS = new Set(['int','void','if','else','for','while','return','struct','char','float','double','const','static','break','continue','sizeof','NULL']);
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hlLine(line){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|(#\w+)|(\b\d+\b)|(\s+)|(\b[A-Za-z_]\w*\b)|([{}()\[\];,.:])|(\S)/g;
+  let out=''; let m;
+  while((m = re.exec(line))){
+    const [,cmt,str,pre,num,ws,ident,punct,other] = m;
+    if(cmt) out += `<span class="tk-cmt">${esc(cmt)}</span>`;
+    else if(str) out += `<span class="tk-str">${esc(str)}</span>`;
+    else if(pre) out += `<span class="tk-pre">${esc(pre)}</span>`;
+    else if(num) out += `<span class="tk-num">${esc(num)}</span>`;
+    else if(ws) out += ws;
+    else if(ident) out += KEYWORDS.has(ident) ? `<span class="tk-kw">${esc(ident)}</span>` : `<span class="tk-id">${esc(ident)}</span>`;
+    else if(punct) out += `<span class="tk-punct">${esc(punct)}</span>`;
+    else out += `<span class="tk-op">${esc(other)}</span>`;
+  }
+  return out;
+}
+function renderCode(container, lines, idPrefix){
+  container.innerHTML = lines.map((l,i)=>
+    `<div class="code-line" id="${idPrefix}-l${i+1}" data-line="${i+1}"><span class="ln">${i+1}</span><code>${hlLine(l)}</code></div>`
+  ).join('');
+}
+function highlightLine(idPrefix, n, root){
+  root.querySelectorAll('.code-line').forEach(el=>el.classList.remove('hl'));
+  if(n){
+    const el = root.querySelector(`#${idPrefix}-l${n}`);
+    if(el){ el.classList.add('hl'); el.scrollIntoView({block:'nearest'}); }
+  }
+}
+
+/* ============================================================
+   RAIL NAV
+============================================================ */
+const railBtns = document.querySelectorAll('.rail button');
+railBtns.forEach(b=>b.addEventListener('click',()=>{
+  document.getElementById(b.dataset.target).scrollIntoView({behavior:'smooth'});
+}));
+const sections = ['s1','s2','s3','s4','s5','s6'].map(id=>document.getElementById(id));
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const id = en.target.id;
+      railBtns.forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+    }
+  });
+},{rootMargin:'-40% 0px -50% 0px'});
+sections.forEach(s=>io.observe(s));
+
+/* ============================================================
+   HERO background mini tree
+============================================================ */
+(function(){
+  const svg = document.getElementById('heroSvg');
+  const pts = [[500,110],[320,220],[680,220],[220,340],[420,340],[600,340],[780,340],[160,480],[600,480]];
+  const edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[3,7],[6,8]];
+  let s = '';
+  edges.forEach(([a,b],i)=>{ s += `<line class="e draw" x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" style="animation-delay:${i*0.09}s"/>`; });
+  pts.forEach((p,i)=>{ s += `<circle class="n pulse" cx="${p[0]}" cy="${p[1]}" r="7" style="animation-delay:${i*0.25}s"/>`; });
+  svg.innerHTML = s;
+})();
+
+/* ============================================================
+   SHARED EXAMPLE TREE
+============================================================ */
+const TREE = {
+  1:{left:2,right:3}, 2:{left:4,right:5}, 3:{left:null,right:6},
+  4:{left:7,right:null}, 5:{left:null,right:null}, 6:{left:8,right:9},
+  7:{left:null,right:null}, 8:{left:null,right:null}, 9:{left:null,right:null}
+};
+const TPOS_SMALL = { 1:[160,30],2:[90,90],3:[240,90],4:[55,150],5:[130,150],6:[250,150],7:[30,210],8:[220,210],9:[280,210] };
+const TPOS_BIG = { 1:[320,40],2:[170,140],3:[480,140],4:[100,240],5:[250,240],6:[500,240],7:[60,340],8:[440,340],9:[560,340] };
+function treeEdgeList(){
+  const es=[];
+  Object.keys(TREE).forEach(k=>{
+    const n=+k, L=TREE[n].left, R=TREE[n].right;
+    if(L!==null) es.push([n,L]); if(R!==null) es.push([n,R]);
+  });
+  return es;
+}
+const TEDGES = treeEdgeList();
+
+/* ============================================================
+   SECTION 1 — general vs binary tree toggle
+============================================================ */
+(function(){
+  const svgEl = document.getElementById('s1svg');
+  const info = document.getElementById('s1info');
+  // general tree example: a node with 3 children
+  const GEN = {
+    nodes:{ A:[60,30], B:[30,110], C:[150,110], D:[270,110], E:[10,190], F:[60,190], G:[270,190] },
+    edges:[['A','B'],['A','C'],['A','D'],['B','E'],['B','F'],['D','G']],
+    parent:{B:'A',C:'A',D:'A',E:'B',F:'B',G:'D'},
+    depth:{A:0,B:1,C:1,D:1,E:2,F:2,G:2}
+  };
+  // binary tree example (subset, degree <= 2)
+  const BIN = {
+    nodes:{ A:[160,30], B:[80,110], C:[240,110], D:[40,190], E:[120,190], F:[280,190] },
+    edges:[['A','B'],['A','C'],['B','D'],['B','E'],['C','F']],
+    parent:{B:'A',C:'A',D:'B',E:'B',F:'C'},
+    depth:{A:0,B:1,C:1,D:2,E:2,F:2}
+  };
+  let mode='general';
+  function data(){ return mode==='general'?GEN:BIN; }
+  function childrenOf(d,id){ return d.edges.filter(e=>e[0]===id).map(e=>e[1]); }
+  function draw(){
+    const d = data();
+    let s='';
+    d.edges.forEach(([a,b],i)=>{
+      const pa=d.nodes[a], pb=d.nodes[b];
+      s += `<line class="tedge" id="s1e${i}" x1="${pa[0]}" y1="${pa[1]}" x2="${pb[0]}" y2="${pb[1]}"/>`;
+    });
+    Object.entries(d.nodes).forEach(([id,p])=>{
+      s += `<circle class="tnode" id="s1n${id}" cx="${p[0]}" cy="${p[1]}" r="17" data-id="${id}"/>`;
+      s += `<text class="tlabel" x="${p[0]}" y="${p[1]+5}">${id}</text>`;
+    });
+    svgEl.innerHTML = s;
+    svgEl.querySelectorAll('.tnode').forEach(el=> el.addEventListener('click', ()=>select(el.dataset.id)));
+  }
+  function select(id){
+    const d = data();
+    svgEl.querySelectorAll('.tnode').forEach(el=>el.classList.toggle('sel', el.dataset.id===id));
+    svgEl.querySelectorAll('.tedge').forEach((el,i)=> el.classList.toggle('hi', d.edges[i][0]===id||d.edges[i][1]===id));
+    const kids = childrenOf(d,id);
+    const par = d.parent[id] || '없음 (루트)';
+    info.innerHTML = `노드 <b>${id}</b>의 깊이는 <b>${d.depth[id]}</b>입니다.<br>부모: <b>${par}</b> · 자식: <b>${kids.length? kids.join(', ') : '없음 (리프)'}</b>`;
+  }
+  document.querySelectorAll('#s1 + .demo-panel, .demo-panel').forEach(()=>{});
+  document.querySelectorAll('.toggle-row button[data-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.toggle-row button[data-mode]').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on'); mode = btn.dataset.mode; draw();
+    });
+  });
+  draw();
+})();
+
+/* ============================================================
+   SECTION 2 — array vs pointer representation
+============================================================ */
+(function(){
+  const svgEl = document.getElementById('s2svg');
+  const right = document.getElementById('s2right');
+  let view='array';
+  const idxOf = {1:0,2:1,3:2,4:3,5:4,6:6,7:7,8:13,9:14};
+  const MAXIDX = 14;
+
+  function draw(){
+    let s='';
+    TEDGES.forEach(([a,b],i)=>{
+      const pa=TPOS_SMALL[a], pb=TPOS_SMALL[b];
+      s += `<line class="tedge" id="s2e${i}" x1="${pa[0]}" y1="${pa[1]}" x2="${pb[0]}" y2="${pb[1]}"/>`;
+    });
+    Object.entries(TPOS_SMALL).forEach(([id,p])=>{
+      s += `<circle class="tnode" id="s2n${id}" cx="${p[0]}" cy="${p[1]}" r="16" data-id="${id}"/>`;
+      s += `<text class="tlabel" x="${p[0]}" y="${p[1]+5}">${id}</text>`;
+    });
+    svgEl.innerHTML = s;
+    svgEl.querySelectorAll('.tnode').forEach(el=> el.addEventListener('click', ()=>select(el.dataset.id)));
+    drawRight();
+  }
+  function drawRight(){
+    if(view==='array'){
+      let cells='';
+      for(let i=0;i<=MAXIDX;i++){
+        const nodeId = Object.keys(idxOf).find(k=>idxOf[k]===i);
+        cells += `<div class="array-cell ${nodeId?'used':''}" id="s2cell${i}"><div class="idx">${i}</div><div class="val">${nodeId?nodeId:'-1'}</div></div>`;
+      }
+      right.innerHTML = `<h4 style="font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.08em; margin:0 0 12px;">tree[MAX] — 왼쪽자식 2i+1, 오른쪽자식 2i+2</h4><div class="array-scroll"><div class="array-cells">${cells}</div></div><p class="hint" style="margin-top:12px;">완전 이진 트리가 아니라서 6, 7, 9~12번 인덱스처럼 빈 칸(-1)이 많이 생깁니다. 이것이 배열 표현의 메모리 낭비입니다.</p>`;
+    } else {
+      let boxes='';
+      Object.keys(TREE).forEach(k=>{
+        const n=+k, L=TREE[n].left, R=TREE[n].right;
+        boxes += `<div class="struct-box" id="s2box${n}">
+          <div class="f"><span class="flabel">data</span><span class="fval">${n}</span></div>
+          <div class="f"><span class="flabel">left</span><span class="fval ${L===null?'null':'ptr'}">${L===null?'NULL':'→ '+L}</span></div>
+          <div class="f"><span class="flabel">right</span><span class="fval ${R===null?'null':'ptr'}">${R===null?'NULL':'→ '+R}</span></div>
+        </div>`;
+      });
+      right.innerHTML = `<h4 style="font-family:var(--mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.08em; margin:0 0 12px;">struct Node* — 실제 존재하는 노드만 사용</h4>${boxes}`;
+    }
+  }
+  function select(id){
+    svgEl.querySelectorAll('.tnode').forEach(el=>el.classList.toggle('sel', el.dataset.id===id));
+    if(view==='array'){
+      document.querySelectorAll('.array-cell').forEach(el=>el.classList.remove('hi'));
+      const cell = document.getElementById('s2cell'+idxOf[id]);
+      if(cell) cell.classList.add('hi');
+    } else {
+      document.querySelectorAll('.struct-box').forEach(el=>el.classList.remove('hi'));
+      const box = document.getElementById('s2box'+id);
+      if(box) box.classList.add('hi');
+    }
+  }
+  document.querySelectorAll('.toggle-row button[data-view]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.toggle-row button[data-view]').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on'); view = btn.dataset.view; drawRight();
+    });
+  });
+  draw();
+})();
+
+/* ============================================================
+   SECTION 3 — C input code (step reveal + tabs)
+============================================================ */
+const PTR_STEPS = [
+  {title:'노드 구조체 정의하기', code:[
+    '#include <stdio.h>',
+    '#include <stdlib.h>',
+    '',
+    'typedef struct Node {',
+    '    int data;',
+    '    struct Node* left;',
+    '    struct Node* right;',
+    '} Node;'
+  ], note:'트리의 한 노드는 값(data)과 왼쪽/오른쪽 자식을 가리키는 포인터 두 개로 이루어집니다.'},
+  {title:'노드를 생성하는 함수 만들기', code:[
+    'Node* createNode(int val) {',
+    '    Node* n = (Node*)malloc(sizeof(Node));',
+    '    n->data = val;',
+    '    n->left = NULL;',
+    '    n->right = NULL;',
+    '    return n;',
+    '}'
+  ], note:'malloc으로 메모리를 새로 확보하고, 처음에는 자식이 없는 상태(NULL)로 초기화합니다.'},
+  {title:'전위 순서 + NULL 표시로 트리 입력받기', code:[
+    'Node* buildTree() {',
+    '    int val;',
+    '    scanf("%d", &val);',
+    '    if (val == -1) return NULL;  // -1은 "자식 없음"',
+    '    Node* root = createNode(val);',
+    '    root->left = buildTree();',
+    '    root->right = buildTree();',
+    '    return root;',
+    '}'
+  ], note:'값을 하나 입력받아 -1이면 그 자리는 노드가 없는 것으로 처리하고, 아니면 노드를 만든 뒤 왼쪽·오른쪽을 재귀적으로 계속 입력받습니다. 예를 들어 "1 2 4 7 -1 -1 -1 5 -1 -1 3 -1 6 8 -1 -1 9 -1 -1"을 입력하면 예제 트리가 그대로 만들어집니다.'}
+];
+const ARR_STEPS = [
+  {title:'배열과 크기 선언하기', code:[
+    '#include <stdio.h>',
+    '#define MAX 100',
+    '',
+    'int tree[MAX];   // tree[i]: 인덱스 i 위치의 노드 값',
+    'int n;           // 값이 채워질 마지막 인덱스'
+  ], note:'배열 기반에서는 트리 모양 자체가 인덱스 규칙(2i+1, 2i+2)으로 정해지므로, 값만 채우면 트리가 완성됩니다.'},
+  {title:'모든 칸을 -1(빈 자리)로 초기화', code:[
+    'for (int i = 0; i < MAX; i++) {',
+    '    tree[i] = -1;   // -1은 그 위치에 노드가 없다는 뜻',
+    '}'
+  ], note:'채우기 전에 먼저 모든 칸을 "비어있음" 상태로 만들어 둡니다.'},
+  {title:'레벨 순서로 값 입력받기', code:[
+    'scanf("%d", &n);        // 채울 인덱스 개수',
+    'for (int i = 0; i < n; i++) {',
+    '    scanf("%d", &tree[i]);   // -1이면 그 자리는 빈 노드',
+    '}'
+  ], note:'루트(인덱스 0)부터 레벨 순서대로 값을 입력받습니다. 이후 tree[2*i+1], tree[2*i+2]로 언제든 자식을 바로 찾을 수 있습니다.'}
+];
+
+function buildRevealSection(steps, containerId, nextBtnId, fullId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = steps.map((st,i)=>`
+    <div class="reveal-item ${i===0?'shown':''}" data-i="${i}">
+      <div class="step-badge"><span class="num">${i+1}</span>${st.title}</div>
+      <div class="code-block"><div class="code-lines" id="${containerId}-c${i}"></div></div>
+      <p style="margin-top:-4px;">${st.note}</p>
+    </div>`).join('');
+  steps.forEach((st,i)=> renderCode(document.getElementById(`${containerId}-c${i}`), st.code, `${containerId}-c${i}`));
+  let shownCount = 1;
+  const nextBtn = document.getElementById(nextBtnId);
+  function refreshBtn(){ if(shownCount>=steps.length){ nextBtn.style.display='none'; } }
+  refreshBtn();
+  nextBtn.addEventListener('click', ()=>{
+    if(shownCount<steps.length){
+      container.querySelector(`.reveal-item[data-i="${shownCount}"]`).classList.add('shown');
+      shownCount++; refreshBtn();
+    }
+  });
+  const fullEl = document.getElementById(fullId);
+  const allLines = steps.flatMap(st=>st.code.concat(['']));
+  allLines.pop();
+  fullEl.innerHTML = `<div class="cb-head"><span>전체 코드</span><span>full listing</span></div><div class="code-lines" id="${fullId}-lines"></div>`;
+  renderCode(document.getElementById(`${fullId}-lines`), allLines, fullId);
+}
+buildRevealSection(PTR_STEPS,'reveal-ptr','nextPtr','full-ptr');
+buildRevealSection(ARR_STEPS,'reveal-arr','nextArr','full-arr');
+
+document.querySelectorAll('.full-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const el = document.getElementById(btn.dataset.full);
+    el.classList.toggle('shown');
+    btn.textContent = el.classList.contains('shown') ? '전체 코드 접기' : '전체 코드 한 번에 보기';
+  });
+});
+document.querySelectorAll('#s3 .tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const row = btn.parentElement;
+    row.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const p1=document.getElementById('tab-ptr'), p2=document.getElementById('tab-arr');
+    if(btn.dataset.tab==='ptr'){ p1.style.display='block'; p2.style.display='none'; }
+    else{ p1.style.display='none'; p2.style.display='block'; }
+  });
+});
+
+/* ============================================================
+   GRAPH-STYLE DRAW HELPERS FOR TREE (shared by s4/s5)
+============================================================ */
+function drawTreeBase(svgId){
+  const svg = document.getElementById(svgId);
+  let s='';
+  TEDGES.forEach(([a,b],i)=>{
+    const pa=TPOS_BIG[a], pb=TPOS_BIG[b];
+    s += `<line class="gv-edge" id="${svgId}-e${a}-${b}" x1="${pa[0]}" y1="${pa[1]}" x2="${pb[0]}" y2="${pb[1]}"/>`;
+  });
+  Object.keys(TREE).forEach(k=>{
+    const p = TPOS_BIG[k];
+    s += `<circle class="gv-node default" id="${svgId}-n${k}" cx="${p[0]}" cy="${p[1]}" r="22"/>`;
+    s += `<text class="gv-label" x="${p[0]}" y="${p[1]+5}">${k}</text>`;
+  });
+  svg.innerHTML = s;
+}
+function setNodeState(svgId,id,state){ const el=document.getElementById(`${svgId}-n${id}`); if(el) el.setAttribute('class','gv-node '+state); }
+function setEdgeState(svgId,a,b,state){
+  const e = document.getElementById(`${svgId}-e${a}-${b}`) || document.getElementById(`${svgId}-e${b}-${a}`);
+  if(e) e.setAttribute('class','gv-edge '+state);
+}
+function resetTreeVisual(svgId){
+  Object.keys(TREE).forEach(k=> setNodeState(svgId,k,'default'));
+  TEDGES.forEach(([a,b])=> setEdgeState(svgId,a,b,''));
+}
+
+/* ============================================================
+   SECTION 4 — preorder / inorder / postorder engine
+============================================================ */
+const CODE_BY_MODE = {
+  pre: {title:'preorder.c', lines:[
+    'void preorder(Node* root) {',
+    '    if (root == NULL) return;',
+    '    printf("%d ", root->data);',
+    '    preorder(root->left);',
+    '    preorder(root->right);',
+    '}'
+  ]},
+  in: {title:'inorder.c', lines:[
+    'void inorder(Node* root) {',
+    '    if (root == NULL) return;',
+    '    inorder(root->left);',
+    '    printf("%d ", root->data);',
+    '    inorder(root->right);',
+    '}'
+  ]},
+  post: {title:'postorder.c', lines:[
+    'void postorder(Node* root) {',
+    '    if (root == NULL) return;',
+    '    postorder(root->left);',
+    '    postorder(root->right);',
+    '    printf("%d ", root->data);',
+    '}'
+  ]}
+};
+const LINE_MAP = {
+  pre:  {nullcheck:2, print:3, left:4, right:5, ret:6},
+  in:   {nullcheck:2, left:3, print:4, right:5, ret:6},
+  post: {nullcheck:2, left:3, right:4, print:5, ret:6}
+};
+
+function* treeDFSGen(mode){
+  const LM = LINE_MAP[mode];
+  const order = [];
+  function* rec(v, callstack){
+    if(v===null){
+      yield {line:LM.nullcheck, kind:'nullcheck', v:null, callstack:[...callstack], order:[...order], msg:'NULL 노드에 도달 → 즉시 함수를 종료합니다 (기저 조건)'};
+      return;
+    }
+    callstack.push(v);
+    yield {line:LM.nullcheck, kind:'enter', v, callstack:[...callstack], order:[...order], msg:`${v}번 노드는 NULL이 아니므로 계속 진행합니다`};
+
+    if(mode==='pre'){
+      yield {line:LM.print, kind:'print', v, callstack:[...callstack], order:[...order], msg:`${v}번 노드 값을 먼저 출력합니다 (전위)`};
+      order.push(v);
+    }
+    yield {line:LM.left, kind:'call', v, dir:'left', child:TREE[v].left, callstack:[...callstack], order:[...order], msg:`${v}번 노드의 왼쪽 자식으로 재귀 호출합니다`};
+    yield* rec(TREE[v].left, callstack);
+
+    if(mode==='in'){
+      yield {line:LM.print, kind:'print', v, callstack:[...callstack], order:[...order], msg:`왼쪽을 다 처리했으니 ${v}번 노드 값을 출력합니다 (중위)`};
+      order.push(v);
+    }
+    yield {line:LM.right, kind:'call', v, dir:'right', child:TREE[v].right, callstack:[...callstack], order:[...order], msg:`${v}번 노드의 오른쪽 자식으로 재귀 호출합니다`};
+    yield* rec(TREE[v].right, callstack);
+
+    if(mode==='post'){
+      yield {line:LM.print, kind:'print', v, callstack:[...callstack], order:[...order], msg:`왼쪽과 오른쪽을 모두 처리했으니 ${v}번 노드 값을 출력합니다 (후위)`};
+      order.push(v);
+    }
+    callstack.pop();
+    yield {line:LM.ret, kind:'return', v, callstack:[...callstack], order:[...order], msg:`${v}번 노드 처리가 끝나 함수가 종료됩니다 (백트래킹)`};
+  }
+  yield* rec(1, []);
+  yield {line:null, kind:'done', callstack:[], order:[...order], msg:`순회 완료! 출력 순서: ${order.join(' → ')}`};
+}
+
+function setupTreeDFS(){
+  const svgId = 'dfsGraph';
+  drawTreeBase(svgId);
+  let mode='pre';
+  let iterator=null, playing=false, timer=null, lastEv=null;
+  const statusEl=document.getElementById('dfsStatus');
+  const speedEl=document.getElementById('dfsSpeed');
+  const playBtn=document.getElementById('dfsPlay');
+  const stepBtn=document.getElementById('dfsStep');
+  const resetBtn=document.getElementById('dfsReset');
+  const codeTitle=document.getElementById('dfsCodeTitle');
+  const codeContainer=document.getElementById('dfsCode');
+
+  function renderModeCode(){
+    codeTitle.textContent = CODE_BY_MODE[mode].title;
+    renderCode(codeContainer, CODE_BY_MODE[mode].lines, 'dfscode');
+  }
+  function apply(ev){
+    highlightLine('dfscode', ev.line, codeContainer);
+    resetTreeVisual(svgId);
+    // nodes fully printed
+    ev.order.forEach(v=> setNodeState(svgId, v, 'printed'));
+    // nodes currently on call stack but not yet in printed order get 'oncall'
+    ev.callstack.forEach(v=>{ if(!ev.order.includes(v)) setNodeState(svgId, v, 'oncall'); });
+    if(ev.v!==undefined && ev.v!==null) setNodeState(svgId, ev.v, ev.order.includes(ev.v) && ev.kind!=='print' ? 'printed' : 'current');
+    // used edges: parent-child both touched (on stack or printed)
+    TEDGES.forEach(([a,b])=>{
+      const touched = x => ev.callstack.includes(x) || ev.order.includes(x);
+      if(touched(a) && touched(b)) setEdgeState(svgId,a,b,'used');
+    });
+    if(ev.kind==='call' && ev.child!==null && ev.child!==undefined){
+      setEdgeState(svgId, ev.v, ev.child, 'active');
+    }
+    statusEl.textContent = (ev.kind==='done'?'✓ ':'▶ ') + ev.msg;
+    dfsPanels(ev);
+    lastEv = ev;
+    if(ev.kind==='done'){ playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; stepBtn.disabled=true; }
+  }
+  function nextStep(){
+    if(!iterator) iterator = treeDFSGen(mode);
+    const r = iterator.next();
+    if(r.done){ stepBtn.disabled=true; playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; return; }
+    apply(r.value);
+  }
+  function reset(){
+    iterator=null; playing=false; clearTimeout(timer);
+    resetTreeVisual(svgId);
+    renderModeCode();
+    highlightLine('dfscode', null, codeContainer);
+    statusEl.textContent = '▶ 재생을 눌러 루트 노드부터 순회를 시작하세요.';
+    stepBtn.disabled=false; playBtn.textContent='▶ 재생';
+    dfsPanels(null);
+  }
+  function tick(){
+    nextStep();
+    if(playing && !(lastEv && lastEv.kind==='done')) timer=setTimeout(tick, +speedEl.value);
+    else { playing=false; playBtn.textContent='▶ 재생'; }
+  }
+  playBtn.addEventListener('click', ()=>{
+    playing=!playing; playBtn.textContent = playing?'⏸ 일시정지':'▶ 재생';
+    if(playing) tick(); else clearTimeout(timer);
+  });
+  stepBtn.addEventListener('click', ()=>{ clearTimeout(timer); playing=false; playBtn.textContent='▶ 재생'; nextStep(); });
+  resetBtn.addEventListener('click', reset);
+  document.querySelectorAll('#s4 .tabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#s4 .tabs button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      mode = btn.dataset.order;
+      reset();
+    });
+  });
+  reset();
+}
+function dfsPanels(ev){
+  const stackEl=document.getElementById('dfsStack');
+  const orderEl=document.getElementById('dfsOrder');
+  if(!ev){ stackEl.innerHTML='<span class="empty-hint">비어 있음</span>'; orderEl.innerHTML='<span class="empty-hint">아직 없음</span>'; return; }
+  stackEl.innerHTML = ev.callstack.length ? ev.callstack.map(v=>`<div class="box">f(${v})</div>`).join('') : '<span class="empty-hint">비어 있음</span>';
+  orderEl.innerHTML = ev.order.length ? ev.order.map(v=>`<span class="chip">${v}</span>`).join('') : '<span class="empty-hint">아직 없음</span>';
+}
+setupTreeDFS();
+
+/* ============================================================
+   SECTION 5 — level order engine
+============================================================ */
+const LEVEL_CODE = [
+  'void levelOrder(Node* root) {',
+  '    Queue q; initQueue(&q);',
+  '    if (root != NULL) enqueue(&q, root);',
+  '    while (!isEmpty(&q)) {',
+  '        Node* cur = dequeue(&q);',
+  '        printf("%d ", cur->data);',
+  '        if (cur->left)  enqueue(&q, cur->left);',
+  '        if (cur->right) enqueue(&q, cur->right);',
+  '    }',
+  '}'
+];
+function* levelGen(){
+  const queue=[1];
+  const order=[];
+  yield {line:3, kind:'enqueue', v:1, queue:[...queue], order:[...order], msg:'루트 노드를 큐에 넣습니다'};
+  while(queue.length){
+    yield {line:4, kind:'whilecheck', queue:[...queue], order:[...order], msg:`큐가 비어있지 않으므로 계속 진행합니다 (남은 ${queue.length}개)`};
+    const v = queue.shift();
+    yield {line:5, kind:'dequeue', v, queue:[...queue], order:[...order], msg:`큐에서 ${v}번 노드를 꺼냅니다`};
+    order.push(v);
+    yield {line:6, kind:'print', v, queue:[...queue], order:[...order], msg:`${v}번 노드 값을 출력 순서에 기록합니다`};
+    const L=TREE[v].left, R=TREE[v].right;
+    yield {line:7, kind:'checkleft', v, has:L!==null, queue:[...queue], order:[...order], msg: L!==null?`${v}의 왼쪽 자식 ${L}을 큐에 넣습니다`:`${v}는 왼쪽 자식이 없습니다`};
+    if(L!==null) queue.push(L);
+    yield {line:8, kind:'checkright', v, has:R!==null, queue:[...queue], order:[...order], msg: R!==null?`${v}의 오른쪽 자식 ${R}을 큐에 넣습니다`:`${v}는 오른쪽 자식이 없습니다`};
+    if(R!==null) queue.push(R);
+  }
+  yield {line:null, kind:'done', queue:[], order:[...order], msg:`순회 완료! 출력 순서: ${order.join(' → ')}`};
+}
+function setupTreeBFS(){
+  const svgId='bfsGraph';
+  drawTreeBase(svgId);
+  renderCode(document.getElementById('bfsCode'), LEVEL_CODE, 'bfscode');
+  let iterator=null, playing=false, timer=null, lastEv=null;
+  const statusEl=document.getElementById('bfsStatus');
+  const speedEl=document.getElementById('bfsSpeed');
+  const playBtn=document.getElementById('bfsPlay');
+  const stepBtn=document.getElementById('bfsStep');
+  const resetBtn=document.getElementById('bfsReset');
+  const codeContainer=document.getElementById('bfsCode');
+
+  function apply(ev){
+    highlightLine('bfscode', ev.line, codeContainer);
+    resetTreeVisual(svgId);
+    ev.order.forEach(v=> setNodeState(svgId, v, 'printed'));
+    ev.queue.forEach(v=>{ if(!ev.order.includes(v)) setNodeState(svgId, v, 'oncall'); });
+    if(ev.v!==undefined) setNodeState(svgId, ev.v, 'current');
+    TEDGES.forEach(([a,b])=>{
+      const touched = x => ev.order.includes(x) || ev.queue.includes(x);
+      if(touched(a) && touched(b)) setEdgeState(svgId,a,b,'used');
+    });
+    if((ev.kind==='checkleft'||ev.kind==='checkright') && ev.has){
+      const child = ev.kind==='checkleft'? TREE[ev.v].left : TREE[ev.v].right;
+      setEdgeState(svgId, ev.v, child, 'active');
+    }
+    statusEl.textContent = (ev.kind==='done'?'✓ ':'▶ ') + ev.msg;
+    bfsPanels(ev);
+    lastEv = ev;
+    if(ev.kind==='done'){ playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; stepBtn.disabled=true; }
+  }
+  function nextStep(){
+    if(!iterator) iterator = levelGen();
+    const r = iterator.next();
+    if(r.done){ stepBtn.disabled=true; playing=false; clearTimeout(timer); playBtn.textContent='▶ 재생'; return; }
+    apply(r.value);
+  }
+  function reset(){
+    iterator=null; playing=false; clearTimeout(timer);
+    resetTreeVisual(svgId);
+    highlightLine('bfscode', null, codeContainer);
+    statusEl.textContent = '▶ 재생을 눌러 루트 노드부터 레벨 순회를 시작하세요.';
+    stepBtn.disabled=false; playBtn.textContent='▶ 재생';
+    bfsPanels(null);
+  }
+  function tick(){
+    nextStep();
+    if(playing && !(lastEv && lastEv.kind==='done')) timer=setTimeout(tick, +speedEl.value);
+    else { playing=false; playBtn.textContent='▶ 재생'; }
+  }
+  playBtn.addEventListener('click', ()=>{
+    playing=!playing; playBtn.textContent = playing?'⏸ 일시정지':'▶ 재생';
+    if(playing) tick(); else clearTimeout(timer);
+  });
+  stepBtn.addEventListener('click', ()=>{ clearTimeout(timer); playing=false; playBtn.textContent='▶ 재생'; nextStep(); });
+  resetBtn.addEventListener('click', reset);
+  reset();
+}
+function bfsPanels(ev){
+  const qEl=document.getElementById('bfsQueue');
+  const orderEl=document.getElementById('bfsOrder');
+  if(!ev){ qEl.innerHTML='<span class="empty-hint">비어 있음</span>'; orderEl.innerHTML='<span class="empty-hint">아직 없음</span>'; return; }
+  qEl.innerHTML = ev.queue.length ? ev.queue.map(v=>`<div class="box">${v}</div>`).join('') : '<span class="empty-hint">비어 있음</span>';
+  orderEl.innerHTML = ev.order.length ? ev.order.map(v=>`<span class="chip">${v}</span>`).join('') : '<span class="empty-hint">아직 없음</span>';
+}
+setupTreeBFS();
+
+/* ============================================================
+   SECTION 6 — quiz
+============================================================ */
+const QUIZ = [
+  {q:'Q1. 이진 탐색 트리(BST)에서 값을 오름차순으로 출력하려면 어떤 순회를 사용해야 할까?', opts:['전위 순회','중위 순회','후위 순회'], correct:1,
+   fb:'중위 순회(왼쪽→나→오른쪽)는 이진 탐색 트리에서 항상 오름차순으로 값을 방문합니다.'},
+  {q:'Q2. 트리를 삭제하며 각 노드의 메모리를 해제하려면, 자식보다 부모를 나중에 처리해야 합니다. 어떤 순회가 적합할까?', opts:['전위 순회','레벨 순회','후위 순회'], correct:2,
+   fb:'후위 순회(왼쪽→오른쪽→나)는 자식을 모두 처리한 뒤 자신을 처리하므로, 트리 삭제에 안전합니다.'},
+  {q:'Q3. 트리의 각 "층(레벨)"을 순서대로 처리하고 싶다면 어떤 방법을 사용해야 할까?', opts:['재귀 DFS','레벨 순회 (큐 사용)'], correct:1,
+   fb:'레벨 순회는 큐를 사용해 가까운 노드부터 한 층씩 처리하므로, 층 단위 작업에 적합합니다.'}
+];
+const quizArea = document.getElementById('quizArea');
+quizArea.innerHTML = QUIZ.map((item,qi)=>`
+  <div class="quiz-card">
+    <div class="q">${item.q}</div>
+    <div class="quiz-opts">${item.opts.map((o,oi)=>`<button data-q="${qi}" data-o="${oi}">${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="fb-${qi}">${item.fb}</div>
+  </div>`).join('');
+quizArea.querySelectorAll('.quiz-opts button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const qi=+btn.dataset.q, oi=+btn.dataset.o;
+    const item=QUIZ[qi];
+    btn.parentElement.querySelectorAll('button').forEach((b,i)=>{
+      b.classList.remove('correct','wrong');
+      if(i===item.correct) b.classList.add('correct');
+      else if(i===oi) b.classList.add('wrong');
+    });
+    document.getElementById('fb-'+qi).classList.add('shown');
+  });
+});
+
+})();
+</script>
+</body>
+</html>
