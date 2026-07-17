@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4605 화려한 정사각형 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.65}
+header{background:linear-gradient(135deg,#db2777,#7c3aed,#2563eb);color:#fff;text-align:center;padding:34px 18px}
+header h1{margin:0;font-size:38px}
+header p{margin:8px 0 0;font-size:21px}
+main{max-width:1280px;margin:auto;padding:24px}
+section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)}
+h2{font-size:30px;color:#1d4ed8;margin-top:0;border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:23px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:15px;padding:17px}
+.good{background:#ecfdf5;border-color:#86efac}
+.warn{background:#fffbeb;border-color:#facc15}
+textarea{width:100%;height:230px;padding:13px;border:2px solid #93c5fd;border-radius:12px;font:17px Consolas,monospace}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0;align-items:center}
+button{font-size:17px;font-weight:800;padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;cursor:pointer}
+button.green{background:#0f766e}
+button.orange{background:#b45309}
+button.gray{background:#64748b}
+input[type=range]{width:100%;margin:10px 0}
+canvas{width:100%;height:570px;background:#fff;border:2px solid #cbd5e1;border-radius:14px}
+.answer{font-size:38px;font-weight:900;color:#dc2626;text-align:center}
+pre{background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;font-size:16px;line-height:1.65;font-family:Consolas,"Courier New",monospace;white-space:pre}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th,td{border:1px solid #bfdbfe;padding:8px;text-align:center}
+th{background:#dbeafe}
+.scroll{max-height:430px;overflow:auto;border:2px solid #dbeafe;border-radius:14px}
+.log{max-height:320px;overflow:auto;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:12px}
+.log div{padding:7px;border-bottom:1px solid #e2e8f0}
+.step-card{background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:15px;margin:12px 0}
+.formula{font-size:24px;font-weight:900;text-align:center;background:#fef3c7;border:2px solid #f59e0b;border-radius:13px;padding:13px}
+.badge{display:inline-block;padding:5px 9px;border-radius:9px;font-weight:800;background:#ede9fe;border:2px solid #8b5cf6}
+.small{font-size:15px;color:#475569}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.legend span{padding:5px 10px;border:2px solid #cbd5e1;border-radius:9px;background:#fff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}header h1{font-size:29px}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4605 화려한 정사각형</h1>
+<p>이분 탐색 + x축 스위핑 + 색깔별 y구간 합집합 시각화</p>
+</header>
+
+<main>
+<section>
+<h2>1. 핵심 아이디어</h2>
+<div class="grid">
+<div class="box good">
+<h3>결정 문제</h3>
+<p>변 길이 R인 화려한 정사각형이 존재하는지 검사한 뒤, R을 이분 탐색합니다.</p>
+</div>
+<div class="box warn">
+<h3>점 하나의 y구간 기여</h3>
+<p>y좌표가 y인 점은 정사각형의 위쪽 좌표 topY가 <b>[y, y+R]</b>에 있을 때 포함됩니다.</p>
+</div>
+</div>
+<div class="formula">가능 조건: 어떤 topY에서 서로 다른 색깔 수 = K</div>
+</section>
+
+<section>
+<h2>2. 직접 입력하고 시각화하기</h2>
+<textarea id="inputData">5 2
+4 2 1
+5 3 1
+5 4 2
+4 5 2
+3 8 2</textarea>
+
+<div class="controls">
+<button onclick="solveMinimum()">최소 변 길이 계산</button>
+<button class="green" onclick="prepareCheck()">현재 R 검사 준비</button>
+<button class="orange" onclick="nextSweep()">x 스위핑 한 단계</button>
+<button class="gray" onclick="loadExample(1)">예제 1</button>
+<button class="gray" onclick="loadExample(2)">예제 2</button>
+<button class="gray" onclick="loadExample(3)">예제 3</button>
+</div>
+
+<div class="box">
+<label><b>검사할 변 길이 R: <span id="rValue">1</span></b></label>
+<input id="rSlider" type="range" min="0" max="20" value="1" oninput="updateRLabel()">
+</div>
+
+<div class="grid">
+<div>
+<h3>평면 시각화</h3>
+<div id="legend" class="legend"></div>
+<canvas id="planeCanvas" width="620" height="570"></canvas>
+</div>
+<div>
+<h3>현재 상태</h3>
+<div id="statusBox" class="box warn"><div class="answer">준비</div></div>
+<h3>진행 로그</h3>
+<div id="log" class="log"></div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>3. 현재 x구간의 색깔별 y구간</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr><th>색깔</th><th>활성 y좌표</th><th>합집합 구간 [y,y+R]</th></tr>
+</thead>
+<tbody id="colorBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>4. topY별 포함 색깔 수</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr><th>topY</th><th>포함 색깔 수</th><th>모든 색 포함 여부</th></tr>
+</thead>
+<tbody id="topBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>5. 이분 탐색 과정</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr><th>단계</th><th>low</th><th>high</th><th>mid</th><th>possible(mid)</th></tr>
+</thead>
+<tbody id="binaryBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>6. 코드 작성 단계</h2>
+<div class="step-card"><h3>1단계. 점을 x좌표 기준으로 정렬</h3><pre>qsort(points + 1, N, sizeof(Point), comparePoint);</pre></div>
+<div class="step-card"><h3>2단계. 길이 R 가능 여부 함수 작성</h3><pre>possible(R)
+1. x구간 [xLeft, xLeft+R]에 들어오는 점 추가
+2. 색깔별 y구간 합집합 갱신
+3. 어떤 topY에서 색깔 수가 K인지 확인
+4. xLeft의 점 제거</pre></div>
+<div class="step-card"><h3>3단계. 점 하나가 덮는 topY 구간</h3><pre>점의 y좌표가 y이면
+topY 구간은 [y, y+R]</pre></div>
+<div class="step-card"><h3>4단계. 같은 색깔의 중복 구간 제거</h3><pre>새 점의 고유 기여:
+[max(y, previousY+R+1), min(y+R, nextY-1)]</pre></div>
+<div class="step-card"><h3>5단계. 세그먼트 트리</h3><pre>구간 덧셈 + 전체 최댓값
+segmentMaximum[1] == K 이면 성공</pre></div>
+<div class="step-card"><h3>6단계. 정답 이분 탐색</h3><pre>low = -1
+high = 250000
+
+while (high - low > 1) {
+    mid = (low + high) / 2
+    if (possible(mid)) high = mid
+    else low = mid
+}</pre></div>
+</section>
+
+<section>
+<h2>7. 정답 C 코드</h2>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#define MAX_N 100000
+#define MAX_K 100000
+#define MAX_Y 500000
+#define SEGMENT_SIZE (MAX_Y * 4 + 20)
+
+typedef struct {
+    int x;
+    int y;
+    int color;
+    int id;
+} Point;
+
+int N;
+int K;
+Point points[MAX_N + 1];
+
+int roots[MAX_K + 1];
+int leftChild[MAX_N + 1];
+int rightChild[MAX_N + 1];
+unsigned int priority[MAX_N + 1];
+
+int segmentMaximum[SEGMENT_SIZE];
+int segmentLazy[SEGMENT_SIZE];
+
+int comparePoint(
+    const void *a,
+    const void *b
+) {
+    const Point *p = (const Point *)a;
+    const Point *q = (const Point *)b;
+
+    if (p->x != q->x) {
+        return p->x < q->x ? -1 : 1;
+    }
+
+    if (p->y != q->y) {
+        return p->y < q->y ? -1 : 1;
+    }
+
+    if (p->id < q->id) {
+        return -1;
+    }
+
+    if (p->id > q->id) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int keyLess(int a, int b) {
+    if (points[a].y != points[b].y) {
+        return points[a].y < points[b].y;
+    }
+
+    return a < b;
+}
+
+int mergeTreap(int a, int b) {
+    if (a == 0) {
+        return b;
+    }
+
+    if (b == 0) {
+        return a;
+    }
+
+    if (priority[a] < priority[b]) {
+        rightChild[a] =
+            mergeTreap(
+                rightChild[a],
+                b
+            );
+
+        return a;
+    }
+
+    leftChild[b] =
+        mergeTreap(
+            a,
+            leftChild[b]
+        );
+
+    return b;
+}
+
+int rotateRight(int root) {
+    int newRoot = leftChild[root];
+
+    leftChild[root] =
+        rightChild[newRoot];
+
+    rightChild[newRoot] = root;
+
+    return newRoot;
+}
+
+int rotateLeft(int root) {
+    int newRoot = rightChild[root];
+
+    rightChild[root] =
+        leftChild[newRoot];
+
+    leftChild[newRoot] = root;
+
+    return newRoot;
+}
+
+int insertTreap(
+    int root,
+    int node
+) {
+    if (root == 0) {
+        return node;
+    }
+
+    if (keyLess(node, root)) {
+        leftChild[root] =
+            insertTreap(
+                leftChild[root],
+                node
+            );
+
+        if (
+            priority[leftChild[root]]
+            < priority[root]
+        ) {
+            root = rotateRight(root);
+        }
+    } else {
+        rightChild[root] =
+            insertTreap(
+                rightChild[root],
+                node
+            );
+
+        if (
+            priority[rightChild[root]]
+            < priority[root]
+        ) {
+            root = rotateLeft(root);
+        }
+    }
+
+    return root;
+}
+
+int eraseTreap(
+    int root,
+    int node
+) {
+    if (root == node) {
+        return mergeTreap(
+            leftChild[root],
+            rightChild[root]
+        );
+    }
+
+    if (keyLess(node, root)) {
+        leftChild[root] =
+            eraseTreap(
+                leftChild[root],
+                node
+            );
+    } else {
+        rightChild[root] =
+            eraseTreap(
+                rightChild[root],
+                node
+            );
+    }
+
+    return root;
+}
+
+int predecessor(
+    int root,
+    int node
+) {
+    int answer = 0;
+
+    while (root != 0) {
+        if (keyLess(root, node)) {
+            answer = root;
+            root = rightChild[root];
+        } else {
+            root = leftChild[root];
+        }
+    }
+
+    return answer;
+}
+
+int successor(
+    int root,
+    int node
+) {
+    int answer = 0;
+
+    while (root != 0) {
+        if (keyLess(node, root)) {
+            answer = root;
+            root = leftChild[root];
+        } else {
+            root = rightChild[root];
+        }
+    }
+
+    return answer;
+}
+
+void rangeAdd(
+    int node,
+    int start,
+    int end,
+    int left,
+    int right,
+    int value
+) {
+    if (
+        right < start ||
+        end < left
+    ) {
+        return;
+    }
+
+    if (
+        left <= start &&
+        end <= right
+    ) {
+        segmentMaximum[node] += value;
+        segmentLazy[node] += value;
+        return;
+    }
+
+    int middle = (start + end) / 2;
+
+    rangeAdd(
+        node * 2,
+        start,
+        middle,
+        left,
+        right,
+        value
+    );
+
+    rangeAdd(
+        node * 2 + 1,
+        middle + 1,
+        end,
+        left,
+        right,
+        value
+    );
+
+    int childMaximum =
+        segmentMaximum[node * 2]
+        >
+        segmentMaximum[node * 2 + 1]
+        ?
+        segmentMaximum[node * 2]
+        :
+        segmentMaximum[node * 2 + 1];
+
+    segmentMaximum[node] =
+        segmentLazy[node] +
+        childMaximum;
+}
+
+void updateUniquePart(
+    int pointIndex,
+    int R,
+    int delta
+) {
+    int color =
+        points[pointIndex].color;
+
+    int root = roots[color];
+
+    int previous =
+        predecessor(
+            root,
+            pointIndex
+        );
+
+    int next =
+        successor(
+            root,
+            pointIndex
+        );
+
+    int left =
+        points[pointIndex].y;
+
+    int right =
+        points[pointIndex].y + R;
+
+    if (previous != 0) {
+        int previousEnd =
+            points[previous].y + R;
+
+        if (previousEnd + 1 > left) {
+            left = previousEnd + 1;
+        }
+    }
+
+    if (next != 0) {
+        int beforeNext =
+            points[next].y - 1;
+
+        if (beforeNext < right) {
+            right = beforeNext;
+        }
+    }
+
+    if (left <= right) {
+        rangeAdd(
+            1,
+            1,
+            MAX_Y,
+            left,
+            right,
+            delta
+        );
+    }
+}
+
+void addPoint(
+    int index,
+    int R
+) {
+    int color =
+        points[index].color;
+
+    leftChild[index] = 0;
+    rightChild[index] = 0;
+
+    updateUniquePart(
+        index,
+        R,
+        1
+    );
+
+    roots[color] =
+        insertTreap(
+            roots[color],
+            index
+        );
+}
+
+void removePoint(
+    int index,
+    int R
+) {
+    int color =
+        points[index].color;
+
+    updateUniquePart(
+        index,
+        R,
+        -1
+    );
+
+    roots[color] =
+        eraseTreap(
+            roots[color],
+            index
+        );
+}
+
+int possible(int R) {
+    memset(
+        roots,
+        0,
+        sizeof(int) * (K + 1)
+    );
+
+    memset(
+        segmentMaximum,
+        0,
+        sizeof(segmentMaximum)
+    );
+
+    memset(
+        segmentLazy,
+        0,
+        sizeof(segmentLazy)
+    );
+
+    int left = 1;
+    int right = 1;
+
+    while (left <= N) {
+        int xLeft =
+            points[left].x;
+
+        while (
+            right <= N &&
+            points[right].x <= xLeft + R
+        ) {
+            addPoint(right, R);
+            right++;
+        }
+
+        if (
+            segmentMaximum[1] == K
+        ) {
+            return 1;
+        }
+
+        while (
+            left <= N &&
+            points[left].x == xLeft
+        ) {
+            removePoint(left, R);
+            left++;
+        }
+    }
+
+    return 0;
+}
+
+unsigned int randomState =
+    2463534242u;
+
+unsigned int xorshift32(void) {
+    randomState ^= randomState << 13;
+    randomState ^= randomState >> 17;
+    randomState ^= randomState << 5;
+
+    return randomState;
+}
+
+int main(void) {
+    scanf("%d %d", &N, &K);
+
+    for (int i = 1; i <= N; i++) {
+        scanf(
+            "%d %d %d",
+            &points[i].x,
+            &points[i].y,
+            &points[i].color
+        );
+
+        points[i].id = i;
+    }
+
+    qsort(
+        points + 1,
+        N,
+        sizeof(Point),
+        comparePoint
+    );
+
+    for (int i = 1; i <= N; i++) {
+        priority[i] =
+            xorshift32();
+    }
+
+    int low = -1;
+    int high = 250000;
+
+    while (high - low > 1) {
+        int middle =
+            low +
+            (high - low) / 2;
+
+        if (possible(middle)) {
+            high = middle;
+        } else {
+            low = middle;
+        }
+    }
+
+    printf("%d\n", high);
+
+    return 0;
+}</pre>
+</section>
+</main>
+
+<script>
+let N=0,K=0,points=[],sorted=[],R=1,sweepState=null,colorPalette=["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#14b8a6","#84cc16"];
+
+function parseInput(){
+ const nums=document.getElementById("inputData").value.trim().split(/\s+/).map(Number);
+ let p=0;N=nums[p++];K=nums[p++];points=[];
+ for(let i=0;i<N;i++)points.push({x:nums[p++],y:nums[p++],c:nums[p++],id:i+1});
+ sorted=[...points].sort((a,b)=>a.x-b.x||a.y-b.y||a.id-b.id);
+ const maxCoord=Math.max(10,...points.flatMap(q=>[q.x,q.y]));
+ document.getElementById("rSlider").max=maxCoord;
+}
+
+function updateRLabel(){
+ R=Number(document.getElementById("rSlider").value);
+ document.getElementById("rValue").textContent=R;
+}
+
+function colorIntervals(active){
+ const by=Array.from({length:K+1},()=>[]);
+ active.forEach(p=>by[p.c].push(p.y));
+ const out=[];
+ for(let c=1;c<=K;c++){
+   const ys=[...new Set(by[c].sort((a,b)=>a-b))];
+   const intervals=[];
+   for(const y of ys){
+     let l=y,r=y+R;
+     if(!intervals.length||l>intervals[intervals.length-1][1]+1)intervals.push([l,r]);
+     else intervals[intervals.length-1][1]=Math.max(intervals[intervals.length-1][1],r);
+   }
+   out.push({c,ys,intervals});
+ }
+ return out;
+}
+
+function analyzeWindow(xLeft){
+ const active=sorted.filter(p=>xLeft<=p.x&&p.x<=xLeft+R);
+ const ci=colorIntervals(active);
+ const maxTop=Math.max(0,...points.map(p=>p.y+R));
+ const counts=[];
+ let best=0,bestY=null;
+ for(let y=0;y<=maxTop;y++){
+   let cnt=0;
+   for(const row of ci){
+     if(row.intervals.some(([l,r])=>l<=y&&y<=r))cnt++;
+   }
+   counts.push({y,cnt});
+   if(cnt>best){best=cnt;bestY=y;}
+ }
+ return {active,ci,counts,best,bestY,ok:best===K};
+}
+
+function possibleBrute(r, record=false){
+ const old=R;R=r;
+ const xs=[...new Set(sorted.map(p=>p.x))];
+ let result=false,steps=[];
+ for(const x of xs){
+   const a=analyzeWindow(x);
+   if(record)steps.push({x,ok:a.ok,best:a.best});
+   if(a.ok){result=true;break;}
+ }
+ R=old;
+ return {result,steps};
+}
+
+function solveMinimum(){
+ parseInput();
+ let lo=-1,hi=Math.max(...points.flatMap(p=>[p.x,p.y]));
+ const rows=[];let step=1;
+ while(hi-lo>1){
+   const mid=Math.floor((lo+hi)/2);
+   const ok=possibleBrute(mid).result;
+   rows.push({step:step++,lo,hi,mid,ok});
+   if(ok)hi=mid;else lo=mid;
+ }
+ document.getElementById("binaryBody").innerHTML=rows.map(r=>`<tr><td>${r.step}</td><td>${r.lo}</td><td>${r.hi}</td><td>${r.mid}</td><td>${r.ok?"가능":"불가능"}</td></tr>`).join("");
+ document.getElementById("statusBox").className="box good";
+ document.getElementById("statusBox").innerHTML=`<div class="answer">${hi}</div><p>최소 변 길이</p>`;
+ addLog(`최소 변 길이 계산 완료: ${hi}`);
+ document.getElementById("rSlider").value=hi;updateRLabel();prepareCheck();
+}
+
+function prepareCheck(){
+ parseInput();updateRLabel();
+ const xs=[...new Set(sorted.map(p=>p.x))];
+ sweepState={xs,index:0,current:null};
+ document.getElementById("log").innerHTML="";
+ addLog(`R=${R} 검사 시작`);
+ renderLegend();nextSweep();
+}
+
+function nextSweep(){
+ if(!sweepState){prepareCheck();return;}
+ if(sweepState.index>=sweepState.xs.length){addLog("모든 x구간 검사 완료");return;}
+ const x=sweepState.xs[sweepState.index++];
+ const a=analyzeWindow(x);
+ sweepState.current={x,...a};
+ renderWindow();
+ addLog(`x구간 [${x}, ${x+R}], 최대 색깔 수 ${a.best}${a.ok?" → 성공":""}`);
+ if(a.ok)document.getElementById("statusBox").className="box good";
+ else document.getElementById("statusBox").className="box warn";
+ document.getElementById("statusBox").innerHTML=`<div class="answer">${a.ok?"가능":"불가능"}</div><p>x구간: [${x}, ${x+R}]</p><p>최대 포함 색깔 수: ${a.best} / ${K}</p><p>최적 topY: ${a.bestY??"-"}</p>`;
+}
+
+function renderWindow(){
+ const s=sweepState.current;
+ drawPlane(s);
+ document.getElementById("colorBody").innerHTML=s.ci.map(row=>`<tr><td>${row.c}</td><td>${row.ys.length?row.ys.join(", "):"없음"}</td><td>${row.intervals.length?row.intervals.map(v=>`[${v[0]},${v[1]}]`).join(" ∪ "):"없음"}</td></tr>`).join("");
+ document.getElementById("topBody").innerHTML=s.counts.filter(r=>r.cnt>0).map(r=>`<tr><td>${r.y}</td><td>${r.cnt}</td><td>${r.cnt===K?"예":"아니오"}</td></tr>`).join("");
+}
+
+function drawPlane(s){
+ const c=document.getElementById("planeCanvas"),ctx=c.getContext("2d");
+ ctx.clearRect(0,0,c.width,c.height);
+ const maxX=Math.max(2,...points.map(p=>p.x))+1,maxY=Math.max(2,...points.map(p=>p.y))+R+1;
+ const margin=45, sx=(c.width-2*margin)/maxX, sy=(c.height-2*margin)/maxY;
+ ctx.strokeStyle="#cbd5e1";ctx.lineWidth=1;
+ for(let x=0;x<=maxX;x++){ctx.beginPath();ctx.moveTo(margin+x*sx,margin);ctx.lineTo(margin+x*sx,c.height-margin);ctx.stroke();}
+ for(let y=0;y<=maxY;y++){ctx.beginPath();ctx.moveTo(margin,c.height-margin-y*sy);ctx.lineTo(c.width-margin,c.height-margin-y*sy);ctx.stroke();}
+ ctx.strokeStyle="#111827";ctx.lineWidth=2;
+ ctx.beginPath();ctx.moveTo(margin,c.height-margin);ctx.lineTo(c.width-margin,c.height-margin);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(margin,c.height-margin);ctx.lineTo(margin,margin);ctx.stroke();
+
+ points.forEach(p=>{
+   const x=margin+p.x*sx,y=c.height-margin-p.y*sy;
+   ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);
+   ctx.fillStyle=colorPalette[(p.c-1)%colorPalette.length];ctx.fill();
+   ctx.strokeStyle="#111827";ctx.stroke();
+   ctx.fillStyle="#111827";ctx.font="12px Arial";ctx.fillText(`${p.id}`,x+10,y-8);
+ });
+
+ if(s){
+   const x1=margin+s.x*sx,x2=margin+(s.x+R)*sx;
+   ctx.fillStyle="rgba(59,130,246,.10)";ctx.fillRect(x1,margin,x2-x1,c.height-2*margin);
+   ctx.strokeStyle="#2563eb";ctx.lineWidth=3;ctx.strokeRect(x1,margin,x2-x1,c.height-2*margin);
+   if(s.ok&&s.bestY!==null){
+     const top=s.bestY,bottom=top-R;
+     const yy= c.height-margin-top*sy;
+     ctx.fillStyle="rgba(16,185,129,.18)";
+     ctx.fillRect(x1,yy,x2-x1,R*sy);
+     ctx.strokeStyle="#059669";ctx.lineWidth=4;ctx.strokeRect(x1,yy,x2-x1,R*sy);
+   }
+ }
+}
+
+function renderLegend(){
+ document.getElementById("legend").innerHTML=Array.from({length:K},(_,i)=>`<span><b style="color:${colorPalette[i%colorPalette.length]}">●</b> 색 ${i+1}</span>`).join("");
+}
+
+function loadExample(n){
+ const ex={
+ 1:`5 2
+4 2 1
+5 3 1
+5 4 2
+4 5 2
+3 8 2`,
+ 2:`5 3
+4 2 1
+5 3 1
+5 4 2
+4 5 2
+3 8 3`,
+ 3:`4 2
+1 1 1
+1 1 1
+1 1 2
+1 1 2`
+ };
+ document.getElementById("inputData").value=ex[n];
+ parseInput();
+ document.getElementById("rSlider").value=n===1?1:n===2?5:0;
+ updateRLabel();solveMinimum();
+}
+
+function addLog(t){const d=document.createElement("div");d.textContent=t;document.getElementById("log").prepend(d);}
+parseInput();updateRLabel();renderLegend();prepareCheck();
+</script>
+</body>
+</html>

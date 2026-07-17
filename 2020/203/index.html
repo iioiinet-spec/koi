@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4604 버블버블 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.65}
+header{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-align:center;padding:34px 18px}
+header h1{margin:0;font-size:38px}
+header p{margin:8px 0 0;font-size:21px}
+main{max-width:1280px;margin:auto;padding:24px}
+section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)}
+h2{font-size:30px;color:#1d4ed8;margin-top:0;border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:23px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:15px;padding:17px}
+.good{background:#ecfdf5;border-color:#86efac}
+.warn{background:#fffbeb;border-color:#facc15}
+textarea{width:100%;height:150px;padding:13px;border:2px solid #93c5fd;border-radius:12px;font:17px Consolas,monospace}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0;align-items:center}
+button{font-size:17px;font-weight:800;padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;cursor:pointer}
+button.green{background:#0f766e}
+button.orange{background:#b45309}
+button.gray{background:#64748b}
+select,input[type=range]{font-size:17px;padding:8px}
+.answer{font-size:38px;font-weight:900;color:#dc2626;text-align:center}
+pre{background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;font-size:16px;line-height:1.65;font-family:Consolas,"Courier New",monospace;white-space:pre}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th,td{border:1px solid #bfdbfe;padding:8px;text-align:center}
+th{background:#dbeafe}
+.scroll{max-height:430px;overflow:auto;border:2px solid #dbeafe;border-radius:14px}
+.log{max-height:300px;overflow:auto;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:12px}
+.log div{padding:7px;border-bottom:1px solid #e2e8f0}
+.step-card{background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:15px;margin:12px 0}
+.formula{font-size:24px;font-weight:900;text-align:center;background:#fef3c7;border:2px solid #f59e0b;border-radius:13px;padding:13px}
+.array{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.cell{min-width:54px;padding:12px;border:2px solid #64748b;border-radius:10px;background:#fff;text-align:center;font-weight:900}
+.cell.active{background:#fde68a;border-color:#d97706}
+.cell.left{background:#dbeafe}.cell.right{background:#dcfce7}
+.badge{display:inline-block;padding:5px 9px;border-radius:9px;font-weight:800;background:#ede9fe;border:2px solid #8b5cf6}
+.bar-area{display:flex;align-items:flex-end;gap:8px;height:250px;padding:20px;border:2px solid #cbd5e1;border-radius:14px;background:#f8fafc;overflow-x:auto}
+.bar{min-width:54px;background:#93c5fd;border:2px solid #2563eb;border-radius:8px 8px 0 0;text-align:center;font-weight:800;padding-top:6px}
+.small{font-size:15px;color:#475569}
+@media(max-width:900px){.grid{grid-template-columns:1fr}header h1{font-size:29px}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4604 버블버블</h1>
+<p>역전쌍 + 펜윅 트리 + 최소 누적합 시각화</p>
+</header>
+
+<main>
+<section>
+<h2>1. 핵심 공식</h2>
+<div class="grid">
+<div class="box good">
+<h3>버블 정렬 교환 횟수</h3>
+<p>버블 정렬의 인접 교환 횟수는 배열의 역전쌍 개수와 같습니다.</p>
+</div>
+<div class="box warn">
+<h3>i번째 값을 바꿀 때</h3>
+<p>기존 전체 역전쌍에서 i가 포함된 역전쌍을 빼고, 새 값이 만드는 최소 역전쌍을 더합니다.</p>
+</div>
+</div>
+<div class="formula">answer[i] = totalInv - leftGreater[i] - rightLess[i] + bestNewCost[i]</div>
+</section>
+
+<section>
+<h2>2. 직접 입력하고 계산하기</h2>
+<textarea id="inputData">5
+6 6 8 5 8</textarea>
+<div class="controls">
+<button onclick="solveAll()">전체 계산</button>
+<button class="green" onclick="loadExample(1)">예제 1</button>
+<button class="green" onclick="loadExample(2)">예제 2</button>
+<button class="gray" onclick="resetView()">초기화</button>
+</div>
+
+<div class="grid">
+<div>
+<h3>배열</h3>
+<div id="arrayView" class="array"></div>
+<h3>변경할 위치</h3>
+<input id="indexSlider" type="range" min="1" max="5" value="1" oninput="changeIndex()">
+<div id="indexText" class="box"></div>
+<h3>값별 비용 변화</h3>
+<div id="barArea" class="bar-area"></div>
+</div>
+<div>
+<h3>현재 위치의 계산</h3>
+<div id="statusBox" class="box warn"><div class="answer">준비</div></div>
+<h3>진행 로그</h3>
+<div id="log" class="log"></div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>3. 위치별 결과</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th>i</th><th>Ai</th><th>leftGreater</th><th>rightLess</th><th>기존 관련 역전쌍</th><th>bestNewCost</th><th>정답</th>
+</tr>
+</thead>
+<tbody id="resultBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>4. 값별 이벤트 상세</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr><th>값</th><th>왼쪽 개수 L</th><th>오른쪽 개수 R</th><th>x=value 비용</th><th>x>value 비용</th></tr>
+</thead>
+<tbody id="eventBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>5. 코드 작성 단계</h2>
+<div class="step-card"><h3>1단계. 좌표 압축</h3><pre>배열을 복사하고 정렬한 뒤 중복을 제거한다.
+각 Ai를 1부터 valueCount까지의 압축 번호로 바꾼다.</pre></div>
+
+<div class="step-card"><h3>2단계. leftGreater 계산</h3><pre>leftGreater[i]
+= (i - 1)
+- 왼쪽에서 Ai 이하인 원소 수</pre></div>
+
+<div class="step-card"><h3>3단계. rightLess 계산</h3><pre>rightLess[i]
+= 오른쪽에서 Ai보다 작은 원소 수</pre></div>
+
+<div class="step-card"><h3>4단계. 새 값의 비용</h3><pre>cost(x)
+= 왼쪽에서 x보다 큰 원소 수
++ 오른쪽에서 x보다 작은 원소 수</pre></div>
+
+<div class="step-card"><h3>5단계. 값 v의 이벤트</h3><pre>x = v가 되면: -leftCount[v]
+x가 v보다 커지면: +rightCount[v]</pre></div>
+
+<div class="step-card"><h3>6단계. 세그먼트 트리 노드</h3><pre>sum[node]
+minimumPrefix[node]
+
+minimumPrefix[node] =
+min(
+    minimumPrefix[left],
+    sum[left] + minimumPrefix[right]
+);</pre></div>
+</section>
+
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#define MAX_N 300000
+#define SEGMENT_SIZE (MAX_N * 4 + 20)
+
+int N;
+
+int A[MAX_N + 1];
+int sortedValue[MAX_N + 1];
+int rankValue[MAX_N + 1];
+
+int fenwick[MAX_N + 1];
+
+long long leftGreater[MAX_N + 1];
+long long rightLess[MAX_N + 1];
+
+int leftCount[MAX_N + 1];
+int rightCount[MAX_N + 1];
+
+long long segmentSum[SEGMENT_SIZE];
+long long segmentMin[SEGMENT_SIZE];
+
+int compareInt(
+    const void *a,
+    const void *b
+) {
+    int valueA = *(const int *)a;
+    int valueB = *(const int *)b;
+
+    if (valueA &lt; valueB) {
+        return -1;
+    }
+
+    if (valueA &gt; valueB) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int getRank(
+    int value,
+    int valueCount
+) {
+    int left = 1;
+    int right = valueCount;
+
+    while (left &lt;= right) {
+        int middle = (left + right) / 2;
+
+        if (sortedValue[middle] == value) {
+            return middle;
+        }
+
+        if (sortedValue[middle] &lt; value) {
+            left = middle + 1;
+        } else {
+            right = middle - 1;
+        }
+    }
+
+    return -1;
+}
+
+void fenwickAdd(
+    int index,
+    int valueCount
+) {
+    while (index &lt;= valueCount) {
+        fenwick[index]++;
+        index += index &amp; -index;
+    }
+}
+
+long long fenwickSum(int index) {
+    long long result = 0;
+
+    while (index &gt; 0) {
+        result += fenwick[index];
+        index -= index &amp; -index;
+    }
+
+    return result;
+}
+
+long long minimumLongLong(
+    long long a,
+    long long b
+) {
+    return a &lt; b ? a : b;
+}
+
+void pull(int node) {
+    int leftChild = node * 2;
+    int rightChild = node * 2 + 1;
+
+    segmentSum[node] =
+        segmentSum[leftChild] +
+        segmentSum[rightChild];
+
+    segmentMin[node] =
+        minimumLongLong(
+            segmentMin[leftChild],
+            segmentSum[leftChild] +
+                segmentMin[rightChild]
+        );
+}
+
+void buildSegmentTree(
+    int node,
+    int start,
+    int end
+) {
+    if (start == end) {
+        segmentSum[node] =
+            (long long)rightCount[start] -
+            leftCount[start];
+
+        segmentMin[node] =
+            -((long long)leftCount[start]);
+
+        return;
+    }
+
+    int middle = (start + end) / 2;
+
+    buildSegmentTree(
+        node * 2,
+        start,
+        middle
+    );
+
+    buildSegmentTree(
+        node * 2 + 1,
+        middle + 1,
+        end
+    );
+
+    pull(node);
+}
+
+void updateSegmentTree(
+    int node,
+    int start,
+    int end,
+    int position
+) {
+    if (start == end) {
+        segmentSum[node] =
+            (long long)rightCount[position] -
+            leftCount[position];
+
+        segmentMin[node] =
+            -((long long)leftCount[position]);
+
+        return;
+    }
+
+    int middle = (start + end) / 2;
+
+    if (position &lt;= middle) {
+        updateSegmentTree(
+            node * 2,
+            start,
+            middle,
+            position
+        );
+    } else {
+        updateSegmentTree(
+            node * 2 + 1,
+            middle + 1,
+            end,
+            position
+        );
+    }
+
+    pull(node);
+}
+
+int main(void) {
+    scanf("%d", &amp;N);
+
+    for (int i = 1; i &lt;= N; i++) {
+        scanf("%d", &amp;A[i]);
+        sortedValue[i] = A[i];
+    }
+
+    qsort(
+        sortedValue + 1,
+        N,
+        sizeof(int),
+        compareInt
+    );
+
+    int valueCount = 0;
+
+    for (int i = 1; i &lt;= N; i++) {
+        if (
+            i == 1 ||
+            sortedValue[i] != sortedValue[i - 1]
+        ) {
+            sortedValue[++valueCount] =
+                sortedValue[i];
+        }
+    }
+
+    for (int i = 1; i &lt;= N; i++) {
+        rankValue[i] =
+            getRank(A[i], valueCount);
+    }
+
+    long long totalInversions = 0;
+
+    memset(fenwick, 0, sizeof(fenwick));
+
+    for (int i = 1; i &lt;= N; i++) {
+        long long lessOrEqual =
+            fenwickSum(rankValue[i]);
+
+        leftGreater[i] =
+            (long long)(i - 1) -
+            lessOrEqual;
+
+        totalInversions += leftGreater[i];
+
+        fenwickAdd(
+            rankValue[i],
+            valueCount
+        );
+    }
+
+    memset(fenwick, 0, sizeof(fenwick));
+
+    for (int i = N; i &gt;= 1; i--) {
+        rightLess[i] =
+            fenwickSum(rankValue[i] - 1);
+
+        fenwickAdd(
+            rankValue[i],
+            valueCount
+        );
+    }
+
+    for (int i = 2; i &lt;= N; i++) {
+        rightCount[rankValue[i]]++;
+    }
+
+    buildSegmentTree(
+        1,
+        1,
+        valueCount
+    );
+
+    long long leftSize = 0;
+
+    for (int i = 1; i &lt;= N; i++) {
+        long long bestNewCost =
+            leftSize + segmentMin[1];
+
+        long long result =
+            totalInversions
+            - leftGreater[i]
+            - rightLess[i]
+            + bestNewCost;
+
+        if (i &gt; 1) {
+            printf(" ");
+        }
+
+        printf("%lld", result);
+
+        if (i &lt; N) {
+            int currentRank =
+                rankValue[i];
+
+            leftCount[currentRank]++;
+
+            updateSegmentTree(
+                1,
+                1,
+                valueCount,
+                currentRank
+            );
+
+            int nextRank =
+                rankValue[i + 1];
+
+            rightCount[nextRank]--;
+
+            updateSegmentTree(
+                1,
+                1,
+                valueCount,
+                nextRank
+            );
+
+            leftSize++;
+        }
+    }
+
+    printf("\n");
+
+    return 0;
+}</pre>
+</section>
+</main>
+
+<script>
+let A=[],N=0,totalInv=0,leftGreater=[],rightLess=[],answers=[],bestCosts=[],unique=[];
+
+function parseInput(){
+ const t=document.getElementById("inputData").value.trim().split(/\s+/).map(Number);
+ N=t[0];A=t.slice(1,N+1);
+}
+
+function inversionData(){
+ leftGreater=Array(N).fill(0);
+ rightLess=Array(N).fill(0);
+ totalInv=0;
+ for(let i=0;i<N;i++){
+   for(let j=0;j<i;j++){
+     if(A[j]>A[i]) leftGreater[i]++;
+   }
+   totalInv+=leftGreater[i];
+ }
+ for(let i=0;i<N;i++){
+   for(let j=i+1;j<N;j++){
+     if(A[i]>A[j]) rightLess[i]++;
+   }
+ }
+}
+
+function bestCostAt(idx){
+ const left=A.slice(0,idx),right=A.slice(idx+1);
+ const vals=[...new Set(A)].sort((a,b)=>a-b);
+ let cost=left.length;
+ let best=cost;
+ const rows=[];
+ for(const v of vals){
+   const L=left.filter(x=>x===v).length;
+   const R=right.filter(x=>x===v).length;
+   cost-=L;
+   best=Math.min(best,cost);
+   const equalCost=cost;
+   cost+=R;
+   best=Math.min(best,cost);
+   rows.push({v,L,R,equalCost,afterCost:cost});
+ }
+ return {best,rows,left,right};
+}
+
+function solveAll(){
+ parseInput();
+ inversionData();
+ answers=[];bestCosts=[];
+ for(let i=0;i<N;i++){
+   const b=bestCostAt(i).best;
+   bestCosts[i]=b;
+   answers[i]=totalInv-leftGreater[i]-rightLess[i]+b;
+ }
+ document.getElementById("indexSlider").max=N;
+ document.getElementById("indexSlider").value=1;
+ renderTable();
+ changeIndex();
+ document.getElementById("log").innerHTML="";
+ addLog(`전체 역전쌍 수: ${totalInv}`);
+ addLog(`정답: ${answers.join(" ")}`);
+}
+
+function changeIndex(){
+ const idx=Number(document.getElementById("indexSlider").value)-1;
+ renderArray(idx);
+ renderIndex(idx);
+ renderEvents(idx);
+}
+
+function renderArray(idx){
+ const v=document.getElementById("arrayView");v.innerHTML="";
+ A.forEach((x,i)=>{
+   const d=document.createElement("div");
+   d.className="cell "+(i<idx?"left":i>idx?"right":"active");
+   d.textContent=`${i+1}: ${x}`;
+   v.appendChild(d);
+ });
+}
+
+function renderIndex(idx){
+ const info=bestCostAt(idx);
+ document.getElementById("indexText").innerHTML=`
+ <p>선택 위치: <span class="badge">${idx+1}</span></p>
+ <p>왼쪽 집합: ${info.left.length?info.left.join(", "):"없음"}</p>
+ <p>오른쪽 집합: ${info.right.length?info.right.join(", "):"없음"}</p>`;
+ document.getElementById("statusBox").innerHTML=`
+ <div class="answer">${answers[idx]}</div>
+ <p>전체 역전쌍: ${totalInv}</p>
+ <p>제거되는 기존 역전쌍: ${leftGreater[idx]} + ${rightLess[idx]}</p>
+ <p>새 값이 만드는 최소 역전쌍: ${bestCosts[idx]}</p>
+ <p><b>${totalInv} - ${leftGreater[idx]} - ${rightLess[idx]} + ${bestCosts[idx]} = ${answers[idx]}</b></p>`;
+}
+
+function renderEvents(idx){
+ const info=bestCostAt(idx);
+ const b=document.getElementById("eventBody");b.innerHTML="";
+ info.rows.forEach(r=>{
+   b.innerHTML+=`<tr><td>${r.v}</td><td>${r.L}</td><td>${r.R}</td><td>${r.equalCost}</td><td>${r.afterCost}</td></tr>`;
+ });
+ const area=document.getElementById("barArea");area.innerHTML="";
+ let max=Math.max(1,...info.rows.flatMap(r=>[r.equalCost,r.afterCost]));
+ info.rows.forEach(r=>{
+   const d=document.createElement("div");
+   d.className="bar";
+   d.style.height=(40+160*r.equalCost/max)+"px";
+   d.innerHTML=`${r.v}<br>${r.equalCost}`;
+   area.appendChild(d);
+ });
+}
+
+function renderTable(){
+ const b=document.getElementById("resultBody");b.innerHTML="";
+ for(let i=0;i<N;i++){
+   b.innerHTML+=`<tr onclick="selectRow(${i+1})"><td>${i+1}</td><td>${A[i]}</td><td>${leftGreater[i]}</td><td>${rightLess[i]}</td><td>${leftGreater[i]+rightLess[i]}</td><td>${bestCosts[i]}</td><td><b>${answers[i]}</b></td></tr>`;
+ }
+}
+
+function selectRow(i){
+ document.getElementById("indexSlider").value=i;
+ changeIndex();
+}
+
+function loadExample(n){
+ document.getElementById("inputData").value=n===1?`3
+3 2 1`:`5
+6 6 8 5 8`;
+ solveAll();
+}
+
+function resetView(){solveAll();}
+function addLog(t){const d=document.createElement("div");d.textContent=t;document.getElementById("log").prepend(d);}
+solveAll();
+</script>
+</body>
+</html>

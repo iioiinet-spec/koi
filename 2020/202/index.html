@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4602 등산 마니아 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f7fbff;color:#111827;font-size:18px;line-height:1.65}
+header{background:linear-gradient(135deg,#166534,#2563eb);color:#fff;text-align:center;padding:34px 18px}
+header h1{margin:0;font-size:38px}
+header p{margin:8px 0 0;font-size:21px}
+main{max-width:1280px;margin:auto;padding:24px}
+section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)}
+h2{font-size:30px;color:#1d4ed8;margin-top:0;border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:23px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:15px;padding:17px}
+.good{background:#ecfdf5;border-color:#86efac}
+.warn{background:#fffbeb;border-color:#facc15}
+textarea{width:100%;height:230px;padding:13px;border:2px solid #93c5fd;border-radius:12px;font:17px Consolas,monospace}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0;align-items:center}
+button{font-size:17px;font-weight:800;padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;cursor:pointer}
+button.green{background:#0f766e}
+button.orange{background:#b45309}
+button.gray{background:#64748b}
+.answer{font-size:38px;font-weight:900;color:#dc2626;text-align:center}
+canvas{width:100%;height:560px;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px}
+pre{background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;font-size:16px;line-height:1.65;font-family:Consolas,"Courier New",monospace;white-space:pre}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th,td{border:1px solid #bfdbfe;padding:8px;text-align:center}
+th{background:#dbeafe}
+.scroll{max-height:440px;overflow:auto;border:2px solid #dbeafe;border-radius:14px}
+.log{max-height:330px;overflow:auto;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:12px}
+.log div{padding:7px;border-bottom:1px solid #e2e8f0}
+.step-card{background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:15px;margin:12px 0}
+.formula{font-size:25px;font-weight:900;text-align:center;background:#fef3c7;border:2px solid #f59e0b;border-radius:13px;padding:13px}
+.badge{display:inline-block;padding:5px 9px;border-radius:9px;font-weight:800;background:#dbeafe;border:2px solid #60a5fa}
+.small{font-size:15px;color:#475569}
+@media(max-width:900px){.grid{grid-template-columns:1fr}header h1{font-size:29px}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4602 등산 마니아</h1>
+<p>서브트리 크기와 간선 기여도 시각화</p>
+</header>
+
+<main>
+<section>
+<h2>1. 핵심 아이디어</h2>
+<div class="grid">
+<div class="box good">
+<h3>쌍을 직접 세지 않는다</h3>
+<p>모든 오두막 쌍을 확인하면 최대 약 450억 쌍이 됩니다.</p>
+<p>대신 각 오솔길이 몇 개의 쌍에서 사용되는지 계산합니다.</p>
+</div>
+<div class="box warn">
+<h3>간선 하나의 기여도</h3>
+<p>자식 서브트리 크기를 <b>s</b>라고 하면, 두 오두막 모두 서브트리 밖에 있을 때만 그 간선을 사용하지 않습니다.</p>
+</div>
+</div>
+<div class="formula">간선 기여도 = C(N, 2) - C(N - s, 2)</div>
+</section>
+
+<section>
+<h2>2. 직접 실행하기</h2>
+<textarea id="inputData">8
+6 2
+7 5
+3 4
+5 6
+1 5
+4 1
+8 6</textarea>
+<div class="controls">
+<button onclick="solveAll()">전체 계산</button>
+<button class="green" onclick="startDFS()">DFS 단계 시작</button>
+<button class="orange" onclick="nextDFS()">DFS 한 단계</button>
+<button class="green" onclick="startSubtree()">서브트리 계산 시작</button>
+<button class="orange" onclick="nextSubtree()">서브트리 한 단계</button>
+<button class="gray" onclick="loadExample(1)">예제 1</button>
+<button class="gray" onclick="loadExample(2)">예제 2</button>
+</div>
+
+<div class="grid">
+<div>
+<h3>트리 시각화</h3>
+<canvas id="treeCanvas" width="620" height="560"></canvas>
+</div>
+<div>
+<h3>현재 상태</h3>
+<div id="statusBox" class="box warn"><div class="answer">준비</div></div>
+<h3>진행 로그</h3>
+<div id="log" class="log"></div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>3. 정점 정보</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>정점</th><th>부모</th><th>깊이</th><th>서브트리 크기</th><th>대표 간선</th></tr></thead>
+<tbody id="vertexBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>4. 간선별 기여도</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>부모-자식</th><th>s</th><th>N-s</th><th>C(N,2)</th><th>C(N-s,2)</th><th>기여도</th><th>누적 합</th></tr></thead>
+<tbody id="edgeBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>5. 코드 작성 단계 자세히</h2>
+<div class="step-card"><h3>1단계. 인접 리스트 준비</h3><pre>#define MAX_N 300000
+#define MAX_EDGE 600000
+
+typedef struct {
+    int to;
+    int next;
+} Edge;
+
+int head[MAX_N + 1];
+Edge edges[MAX_EDGE];</pre></div>
+
+<div class="step-card"><h3>2단계. 무방향 간선 저장</h3><pre>void addEdge(int from, int to) {
+    edges[edgeCount].to = to;
+    edges[edgeCount].next = head[from];
+    head[from] = edgeCount;
+    edgeCount++;
+}
+
+addEdge(a, b);
+addEdge(b, a);</pre></div>
+
+<div class="step-card"><h3>3단계. 반복 DFS로 부모와 순서 저장</h3><pre>parent[1] = 0;
+stack[top++] = 1;
+
+while (top > 0) {
+    int current = stack[--top];
+    order[orderCount++] = current;
+
+    for (
+        int e = head[current];
+        e != -1;
+        e = edges[e].next
+    ) {
+        int next = edges[e].to;
+
+        if (next == parent[current]) {
+            continue;
+        }
+
+        parent[next] = current;
+        stack[top++] = next;
+    }
+}</pre></div>
+
+<div class="step-card"><h3>4단계. 서브트리 크기 초기화</h3><pre>for (int i = 1; i <= N; i++) {
+    subtreeSize[i] = 1;
+}</pre></div>
+
+<div class="step-card"><h3>5단계. 방문 순서를 역순으로 처리</h3><pre>for (
+    int index = orderCount - 1;
+    index > 0;
+    index--
+) {
+    int current = order[index];
+    int p = parent[current];
+
+    subtreeSize[p] += subtreeSize[current];
+}</pre></div>
+
+<div class="step-card"><h3>6단계. 간선 기여도 계산</h3><pre>long long totalPairs =
+    (long long)N * (N - 1) / 2;
+
+for (int current = 2; current <= N; current++) {
+    long long s = subtreeSize[current];
+    long long outside = N - s;
+
+    long long unusedPairs =
+        outside * (outside - 1) / 2;
+
+    answer += totalPairs - unusedPairs;
+}</pre></div>
+</section>
+
+<section>
+<h2>6. 정답 C 코드</h2>
+<pre>#include &lt;stdio.h&gt;
+
+#define MAX_N 300000
+#define MAX_EDGE 600000
+
+typedef struct {
+    int to;
+    int next;
+} Edge;
+
+int head[MAX_N + 1];
+Edge edges[MAX_EDGE];
+int edgeCount;
+
+int parent[MAX_N + 1];
+int order[MAX_N];
+int stack[MAX_N];
+int subtreeSize[MAX_N + 1];
+
+void addEdge(int from, int to) {
+    edges[edgeCount].to = to;
+    edges[edgeCount].next = head[from];
+
+    head[from] = edgeCount;
+    edgeCount++;
+}
+
+int main(void) {
+    int N;
+
+    scanf("%d", &amp;N);
+
+    for (int i = 1; i &lt;= N; i++) {
+        head[i] = -1;
+    }
+
+    edgeCount = 0;
+
+    for (int i = 0; i &lt; N - 1; i++) {
+        int a;
+        int b;
+
+        scanf("%d %d", &amp;a, &amp;b);
+
+        addEdge(a, b);
+        addEdge(b, a);
+    }
+
+    int top = 0;
+    int orderCount = 0;
+
+    parent[1] = 0;
+    stack[top++] = 1;
+
+    while (top &gt; 0) {
+        int current = stack[--top];
+
+        order[orderCount++] = current;
+
+        for (
+            int edgeIndex = head[current];
+            edgeIndex != -1;
+            edgeIndex = edges[edgeIndex].next
+        ) {
+            int next = edges[edgeIndex].to;
+
+            if (next == parent[current]) {
+                continue;
+            }
+
+            parent[next] = current;
+            stack[top++] = next;
+        }
+    }
+
+    for (int i = 1; i &lt;= N; i++) {
+        subtreeSize[i] = 1;
+    }
+
+    for (
+        int index = orderCount - 1;
+        index &gt; 0;
+        index--
+    ) {
+        int current = order[index];
+        int p = parent[current];
+
+        subtreeSize[p] += subtreeSize[current];
+    }
+
+    long long totalPairs =
+        (long long)N * (N - 1) / 2;
+
+    long long answer = 0;
+
+    for (int current = 2; current &lt;= N; current++) {
+        long long s = subtreeSize[current];
+        long long outside = N - s;
+
+        long long unusedPairs =
+            outside * (outside - 1) / 2;
+
+        answer += totalPairs - unusedPairs;
+    }
+
+    printf("%lld\n", answer);
+
+    return 0;
+}</pre>
+</section>
+</main>
+
+<script>
+let N=0,adj=[],parent=[],depth=[],order=[],subtree=[],positions=[],edges=[];
+let dfsState=null,subState=null;
+
+function parseInput(){
+ const nums=document.getElementById("inputData").value.trim().split(/\s+/).map(Number);
+ let p=0;N=nums[p++];adj=Array.from({length:N+1},()=>[]);edges=[];
+ for(let i=0;i<N-1;i++){
+   const a=nums[p++],b=nums[p++];
+   adj[a].push(b);adj[b].push(a);edges.push([a,b]);
+ }
+ parent=Array(N+1).fill(-1);depth=Array(N+1).fill(0);subtree=Array(N+1).fill(1);order=[];
+ buildRootedTree();
+ layoutTree();
+}
+
+function buildRootedTree(){
+ const st=[1];parent[1]=0;
+ while(st.length){
+   const u=st.pop();order.push(u);
+   for(const v of adj[u]){
+     if(v===parent[u])continue;
+     parent[v]=u;depth[v]=depth[u]+1;st.push(v);
+   }
+ }
+ subtree.fill(1);
+ for(let i=order.length-1;i>0;i--)subtree[parent[order[i]]]+=subtree[order[i]];
+}
+
+function choose2(x){return x*(x-1)/2;}
+
+function solveAll(){
+ parseInput();
+ renderAll();
+ const total=choose2(N);let ans=0;
+ for(let u=2;u<=N;u++)ans+=total-choose2(N-subtree[u]);
+ document.getElementById("statusBox").className="box good";
+ document.getElementById("statusBox").innerHTML=`<div class="answer">${ans}</div><p>전체 쌍 C(${N},2) = ${total}</p>`;
+ document.getElementById("log").innerHTML="";
+ addLog(`계산 완료: 정답 ${ans}`);
+ drawTree();
+}
+
+function startDFS(){
+ const nums=document.getElementById("inputData").value.trim().split(/\s+/).map(Number);
+ let p=0;N=nums[p++];adj=Array.from({length:N+1},()=>[]);edges=[];
+ for(let i=0;i<N-1;i++){const a=nums[p++],b=nums[p++];adj[a].push(b);adj[b].push(a);edges.push([a,b]);}
+ parent=Array(N+1).fill(-1);depth=Array(N+1).fill(0);order=[];subtree=Array(N+1).fill(1);
+ parent[1]=0;dfsState={stack:[1],visited:new Set(),current:null};
+ layoutTree();
+ document.getElementById("log").innerHTML="";
+ addLog("루트 1에서 반복 DFS를 시작합니다.");
+ renderAll();
+}
+
+function nextDFS(){
+ if(!dfsState){startDFS();return;}
+ if(!dfsState.stack.length){addLog("DFS 완료");return;}
+ const u=dfsState.stack.pop();dfsState.current=u;dfsState.visited.add(u);order.push(u);
+ const children=[];
+ for(const v of adj[u]){
+   if(v===parent[u])continue;
+   if(parent[v]===-1){
+     parent[v]=u;depth[v]=depth[u]+1;children.push(v);
+   }
+ }
+ children.reverse().forEach(v=>dfsState.stack.push(v));
+ addLog(`${u} 방문, 자식 후보: ${children.length?children.join(", "):"없음"}`);
+ renderAll();
+ drawTree(u,dfsState.visited);
+}
+
+function startSubtree(){
+ if(!order.length||order.length!==N)parseInput();
+ subtree=Array(N+1).fill(1);
+ subState={index:order.length-1,current:null};
+ document.getElementById("log").innerHTML="";
+ addLog("모든 서브트리 크기를 1로 초기화합니다.");
+ renderAll();
+}
+
+function nextSubtree(){
+ if(!subState){startSubtree();return;}
+ if(subState.index<=0){addLog("서브트리 계산 완료");renderAll();return;}
+ const u=order[subState.index--],p=parent[u];
+ subtree[p]+=subtree[u];subState.current=u;
+ addLog(`subtree[${p}] += subtree[${u}] → ${subtree[p]}`);
+ renderAll();
+ drawTree(u,new Set(order));
+}
+
+function renderAll(){
+ renderVertexTable();renderEdgeTable();renderStatus();drawTree();
+}
+
+function renderStatus(){
+ const body=document.getElementById("statusBox");
+ body.innerHTML=`<p>N = <span class="badge">${N}</span></p>
+ <p>DFS 순서: ${order.length?order.join(" → "):"아직 없음"}</p>
+ <p>현재 스택: ${dfsState?dfsState.stack.join(", "):"-"}</p>`;
+}
+
+function renderVertexTable(){
+ const b=document.getElementById("vertexBody");b.innerHTML="";
+ for(let u=1;u<=N;u++){
+   b.innerHTML+=`<tr><td>${u}</td><td>${parent[u]>=0?parent[u]:"-"}</td><td>${depth[u]||0}</td><td>${subtree[u]||1}</td><td>${u===1?"루트":`${parent[u]}-${u}`}</td></tr>`;
+ }
+}
+
+function renderEdgeTable(){
+ const b=document.getElementById("edgeBody");b.innerHTML="";
+ if(!N)return;
+ const total=choose2(N);let sum=0;
+ for(let u=2;u<=N;u++){
+   const s=subtree[u]||1,out=N-s,unused=choose2(out),contrib=total-unused;
+   sum+=contrib;
+   b.innerHTML+=`<tr><td>${parent[u]}-${u}</td><td>${s}</td><td>${out}</td><td>${total}</td><td>${unused}</td><td>${contrib}</td><td>${sum}</td></tr>`;
+ }
+}
+
+function layoutTree(){
+ positions=Array(N+1);
+ const levels={};
+ for(let i=1;i<=N;i++){const d=depth[i]||0;(levels[d]??=[]).push(i);}
+ const maxDepth=Math.max(0,...Object.keys(levels).map(Number));
+ for(const [ds,nodes] of Object.entries(levels)){
+   const d=Number(ds);
+   nodes.forEach((u,i)=>{
+     positions[u]={x:(i+1)*620/(nodes.length+1),y:55+d*(450/Math.max(1,maxDepth))};
+   });
+ }
+}
+
+function drawTree(highlight=null,visited=new Set()){
+ const c=document.getElementById("treeCanvas"),ctx=c.getContext("2d");
+ ctx.clearRect(0,0,c.width,c.height);
+ ctx.lineWidth=3;
+ for(let u=2;u<=N;u++){
+   if(parent[u]<0||!positions[u]||!positions[parent[u]])continue;
+   const a=positions[parent[u]],b=positions[u];
+   ctx.strokeStyle=highlight===u?"#dc2626":"#94a3b8";
+   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+ }
+ for(let u=1;u<=N;u++){
+   if(!positions[u])continue;
+   const p=positions[u];
+   ctx.beginPath();ctx.arc(p.x,p.y,22,0,Math.PI*2);
+   ctx.fillStyle=u===highlight?"#fca5a5":visited.has(u)?"#86efac":u===1?"#fde68a":"#dbeafe";
+   ctx.fill();ctx.strokeStyle="#1e3a8a";ctx.lineWidth=2;ctx.stroke();
+   ctx.fillStyle="#111827";ctx.font="bold 16px Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+   ctx.fillText(u,p.x,p.y-2);
+   ctx.font="12px Arial";ctx.fillText(`s=${subtree[u]||1}`,p.x,p.y+15);
+ }
+}
+
+function addLog(t){const d=document.createElement("div");d.textContent=t;document.getElementById("log").prepend(d);}
+
+function loadExample(n){
+ const examples={
+ 1:`3
+1 2
+2 3`,
+ 2:`8
+6 2
+7 5
+3 4
+5 6
+1 5
+4 1
+8 6`
+ };
+ document.getElementById("inputData").value=examples[n];solveAll();
+}
+
+solveAll();
+</script>
+</body>
+</html>

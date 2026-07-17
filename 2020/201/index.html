@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>정올 4601 종이접기</title><style>*{box-sizing:border-box}body{margin:0;font-family:Malgun Gothic,Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.6}header{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-align:center;padding:30px}main{max-width:1200px;margin:auto;padding:22px}section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:22px;margin-bottom:22px}h2{color:#1d4ed8;border-left:8px solid #60a5fa;padding-left:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:14px;padding:16px}.controls{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}button{font-size:17px;font-weight:800;padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;cursor:pointer}button.green{background:#0f766e}button.orange{background:#b45309}button.gray{background:#64748b}textarea{width:100%;height:150px;padding:12px;border:2px solid #93c5fd;border-radius:12px;font:17px Consolas,monospace}.paper-wrap{overflow:auto;max-height:600px;border:2px solid #cbd5e1;border-radius:14px;padding:14px;background:#f8fafc}.paper{display:grid;gap:2px;justify-content:start}.cell{width:40px;height:40px;border:2px solid #64748b;display:flex;align-items:center;justify-content:center;font-weight:900}.h0{background:#fee2e2}.h1{background:#dbeafe}.h2{background:#dcfce7}.h3{background:#fef3c7}.badge{display:inline-block;padding:5px 9px;border-radius:9px;background:#ede9fe;border:2px solid #8b5cf6;font-weight:800}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bfdbfe;padding:8px;text-align:center}th{background:#dbeafe}.scroll{max-height:380px;overflow:auto;border:2px solid #dbeafe;border-radius:14px}.log{max-height:280px;overflow:auto;background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:10px}.log div{padding:6px;border-bottom:1px solid #e2e8f0}pre{background:#0f172a;color:#e5e7eb;padding:18px;border-radius:14px;overflow:auto;font-size:15px;line-height:1.6}.step{background:#f8fafc;border:2px solid #cbd5e1;border-radius:14px;padding:14px;margin:10px 0}@media(max-width:850px){.grid{grid-template-columns:1fr}.cell{width:32px;height:32px}}</style></head><body><header><h1>정올 4601 종이접기</h1><p>접은 순서의 역순으로 펼치는 과정 시각화</p></header><main><section><h2>1. 구멍 번호와 반전</h2><div class="grid"><div class="box"><div class="paper" style="grid-template-columns:repeat(2,40px)"><div class="cell h0">0</div><div class="cell h1">1</div><div class="cell h2">2</div><div class="cell h3">3</div></div></div><div class="box"><p>위아래 반전: 0↔2, 1↔3 → <b>hole ^ 2</b></p><p>좌우 반전: 0↔1, 2↔3 → <b>hole ^ 1</b></p></div></div></section><section><h2>2. 직접 실행</h2><textarea id="inputData">2
+R D D R
+3</textarea><div class="controls"><button onclick="solveAll()">전체 펼치기</button><button class="green" onclick="startSteps()">단계별 시작</button><button class="orange" onclick="nextStep()">한 단계 펼치기</button><button class="gray" onclick="resetAll()">초기화</button></div><div class="grid"><div><h3>현재 종이</h3><div class="paper-wrap"><div id="paper" class="paper"></div></div></div><div><h3>현재 정보</h3><div id="status" class="box"></div><h3>명령 순서</h3><div id="commands" class="box"></div><h3>로그</h3><div id="log" class="log"></div></div></div></section><section><h2>3. 단계별 변화</h2><div class="scroll"><table><thead><tr><th>단계</th><th>명령</th><th>크기</th><th>설명</th></tr></thead><tbody id="steps"></tbody></table></div></section><section><h2>4. 코드 작성 단계</h2><div class="step"><h3>1단계. 반전 함수</h3><pre>int flipVertical(int hole) { return hole ^ 2; }
+int flipHorizontal(int hole) { return hole ^ 1; }</pre></div><div class="step"><h3>2단계. 1×1에서 시작</h3><pre>int rows = 1;
+int cols = 1;
+paper[0][0] = h;</pre></div><div class="step"><h3>3단계. 역순으로 펼치기</h3><pre>for (int index = 2 * k - 1; index >= 0; index--) {
+    char direction = command[index];
+}</pre></div><div class="step"><h3>4단계. D/U/R/L 배치 규칙</h3><pre>D: 위쪽 반전본, 아래쪽 원본
+U: 위쪽 원본, 아래쪽 반전본
+R: 왼쪽 반전본, 오른쪽 원본
+L: 왼쪽 원본, 오른쪽 반전본</pre></div></section><section><h2>5. 정답 C 코드</h2><pre>#include &lt;stdio.h&gt;
+#define MAX_K 8
+#define MAX_SIZE 256
+char command[2 * MAX_K];
+int paper[MAX_SIZE][MAX_SIZE];
+int nextPaper[MAX_SIZE][MAX_SIZE];
+int flipVertical(int hole) { return hole ^ 2; }
+int flipHorizontal(int hole) { return hole ^ 1; }
+int main(void) {
+    int k, h;
+    scanf("%d", &amp;k);
+    for (int i = 0; i &lt; 2 * k; i++) scanf(" %c", &amp;command[i]);
+    scanf("%d", &amp;h);
+    int rows = 1, cols = 1;
+    paper[0][0] = h;
+    for (int index = 2 * k - 1; index &gt;= 0; index--) {
+        char d = command[index];
+        int nr = rows, nc = cols;
+        if (d == 'D' || d == 'U') nr *= 2; else nc *= 2;
+        if (d == 'D') {
+            for (int r=0;r&lt;rows;r++) for (int c=0;c&lt;cols;c++) {
+                nextPaper[rows-1-r][c] = flipVertical(paper[r][c]);
+                nextPaper[rows+r][c] = paper[r][c];
+            }
+        } else if (d == 'U') {
+            for (int r=0;r&lt;rows;r++) for (int c=0;c&lt;cols;c++) {
+                nextPaper[r][c] = paper[r][c];
+                nextPaper[2*rows-1-r][c] = flipVertical(paper[r][c]);
+            }
+        } else if (d == 'R') {
+            for (int r=0;r&lt;rows;r++) for (int c=0;c&lt;cols;c++) {
+                nextPaper[r][cols-1-c] = flipHorizontal(paper[r][c]);
+                nextPaper[r][cols+c] = paper[r][c];
+            }
+        } else {
+            for (int r=0;r&lt;rows;r++) for (int c=0;c&lt;cols;c++) {
+                nextPaper[r][c] = paper[r][c];
+                nextPaper[r][2*cols-1-c] = flipHorizontal(paper[r][c]);
+            }
+        }
+        for (int r=0;r&lt;nr;r++) for (int c=0;c&lt;nc;c++) paper[r][c]=nextPaper[r][c];
+        rows=nr; cols=nc;
+    }
+    for (int r=0;r&lt;rows;r++) {
+        for (int c=0;c&lt;cols;c++) printf("%d%c", paper[r][c], c==cols-1?'\n':' ');
+    }
+    return 0;
+}</pre></section></main><script>let k=0,cmd=[],hole=0,paper=[[0]],idx=-1,hist=[];function parse(){const t=document.getElementById('inputData').value.trim().split(/\s+/);let p=0;k=+t[p++];cmd=[];for(let i=0;i<2*k;i++)cmd.push(t[p++]);hole=+t[p++]}function fv(x){return x^2}function fh(x){return x^1}function unfold(a,d){const r=a.length,c=a[0].length;if(d==='D'){const n=Array.from({length:r*2},()=>Array(c));for(let i=0;i<r;i++)for(let j=0;j<c;j++){n[r-1-i][j]=fv(a[i][j]);n[r+i][j]=a[i][j]}return n}if(d==='U'){const n=Array.from({length:r*2},()=>Array(c));for(let i=0;i<r;i++)for(let j=0;j<c;j++){n[i][j]=a[i][j];n[2*r-1-i][j]=fv(a[i][j])}return n}if(d==='R'){const n=Array.from({length:r},()=>Array(c*2));for(let i=0;i<r;i++)for(let j=0;j<c;j++){n[i][c-1-j]=fh(a[i][j]);n[i][c+j]=a[i][j]}return n}const n=Array.from({length:r},()=>Array(c*2));for(let i=0;i<r;i++)for(let j=0;j<c;j++){n[i][j]=a[i][j];n[i][2*c-1-j]=fh(a[i][j])}return n}function startSteps(){parse();paper=[[hole]];idx=cmd.length-1;hist=[];document.getElementById('log').innerHTML='';render();log('1×1에서 시작')}function nextStep(){if(idx<0){log('완료');return}const d=cmd[idx];paper=unfold(paper,d);const desc={D:'위 반전본 / 아래 원본',U:'위 원본 / 아래 반전본',R:'왼쪽 반전본 / 오른쪽 원본',L:'왼쪽 원본 / 오른쪽 반전본'}[d];hist.push([hist.length+1,d,`${paper.length} × ${paper[0].length}`,desc]);idx--;render();log(`${d} 펼치기 완료`)}function solveAll(){startSteps();while(idx>=0)nextStep()}function resetAll(){startSteps()}function render(){const area=document.getElementById('paper');area.style.gridTemplateColumns=`repeat(${paper[0].length},40px)`;area.innerHTML='';paper.flat().forEach(v=>area.innerHTML+=`<div class="cell h${v}">${v}</div>`);document.getElementById('status').innerHTML=`<p>현재 크기: <b>${paper.length} × ${paper[0].length}</b></p><p>다음 명령: <span class="badge">${idx>=0?cmd[idx]:'없음'}</span></p>`;document.getElementById('commands').innerHTML=`<p>입력: ${cmd.join(' ')}</p><p>펼치기: ${[...cmd].reverse().join(' ')}</p>`;document.getElementById('steps').innerHTML=hist.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('')}function log(t){const d=document.createElement('div');d.textContent=t;document.getElementById('log').prepend(d)}resetAll();</script></body></html>
