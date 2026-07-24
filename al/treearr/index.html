@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C언어로 트리를 배열에 저장하기</title>
+<style>
+:root{
+  --pink-50:#fff7fb;
+  --pink-100:#ffeaf4;
+  --pink-200:#ffd2e7;
+  --pink-300:#ffafd2;
+  --pink-400:#f77eb2;
+  --pink-500:#e9569a;
+  --pink-600:#c9367f;
+  --pink-700:#9d285f;
+  --text:#4a2540;
+  --muted:#76556d;
+  --line:#efbdd5;
+  --white:#ffffff;
+  --good:#2d8b68;
+  --bad:#c94d61;
+  --shadow:0 12px 35px rgba(166,66,117,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%, #ffe2f0 0 180px, transparent 181px),
+    linear-gradient(180deg,#fff8fc,#fffdfd);
+  line-height:1.75;
+}
+button,input,select{font:inherit}
+a{color:inherit}
+.container{width:min(1180px,92%);margin:auto}
+header{
+  padding:54px 0 32px;
+}
+.hero{
+  background:linear-gradient(135deg,#fff,#ffeaf4);
+  border:2px solid var(--pink-200);
+  border-radius:30px;
+  box-shadow:var(--shadow);
+  padding:38px;
+  display:grid;
+  grid-template-columns:1.45fr .85fr;
+  gap:26px;
+  align-items:center;
+}
+.badge{
+  display:inline-block;
+  padding:7px 14px;
+  border-radius:999px;
+  background:var(--pink-100);
+  color:var(--pink-700);
+  font-weight:800;
+  font-size:.92rem;
+}
+h1{
+  margin:14px 0 10px;
+  font-size:clamp(2rem,5vw,3.5rem);
+  line-height:1.2;
+  color:var(--pink-700);
+}
+.hero p{font-size:1.14rem;color:var(--muted);margin:0}
+.hero-visual{
+  width:350px;
+  height:180px;
+  min-width:350px;
+  min-height:180px;
+  max-width:350px;
+  max-height:180px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.hero-tree-svg{
+  display:block;
+  width:350px;
+  height:180px;
+  flex:0 0 350px;
+}
+.hero-tree-svg line{
+  stroke:var(--pink-300);
+  stroke-width:5;
+  stroke-linecap:round;
+}
+.hero-tree-svg circle{
+  fill:url(#heroNodeGradient);
+  stroke:var(--pink-500);
+  stroke-width:4;
+  filter:drop-shadow(0 7px 8px rgba(233,86,154,.18));
+}
+.hero-tree-svg text{
+  fill:var(--pink-700);
+  font-size:20px;
+  font-weight:900;
+  text-anchor:middle;
+  dominant-baseline:middle;
+  font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+}
+
+nav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,250,253,.94);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--pink-100);
+  border-bottom:1px solid var(--pink-200);
+}
+.nav-inner{display:flex;gap:10px;overflow:auto;padding:10px 0}
+.nav-inner a{
+  white-space:nowrap;text-decoration:none;
+  padding:9px 14px;border-radius:999px;
+  background:#fff;border:1px solid var(--pink-200);
+  color:var(--pink-700);font-weight:800
+}
+.nav-inner a:hover{background:var(--pink-100)}
+section{padding:44px 0}
+.section-title{
+  display:flex;gap:14px;align-items:center;margin-bottom:22px
+}
+.section-no{
+  width:48px;height:48px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--pink-500);color:#fff;font-weight:900;font-size:1.25rem;
+  box-shadow:0 8px 18px rgba(233,86,154,.25)
+}
+h2{margin:0;font-size:clamp(1.55rem,3vw,2.25rem);color:var(--pink-700)}
+h3{color:var(--pink-700);margin-top:0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  background:#fff;border:1.5px solid var(--pink-200);
+  border-radius:24px;padding:24px;box-shadow:var(--shadow)
+}
+.info{
+  border-left:7px solid var(--pink-500);
+  background:var(--pink-50);
+  padding:18px 20px;border-radius:14px;margin:18px 0
+}
+.formula{
+  font-size:1.2rem;font-weight:900;text-align:center;
+  background:linear-gradient(135deg,#fff0f7,#fff);
+  border:2px dashed var(--pink-300);
+  border-radius:18px;padding:20px;margin:15px 0
+}
+code,kbd{
+  font-family:Consolas,"Courier New",monospace;
+}
+pre{
+  margin:0;overflow:auto;
+  background:#fff8fc;
+  border:1px solid var(--pink-200);
+  border-radius:18px;
+  padding:20px;
+  color:#53213f;
+  font-size:.98rem;
+  line-height:1.62;
+  tab-size:4;
+}
+.code-title{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;font-weight:900;color:var(--pink-700)
+}
+.copy-btn,.action-btn{
+  border:0;border-radius:12px;padding:9px 14px;
+  background:var(--pink-500);color:#fff;font-weight:800;cursor:pointer
+}
+.copy-btn:hover,.action-btn:hover{background:var(--pink-600)}
+.action-btn.secondary{background:#fff;color:var(--pink-700);border:2px solid var(--pink-300)}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.tab-btn{
+  border:2px solid var(--pink-200);background:#fff;
+  color:var(--pink-700);padding:10px 16px;border-radius:999px;
+  cursor:pointer;font-weight:900
+}
+.tab-btn.active{background:var(--pink-500);color:#fff;border-color:var(--pink-500)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.array-wrap{overflow:auto;padding-bottom:8px}
+.array-row{display:flex;gap:8px;min-width:max-content;margin:14px 0}
+.cell{
+  width:72px;height:72px;border-radius:16px;
+  border:2px solid var(--pink-300);
+  background:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-weight:900;
+  transition:.25s
+}
+.cell small{color:var(--muted);font-weight:700;font-size:.75rem}
+.cell.active{transform:translateY(-8px);background:var(--pink-500);color:#fff;box-shadow:0 10px 20px rgba(233,86,154,.28)}
+.cell.active small{color:#fff}
+.tree-stage{
+  width:700px;
+  height:360px;
+  max-width:100%;
+  display:block;
+  margin:0 auto;
+  background:linear-gradient(180deg,#fffafd,#fff);
+  border:2px solid var(--pink-100);
+  border-radius:24px;
+  overflow:hidden;
+}
+.tree-edge{
+  stroke:var(--pink-300);
+  stroke-width:6;
+  stroke-linecap:round;
+}
+.tree-node{cursor:pointer}
+.tree-node circle{
+  fill:#fff;
+  stroke:var(--pink-400);
+  stroke-width:4;
+  filter:drop-shadow(0 8px 9px rgba(205,71,135,.16));
+  transition:.25s;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.tree-node .node-value{
+  fill:var(--text);
+  font-size:22px;
+  font-weight:900;
+  text-anchor:middle;
+  dominant-baseline:middle;
+  pointer-events:none;
+}
+.tree-node .node-index{
+  fill:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  text-anchor:middle;
+  pointer-events:none;
+}
+.tree-node.active circle{
+  fill:var(--pink-500);
+  stroke:var(--pink-600);
+  transform:scale(1.1);
+}
+.tree-node.active .node-value,.tree-node.active .node-index{fill:#fff}
+.controls{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:15px
+}
+.controls label{font-weight:900;color:var(--pink-700)}
+.controls input{
+  width:90px;border:2px solid var(--pink-200);
+  border-radius:12px;padding:9px;background:#fff
+}
+.result-box{
+  margin-top:15px;padding:16px;border-radius:15px;
+  background:var(--pink-50);border:1px solid var(--pink-200);
+  min-height:62px;font-weight:800
+}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{padding:13px;border:1px solid var(--pink-200);text-align:center}
+th{background:var(--pink-100);color:var(--pink-700)}
+tr:hover td{background:#fff8fc}
+.quiz{
+  background:#fff;border:2px solid var(--pink-200);border-radius:22px;
+  padding:22px;margin:16px 0
+}
+.quiz p{font-size:1.1rem;font-weight:900}
+.option{
+  display:block;width:100%;text-align:left;margin:8px 0;
+  padding:12px 14px;border-radius:13px;border:2px solid var(--pink-100);
+  background:#fff;cursor:pointer;color:var(--text)
+}
+.option:hover{border-color:var(--pink-400);background:var(--pink-50)}
+.option.correct{background:#eafaf3;border-color:#65bd94;color:#176848}
+.option.wrong{background:#fff0f2;border-color:#e37b89;color:#9e3344}
+.feedback{font-weight:900;min-height:30px;margin-top:8px}
+.progress-shell{
+  height:16px;background:#f4d8e7;border-radius:999px;overflow:hidden;margin:12px 0
+}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--pink-400),var(--pink-600));transition:.3s}
+footer{padding:34px 0 55px;text-align:center;color:var(--muted)}
+.highlight{color:var(--pink-600);font-weight:900}
+@media(max-width:850px){
+  .hero,.grid-2,.grid-3{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .hero{padding:24px}
+  .card{padding:18px}
+  body{font-size:17px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <span class="badge">C언어 자료구조 · 인터랙티브 강의</span>
+        <h1>트리를 배열에 저장하는 방법</h1>
+        <p>완전이진트리, 일반 이진트리, 부모 배열의 차이를 그림과 코드로 차근차근 익혀봅니다.</p>
+      </div>
+      <div class="hero-visual" aria-label="트리 그림">
+        <svg class="hero-tree-svg" width="350" height="180" viewBox="0 0 350 180" role="img" aria-label="A를 루트로 하는 완전이진트리">
+          <defs>
+            <linearGradient id="heroNodeGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#ffcfe4"/>
+            </linearGradient>
+          </defs>
+          <line x1="175" y1="42" x2="100" y2="88"/>
+          <line x1="175" y1="42" x2="250" y2="88"/>
+          <line x1="100" y1="100" x2="50" y2="145"/>
+          <line x1="100" y1="100" x2="135" y2="145"/>
+          <line x1="250" y1="100" x2="215" y2="145"/>
+          <line x1="250" y1="100" x2="300" y2="145"/>
+
+          <circle cx="175" cy="30" r="24"/><text x="175" y="31">A</text>
+          <circle cx="100" cy="92" r="24"/><text x="100" y="93">B</text>
+          <circle cx="250" cy="92" r="24"/><text x="250" y="93">C</text>
+          <circle cx="50" cy="150" r="22"/><text x="50" y="151">D</text>
+          <circle cx="135" cy="150" r="22"/><text x="135" y="151">E</text>
+          <circle cx="215" cy="150" r="22"/><text x="215" y="151">F</text>
+          <circle cx="300" cy="150" r="22"/><text x="300" y="151">G</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="#concept">1. 기본 개념</a>
+    <a href="#complete">2. 완전이진트리</a>
+    <a href="#explorer">3. 인덱스 탐색기</a>
+    <a href="#general">4. 일반 이진트리</a>
+    <a href="#traversal">5. 순회</a>
+    <a href="#quiz">6. 연습문제</a>
+  </div>
+</nav>
+
+<main>
+<section id="concept">
+  <div class="container">
+    <div class="section-title"><div class="section-no">1</div><h2>트리와 배열은 무엇이 다를까요?</h2></div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>트리</h3>
+        <p>트리는 노드가 부모와 자식 관계로 연결된 자료구조입니다.</p>
+        <div class="info"><b>핵심 질문</b><br>“현재 노드의 부모와 자식이 누구인가?”를 저장해야 합니다.</div>
+      </div>
+      <div class="card">
+        <h3>배열</h3>
+        <p>배열은 데이터를 번호가 붙은 연속된 칸에 저장합니다.</p>
+        <div class="array-row">
+          <div class="cell"><small>index 1</small>A</div>
+          <div class="cell"><small>index 2</small>B</div>
+          <div class="cell"><small>index 3</small>C</div>
+          <div class="cell"><small>index 4</small>D</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:22px">
+      <h3>저장 방식은 트리 모양에 따라 달라집니다.</h3>
+      <div class="grid-3">
+        <div class="info"><b>완전이진트리</b><br>인덱스 공식 사용</div>
+        <div class="info"><b>일반 이진트리</b><br>left, right 저장</div>
+        <div class="info"><b>조상 탐색</b><br>parent 배열 사용</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="complete">
+  <div class="container">
+    <div class="section-title"><div class="section-no">2</div><h2>완전이진트리를 배열에 저장하기</h2></div>
+    <div class="card">
+      <p>루트 노드를 <span class="highlight">1번 인덱스</span>에 저장하면 부모와 자식의 위치를 계산할 수 있습니다.</p>
+      <div class="grid-3">
+        <div class="formula">부모<br><code>i / 2</code></div>
+        <div class="formula">왼쪽 자식<br><code>i * 2</code></div>
+        <div class="formula">오른쪽 자식<br><code>i * 2 + 1</code></div>
+      </div>
+      <div class="info">예를 들어 B가 2번 인덱스라면 왼쪽 자식은 4번 D, 오른쪽 자식은 5번 E입니다.</div>
+      <div class="array-wrap">
+        <div class="array-row" id="mainArray">
+          <div class="cell" data-index="1"><small>index 1</small>A</div>
+          <div class="cell" data-index="2"><small>index 2</small>B</div>
+          <div class="cell" data-index="3"><small>index 3</small>C</div>
+          <div class="cell" data-index="4"><small>index 4</small>D</div>
+          <div class="cell" data-index="5"><small>index 5</small>E</div>
+          <div class="cell" data-index="6"><small>index 6</small>F</div>
+          <div class="cell" data-index="7"><small>index 7</small>G</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <div class="code-title"><span>C언어 기본 코드</span><button class="copy-btn" onclick="copyCode('code1')">코드 복사</button></div>
+<pre id="code1"><code>#include &lt;stdio.h&gt;
+
+char tree[100];
+
+int main(void)
+{
+    tree[1] = 'A';
+    tree[2] = 'B';
+    tree[3] = 'C';
+    tree[4] = 'D';
+    tree[5] = 'E';
+    tree[6] = 'F';
+    tree[7] = 'G';
+
+    int i = 2;  // B의 인덱스
+
+    printf("현재 노드: %c\n", tree[i]);
+    printf("부모: %c\n", tree[i / 2]);
+    printf("왼쪽 자식: %c\n", tree[i * 2]);
+    printf("오른쪽 자식: %c\n", tree[i * 2 + 1]);
+
+    return 0;
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="explorer">
+  <div class="container">
+    <div class="section-title"><div class="section-no">3</div><h2>인덱스 관계 탐색기</h2></div>
+    <div class="card">
+      <p>인덱스를 입력하고 버튼을 누르면 부모와 자식 위치가 강조됩니다.</p>
+      <div class="array-wrap">
+        <svg class="tree-stage" id="treeStage" viewBox="0 0 700 360" role="img" aria-label="배열 인덱스로 저장한 완전이진트리">
+          <!-- 간선의 끝점을 노드 원의 경계에 정확히 맞춤 -->
+          <line class="tree-edge" x1="331" y1="83" x2="229" y2="142" />
+          <line class="tree-edge" x1="369" y1="83" x2="471" y2="142" />
+          <line class="tree-edge" x1="194" y1="194" x2="126" y2="256" />
+          <line class="tree-edge" x1="226" y1="194" x2="284" y2="256" />
+          <line class="tree-edge" x1="474" y1="194" x2="416" y2="256" />
+          <line class="tree-edge" x1="506" y1="194" x2="574" y2="256" />
+
+          <g class="tree-node" data-node="1">
+            <circle cx="350" cy="60" r="34" />
+            <text class="node-value" x="350" y="55">A</text>
+            <text class="node-index" x="350" y="76">1번</text>
+          </g>
+          <g class="tree-node" data-node="2">
+            <circle cx="210" cy="165" r="34" />
+            <text class="node-value" x="210" y="160">B</text>
+            <text class="node-index" x="210" y="181">2번</text>
+          </g>
+          <g class="tree-node" data-node="3">
+            <circle cx="490" cy="165" r="34" />
+            <text class="node-value" x="490" y="160">C</text>
+            <text class="node-index" x="490" y="181">3번</text>
+          </g>
+          <g class="tree-node" data-node="4">
+            <circle cx="105" cy="280" r="34" />
+            <text class="node-value" x="105" y="275">D</text>
+            <text class="node-index" x="105" y="296">4번</text>
+          </g>
+          <g class="tree-node" data-node="5">
+            <circle cx="300" cy="280" r="34" />
+            <text class="node-value" x="300" y="275">E</text>
+            <text class="node-index" x="300" y="296">5번</text>
+          </g>
+          <g class="tree-node" data-node="6">
+            <circle cx="400" cy="280" r="34" />
+            <text class="node-value" x="400" y="275">F</text>
+            <text class="node-index" x="400" y="296">6번</text>
+          </g>
+          <g class="tree-node" data-node="7">
+            <circle cx="595" cy="280" r="34" />
+            <text class="node-value" x="595" y="275">G</text>
+            <text class="node-index" x="595" y="296">7번</text>
+          </g>
+        </svg>
+      </div>
+      <div class="controls">
+        <label for="indexInput">현재 인덱스 i =</label>
+        <input id="indexInput" type="number" min="1" max="7" value="2">
+        <button class="action-btn" onclick="showRelation()">관계 확인</button>
+        <button class="action-btn secondary" onclick="resetRelation()">초기화</button>
+      </div>
+      <div class="result-box" id="relationResult">2를 입력하면 B의 부모 A, 왼쪽 자식 D, 오른쪽 자식 E를 확인할 수 있습니다.</div>
+    </div>
+  </div>
+</section>
+
+<section id="general">
+  <div class="container">
+    <div class="section-title"><div class="section-no">4</div><h2>일반 이진트리는 구조체 배열로 저장하기</h2></div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event,'waste')">단순 인덱스 방식</button>
+        <button class="tab-btn" onclick="openTab(event,'struct')">구조체 배열 방식</button>
+        <button class="tab-btn" onclick="openTab(event,'parent')">부모 배열 방식</button>
+      </div>
+      <div id="waste" class="tab-panel active">
+        <h3>빈 공간이 많아질 수 있습니다.</h3>
+        <p>A의 왼쪽으로만 노드가 이어지면 인덱스가 1, 2, 4, 8처럼 커집니다.</p>
+        <div class="array-row">
+          <div class="cell"><small>1</small>A</div>
+          <div class="cell"><small>2</small>B</div>
+          <div class="cell"><small>3</small>빈칸</div>
+          <div class="cell"><small>4</small>C</div>
+          <div class="cell"><small>5</small>빈칸</div>
+          <div class="cell"><small>6</small>빈칸</div>
+          <div class="cell"><small>7</small>빈칸</div>
+          <div class="cell"><small>8</small>D</div>
+        </div>
+      </div>
+      <div id="struct" class="tab-panel">
+        <h3>각 노드가 왼쪽·오른쪽 자식 번호를 저장합니다.</h3>
+        <div class="table-wrap">
+          <table>
+            <tr><th>노드 번호</th><th>data</th><th>left</th><th>right</th></tr>
+            <tr><td>0</td><td>A</td><td>1</td><td>2</td></tr>
+            <tr><td>1</td><td>B</td><td>3</td><td>-1</td></tr>
+            <tr><td>2</td><td>C</td><td>-1</td><td>-1</td></tr>
+            <tr><td>3</td><td>D</td><td>-1</td><td>-1</td></tr>
+          </table>
+        </div>
+      </div>
+      <div id="parent" class="tab-panel">
+        <h3>각 노드의 부모 번호만 저장합니다.</h3>
+        <div class="formula"><code>parent[4] = 2;</code><br>4번 노드의 부모는 2번</div>
+        <p>LCA, 조상 찾기, 깊이 계산 문제에서 자주 사용합니다.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <div class="code-title"><span>구조체 배열 C 코드</span><button class="copy-btn" onclick="copyCode('code2')">코드 복사</button></div>
+<pre id="code2"><code>#include &lt;stdio.h&gt;
+
+typedef struct
+{
+    char data;  // 노드에 저장할 값
+    int left;   // 왼쪽 자식의 배열 번호
+    int right;  // 오른쪽 자식의 배열 번호
+} Node;
+
+Node tree[100];
+
+void preorder(int now)
+{
+    if (now == -1)
+        return;
+
+    printf("%c ", tree[now].data);
+    preorder(tree[now].left);
+    preorder(tree[now].right);
+}
+
+int main(void)
+{
+    tree[0] = (Node){'A', 1, 2};
+    tree[1] = (Node){'B', 3, -1};
+    tree[2] = (Node){'C', -1, -1};
+    tree[3] = (Node){'D', -1, -1};
+
+    preorder(0);
+
+    return 0;
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="traversal">
+  <div class="container">
+    <div class="section-title"><div class="section-no">5</div><h2>배열 트리 순회 애니메이션</h2></div>
+    <div class="card">
+      <p>전위, 중위, 후위 순회를 눌러 방문 순서를 확인하세요.</p>
+      <div class="controls">
+        <button class="action-btn" onclick="startTraversal('pre')">전위순회</button>
+        <button class="action-btn" onclick="startTraversal('in')">중위순회</button>
+        <button class="action-btn" onclick="startTraversal('post')">후위순회</button>
+        <button class="action-btn secondary" onclick="stopTraversal()">정지</button>
+      </div>
+      <div class="array-row" id="traversalArray">
+        <div class="cell" data-tindex="1"><small>1</small>A</div>
+        <div class="cell" data-tindex="2"><small>2</small>B</div>
+        <div class="cell" data-tindex="3"><small>3</small>C</div>
+        <div class="cell" data-tindex="4"><small>4</small>D</div>
+        <div class="cell" data-tindex="5"><small>5</small>E</div>
+        <div class="cell" data-tindex="6"><small>6</small>F</div>
+        <div class="cell" data-tindex="7"><small>7</small>G</div>
+      </div>
+      <div class="result-box" id="traversalResult">순회 버튼을 눌러 시작하세요.</div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <div class="container">
+    <div class="section-title"><div class="section-no">6</div><h2>연습문제</h2></div>
+    <div class="card">
+      <div>학습 진행도: <span id="scoreText">0 / 4</span></div>
+      <div class="progress-shell"><div class="progress-bar" id="progressBar"></div></div>
+
+      <div class="quiz" data-answer="2">
+        <p>1. 인덱스 5번 노드의 부모 인덱스는?</p>
+        <button class="option" onclick="answerQuiz(this,1)">1번</button>
+        <button class="option" onclick="answerQuiz(this,2)">2번</button>
+        <button class="option" onclick="answerQuiz(this,3)">3번</button>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz" data-answer="6">
+        <p>2. 인덱스 3번 노드의 왼쪽 자식 인덱스는?</p>
+        <button class="option" onclick="answerQuiz(this,5)">5번</button>
+        <button class="option" onclick="answerQuiz(this,6)">6번</button>
+        <button class="option" onclick="answerQuiz(this,7)">7번</button>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz" data-answer="-1">
+        <p>3. 구조체 배열에서 자식이 없음을 나타내기 좋은 값은?</p>
+        <button class="option" onclick="answerQuiz(this,0)">0</button>
+        <button class="option" onclick="answerQuiz(this,-1)">-1</button>
+        <button class="option" onclick="answerQuiz(this,100)">100</button>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz" data-answer="전위">
+        <p>4. 루트 → 왼쪽 → 오른쪽 순서로 방문하는 순회는?</p>
+        <button class="option" onclick="answerQuiz(this,'중위')">중위순회</button>
+        <button class="option" onclick="answerQuiz(this,'후위')">후위순회</button>
+        <button class="option" onclick="answerQuiz(this,'전위')">전위순회</button>
+        <div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <b>핵심 정리</b><br>
+    완전이진트리 → 인덱스 공식 · 일반 이진트리 → left/right 구조체 배열 · 조상 탐색 → parent 배열
+  </div>
+</footer>
+
+<script>
+function copyCode(id){
+  const text=document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("코드를 복사했습니다.");
+  });
+}
+
+function openTab(event,id){
+  document.querySelectorAll(".tab-panel").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  event.currentTarget.classList.add("active");
+}
+
+function clearNodeActive(){
+  document.querySelectorAll("[data-node]").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll("#mainArray .cell").forEach(x=>x.classList.remove("active"));
+}
+
+function showRelation(){
+  clearNodeActive();
+  const i=Number(document.getElementById("indexInput").value);
+  const names=["","A","B","C","D","E","F","G"];
+  const result=document.getElementById("relationResult");
+
+  if(i<1 || i>7){
+    result.textContent="1부터 7 사이의 인덱스를 입력하세요.";
+    return;
+  }
+
+  const targets=[i];
+  const parent=Math.floor(i/2);
+  const left=i*2;
+  const right=i*2+1;
+  if(parent>=1) targets.push(parent);
+  if(left<=7) targets.push(left);
+  if(right<=7) targets.push(right);
+
+  targets.forEach(n=>{
+    const node=document.querySelector(`[data-node="${n}"]`);
+    const cell=document.querySelector(`#mainArray [data-index="${n}"]`);
+    if(node) node.classList.add("active");
+    if(cell) cell.classList.add("active");
+  });
+
+  let text=`현재 노드: ${names[i]}(${i}번)`;
+  text+= parent>=1 ? ` · 부모: ${names[parent]}(${parent}번)` : " · 부모: 없음";
+  text+= left<=7 ? ` · 왼쪽 자식: ${names[left]}(${left}번)` : " · 왼쪽 자식: 없음";
+  text+= right<=7 ? ` · 오른쪽 자식: ${names[right]}(${right}번)` : " · 오른쪽 자식: 없음";
+  result.textContent=text;
+}
+
+function resetRelation(){
+  clearNodeActive();
+  document.getElementById("relationResult").textContent="인덱스를 입력하고 관계 확인 버튼을 누르세요.";
+}
+
+let traversalTimer=null;
+function stopTraversal(){
+  if(traversalTimer) clearInterval(traversalTimer);
+  traversalTimer=null;
+  document.querySelectorAll("[data-tindex]").forEach(x=>x.classList.remove("active"));
+}
+
+function startTraversal(type){
+  stopTraversal();
+  const orders={
+    pre:[1,2,4,5,3,6,7],
+    in:[4,2,5,1,6,3,7],
+    post:[4,5,2,6,7,3,1]
+  };
+  const names=["","A","B","C","D","E","F","G"];
+  const labels={pre:"전위순회",in:"중위순회",post:"후위순회"};
+  const order=orders[type];
+  let step=0;
+  let visited=[];
+  const result=document.getElementById("traversalResult");
+
+  traversalTimer=setInterval(()=>{
+    document.querySelectorAll("[data-tindex]").forEach(x=>x.classList.remove("active"));
+    if(step>=order.length){
+      clearInterval(traversalTimer);
+      traversalTimer=null;
+      result.textContent=`${labels[type]} 완료: ${visited.join(" → ")}`;
+      return;
+    }
+    const idx=order[step];
+    document.querySelector(`[data-tindex="${idx}"]`).classList.add("active");
+    visited.push(names[idx]);
+    result.textContent=`${labels[type]} 진행: ${visited.join(" → ")}`;
+    step++;
+  },700);
+}
+
+let solved=0;
+function answerQuiz(button,value){
+  const quiz=button.closest(".quiz");
+  if(quiz.dataset.solved==="true") return;
+
+  const raw=quiz.dataset.answer;
+  const answer=isNaN(Number(raw)) ? raw : Number(raw);
+  const feedback=quiz.querySelector(".feedback");
+  const options=quiz.querySelectorAll(".option");
+
+  if(value===answer){
+    button.classList.add("correct");
+    feedback.textContent="정답입니다!";
+    feedback.style.color="var(--good)";
+    quiz.dataset.solved="true";
+    solved++;
+    document.getElementById("scoreText").textContent=`${solved} / 4`;
+    document.getElementById("progressBar").style.width=`${solved*25}%`;
+  }else{
+    button.classList.add("wrong");
+    feedback.textContent="다시 생각해 보세요. 인덱스 공식을 확인해 보세요.";
+    feedback.style.color="var(--bad)";
+    setTimeout(()=>button.classList.remove("wrong"),700);
+  }
+}
+</script>
+</body>
+</html>
