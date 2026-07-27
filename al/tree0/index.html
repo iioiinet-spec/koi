@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>트리 알고리즘 완벽 가이드</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f7fa; 
+            color: #1a1a2e; 
+            line-height: 1.6; 
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            text-align: center; 
+            padding: 32px 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            border-radius: 16px; 
+            margin-bottom: 24px; 
+            color: white;
+        }
+        .header h1 { margin: 0 0 8px 0; font-size: 28px; font-weight: 700; }
+        .header p { margin: 0; opacity: 0.9; font-size: 15px; }
+        .tags { margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+        .progress-box {
+            background: #f0f0f5; 
+            border-radius: 12px; 
+            padding: 16px 20px; 
+            margin-bottom: 24px;
+        }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .progress-label { font-size: 13px; font-weight: 600; color: #666; }
+        .progress-text { font-size: 13px; font-weight: 700; color: #667eea; }
+        .progress-track { background: #e0e0e8; border-radius: 8px; height: 8px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 8px; transition: width 0.5s ease; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+        .tab {
+            flex: 1; min-width: 100px; padding: 12px 16px; 
+            border: 2px solid; border-radius: 12px; 
+            font-weight: 700; cursor: pointer; transition: all 0.3s; 
+            font-size: 14px; text-align: center;
+        }
+        .tab.active { color: white; }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .grade-box {
+            border-radius: 16px; 
+            padding: 24px; 
+            border-left: 5px solid;
+        }
+        .grade-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .grade-icon { font-size: 32px; }
+        .grade-title { margin: 0; font-size: 22px; }
+        .grade-sub { margin: 4px 0 0 0; font-size: 13px; }
+
+        .card {
+            background: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 16px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card h3 { margin: 0 0 12px 0; font-size: 16px; }
+        .card p { margin: 0 0 12px 0; color: #555; font-size: 14px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+
+        .formula-box {
+            background: #F5F5F5; border-radius: 8px; padding: 12px; 
+            text-align: center; font-family: monospace; font-size: 14px; 
+            color: #333; border: 1px solid #E0E0E0;
+        }
+
+        .code-block {
+            background: #1e1e2e; border-radius: 10px; padding: 16px; 
+            overflow-x: auto; position: relative;
+        }
+        .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .code-label { color: #7dd3fc; font-size: 12px; font-weight: 600; }
+        .copy-btn {
+            background: rgba(255,255,255,0.1); border: none; color: #aaa; 
+            padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); }
+        pre { margin: 0; color: #e2e8f0; font-size: 13px; line-height: 1.5; font-family: 'JetBrains Mono', 'Consolas', monospace; }
+        code { font-family: 'JetBrains Mono', 'Consolas', monospace; }
+
+        .tip-box {
+            border-radius: 10px; padding: 16px; border: 1px dashed;
+        }
+        .tip-box ul { margin: 0; padding-left: 18px; color: #555; font-size: 13px; line-height: 1.8; }
+        .tip-title { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+
+        .check-item {
+            display: flex; align-items: center; gap: 10px; 
+            padding: 12px; background: #FAFAFA; border-radius: 8px; 
+            cursor: pointer; border: 1px solid #E0E0E0; transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .check-item:hover { background: #F5F5F5; }
+        .check-item input { width: 18px; height: 18px; accent-color: #9E9E9E; }
+        .check-title { font-weight: 600; color: #424242; font-size: 14px; }
+        .check-desc { font-size: 12px; color: #888; }
+
+        .tech-card {
+            background: white; border-radius: 12px; padding: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-top: 4px solid;
+            margin-bottom: 14px;
+        }
+        .tech-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tech-num {
+            color: white; width: 28px; height: 28px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 700; font-size: 13px;
+        }
+        .tech-title { margin: 0; font-size: 16px; color: #424242; }
+        .tech-desc { margin: 0 0 10px 0; color: #666; font-size: 13px; line-height: 1.6; }
+        .tech-tag { border-radius: 6px; padding: 8px 12px; font-size: 12px; font-weight: 600; }
+
+        .nav-footer {
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-top: 24px; padding: 16px 20px; background: #f8f9fa; border-radius: 12px;
+        }
+        .nav-btn {
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; 
+            font-weight: 600; transition: all 0.2s; border: none;
+        }
+        .nav-btn-prev { border: 1px solid #ddd; background: white; color: #666; }
+        .nav-btn-prev:hover { background: #f0f0f0; }
+        .nav-btn-next { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .nav-btn-next:hover { opacity: 0.9; }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .nav-info { font-size: 13px; color: #888; font-weight: 500; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px; border: 1px solid; text-align: left; }
+
+        .bronze { background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-color: #CD7F32; }
+        .silver { background: linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%); border-color: #9E9E9E; }
+        .gold { background: linear-gradient(135deg, #FFFDE7 0%, #FFF9C4 100%); border-color: #FFD700; }
+        .platinum { background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-color: #0288D1; }
+
+        .info-pill {
+            padding: 12px; border-radius: 8px; text-align: center; border: 1px solid;
+        }
+        .pill-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .pill-value { font-weight: 700; font-size: 18px; }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .header h1 { font-size: 22px; }
+            .grade-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🌳 트리 알고리즘 완벽 가이드</h1>
+    <p>브론즈 → 플래티넘, 등급별 핵심 팁과 전략</p>
+    <div class="tags">
+      <span class="tag">배열 표현</span>
+      <span class="tag">DFS/BFS</span>
+      <span class="tag">Tree DP</span>
+      <span class="tag">LCA</span>
+      <span class="tag">HLD</span>
+    </div>
+  </div>
+
+  <div class="progress-box">
+    <div class="progress-header">
+      <span class="progress-label">학습 진행률</span>
+      <span id="progress-text" class="progress-text">0 / 4 완료</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-bar" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button onclick="switchTab('bronze')" id="tab-bronze" class="tab active" style="border-color: #CD7F32; background: #CD7F32; color: white;">
+      🥉 브론즈
+    </button>
+    <button onclick="switchTab('silver')" id="tab-silver" class="tab" style="border-color: #C0C0C0; background: white; color: #888;">
+      🥈 실버
+    </button>
+    <button onclick="switchTab('gold')" id="tab-gold" class="tab" style="border-color: #FFD700; background: white; color: #B8860B;">
+      🥇 골드
+    </button>
+    <button onclick="switchTab('platinum')" id="tab-platinum" class="tab" style="border-color: #81D4FA; background: white; color: #0288D1;">
+      💎 플래티넘
+    </button>
+  </div>
+
+  <!-- Bronze -->
+  <div id="content-bronze" class="panel active">
+    <div class="grade-box bronze">
+      <div class="grade-header">
+        <div class="grade-icon">🥉</div>
+        <div>
+          <h2 class="grade-title" style="color: #8B4513;">브론즈 트리 문제</h2>
+          <p class="grade-sub" style="color: #A0522D;">기초 개념 확립 · 배열 표현 · 3가지 순회</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #8B4513;">📐 배열로 이진 트리 표현하기</h3>
+        <p>완전 이진 트리가 아니더라도 노드 수가 적을 때는 배열만으로 쉽게 자식을 참조할 수 있습니다.</p>
+        <div class="grid-auto">
+          <div class="info-pill" style="background: #FFF8E1; border-color: #FFE082;">
+            <div class="pill-label">부모 노드 인덱스</div>
+            <div class="pill-value" style="color: #E65100;">i</div>
+          </div>
+          <div class="info-pill" style="background: #E8F5E9; border-color: #A5D6A7;">
+            <div class="pill-label">왼쪽 자식</div>
+            <div class="pill-value" style="color: #2E7D32;">2 × i</div>
+          </div>
+          <div class="info-pill" style="background: #E3F2FD; border-color: #90CAF9;">
+            <div class="pill-label">오른쪽 자식</div>
+            <div class="pill-value" style="color: #1565C0;">2 × i + 1</div>
+          </div>
+          <div class="info-pill" style="background: #F3E5F5; border-color: #CE93D8;">
+            <div class="pill-label">부모 노드</div>
+            <div class="pill-value" style="color: #6A1B9A;">i / 2</div>
+          </div>
+        </div>
+        <div class="code-block" style="margin-top: 16px;">
+          <div class="code-header">
+            <span class="code-label">C++ 예시</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 복사</button>
+          </div>
+          <pre><code>// 1차원 배열로 트리 표현 (1-based index)
+int tree[MAX];
+
+// 노드 i의 부모/자식 접근
+int parent = i / 2;
+int left_child = 2 * i;
+int right_child = 2 * i + 1;
+
+// 주의: 완전 이진 트리가 아닐 때는 
+//       유효한 인덱스 범위 체크 필요!</code></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #8B4513;">🔄 재귀 함수를 이용한 3가지 순회</h3>
+        <div class="grid-auto">
+          <div class="info-pill" style="background: #FFEBEE; border-color: #EF9A9A;">
+            <div style="font-weight: 700; color: #C62828; margin-bottom: 8px; font-size: 15px;">전위 (Preorder)</div>
+            <div style="font-size: 13px; color: #555; line-height: 1.8;">
+              <span style="background: #C62828; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Root</span> → Left → Right
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: #888;">루트를 먼저 방문</div>
+          </div>
+          <div class="info-pill" style="background: #E8F5E9; border-color: #A5D6A7;">
+            <div style="font-weight: 700; color: #2E7D32; margin-bottom: 8px; font-size: 15px;">중위 (Inorder)</div>
+            <div style="font-size: 13px; color: #555; line-height: 1.8;">
+              Left → <span style="background: #2E7D32; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Root</span> → Right
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: #888;">BST에서 정렬된 순서</div>
+          </div>
+          <div class="info-pill" style="background: #E3F2FD; border-color: #90CAF9;">
+            <div style="font-weight: 700; color: #1565C0; margin-bottom: 8px; font-size: 15px;">후위 (Postorder)</div>
+            <div style="font-size: 13px; color: #555; line-height: 1.8;">
+              Left → Right → <span style="background: #1565C0; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Root</span>
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: #888;">서브트리 크기 계산에 필수</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box" style="background: #FFF8E1; border-color: #FFB300;">
+        <div class="tip-title" style="color: #E65100;">💡 브론즈 꿀팁</div>
+        <ul>
+          <li>노드 수가 <strong>적을 때(약 1000개 이하)</strong>는 배열 표현이 가장 간단합니다</li>
+          <li>순회 방식은 <strong>문제의 "방문 시점"</strong>을 기준으로 선택하세요</li>
+          <li>전위: 복사/출력, 중위: BST 성질, 후위: 서브트리 결과 합산</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Silver -->
+  <div id="content-silver" class="panel">
+    <div class="grade-box silver">
+      <div class="grade-header">
+        <div class="grade-icon">🥈</div>
+        <div>
+          <h2 class="grade-title" style="color: #424242;">실버 트리 문제</h2>
+          <p class="grade-sub" style="color: #757575;">그래프 탐색 · 인접 리스트 · 트리 특성 활용</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #424242;">🚫 절대 쓰지 마세요: 인접 행렬</h3>
+        <div class="grid-2">
+          <div class="info-pill" style="background: #FFEBEE; border-color: #EF9A9A; opacity: 0.7;">
+            <div style="font-weight: 700; color: #C62828; margin-bottom: 6px;">❌ 인접 행렬</div>
+            <div style="font-size: 13px; color: #555;">int adj[N][N]</div>
+            <div style="font-size: 12px; color: #C62828; margin-top: 6px; font-weight: 600;">메모리 O(N²) → 초과!</div>
+          </div>
+          <div class="info-pill" style="background: #E8F5E9; border-color: #66BB6A;">
+            <div style="font-weight: 700; color: #2E7D32; margin-bottom: 6px;">✅ 인접 리스트</div>
+            <div style="font-size: 13px; color: #555;">vector&lt;int&gt; adj[N]</div>
+            <div style="font-size: 12px; color: #2E7D32; margin-top: 6px; font-weight: 600;">메모리 O(N) → 안전!</div>
+          </div>
+        </div>
+        <p style="margin-top: 12px; font-size: 13px; color: #666;">실버급 문제는 N이 10,000~100,000개입니다. 간선은 항상 N-1개이므로 인접 리스트가 필수입니다.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #424242;">🔍 DFS 패턴: 부모만 체크하면 visited 불필요</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-label">C++ 예시</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 복사</button>
+          </div>
+          <pre><code>void dfs(int current, int parent) {
+    for (int next : adj[current]) {
+        if (next != parent) {  // ⭐ 핵심: 부모만 제외
+            parent_array[next] = current;
+            dfs(next, current);
+        }
+    }
+}
+
+// BFS 버전도 동일한 원리
+void bfs(int start) {
+    queue&lt;int&gt; q;
+    q.push(start);
+    while (!q.empty()) {
+        int cur = q.front(); q.pop();
+        for (int next : adj[cur]) {
+            if (next != parent_array[cur]) {
+                parent_array[next] = cur;
+                q.push(next);
+            }
+        }
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #424242;">📋 자주 나오는 실버 유형 체크리스트</h3>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()">
+          <div>
+            <div class="check-title">트리의 부모 찾기</div>
+            <div class="check-desc">루트부터 BFS/DFS로 부모 배열 채우기</div>
+          </div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()">
+          <div>
+            <div class="check-title">트리의 지름 (기초)</div>
+            <div class="check-desc">임의 노드 A → 가장 먼 B → 가장 먼 C (DFS 2회)</div>
+          </div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()">
+          <div>
+            <div class="check-title">트리의 높이 / 깊이</div>
+            <div class="check-desc">DFS 진입 시 depth+1 전달하며 최대값 갱신</div>
+          </div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()">
+          <div>
+            <div class="check-title">서브트리 노드 개수</div>
+            <div class="check-desc">Postorder: 자식들 합 + 1 반환</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="tip-box" style="background: #ECEFF1; border-color: #78909C;">
+        <div class="tip-title" style="color: #37474F;">⚠️ 주의사항</div>
+        <ul>
+          <li><strong>편향 트리</strong>가 될 수 있으므로 Python은 <code style="background: #CFD8DC; padding: 2px 6px; border-radius: 4px;">sys.setrecursionlimit(10**6)</code> 필수</li>
+          <li>C/C++에서는 재귀 깊이가 클 때 <strong>BFS(큐)로 전환</strong>하세요</li>
+          <li>트리는 사이클이 없으므로 <strong>parent만 제외</strong>하면 visited 배열 불필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gold -->
+  <div id="content-gold" class="panel">
+    <div class="grade-box gold">
+      <div class="grade-header">
+        <div class="grade-icon">🥇</div>
+        <div>
+          <h2 class="grade-title" style="color: #B8860B;">골드 트리 문제</h2>
+          <p class="grade-sub" style="color: #DAA520;">Tree DP · LCA · 오일러 경로 · 오프라인 쿼리</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #B8860B;">🧮 Tree DP 핵심 패턴</h3>
+        <p>골드의 절반 이상은 DP와 결합됩니다. <strong>dp[node][state]</strong> 형태로 정의하고 <strong>Postorder(Bottom-up)</strong>로 계산합니다.</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-label">C++ 예시 - 트리의 독립집합</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 복사</button>
+          </div>
+          <pre><code>// dp[node][0]: 미선택, dp[node][1]: 선택
+void solve_dp(int cur, int parent) {
+    dp[cur][0] = 0;
+    dp[cur][1] = weight[cur];
+
+    for (int next : adj[cur]) {
+        if (next == parent) continue;
+        solve_dp(next, cur);  // 자식 먼저!
+
+        dp[cur][0] += max(dp[next][0], dp[next][1]);
+        dp[cur][1] += dp[next][0];  // 내가 뽑히면 자식은 X
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #B8860B;">🔝 LCA (최소 공통 조상) - 희소 배열</h3>
+        <div class="grid-2">
+          <div class="info-pill" style="background: #FFF3E0; border-color: #FFCC80;">
+            <div style="font-weight: 700; color: #E65100; font-size: 13px; margin-bottom: 6px;">❌ O(N) LCA</div>
+            <div style="font-size: 12px; color: #666;">매 쿼리마다 부모를 한 칸씩 올라가면 <strong>시간 초과</strong></div>
+          </div>
+          <div class="info-pill" style="background: #E8F5E9; border-color: #A5D6A7;">
+            <div style="font-weight: 700; color: #2E7D32; font-size: 13px; margin-bottom: 6px;">✅ O(log N) 희소 배열</div>
+            <div style="font-size: 12px; color: #666;">parent[k][node] = node의 2^k번째 부모로 <strong>점프</strong></div>
+          </div>
+        </div>
+        <div class="formula-box" style="margin-top: 12px;">
+          dist(u, v) = depth[u] + depth[v] - 2 × depth[lca(u, v)]
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #B8860B;">📊 알고리즘 선택 가이드</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr style="background: #FFF8E1;">
+                <th style="border-color: #FFE082; color: #B8860B;">문제 유형</th>
+                <th style="border-color: #FFE082; color: #B8860B;">핵심 기법</th>
+                <th style="border-color: #FFE082; color: #B8860B;">복잡도</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border-color: #EEE; color: #555;">정점 선택/미선택 최적화</td>
+                <td style="border-color: #EEE; color: #333; font-weight: 600;">Tree DP</td>
+                <td style="border-color: #EEE; color: #2E7D32; font-weight: 600;">O(N)</td>
+              </tr>
+              <tr style="background: #FAFAFA;">
+                <td style="border-color: #EEE; color: #555;">두 노드 간 경로/공통 조상</td>
+                <td style="border-color: #EEE; color: #333; font-weight: 600;">LCA + Sparse Table</td>
+                <td style="border-color: #EEE; color: #2E7D32; font-weight: 600;">O(log N)</td>
+              </tr>
+              <tr>
+                <td style="border-color: #EEE; color: #555;">서브트리 구간 합/갱신</td>
+                <td style="border-color: #EEE; color: #333; font-weight: 600;">Euler Tour + Segment Tree</td>
+                <td style="border-color: #EEE; color: #2E7D32; font-weight: 600;">O(log N)</td>
+              </tr>
+              <tr style="background: #FAFAFA;">
+                <td style="border-color: #EEE; color: #555;">트리의 최장 거리</td>
+                <td style="border-color: #EEE; color: #333; font-weight: 600;">트리의 지름 (DFS 2회)</td>
+                <td style="border-color: #EEE; color: #2E7D32; font-weight: 600;">O(N)</td>
+              </tr>
+              <tr>
+                <td style="border-color: #EEE; color: #555;">간선 파괴/동적 연결성</td>
+                <td style="border-color: #EEE; color: #333; font-weight: 600;">Offline Query + Union-Find</td>
+                <td style="border-color: #EEE; color: #2E7D32; font-weight: 600;">O(α(N))</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tip-box" style="background: #FFF8E1; border-color: #FFB300;">
+        <div class="tip-title" style="color: #E65100;">🎯 골드 핵심 전략</div>
+        <ul>
+          <li><strong>오일러 경로</strong>: in[node] ~ out[node]가 서브트리의 연속 구간 → 세그먼트 트리로 구간 처리</li>
+          <li><strong>오프라인 쿼리</strong>: 쿼리를 거꾸로(역순) 처리하면 간선 "제거"를 "추가"로 변환</li>
+          <li>트리의 지름은 <strong>임의 노드 A에서 가장 먼 B, B에서 가장 먼 C</strong>로 구성됨</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platinum -->
+  <div id="content-platinum" class="panel">
+    <div class="grade-box platinum">
+      <div class="grade-header">
+        <div class="grade-icon">💎</div>
+        <div>
+          <h2 class="grade-title" style="color: #01579B;">플래티넘 트리 문제</h2>
+          <p class="grade-sub" style="color: #0288D1;">Centroid Decomposition · HLD · Small to Large · CHT</p>
+        </div>
+      </div>
+
+      <div class="tech-card" style="border-color: #7E57C2;">
+        <div class="tech-header">
+          <div class="tech-num" style="background: #7E57C2;">1</div>
+          <h4 class="tech-title">Centroid Decomposition (점분할)</h4>
+        </div>
+        <p class="tech-desc">"모든 정점 쌍의 경로"를 O(N²)에서 <strong>O(N log N)</strong>으로 줄이는 분할 정복. 센트로이드를 찾아 해당 정점을 지나는 경로를 계산 후 재귀 분할.</p>
+        <div class="tech-tag" style="background: #F3E5F5; color: #6A1B9A;">💡 적용: 정점 간 거리가 K 이하인 쌍의 개수, 경로 조건 카운팅</div>
+      </div>
+
+      <div class="tech-card" style="border-color: #EF5350;">
+        <div class="tech-header">
+          <div class="tech-num" style="background: #EF5350;">2</div>
+          <h4 class="tech-title">Heavy-Light Decomposition (HLD)</h4>
+        </div>
+        <p class="tech-desc">Heavy Edge와 Light Edge로 분할하여 트리 경로를 최대 <strong>O(log N)</strong>개의 연속 구간으로 변환. 세그먼트 트리와 결합하여 경로 쿼리를 <strong>O(log² N)</strong>에 처리.</p>
+        <div class="tech-tag" style="background: #FFEBEE; color: #C62828;">💡 적용: 경로 상 구간 갱신/구간 합/최댓값 쿼리</div>
+      </div>
+
+      <div class="tech-card" style="border-color: #66BB6A;">
+        <div class="tech-header">
+          <div class="tech-num" style="background: #66BB6A;">3</div>
+          <h4 class="tech-title">Small to Large (dsu on tree)</h4>
+        </div>
+        <p class="tech-desc">서브트리 정보를 합칠 때 <strong>작은 쪽을 큰 쪽(Heavy)으로 옮기는</strong> 방식. O(N²)를 <strong>O(N log N)</strong>으로 단축. Map/Set 병합 시 필수 테크닉.</p>
+        <div class="tech-tag" style="background: #E8F5E9; color: #2E7D32;">💡 적용: 서브트리 내 서로 다른 색깔 개수, 집합 정보 통합</div>
+      </div>
+
+      <div class="tech-card" style="border-color: #FFA726;">
+        <div class="tech-header">
+          <div class="tech-num" style="background: #FFA726;">4</div>
+          <h4 class="tech-title">Tree DP + Convex Hull Trick (CHT)</h4>
+        </div>
+        <p class="tech-desc">점화식이 <strong>dp[i] = min(dp[j] + A[i]·B[j])</strong> 꼴일 때 1차 함수 최적화. 트리에서는 <strong>Li Chao Tree</strong>나 상태 복원(Rollback)이 필요.</p>
+        <div class="tech-tag" style="background: #FFF3E0; color: #E65100;">💡 적용: 기울기가 단조가 아닌 트리 DP 최적화</div>
+      </div>
+
+      <div class="tech-card" style="border-color: #42A5F5;">
+        <div class="tech-header">
+          <div class="tech-num" style="background: #42A5F5;">5</div>
+          <h4 class="tech-title">Parallel Binary Search + 트리</h4>
+        </div>
+        <p class="tech-desc">수만 개 쿼리의 이분 탐색을 <strong>동시에 진행</strong>. 조건이 모노톤하고 오프라인 처리 가능할 때, Fenwick/세그먼트 트리와 결합.</p>
+        <div class="tech-tag" style="background: #E3F2FD; color: #1565C0;">💡 적용: 여러 쿼리의 최댓값/최소값 이분 탐색</div>
+      </div>
+
+      <div class="tip-box" style="background: #E1F5FE; border-color: #0288D1;">
+        <div class="tip-title" style="color: #01579B;">🧠 플래티넘 마인드셋</div>
+        <ul>
+          <li>"<strong>모든 경로</strong>"를 다뤄야 한다면 → Centroid Decomposition을 먼저 떠올리자</li>
+          <li>"<strong>경로상 구간</strong>" 쿼리가 들어오면 → HLD + Segment Tree가 정답일 가능성이 높음</li>
+          <li>"<strong>서브트리 집합</strong>"을 합쳐야 하면 → Small to Large가 거의 정석</li>
+          <li>트리 DP에서 <strong>1차 함수 꼴</strong>이 보이면 → Li Chao Tree를 고려하자</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button onclick="prevTab()" id="btn-prev" class="nav-btn nav-btn-prev">← 이전 등급</button>
+    <div class="nav-info"><span id="current-grade">브론즈</span> / 4</div>
+    <button onclick="nextTab()" id="btn-next" class="nav-btn nav-btn-next">다음 등급 →</button>
+  </div>
+</div>
+
+<script>
+const grades = ['bronze', 'silver', 'gold', 'platinum'];
+const gradeNames = { bronze: '브론즈', silver: '실버', gold: '골드', platinum: '플래티넘' };
+const gradeColors = {
+  bronze: { active: '#CD7F32', text: 'white' },
+  silver: { active: '#C0C0C0', text: 'white' },
+  gold: { active: '#FFD700', text: 'white' },
+  platinum: { active: '#81D4FA', text: 'white' }
+};
+let currentIdx = 0;
+
+function switchTab(grade) {
+  currentIdx = grades.indexOf(grade);
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  document.getElementById('content-' + grade).classList.add('active');
+
+  grades.forEach(g => {
+    const btn = document.getElementById('tab-' + g);
+    if (g === grade) {
+      btn.style.background = gradeColors[g].active;
+      btn.style.color = 'white';
+      btn.style.borderColor = gradeColors[g].active;
+    } else {
+      btn.style.background = 'white';
+      btn.style.color = g === 'bronze' ? '#CD7F32' : g === 'silver' ? '#888' : g === 'gold' ? '#B8860B' : '#0288D1';
+      btn.style.borderColor = gradeColors[g].active;
+    }
+  });
+
+  document.getElementById('current-grade').textContent = gradeNames[grade];
+  updateNavButtons();
+}
+
+function nextTab() {
+  if (currentIdx < grades.length - 1) switchTab(grades[currentIdx + 1]);
+}
+function prevTab() {
+  if (currentIdx > 0) switchTab(grades[currentIdx - 1]);
+}
+
+function updateNavButtons() {
+  document.getElementById('btn-prev').disabled = currentIdx === 0;
+  document.getElementById('btn-next').disabled = currentIdx === grades.length - 1;
+}
+
+function updateProgress() {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+  const pct = (checked.length / checkboxes.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = checked.length + ' / ' + checkboxes.length + ' 완료';
+}
+
+function copyCode(btn) {
+  const pre = btn.parentElement.nextElementSibling;
+  const code = pre.innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const original = btn.innerText;
+    btn.innerText = '✅ 완료';
+    setTimeout(() => btn.innerText = original, 1500);
+  }).catch(() => {
+    const textarea = document.createElement('textarea');
+    textarea.value = code;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    const original = btn.innerText;
+    btn.innerText = '✅ 완료';
+    setTimeout(() => btn.innerText = original, 1500);
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') nextTab();
+  if (e.key === 'ArrowLeft') prevTab();
+});
+
+updateNavButtons();
+updateProgress();
+</script>
+</body>
+</html>
