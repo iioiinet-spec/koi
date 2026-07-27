@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비코 6127 주사위 탑 쌓기 - 인터랙티브 강의자료</title>
+<style>
+:root{
+  --pink:#ff5fa2;--pink2:#ffa4c8;--pink3:#ffe8f2;--deep:#9e2e60;
+  --purple:#7657ff;--green:#1f9d68;--blue:#4285f4;--yellow:#fff4bf;
+  --red:#d94e68;--ink:#3b2732;--muted:#735f69;--line:#efc4d7;
+  --bg:#fff8fb;--card:#ffffff;--shadow:0 12px 30px rgba(150,55,95,.13);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+  background:linear-gradient(180deg,#fff8fb,#fffdfd);
+  color:var(--ink);line-height:1.75;font-size:18px
+}
+header{
+  background:linear-gradient(135deg,#ff62a5,#ffa3ca 60%,#ffdbe9);
+  color:white;padding:42px 20px 34px;box-shadow:var(--shadow)
+}
+.header-inner{max-width:1180px;margin:auto}
+.badge{
+  display:inline-block;padding:7px 13px;border-radius:999px;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);
+  font-weight:900
+}
+h1{font-size:clamp(2.2rem,4vw,3.8rem);line-height:1.12;margin:14px 0 8px}
+.subtitle{max-width:900px;margin:0;font-size:1.1rem}
+nav{
+  position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(10px)
+}
+.nav-inner{max-width:1180px;margin:auto;padding:10px 16px;display:flex;gap:8px;overflow-x:auto}
+nav a{
+  flex:0 0 auto;text-decoration:none;color:var(--ink);font-weight:900;
+  padding:9px 14px;border-radius:999px
+}
+nav a:hover{background:var(--pink3);color:var(--deep)}
+main{max-width:1180px;margin:auto;padding:28px 18px 60px}
+section{
+  background:var(--card);border:1px solid var(--line);border-radius:24px;
+  padding:26px;margin:24px 0;box-shadow:var(--shadow)
+}
+h2{margin:0 0 16px;color:var(--deep);font-size:1.8rem}
+h3{margin:18px 0 10px;color:#6f355e}
+.num{
+  display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;
+  background:var(--pink);color:white;font-weight:900;margin-right:8px
+}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:850px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:18px;padding:18px;background:#fffafd}
+.note,.good,.warn,.bad{padding:16px;border-radius:14px;margin:14px 0}
+.note{background:#fff0f6;border-left:7px solid var(--pink)}
+.good{background:#edfff6;border-left:7px solid var(--green)}
+.warn{background:#fff8d8;border-left:7px solid #d6ad00}
+.bad{background:#fff0f2;border-left:7px solid var(--red)}
+.math{
+  display:inline-block;font-family:Consolas,"Courier New",monospace;font-weight:900;
+  background:#fff4f8;border:1px dashed #dca5bd;padding:8px 12px;border-radius:11px
+}
+button{
+  border:none;border-radius:13px;padding:11px 16px;font-size:1rem;font-weight:900;
+  cursor:pointer;color:white;background:var(--pink);box-shadow:0 6px 14px rgba(255,95,162,.23)
+}
+button.secondary{background:var(--purple)}
+button.green{background:var(--green)}
+button.blue{background:var(--blue)}
+button.gray{background:#746873}
+button:hover{transform:translateY(-1px)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0}
+input,textarea{
+  width:100%;border:1px solid #d8b4c4;border-radius:12px;padding:12px 13px;
+  font-size:1rem;background:white
+}
+label{font-weight:900;display:block;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid var(--line);padding:10px;text-align:center}
+th{background:#ffe8f2}
+pre{
+  background:#241a22;color:#fff8fb;border-radius:16px;padding:18px;overflow:auto;
+  line-height:1.62;font-size:.92rem
+}
+code{font-family:Consolas,"Courier New",monospace}
+details{border:1px solid var(--line);border-radius:15px;padding:13px 16px;margin:10px 0;background:#fffafd}
+summary{cursor:pointer;font-weight:900;color:#8c2d59}
+.small{font-size:.92rem;color:var(--muted)}
+.die{
+  width:64px;height:64px;border-radius:14px;border:3px solid #b66a8f;
+  background:white;display:grid;place-items:center;font-size:1.5rem;font-weight:900;
+  box-shadow:0 6px 14px rgba(113,40,77,.12)
+}
+.die.a{border-color:#ff5fa2;background:#fff1f7}
+.die.b{border-color:#7657ff;background:#f0edff}
+.die-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.tower-area{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;
+  align-items:end;margin-top:18px
+}
+.tower-card{
+  background:#fffafd;border:1px solid var(--line);border-radius:16px;padding:14px;
+  min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center
+}
+.tower{
+  display:flex;flex-direction:column-reverse;align-items:center;gap:3px;
+  min-height:150px;justify-content:flex-start
+}
+.block{
+  width:76px;height:46px;border-radius:10px;border:3px solid #b25d87;
+  display:grid;place-items:center;background:white;font-weight:900
+}
+.block.x{background:#fff0f6;border-color:#ff5fa2}
+.block.y{background:#efecff;border-color:#7657ff}
+.formula-box{
+  padding:20px;border:2px dashed #df9fbc;border-radius:18px;background:#fff9fc;
+  text-align:center;font-size:1.1rem
+}
+.quiz-item{border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.choice{display:block;padding:10px;border-radius:10px;background:#fff7fb;margin:7px 0;cursor:pointer}
+.choice input{width:auto;margin-right:8px}
+footer{text-align:center;padding:26px;background:#fff2f7;border-top:1px solid var(--line);font-weight:900;color:#8b3a61}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="badge">KOI 2026 2차대회 · 비코 6127</span>
+    <h1>주사위 탑 쌓기</h1>
+    <p class="subtitle">서로 마주 보는 면의 합이 7이라는 성질을 이용해, 최소 탑 수를 단순한 개수 계산으로 바꾸는 과정을 직접 실험하며 이해합니다.</p>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#rule">쌓기 조건</a>
+    <a href="#pair">숫자쌍</a>
+    <a href="#formula">핵심 공식</a>
+    <a href="#sim">탑 시뮬레이터</a>
+    <a href="#examples">예제</a>
+    <a href="#proof">증명</a>
+    <a href="#code">C 코드</a>
+    <a href="#quiz">확인 문제</a>
+  </div>
+</nav>
+
+<main>
+<section id="rule">
+  <h2><span class="num">1</span>두 주사위를 언제 쌓을 수 있을까요?</h2>
+  <p>주사위의 윗면이 <span class="math">x</span>라면 아랫면은 반드시 <span class="math">7-x</span>입니다.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3>아래 주사위</h3>
+      <p>윗면 숫자가 x입니다.</p>
+    </div>
+    <div class="card">
+      <h3>위 주사위</h3>
+      <p>윗면 숫자가 y이므로 아랫면은 7-y입니다.</p>
+    </div>
+  </div>
+  <p>맞닿는 두 면이 같아야 하므로:</p>
+  <div class="formula-box">
+    x = 7-y<br>
+    따라서 <strong>x+y=7</strong>
+  </div>
+  <div class="good">즉, 서로 쌓을 수 있는 윗면 숫자는 반드시 합이 7이어야 합니다.</div>
+</section>
+
+<section id="pair">
+  <h2><span class="num">2</span>가능한 숫자쌍은 세 종류뿐입니다</h2>
+  <div class="grid3">
+    <div class="card"><h3>1과 6</h3><p>1 → 6 → 1 → 6처럼 번갈아 쌓습니다.</p></div>
+    <div class="card"><h3>2와 5</h3><p>2 → 5 → 2 → 5처럼 번갈아 쌓습니다.</p></div>
+    <div class="card"><h3>3과 4</h3><p>3 → 4 → 3 → 4처럼 번갈아 쌓습니다.</p></div>
+  </div>
+  <div class="warn">1과 6으로 만든 탑에 2나 5를 넣을 수 없습니다. 따라서 세 숫자쌍은 서로 독립적으로 계산한 뒤 더하면 됩니다.</div>
+</section>
+
+<section id="formula">
+  <h2><span class="num">3</span>한 숫자쌍의 최소 탑 수</h2>
+  <p>한 쌍의 두 숫자 개수를 각각 a, b라고 합시다.</p>
+  <div class="formula-box">
+    <strong>
+      a=b=0 → 0개<br>
+      a=b&gt;0 → 1개<br>
+      a≠b → |a-b|개
+    </strong>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>개수가 같은 경우</h3>
+      <p>모두 번갈아 쌓아 하나의 긴 탑으로 만들 수 있습니다.</p>
+      <p class="math">3,3 → 탑 1개</p>
+    </div>
+    <div class="card">
+      <h3>개수가 다른 경우</h3>
+      <p>많은 쪽의 남는 주사위는 각각 다른 탑의 끝이 되어야 합니다.</p>
+      <p class="math">4,1 → |4-1|=3개</p>
+    </div>
+  </div>
+</section>
+
+<section id="sim">
+  <h2><span class="num">4</span>직접 탑을 만들어 보기</h2>
+  <p>숫자쌍과 각 개수를 입력하면 실제로 가능한 최소 탑 구성을 보여줍니다.</p>
+
+  <div class="grid3">
+    <div>
+      <label for="pairSelect">숫자쌍</label>
+      <select id="pairSelect" style="width:100%;padding:12px;border-radius:12px;border:1px solid #d8b4c4;font-size:1rem">
+        <option value="1,6">1과 6</option>
+        <option value="2,5">2와 5</option>
+        <option value="3,4" selected>3과 4</option>
+      </select>
+    </div>
+    <div>
+      <label for="countX">첫 번째 숫자 개수</label>
+      <input id="countX" type="number" min="0" max="12" value="4">
+    </div>
+    <div>
+      <label for="countY">두 번째 숫자 개수</label>
+      <input id="countY" type="number" min="0" max="12" value="1">
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="buildTowers()">최소 탑 구성</button>
+    <button class="secondary" onclick="randomExample()">무작위 예제</button>
+    <button class="gray" onclick="resetSim()">초기화</button>
+  </div>
+
+  <div id="simSummary" class="note">값을 입력하고 최소 탑 구성을 눌러 보세요.</div>
+
+  <h3>입력된 주사위</h3>
+  <div id="diceRow" class="die-row"></div>
+
+  <h3>최소 탑 구성</h3>
+  <div id="towerArea" class="tower-area"></div>
+</section>
+
+<section>
+  <h2><span class="num">5</span>전체 입력을 직접 계산하기</h2>
+  <label for="allInput">윗면 숫자들을 공백으로 입력하세요</label>
+  <textarea id="allInput" rows="3">3 3 5 4</textarea>
+  <div class="controls">
+    <button class="blue" onclick="solveAll()">전체 최소 탑 수 계산</button>
+  </div>
+  <div id="allResult" class="note">예: 3 3 5 4</div>
+  <div id="countTable"></div>
+</section>
+
+<section id="examples">
+  <h2><span class="num">6</span>예제 분석</h2>
+  <div class="grid3">
+    <div class="card">
+      <h3>예제 1</h3>
+      <p>3 3 5 4</p>
+      <p>(2,5): 0개와 1개 → 1개</p>
+      <p>(3,4): 2개와 1개 → 1개</p>
+      <strong>정답 2</strong>
+    </div>
+    <div class="card">
+      <h3>예제 2</h3>
+      <p>3 4</p>
+      <p>(3,4): 1개와 1개</p>
+      <p>번갈아 하나의 탑</p>
+      <strong>정답 1</strong>
+    </div>
+    <div class="card">
+      <h3>예제 3</h3>
+      <p>1 1 6 1 1</p>
+      <p>(1,6): 4개와 1개</p>
+      <p>|4-1|=3</p>
+      <strong>정답 3</strong>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <h2><span class="num">7</span>왜 개수 차이가 정답일까요?</h2>
+  <details open>
+    <summary>1. 한 탑에서 두 숫자의 개수 차이는 최대 1</summary>
+    <p>숫자는 반드시 x, y, x, y처럼 번갈아 나옵니다. 따라서 한 탑에서는 두 숫자의 개수 차이가 0 또는 1입니다.</p>
+  </details>
+  <details>
+    <summary>2. 전체 개수 차이가 d라면 최소 d개의 탑 필요</summary>
+    <p>한 탑이 많은 쪽의 초과분을 최대 1개만 담당할 수 있으므로, 전체 초과분이 d개라면 적어도 d개의 탑이 필요합니다.</p>
+  </details>
+  <details>
+    <summary>3. 실제로 d개의 탑으로 만들 수 있음</summary>
+    <p>적은 쪽 주사위를 많은 쪽 주사위 사이에 번갈아 배치하면, 남는 많은 쪽 주사위들이 각각 탑 하나의 시작 또는 끝이 됩니다. 따라서 정확히 d개의 탑으로 모두 사용할 수 있습니다.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="num">8</span>코드 작성 단계</h2>
+  <div class="grid2">
+    <div class="card"><h3>1단계</h3><p>count[1]부터 count[6]까지 숫자별 개수를 셉니다.</p></div>
+    <div class="card"><h3>2단계</h3><p>(1,6), (2,5), (3,4)를 각각 계산합니다.</p></div>
+    <div class="card"><h3>3단계</h3><p>둘 다 0이면 0, 같으면 1, 다르면 절댓값 차이를 더합니다.</p></div>
+    <div class="card"><h3>4단계</h3><p>세 쌍의 결과를 모두 더해 출력합니다.</p></div>
+  </div>
+  <div class="good">
+    시간 복잡도는 <span class="math">O(N)</span>, 공간 복잡도는 <span class="math">O(1)</span>입니다.
+  </div>
+</section>
+
+<section id="code">
+  <h2><span class="num">9</span>C 정답 코드</h2>
+  <details open>
+    <summary>전체 코드 펼치기 / 접기</summary>
+<pre><code>#include &lt;stdio.h&gt;
+
+long long minimum_towers(long long a, long long b)
+{
+    long long difference;
+
+    /*
+        두 숫자의 주사위가 모두 없다면
+        해당 숫자쌍의 탑은 필요 없다.
+    */
+    if (a == 0 &amp;&amp; b == 0) {
+        return 0;
+    }
+
+    /*
+        두 개수가 같고 하나 이상 있다면
+        모두 번갈아 쌓아 하나의 탑으로 만들 수 있다.
+    */
+    if (a == b) {
+        return 1;
+    }
+
+    /*
+        개수가 다르면 두 개수의 차이만큼
+        최소 탑이 필요하다.
+    */
+    difference = a - b;
+
+    if (difference &lt; 0) {
+        difference = -difference;
+    }
+
+    return difference;
+}
+
+int main(void)
+{
+    int N;
+    long long count[7] = {0};
+    long long answer = 0;
+
+    scanf("%d", &amp;N);
+
+    /*
+        각 윗면 숫자의 개수를 센다.
+    */
+    for (int i = 0; i &lt; N; i++) {
+        int value;
+
+        scanf("%d", &amp;value);
+        count[value]++;
+    }
+
+    /*
+        서로 쌓을 수 있는 세 숫자쌍을
+        각각 독립적으로 계산한다.
+    */
+    answer += minimum_towers(count[1], count[6]);
+    answer += minimum_towers(count[2], count[5]);
+    answer += minimum_towers(count[3], count[4]);
+
+    printf("%lld\n", answer);
+
+    return 0;
+}</code></pre>
+  </details>
+</section>
+
+<section id="quiz">
+  <h2><span class="num">10</span>확인 문제</h2>
+
+  <div class="quiz-item">
+    <p><strong>문제 1.</strong> 윗면이 2인 주사위 위에 올 수 있는 주사위의 윗면은?</p>
+    <label class="choice"><input type="radio" name="q1" value="1"> 5</label>
+    <label class="choice"><input type="radio" name="q1" value="0"> 4</label>
+    <div id="r1"></div>
+  </div>
+
+  <div class="quiz-item">
+    <p><strong>문제 2.</strong> 3이 5개, 4가 2개라면 최소 탑 수는?</p>
+    <label class="choice"><input type="radio" name="q2" value="1"> 3개</label>
+    <label class="choice"><input type="radio" name="q2" value="0"> 2개</label>
+    <div id="r2"></div>
+  </div>
+
+  <div class="quiz-item">
+    <p><strong>문제 3.</strong> 1과 6이 각각 4개라면 최소 탑 수는?</p>
+    <label class="choice"><input type="radio" name="q3" value="1"> 1개</label>
+    <label class="choice"><input type="radio" name="q3" value="0"> 0개</label>
+    <div id="r3"></div>
+  </div>
+
+  <button onclick="checkQuiz()">정답 확인</button>
+  <div id="quizScore" class="note">아직 채점하지 않았습니다.</div>
+</section>
+
+<section>
+  <h2><span class="num">11</span>최종 핵심 정리</h2>
+  <div class="good">
+    <p><strong>1.</strong> 서로 쌓을 수 있는 윗면 숫자의 합은 7입니다.</p>
+    <p><strong>2.</strong> 가능한 숫자쌍은 (1,6), (2,5), (3,4)입니다.</p>
+    <p><strong>3.</strong> 한 탑에서는 두 숫자가 번갈아 나옵니다.</p>
+    <p><strong>4.</strong> 개수가 다르면 개수 차이만큼 탑이 필요합니다.</p>
+    <p><strong>5.</strong> 개수가 같고 하나 이상 있으면 탑 1개입니다.</p>
+  </div>
+</section>
+</main>
+
+<footer>-세영코딩연구소- &nbsp;&nbsp;&nbsp; ph.D KIM</footer>
+
+<script>
+function pairValues(){
+  return document.getElementById("pairSelect").value.split(",").map(Number);
+}
+
+function resetSim(){
+  document.getElementById("pairSelect").value="3,4";
+  document.getElementById("countX").value=4;
+  document.getElementById("countY").value=1;
+  document.getElementById("diceRow").innerHTML="";
+  document.getElementById("towerArea").innerHTML="";
+  document.getElementById("simSummary").className="note";
+  document.getElementById("simSummary").textContent="값을 입력하고 최소 탑 구성을 눌러 보세요.";
+}
+
+function randomExample(){
+  const pairs=["1,6","2,5","3,4"];
+  document.getElementById("pairSelect").value=pairs[Math.floor(Math.random()*3)];
+  document.getElementById("countX").value=Math.floor(Math.random()*8);
+  document.getElementById("countY").value=Math.floor(Math.random()*8);
+  buildTowers();
+}
+
+function createTowerSequences(x,y,a,b){
+  const towers=[];
+
+  if(a===0 && b===0) return towers;
+
+  if(a===b){
+    const arr=[];
+    for(let i=0;i<a;i++){
+      arr.push(x);
+      arr.push(y);
+    }
+    towers.push(arr);
+    return towers;
+  }
+
+  let major=x, minor=y, majorCount=a, minorCount=b;
+  if(b>a){
+    major=y; minor=x; majorCount=b; minorCount=a;
+  }
+
+  const towerCount=majorCount-minorCount;
+
+  for(let i=0;i<towerCount;i++){
+    towers.push([major]);
+  }
+
+  let t=0;
+  for(let i=0;i<minorCount;i++){
+    towers[t].push(minor);
+    towers[t].push(major);
+    t=(t+1)%towerCount;
+  }
+
+  return towers;
+}
+
+function buildTowers(){
+  const [x,y]=pairValues();
+  const a=Math.max(0,Number(document.getElementById("countX").value)||0);
+  const b=Math.max(0,Number(document.getElementById("countY").value)||0);
+
+  const diceRow=document.getElementById("diceRow");
+  diceRow.innerHTML="";
+  for(let i=0;i<a;i++) diceRow.innerHTML+=`<div class="die a">${x}</div>`;
+  for(let i=0;i<b;i++) diceRow.innerHTML+=`<div class="die b">${y}</div>`;
+  if(a+b===0) diceRow.innerHTML="<span>주사위가 없습니다.</span>";
+
+  const towers=createTowerSequences(x,y,a,b);
+  const area=document.getElementById("towerArea");
+  area.innerHTML="";
+
+  towers.forEach((tower,idx)=>{
+    const blocks=tower.map(v=>`<div class="block ${v===x?"x":"y"}">${v}</div>`).join("");
+    area.innerHTML+=`
+      <div class="tower-card">
+        <strong>탑 ${idx+1}</strong>
+        <div class="tower">${blocks}</div>
+      </div>`;
+  });
+
+  if(towers.length===0){
+    area.innerHTML="<div class='note'>만들 탑이 없습니다.</div>";
+  }
+
+  let formula;
+  if(a===0 && b===0) formula="두 개수 모두 0이므로 0개";
+  else if(a===b) formula="개수가 같고 하나 이상이므로 1개";
+  else formula=`|${a}-${b}| = ${Math.abs(a-b)}개`;
+
+  const summary=document.getElementById("simSummary");
+  summary.className="good";
+  summary.innerHTML=`숫자 ${x}는 ${a}개, 숫자 ${y}는 ${b}개입니다.<br><strong>최소 탑 수: ${towers.length}개</strong><br>${formula}`;
+}
+
+function pairCost(a,b){
+  if(a===0 && b===0) return 0;
+  if(a===b) return 1;
+  return Math.abs(a-b);
+}
+
+function solveAll(){
+  const raw=document.getElementById("allInput").value.trim();
+  const nums=raw ? raw.split(/\s+/).map(Number) : [];
+  const count=[0,0,0,0,0,0,0];
+  let valid=true;
+
+  for(const v of nums){
+    if(!Number.isInteger(v) || v<1 || v>6){
+      valid=false;break;
+    }
+    count[v]++;
+  }
+
+  const result=document.getElementById("allResult");
+  if(!valid){
+    result.className="bad";
+    result.textContent="1부터 6까지의 정수만 입력해야 합니다.";
+    return;
+  }
+
+  const p16=pairCost(count[1],count[6]);
+  const p25=pairCost(count[2],count[5]);
+  const p34=pairCost(count[3],count[4]);
+  const ans=p16+p25+p34;
+
+  result.className="good";
+  result.innerHTML=`
+    (1,6) → ${p16}개<br>
+    (2,5) → ${p25}개<br>
+    (3,4) → ${p34}개<br>
+    <strong>전체 최소 탑 수 = ${ans}개</strong>`;
+
+  let table="<table><tr><th>숫자</th>";
+  for(let i=1;i<=6;i++) table+=`<th>${i}</th>`;
+  table+="</tr><tr><th>개수</th>";
+  for(let i=1;i<=6;i++) table+=`<td>${count[i]}</td>`;
+  table+="</tr></table>";
+  document.getElementById("countTable").innerHTML=table;
+}
+
+function checkQuiz(){
+  let score=0;
+  for(let i=1;i<=3;i++){
+    const pick=document.querySelector(`input[name=q${i}]:checked`);
+    const box=document.getElementById("r"+i);
+
+    if(!pick){
+      box.textContent="선택하지 않았습니다.";
+      box.style.color="#a86e00";
+    }else if(pick.value==="1"){
+      score++;
+      box.textContent="정답입니다.";
+      box.style.color="#168052";
+    }else{
+      box.textContent="다시 생각해 보세요.";
+      box.style.color="#c53852";
+    }
+  }
+
+  document.getElementById("quizScore").textContent=`점수: ${score} / 3`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비코 6129 수열 연산 - 인터랙티브 강의자료</title>
+<style>
+:root{
+  --pink:#ff5fa2;
+  --pink2:#ff8fbd;
+  --pink3:#ffe5f0;
+  --deep:#3b2230;
+  --purple:#7b61ff;
+  --blue:#4aa8ff;
+  --green:#2ca56f;
+  --yellow:#fff3b8;
+  --red:#d94b64;
+  --bg:#fff8fb;
+  --card:#ffffff;
+  --line:#f1c9da;
+  --muted:#6f5a64;
+  --shadow:0 12px 28px rgba(157,67,108,.13);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+  background:linear-gradient(180deg,#fff8fb 0%,#fffdfd 100%);
+  color:var(--deep);
+  line-height:1.78;
+  font-size:18px;
+}
+header{
+  background:linear-gradient(135deg,#ff6aa9,#ff9ac5 55%,#ffd3e4);
+  color:white;
+  padding:42px 20px 34px;
+  box-shadow:var(--shadow);
+}
+.header-inner{max-width:1180px;margin:auto}
+.badge{
+  display:inline-block;
+  padding:7px 13px;
+  background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.5);
+  border-radius:999px;
+  font-weight:800;
+  letter-spacing:.3px;
+}
+h1{font-size:clamp(2rem,4vw,3.6rem);margin:14px 0 8px;line-height:1.16}
+.subtitle{font-size:1.12rem;max-width:900px;margin:0}
+nav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:1180px;margin:auto;padding:10px 16px;
+  display:flex;gap:8px;overflow-x:auto;
+}
+nav a{
+  flex:0 0 auto;
+  text-decoration:none;color:var(--deep);
+  padding:9px 14px;border-radius:999px;font-weight:800;
+}
+nav a:hover{background:var(--pink3);color:#b52f68}
+main{max-width:1180px;margin:auto;padding:28px 18px 60px}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:26px;
+  margin:24px 0;
+  box-shadow:var(--shadow);
+}
+h2{font-size:1.8rem;margin:0 0 16px;color:#a72e64}
+h3{font-size:1.35rem;margin:20px 0 10px;color:#6b3760}
+.num{
+  display:inline-grid;place-items:center;
+  width:38px;height:38px;border-radius:50%;
+  background:var(--pink);color:#fff;font-weight:900;margin-right:8px;
+}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:800px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.card{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  background:#fffafd;
+}
+.note{background:#fff0f6;border-left:7px solid var(--pink);padding:16px;border-radius:14px}
+.good{background:#edfff6;border-left:7px solid var(--green);padding:16px;border-radius:14px}
+.warn{background:#fff8db;border-left:7px solid #e5b700;padding:16px;border-radius:14px}
+.bad{background:#fff0f2;border-left:7px solid var(--red);padding:16px;border-radius:14px}
+.math{
+  font-family:Consolas,"Courier New",monospace;
+  background:#fff3f8;border:1px dashed #e3a8c0;
+  padding:10px 13px;border-radius:12px;
+  display:inline-block;font-weight:800;
+}
+.seq{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding:14px;background:#fff7fb;border-radius:16px;border:1px solid var(--line);
+}
+.cell{
+  min-width:58px;height:58px;border-radius:14px;
+  display:grid;place-items:center;
+  background:white;border:2px solid #f2a8c7;font-weight:900;font-size:1.25rem;
+  position:relative;transition:.25s;
+}
+.cell small{position:absolute;bottom:-24px;font-size:.72rem;color:#7c5d6b;white-space:nowrap}
+.cell.g1{border-color:#ff5fa2;background:#ffe8f1}
+.cell.g2{border-color:#7b61ff;background:#eeeaff}
+.cell.g3{border-color:#4aa8ff;background:#eaf5ff}
+.cell.g4{border-color:#2ca56f;background:#e9fff4}
+.arrow{font-size:1.5rem;font-weight:900;color:var(--pink)}
+button{
+  border:none;border-radius:13px;padding:11px 16px;
+  font-weight:900;font-size:1rem;cursor:pointer;
+  background:var(--pink);color:#fff;
+  box-shadow:0 6px 14px rgba(255,95,162,.24);
+}
+button.secondary{background:#7b61ff}
+button.gray{background:#6f6570}
+button.green{background:var(--green)}
+button:hover{transform:translateY(-1px)}
+input,textarea{
+  width:100%;padding:12px 13px;border-radius:12px;
+  border:1px solid #d9b8c7;font-size:1rem;background:#fff;
+}
+label{font-weight:900;display:block;margin-bottom:6px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+pre{
+  background:#231923;color:#fff7fb;padding:18px;border-radius:16px;
+  overflow:auto;font-size:.94rem;line-height:1.62;border:1px solid #4d3548;
+}
+code{font-family:Consolas,"Courier New",monospace}
+details{
+  border:1px solid var(--line);border-radius:15px;padding:13px 16px;margin:10px 0;background:#fffafd
+}
+summary{cursor:pointer;font-weight:900;color:#8e2c59}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid var(--line);padding:10px;text-align:center}
+th{background:#ffe8f1}
+.progress{
+  height:12px;background:#f3d6e2;border-radius:999px;overflow:hidden;margin:12px 0
+}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--purple));transition:.3s}
+.quiz-item{border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.choice{display:block;padding:10px;border-radius:10px;margin:7px 0;background:#fff7fb;cursor:pointer}
+.choice input{width:auto;margin-right:8px}
+.result{font-weight:900;margin-top:8px}
+footer{
+  text-align:center;padding:26px;font-weight:900;font-size:1.05rem;
+  color:#8f3b63;border-top:1px solid var(--line);background:#fff2f7;
+}
+.step-box{
+  min-height:160px;padding:18px;border:2px dashed #df9fbb;border-radius:18px;background:#fff9fc
+}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.legend span{padding:6px 10px;border-radius:999px;font-size:.9rem;font-weight:800}
+.kbd{font-family:Consolas,monospace;background:#31212d;color:#fff;padding:2px 7px;border-radius:6px}
+.small{font-size:.92rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="badge">KOI 2026 중등부 4번 · 비코 6129</span>
+    <h1>수열 연산</h1>
+    <p class="subtitle">허용된 교환과 합치기만 사용하여 순열 A를 목표 수열 B로 바꾸는 방법을, 그룹 배정 관점에서 단계별로 이해하는 인터랙티브 강의자료입니다.</p>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#idea">핵심 아이디어</a>
+    <a href="#condition">필요충분조건</a>
+    <a href="#greedy">그리디</a>
+    <a href="#visual">직접 시뮬레이션</a>
+    <a href="#proof">정당성</a>
+    <a href="#code">C 코드</a>
+    <a href="#quiz">확인 문제</a>
+  </div>
+</nav>
+
+<main>
+<section id="idea">
+  <h2><span class="num">1</span>문제를 아주 쉽게 바꾸어 생각하기</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>교환 연산</h3>
+      <p>인접한 두 값이 왼쪽에서 오른쪽으로 증가할 때만 바꿀 수 있습니다.</p>
+      <div class="seq"><div class="cell">2</div><div class="arrow">↔</div><div class="cell">5</div><span>가능</span></div>
+      <p class="math">2 &lt; 5</p>
+      <div class="seq"><div class="cell">5</div><div class="arrow">↔</div><div class="cell">2</div><span>불가능</span></div>
+      <p class="math">5 &lt; 2는 거짓</p>
+    </div>
+    <div class="card">
+      <h3>합치기 연산</h3>
+      <p>두 값을 합치면 작은 값만 남습니다.</p>
+      <div class="seq"><div class="cell">8</div><div class="cell">3</div><div class="arrow">→</div><div class="cell">3</div></div>
+      <p>여러 값을 계속 합치면 결국 그 그룹의 최솟값만 남습니다.</p>
+      <div class="seq"><div class="cell">8</div><div class="cell">3</div><div class="cell">7</div><div class="cell">5</div><div class="arrow">→</div><div class="cell">3</div></div>
+    </div>
+  </div>
+  <div class="note">
+    <strong>핵심 관찰:</strong> 최종적으로 B의 각 원소 하나는 A의 여러 원소를 합친 결과입니다. 따라서 A의 각 원소를 “B의 몇 번째 원소와 합칠 것인가?”로 나누면 문제가 쉬워집니다.
+  </div>
+</section>
+
+<section id="condition">
+  <h2><span class="num">2</span>그룹 번호로 바꾸기</h2>
+  <p><span class="math">group[x] = j</span> 는 값 x가 최종적으로 <span class="math">B[j]</span>와 합쳐진다는 뜻입니다.</p>
+  <div class="grid-3">
+    <div class="card">
+      <h3>조건 A</h3>
+      <p>B에 직접 들어 있는 값은 자기 위치가 고정됩니다.</p>
+      <p class="math">group[B[j]] = j</p>
+    </div>
+    <div class="card">
+      <h3>조건 B</h3>
+      <p>x가 B[j]와 합쳐져 B[j]가 남으려면 B[j]가 더 작거나 같아야 합니다.</p>
+      <p class="math">B[j] ≤ x</p>
+    </div>
+    <div class="card">
+      <h3>조건 C</h3>
+      <p>A에서 큰 값 x가 작은 값 y보다 앞에 있으면 두 값의 상대 순서를 뒤집을 수 없습니다.</p>
+      <p class="math">x&gt;y, pos[x]&lt;pos[y] ⇒ group[x]≤group[y]</p>
+    </div>
+  </div>
+  <details open>
+    <summary>왜 큰 값이 앞에 있으면 순서를 뒤집을 수 없을까요?</summary>
+    <p>예를 들어 A 안에 8이 3보다 앞에 있다고 하겠습니다. 둘의 순서를 뒤집으려면 언젠가 인접한 상태에서 <span class="math">[8,3] → [3,8]</span> 교환이 필요합니다. 하지만 교환 조건은 왼쪽 값이 더 작아야 하므로 8과 3은 바꿀 수 없습니다.</p>
+  </details>
+</section>
+
+<section id="greedy">
+  <h2><span class="num">3</span>큰 값부터 그룹을 정하는 그리디</h2>
+  <p>값을 <span class="math">N, N-1, …, 1</span> 순서로 처리합니다.</p>
+  <div class="card">
+    <h3>현재 값 x가 들어가야 하는 최소 그룹</h3>
+    <p>x보다 큰 값 u 중에서 A에서 u가 x보다 앞에 있으면, u의 그룹은 x의 그룹보다 뒤로 갈 수 없습니다.</p>
+    <p class="math">need[x] = max(group[u])</p>
+    <p class="small">단, u &gt; x 이고 pos[u] &lt; pos[x]인 u만 고려합니다.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>x가 B에 있는 값</h3>
+      <p>그룹은 이미 고정되어 있습니다.</p>
+      <p class="math">group[x] = fixedGroup[x]</p>
+      <p>고정 그룹이 need보다 작으면 불가능합니다.</p>
+    </div>
+    <div class="card">
+      <h3>x가 B에 없는 값</h3>
+      <p>다음 두 조건을 만족하는 가장 작은 j를 선택합니다.</p>
+      <p class="math">j ≥ need[x]</p><br>
+      <p class="math">B[j] ≤ x</p>
+    </div>
+  </div>
+  <div class="good"><strong>왜 가장 작은 그룹을 선택할까요?</strong> 앞쪽 그룹을 사용할 수 있으면 먼저 사용해야 뒤에서 처리할 더 작은 값들이 선택할 수 있는 그룹을 최대한 남길 수 있습니다.</div>
+</section>
+
+<section id="visual">
+  <h2><span class="num">4</span>직접 실행하는 그룹 배정 시뮬레이터</h2>
+  <div class="grid-2">
+    <div>
+      <label for="nInput">N, M</label>
+      <input id="nInput" value="4 2">
+    </div>
+    <div>
+      <label for="aInput">수열 A</label>
+      <input id="aInput" value="1 4 2 3">
+    </div>
+  </div>
+  <div style="margin-top:12px">
+    <label for="bInput">수열 B</label>
+    <input id="bInput" value="3 1">
+  </div>
+  <div class="controls">
+    <button onclick="prepareSimulation()">입력 적용</button>
+    <button class="secondary" onclick="nextStep()">한 단계 진행</button>
+    <button class="green" onclick="runAll()">끝까지 실행</button>
+    <button class="gray" onclick="resetSim()">초기화</button>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div id="simMessage" class="note">입력 적용 버튼을 눌러 시작하세요.</div>
+  <h3>현재 A와 그룹</h3>
+  <div id="arrayView" class="seq"></div>
+  <h3>단계 설명</h3>
+  <div id="stepView" class="step-box"></div>
+  <h3>결정된 그룹 표</h3>
+  <div id="groupTable"></div>
+</section>
+
+<section>
+  <h2><span class="num">5</span>그룹끼리 모으는 실제 교환</h2>
+  <p>그룹 번호가 감소하는 인접한 두 원소를 버블 정렬처럼 바꿉니다.</p>
+  <div class="warn">
+    <strong>중요:</strong> <span class="math">group[left] &gt; group[right]</span>라면 반드시 <span class="math">left &lt; right</span>입니다. 그래서 문제에서 허용하는 교환 조건을 자동으로 만족합니다.
+  </div>
+  <div id="sortDemo" class="step-box">
+    <div class="seq">
+      <div class="cell g2">1<small>group 2</small></div>
+      <div class="cell g1">4<small>group 1</small></div>
+      <div class="cell g2">2<small>group 2</small></div>
+      <div class="cell g1">3<small>group 1</small></div>
+    </div>
+    <p>그룹 번호 순서가 2,1,2,1이므로 잘못된 인접 쌍을 바꾸면 1,1,2,2가 됩니다.</p>
+  </div>
+  <div class="controls">
+    <button onclick="animateSortDemo()">교환 과정 보기</button>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">6</span>같은 그룹 합치기</h2>
+  <p>같은 그룹 원소가 연속으로 모이면 그룹의 첫 위치에서 계속 합칩니다.</p>
+  <div class="seq">
+    <div class="cell g1">4</div>
+    <div class="cell g1">3</div>
+    <div class="arrow">→</div>
+    <div class="cell g1">3</div>
+  </div>
+  <p>그룹 1에는 B[1]=3이 포함되어 있고 모든 값이 3 이상이므로 최종값은 반드시 3입니다.</p>
+  <div class="seq">
+    <div class="cell g2">1</div>
+    <div class="cell g2">2</div>
+    <div class="arrow">→</div>
+    <div class="cell g2">1</div>
+  </div>
+</section>
+
+<section id="proof">
+  <h2><span class="num">7</span>정당성 증명</h2>
+  <details open>
+    <summary>1. 그룹 조건이 왜 필요한가?</summary>
+    <p>합치면 최솟값만 남으므로 그룹 j에 들어가는 모든 값 x는 B[j] 이상이어야 합니다. 또한 초기 A에서 큰 값이 작은 값보다 앞에 있으면 둘의 상대 순서를 뒤집을 수 없으므로 큰 값의 그룹 번호가 더 뒤가 될 수 없습니다.</p>
+  </details>
+  <details>
+    <summary>2. 그리디가 왜 안전한가?</summary>
+    <p>현재 가능한 그룹 중 가장 작은 번호를 선택하면, 어떤 가능한 해보다 그룹 번호를 더 크게 만들지 않습니다. 따라서 뒤에서 처리할 더 작은 값의 선택 가능성을 줄이지 않습니다.</p>
+  </details>
+  <details>
+    <summary>3. 그룹 정렬의 모든 교환이 왜 허용되는가?</summary>
+    <p>group[x] &gt; group[y]인 인접 쌍을 바꿀 때 x &gt; y라면 초기 순서 불변 조건에 위배됩니다. 따라서 반드시 x &lt; y이고 교환 연산이 허용됩니다.</p>
+  </details>
+  <details>
+    <summary>4. 합친 결과가 왜 정확히 B인가?</summary>
+    <p>각 그룹에는 B[j]가 반드시 포함되고, 그 외 모든 값은 B[j] 이상입니다. 따라서 그룹 전체의 최솟값은 B[j]입니다.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="num">8</span>시간 복잡도</h2>
+  <table>
+    <tr><th>단계</th><th>복잡도</th><th>설명</th></tr>
+    <tr><td>그룹 결정</td><td>O(N²)</td><td>각 값마다 더 큰 값을 검사</td></tr>
+    <tr><td>그룹별 정렬</td><td>O(N²)</td><td>버블 정렬 방식</td></tr>
+    <tr><td>합치기</td><td>O(N²)</td><td>단순 배열 이동 구현 기준</td></tr>
+    <tr><td>전체</td><td><strong>O(N²)</strong></td><td>N≤3000에서 가능</td></tr>
+  </table>
+</section>
+
+<section id="code">
+  <h2><span class="num">9</span>C 정답 코드</h2>
+  <p>아래 코드는 그룹을 결정한 뒤, 실제 교환과 합치기 연산을 생성합니다.</p>
+  <details open>
+    <summary>전체 코드 펼치기 / 접기</summary>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct {
+    int type;
+    int index;
+} Operation;
+
+int main(void)
+{
+    int N, M;
+    scanf("%d %d", &N, &M);
+
+    int *A = (int *)malloc(sizeof(int) * (N + 1));
+    int *B = (int *)malloc(sizeof(int) * (M + 1));
+    int *pos = (int *)malloc(sizeof(int) * (N + 1));
+    int *group = (int *)calloc(N + 1, sizeof(int));
+    int *fixed = (int *)calloc(N + 1, sizeof(int));
+
+    Operation *op =
+        (Operation *)malloc(sizeof(Operation) * (size_t)N * N);
+    int q = 0;
+
+    for (int i = 1; i &lt;= N; i++) {
+        scanf("%d", &A[i]);
+        pos[A[i]] = i;
+    }
+
+    for (int j = 1; j &lt;= M; j++) {
+        scanf("%d", &B[j]);
+        fixed[B[j]] = j;
+    }
+
+    /* 1. 큰 값부터 그룹 결정 */
+    for (int x = N; x &gt;= 1; x--) {
+        int need = 1;
+
+        for (int u = x + 1; u &lt;= N; u++) {
+            if (pos[u] &lt; pos[x] && group[u] &gt; need) {
+                need = group[u];
+            }
+        }
+
+        if (fixed[x] != 0) {
+            if (fixed[x] &lt; need) {
+                printf("NO\n");
+                return 0;
+            }
+            group[x] = fixed[x];
+        }
+        else {
+            int selected = 0;
+
+            for (int j = need; j &lt;= M; j++) {
+                if (B[j] &lt;= x) {
+                    selected = j;
+                    break;
+                }
+            }
+
+            if (selected == 0) {
+                printf("NO\n");
+                return 0;
+            }
+
+            group[x] = selected;
+        }
+    }
+
+    /* 2. 그룹 번호 기준 버블 정렬 */
+    for (int pass = 1; pass &lt;= N; pass++) {
+        for (int i = 1; i &lt; N; i++) {
+            if (group[A[i]] &gt; group[A[i + 1]]) {
+                int temp;
+
+                if (A[i] &gt;= A[i + 1]) {
+                    printf("NO\n");
+                    return 0;
+                }
+
+                op[q].type = 1;
+                op[q].index = i;
+                q++;
+
+                temp = A[i];
+                A[i] = A[i + 1];
+                A[i + 1] = temp;
+            }
+        }
+    }
+
+    /* 3. 같은 그룹 합치기 */
+    int len = N;
+    int start = 1;
+
+    for (int j = 1; j &lt;= M; j++) {
+        int size = 0;
+
+        for (int i = 1; i &lt;= len; i++) {
+            if (group[A[i]] == j) {
+                size++;
+            }
+        }
+
+        for (int cnt = 1; cnt &lt; size; cnt++) {
+            op[q].type = 2;
+            op[q].index = start;
+            q++;
+
+            if (A[start + 1] &lt; A[start]) {
+                A[start] = A[start + 1];
+            }
+
+            for (int i = start + 1; i &lt; len; i++) {
+                A[i] = A[i + 1];
+            }
+
+            len--;
+        }
+
+        if (A[start] != B[j]) {
+            printf("NO\n");
+            return 0;
+        }
+
+        start++;
+    }
+
+    printf("YES\n");
+    printf("%d\n", q);
+
+    for (int i = 0; i &lt; q; i++) {
+        printf("%d %d\n", op[i].type, op[i].index);
+    }
+
+    free(A);
+    free(B);
+    free(pos);
+    free(group);
+    free(fixed);
+    free(op);
+
+    return 0;
+}</code></pre>
+  </details>
+</section>
+
+<section id="quiz">
+  <h2><span class="num">10</span>확인 문제</h2>
+  <div class="quiz-item">
+    <p><strong>문제 1.</strong> [8,3]을 교환하여 [3,8]로 만들 수 있습니까?</p>
+    <label class="choice"><input type="radio" name="q1" value="0"> 가능하다</label>
+    <label class="choice"><input type="radio" name="q1" value="1"> 불가능하다</label>
+    <div id="r1" class="result"></div>
+  </div>
+  <div class="quiz-item">
+    <p><strong>문제 2.</strong> 원소 x가 그룹 j에 들어가려면 반드시 필요한 값 조건은?</p>
+    <label class="choice"><input type="radio" name="q2" value="1"> B[j] ≤ x</label>
+    <label class="choice"><input type="radio" name="q2" value="0"> B[j] &gt; x</label>
+    <div id="r2" class="result"></div>
+  </div>
+  <div class="quiz-item">
+    <p><strong>문제 3.</strong> 그룹을 어떤 값 순서로 정해야 합니까?</p>
+    <label class="choice"><input type="radio" name="q3" value="0"> 작은 값부터</label>
+    <label class="choice"><input type="radio" name="q3" value="1"> 큰 값부터</label>
+    <div id="r3" class="result"></div>
+  </div>
+  <button onclick="checkQuiz()">정답 확인</button>
+  <div id="quizScore" class="note" style="margin-top:12px">아직 채점하지 않았습니다.</div>
+</section>
+
+<section>
+  <h2><span class="num">11</span>최종 정리</h2>
+  <div class="good">
+    <p><strong>1.</strong> A의 각 값을 B의 어느 원소와 합칠지 그룹으로 정합니다.</p>
+    <p><strong>2.</strong> 그룹의 대표값 B[j]는 그룹 내 최솟값이어야 합니다.</p>
+    <p><strong>3.</strong> A에서 큰 값이 작은 값보다 앞에 있으면 그룹 순서를 뒤집을 수 없습니다.</p>
+    <p><strong>4.</strong> 큰 값부터 가장 앞의 가능한 그룹을 선택합니다.</p>
+    <p><strong>5.</strong> 그룹 번호 기준으로 버블 정렬한 후 같은 그룹을 합칩니다.</p>
+  </div>
+</section>
+</main>
+
+<footer>-세영코딩연구소- &nbsp;&nbsp;&nbsp; ph.D KIM</footer>
+
+<script>
+let sim = null;
+
+function parseNums(id){
+  return document.getElementById(id).value.trim().split(/\s+/).map(Number);
+}
+function gClass(g){ return 'g'+(((g-1)%4)+1); }
+
+function prepareSimulation(){
+  const nm = parseNums('nInput');
+  const A = parseNums('aInput');
+  const B = parseNums('bInput');
+  if(nm.length!==2){alert('N M을 입력하세요.');return;}
+  const [N,M]=nm;
+  if(A.length!==N || B.length!==M){alert('N, M과 수열 길이가 맞지 않습니다.');return;}
+  const pos=Array(N+1).fill(0), fixed=Array(N+1).fill(0), group=Array(N+1).fill(0);
+  A.forEach((v,i)=>pos[v]=i+1);
+  B.forEach((v,i)=>fixed[v]=i+1);
+  sim={N,M,A:[...A],B:[0,...B],pos,fixed,group,current:N,done:false,failed:false,logs:[]};
+  document.getElementById('simMessage').className='note';
+  document.getElementById('simMessage').textContent='준비 완료. 큰 값부터 그룹을 결정합니다.';
+  renderSim();
+}
+function resetSim(){
+  sim=null;
+  document.getElementById('arrayView').innerHTML='';
+  document.getElementById('groupTable').innerHTML='';
+  document.getElementById('stepView').innerHTML='';
+  document.getElementById('progressBar').style.width='0%';
+  document.getElementById('simMessage').className='note';
+  document.getElementById('simMessage').textContent='입력 적용 버튼을 눌러 시작하세요.';
+}
+function nextStep(){
+  if(!sim) prepareSimulation();
+  if(!sim || sim.done || sim.failed) return;
+  const x=sim.current;
+  let need=1, blockers=[];
+  for(let u=x+1;u<=sim.N;u++){
+    if(sim.pos[u]<sim.pos[x]){
+      blockers.push(u);
+      need=Math.max(need,sim.group[u]);
+    }
+  }
+  let msg=`값 ${x} 처리: `;
+  if(sim.fixed[x]){
+    const f=sim.fixed[x];
+    if(f<need){
+      sim.failed=true;
+      msg+=`B에 포함되어 그룹 ${f}로 고정되지만 need=${need}보다 작으므로 불가능합니다.`;
+    }else{
+      sim.group[x]=f;
+      msg+=`B에 포함된 값이므로 그룹 ${f}로 고정합니다.`;
+    }
+  }else{
+    let s=0;
+    for(let j=need;j<=sim.M;j++){
+      if(sim.B[j]<=x){s=j;break;}
+    }
+    if(!s){
+      sim.failed=true;
+      msg+=`need=${need} 이상이며 B[j]≤${x}인 그룹이 없어 불가능합니다.`;
+    }else{
+      sim.group[x]=s;
+      msg+=`need=${need}, 가능한 가장 작은 그룹 ${s}를 선택합니다.`;
+    }
+  }
+  msg+= blockers.length ? ` 앞쪽의 더 큰 값: ${blockers.join(', ')}` : ' 앞쪽에 더 큰 값이 없습니다.';
+  sim.logs.push(msg);
+  sim.current--;
+  if(sim.current===0 && !sim.failed) sim.done=true;
+  renderSim();
+}
+function runAll(){
+  if(!sim) prepareSimulation();
+  let guard=10000;
+  while(sim && !sim.done && !sim.failed && guard--) nextStep();
+}
+function renderSim(){
+  if(!sim) return;
+  const av=document.getElementById('arrayView');
+  av.innerHTML='';
+  sim.A.forEach(v=>{
+    const d=document.createElement('div');
+    const g=sim.group[v];
+    d.className='cell '+(g?gClass(g):'');
+    d.innerHTML=`${v}<small>${g?'group '+g:'미정'}</small>`;
+    av.appendChild(d);
+  });
+  let rows='<table><tr><th>값</th><th>A 위치</th><th>고정 그룹</th><th>결정 그룹</th></tr>';
+  for(let x=1;x<=sim.N;x++){
+    rows+=`<tr><td>${x}</td><td>${sim.pos[x]}</td><td>${sim.fixed[x]||'-'}</td><td>${sim.group[x]||'-'}</td></tr>`;
+  }
+  rows+='</table>';
+  document.getElementById('groupTable').innerHTML=rows;
+  document.getElementById('stepView').innerHTML=sim.logs.length?sim.logs.map((x,i)=>`<p><strong>${i+1}단계.</strong> ${x}</p>`).join(''):'아직 진행하지 않았습니다.';
+  const doneCount=sim.N-sim.current;
+  document.getElementById('progressBar').style.width=(doneCount/sim.N*100)+'%';
+  const m=document.getElementById('simMessage');
+  if(sim.failed){m.className='bad';m.textContent='판정 결과: NO';}
+  else if(sim.done){m.className='good';m.textContent='판정 결과: 그룹 배정 성공. 실제 교환과 합치기 연산을 만들 수 있습니다.';}
+}
+
+function animateSortDemo(){
+  const box=document.getElementById('sortDemo');
+  const states=[
+    [[1,2],[4,1],[2,2],[3,1]],
+    [[4,1],[1,2],[2,2],[3,1]],
+    [[4,1],[1,2],[3,1],[2,2]],
+    [[4,1],[3,1],[1,2],[2,2]]
+  ];
+  let k=0;
+  function draw(){
+    const s=states[k];
+    box.innerHTML='<div class="seq">'+s.map(([v,g])=>`<div class="cell ${gClass(g)}">${v}<small>group ${g}</small></div>`).join('')+'</div><p>'+(k===states.length-1?'그룹 번호가 1,1,2,2로 정렬되었습니다.':'그룹 번호가 감소하는 인접 쌍을 교환합니다.')+'</p>';
+    k++;
+    if(k<states.length) setTimeout(draw,700);
+  }
+  draw();
+}
+
+function checkQuiz(){
+  let score=0;
+  for(let i=1;i<=3;i++){
+    const pick=document.querySelector(`input[name=q${i}]:checked`);
+    const r=document.getElementById('r'+i);
+    if(!pick){r.textContent='선택하지 않았습니다.';r.style.color='#b06b00';continue;}
+    if(pick.value==='1'){score++;r.textContent='정답입니다.';r.style.color='#138454';}
+    else{r.textContent='다시 생각해 보세요.';r.style.color='#c53650';}
+  }
+  document.getElementById('quizScore').textContent=`점수: ${score} / 3`;
+}
+</script>
+</body>
+</html>
