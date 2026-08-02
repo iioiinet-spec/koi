@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>최소 신장 트리 완전 정복 — 프림 · 크루스칼 · 유니온 파인드</title>
+<style>
+:root{
+  --bg:#080e1a; --panel:#0f1a2e; --panel2:#132038; --line:#22334f;
+  --tx:#e6edf7; --mut:#8fa3c0; --dim:#5f7391;
+  --teal:#2dd4bf; --cyan:#38bdf8; --orange:#fb923c; --red:#f87171;
+  --yellow:#fbbf24; --violet:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(circle at 15% 0%,rgba(45,212,191,.09),transparent 45%),
+                   radial-gradient(circle at 85% 8%,rgba(56,189,248,.08),transparent 45%);
+  color:var(--tx);
+  font-family:'Pretendard','Malgun Gothic','맑은 고딕',system-ui,sans-serif;
+  line-height:1.75; padding-bottom:60px;
+}
+.wrap{max-width:1440px;margin:0 auto;padding:0 20px}
+code,pre,.mono{font-family:'D2Coding','Consolas','Menlo',monospace}
+
+/* ===== 헤더 ===== */
+header{padding:44px 0 26px;text-align:center;border-bottom:1px solid var(--line);margin-bottom:0}
+.eyebrow{color:var(--teal);font-size:13px;letter-spacing:3px;font-weight:700}
+h1{font-size:38px;font-weight:800;margin:10px 0 8px;letter-spacing:-1px}
+h1 .ac{background:linear-gradient(90deg,var(--teal),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);font-size:15px}
+
+/* ===== 탭 ===== */
+nav{position:sticky;top:0;z-index:60;background:rgba(8,14,26,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:34px}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tab{background:var(--panel);border:1px solid var(--line);color:var(--mut);
+     padding:9px 17px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;
+     font-family:inherit;transition:.15s}
+.tab:hover{color:var(--tx);border-color:var(--teal)}
+.tab.on{background:linear-gradient(135deg,var(--teal),var(--cyan));color:#05202a;border-color:transparent}
+.tab .n{opacity:.6;margin-right:6px;font-size:12px}
+
+section.sec{display:none;animation:fade .3s ease}
+section.sec.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+h2{font-size:26px;font-weight:800;margin:6px 0 16px;display:flex;align-items:center;gap:11px}
+h2::before{content:'';width:5px;height:26px;background:linear-gradient(var(--teal),var(--cyan));border-radius:3px}
+h3{font-size:19px;font-weight:700;margin:30px 0 12px;color:var(--cyan)}
+h4{font-size:13px;font-weight:700;color:var(--mut);letter-spacing:1.2px;margin-bottom:9px}
+p{margin:9px 0;color:#cfdcec}
+.small{font-size:14px;color:var(--mut)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
+.card.teal{border-left:4px solid var(--teal)}
+.card.orange{border-left:4px solid var(--orange)}
+.card.violet{border-left:4px solid var(--violet)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+b.hl{color:var(--yellow)}
+b.tl{color:var(--teal)}
+b.cy{color:var(--cyan)}
+b.rd{color:var(--red)}
+
+ul.li{margin:8px 0 8px 4px;list-style:none}
+ul.li li{padding-left:20px;position:relative;margin:7px 0;color:#cfdcec}
+ul.li li::before{content:'▸';position:absolute;left:0;color:var(--teal)}
+
+/* ===== 시뮬레이터 ===== */
+.sim{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}
+.simbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+        padding:10px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;margin-bottom:14px}
+.btn{background:#1b2c48;border:1px solid var(--line);color:var(--tx);padding:8px 14px;border-radius:8px;
+     cursor:pointer;font-size:13.5px;font-weight:700;font-family:inherit;transition:.15s}
+.btn:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.pri{background:linear-gradient(135deg,var(--teal),var(--cyan));color:#052029;border:none}
+.btn.pri.playing{background:linear-gradient(135deg,var(--orange),var(--red));color:#2a0d00}
+.stepnum{margin-left:auto;font-size:13px;color:var(--mut)}
+.stepnum b{color:var(--teal);font-size:16px}
+select,input[type=range]{background:#1b2c48;border:1px solid var(--line);color:var(--tx);
+  border-radius:7px;padding:6px 9px;font-family:inherit;font-size:13px}
+.bar-wrap{height:5px;background:#152238;border-radius:3px;overflow:hidden;margin-bottom:13px}
+.bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--cyan));width:0;transition:width .2s}
+
+.simgrid{display:grid;grid-template-columns:1.18fr 1.06fr .96fr;gap:13px}
+.pane{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px}
+.pane svg{width:100%;height:auto;display:block}
+
+/* 코드 패널 */
+.code{background:#060c17;border:1px solid var(--line);border-radius:9px;padding:11px 0;
+      font-size:12.6px;line-height:1.95;overflow-x:auto}
+.cl{display:flex;padding:0 12px;white-space:pre;border-left:3px solid transparent}
+.cl .ln{color:#3d5273;width:26px;flex:0 0 26px;text-align:right;margin-right:13px;user-select:none;font-size:11.5px}
+.cl .ct{color:#c3d3e8}
+.cl.on{background:rgba(251,146,60,.16);border-left-color:var(--orange)}
+.cl.on .ct{color:#ffe4c9;font-weight:700}
+.cl.on .ln{color:var(--orange)}
+.tokk{color:#ff7b9c}.tokt{color:#7dd3fc}.tokc{color:#4d6684;font-style:italic}.tokn{color:#c9b6ff}
+
+/* 상태 패널 */
+table.st{width:100%;border-collapse:collapse;font-size:12.6px;font-family:'D2Coding','Consolas',monospace}
+table.st th{background:#182948;color:var(--mut);padding:5px 4px;font-weight:700;border:1px solid var(--line);font-size:11.5px}
+table.st td{padding:5px 4px;text-align:center;border:1px solid var(--line);color:#cfdcec}
+table.st td.in{background:rgba(45,212,191,.15);color:var(--teal);font-weight:700}
+table.st td.cur{background:rgba(251,146,60,.22);color:var(--orange);font-weight:700}
+table.st td.inf{color:#4d6684}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{background:#1b2c48;border:1px solid var(--line);border-radius:6px;padding:3px 8px;
+      font-size:12px;font-family:'D2Coding','Consolas',monospace;color:#cfdcec}
+.chip.t{border-color:var(--teal);color:var(--teal)}
+.chip.o{border-color:var(--orange);color:var(--orange);background:rgba(251,146,60,.12)}
+.chip.r{border-color:var(--red);color:var(--red);opacity:.75;text-decoration:line-through}
+.tot{margin-top:9px;padding:8px 11px;background:rgba(45,212,191,.1);border:1px solid var(--teal);
+     border-radius:8px;font-size:13px;color:var(--teal);font-weight:700;text-align:center}
+.blk{margin-top:12px}
+.emp{color:var(--dim);font-size:12px;padding:5px 0}
+
+/* 내레이션 */
+.narr{margin-top:13px;padding:13px 16px;background:rgba(251,146,60,.09);
+      border:1px solid rgba(251,146,60,.35);border-left:4px solid var(--orange);
+      border-radius:10px;font-size:14.5px;color:#ffdfc4;min-height:52px;display:flex;align-items:center}
+.narr .tag{background:var(--orange);color:#2a0d00;font-size:11px;font-weight:800;padding:2px 8px;
+           border-radius:5px;margin-right:11px;flex:0 0 auto}
+
+/* 범례 */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:9px;justify-content:center}
+.legend i{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+/* 표 */
+table.cmp{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+table.cmp th{background:#182948;padding:11px;text-align:left;border:1px solid var(--line);color:var(--cyan);font-weight:700}
+table.cmp td{padding:11px;border:1px solid var(--line);color:#cfdcec;vertical-align:top}
+table.cmp tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+
+pre.src{background:#060c17;border:1px solid var(--line);border-radius:11px;padding:16px 18px;
+        overflow-x:auto;font-size:13px;line-height:1.8;color:#c3d3e8;margin:12px 0}
+
+/* 퀴즈 */
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:13px 0}
+.qq{font-weight:700;margin-bottom:11px;color:var(--tx)}
+.opt{background:#16253f;border:1px solid var(--line);color:#cfdcec;padding:9px 13px;border-radius:8px;
+     margin:6px 0;cursor:pointer;font-size:14px;font-family:inherit;width:100%;text-align:left;transition:.15s}
+.opt:hover{border-color:var(--cyan)}
+.opt.ok{background:rgba(45,212,191,.17);border-color:var(--teal);color:var(--teal)}
+.opt.no{background:rgba(248,113,113,.15);border-color:var(--red);color:var(--red)}
+.qa{margin-top:9px;font-size:13.5px;color:var(--mut);display:none}
+.qa.show{display:block}
+
+footer{text-align:center;color:var(--dim);font-size:13px;padding:40px 0 10px;border-top:1px solid var(--line);margin-top:44px}
+
+@media(max-width:1180px){
+  .simgrid{grid-template-columns:1fr}
+  .grid2,.grid3{grid-template-columns:1fr}
+  h1{font-size:28px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">KOI · 정보올림피아드 알고리즘</div>
+    <h1>최소 신장 트리 <span class="ac">MST</span> 완전 정복</h1>
+    <div class="sub">그래프 · 코드 · 상태표를 <b style="color:#fb923c">한 스텝씩 동시에</b> 따라가며 배우는 프림 &amp; 크루스칼 &amp; 유니온 파인드</div>
+  </div>
+</header>
+
+<nav><div class="wrap"><div class="tabs">
+  <button class="tab on" onclick="goSec(0)"><span class="n">00</span>MST란?</button>
+  <button class="tab" onclick="goSec(1)"><span class="n">01</span>프림 시뮬레이터</button>
+  <button class="tab" onclick="goSec(2)"><span class="n">02</span>크루스칼 시뮬레이터</button>
+  <button class="tab" onclick="goSec(3)"><span class="n">03</span>유니온 파인드</button>
+  <button class="tab" onclick="goSec(4)"><span class="n">04</span>비교 · 실전 문제</button>
+</div></div></nav>
+
+<div class="wrap">
+<!-- ============ SEC 0 ============ -->
+<section class="sec on" id="sec0">
+  <h2>최소 신장 트리(MST)란 무엇인가?</h2>
+
+  <div class="card teal">
+    <p><b class="tl">신장 트리(Spanning Tree)</b> = 그래프의 <b>모든 정점</b>을 <b>사이클 없이</b> 연결한 부분 그래프.<br>
+    정점이 N개라면 간선은 <b class="hl">정확히 N−1개</b>입니다. 하나라도 빼면 끊기고, 하나라도 더하면 사이클이 생깁니다.</p>
+    <p style="margin-top:10px"><b class="tl">최소 신장 트리(MST)</b> = 그런 신장 트리 중에서 <b>간선 가중치의 합이 가장 작은</b> 것.</p>
+  </div>
+
+  <h3>한 문장으로: "모든 마을을 잇는 가장 싼 도로망"</h3>
+  <p>N개 마을을 전부 연결해야 하는데 공사비를 최소로 하고 싶다. 이때 <b>절대 사이클을 만들 필요가 없습니다</b>. 사이클이 있다는 건 "이미 연결된 곳을 또 연결"한 것이므로, 그 중 가장 비싼 도로를 없애도 여전히 모두 연결되니까요. 그래서 답은 언제나 트리 모양이 됩니다.</p>
+
+  <div class="card">
+    <h4>이번 시간에 계속 쓸 예제 그래프 (정점 7개 · 간선 11개)</h4>
+    <svg id="introSvg" viewBox="0 0 560 420"></svg>
+    <div class="legend">
+      <span><i style="background:#2b3a55"></i>일반 간선</span>
+      <span><i style="background:#2dd4bf"></i>MST 확정 간선</span>
+      <span><i style="background:#fbbf24"></i>지금 검사 중</span>
+      <span><i style="background:#38bdf8"></i>후보 간선</span>
+      <span><i style="background:#f87171"></i>버려진 간선</span>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn pri" onclick="toggleIntroMST()" id="introBtn">정답 MST 보여주기</button>
+    </div>
+    <div class="narr" id="introDesc"><span class="tag">그래프</span>간선 11개 중 <b>6개(=7−1)</b>만 골라서 모든 정점을 잇되, 합을 최소로 만드는 게 목표입니다.</div>
+  </div>
+
+  <h3>왜 "제일 싼 것부터 고르면 된다"가 맞을까? — 컷 정리(Cut Property)</h3>
+  <div class="grid2">
+    <div class="card violet">
+      <p>정점 집합을 <b class="cy">아무렇게나</b> 두 덩어리로 나눴다고 합시다. 이 경계선을 <b>컷(cut)</b>이라 부릅니다.</p>
+      <p style="margin-top:8px"><b class="hl">컷 정리:</b> 컷을 가로지르는 간선들 중 <b>가장 가벼운 간선</b>은 반드시 어떤 MST에 포함된다.</p>
+      <p style="margin-top:8px" class="small"><b>증명 아이디어(교환 논법):</b> 그 최소 간선 e를 안 쓴 MST T가 있다고 하자. T에 e를 넣으면 사이클이 생기고, 그 사이클은 컷을 반드시 한 번 더 가로지른다(들어갔으면 나와야 하니까). 그 다른 간선 f를 빼면 여전히 신장 트리이고, w(e) ≤ w(f)이므로 비용이 늘지 않는다. 따라서 e를 포함한 MST가 존재한다. ∎</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 420 250" style="width:100%;height:auto">
+        <path d="M210 10 C 150 80, 270 160, 200 240" stroke="#a78bfa" stroke-width="2.5" stroke-dasharray="8 6" fill="none"/>
+        <text x="248" y="26" fill="#a78bfa" font-size="13" font-family="monospace">CUT</text>
+        <circle cx="90" cy="60" r="20" fill="#132038" stroke="#2dd4bf" stroke-width="2.5"/><text x="90" y="66" fill="#2dd4bf" font-size="14" text-anchor="middle" font-family="monospace">A</text>
+        <circle cx="80" cy="150" r="20" fill="#132038" stroke="#2dd4bf" stroke-width="2.5"/><text x="80" y="156" fill="#2dd4bf" font-size="14" text-anchor="middle" font-family="monospace">B</text>
+        <circle cx="140" cy="215" r="20" fill="#132038" stroke="#2dd4bf" stroke-width="2.5"/><text x="140" y="221" fill="#2dd4bf" font-size="14" text-anchor="middle" font-family="monospace">C</text>
+        <circle cx="330" cy="55" r="20" fill="#132038" stroke="#38bdf8" stroke-width="2.5"/><text x="330" y="61" fill="#38bdf8" font-size="14" text-anchor="middle" font-family="monospace">X</text>
+        <circle cx="345" cy="150" r="20" fill="#132038" stroke="#38bdf8" stroke-width="2.5"/><text x="345" y="156" fill="#38bdf8" font-size="14" text-anchor="middle" font-family="monospace">Y</text>
+        <circle cx="285" cy="215" r="20" fill="#132038" stroke="#38bdf8" stroke-width="2.5"/><text x="285" y="221" fill="#38bdf8" font-size="14" text-anchor="middle" font-family="monospace">Z</text>
+        <line x1="110" y1="60" x2="310" y2="55" stroke="#f87171" stroke-width="2.5" stroke-dasharray="4 4"/>
+        <text x="205" y="48" fill="#f87171" font-size="13" text-anchor="middle" font-family="monospace">9</text>
+        <line x1="100" y1="150" x2="325" y2="150" stroke="#fbbf24" stroke-width="6"/>
+        <text x="212" y="142" fill="#fbbf24" font-size="15" text-anchor="middle" font-family="monospace" font-weight="bold">3 ← 최소!</text>
+        <line x1="160" y1="215" x2="265" y2="215" stroke="#f87171" stroke-width="2.5" stroke-dasharray="4 4"/>
+        <text x="212" y="207" fill="#f87171" font-size="13" text-anchor="middle" font-family="monospace">7</text>
+        <text x="88" y="245" fill="#8fa3c0" font-size="12" text-anchor="middle">집합 S</text>
+        <text x="345" y="245" fill="#8fa3c0" font-size="12" text-anchor="middle">집합 V−S</text>
+      </svg>
+      <p class="small" style="text-align:center;margin-top:8px">컷을 가로지르는 3, 7, 9 중 <b class="hl">3</b>은 MST에 반드시 들어간다.</p>
+    </div>
+  </div>
+
+  <div class="card orange">
+    <p><b>이 정리 하나로 두 알고리즘이 모두 설명됩니다.</b></p>
+    <ul class="li">
+      <li><b class="tl">프림:</b> 컷을 "지금까지 만든 트리 S vs 나머지"로 두고, 그 컷의 최소 간선을 계속 고른다 → <b>트리가 눈덩이처럼 하나씩 자란다</b>.</li>
+      <li><b class="cy">크루스칼:</b> 전체 간선을 싼 것부터 보되, 사이클이면 버린다. 채택되는 순간 그 간선은 "두 덩어리를 가르는 컷의 최소 간선"이다 → <b>여러 조각이 합쳐지며 자란다</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ SEC 1 : PRIM ============ -->
+<section class="sec" id="sec1">
+  <h2>프림(Prim) — 트리를 눈덩이처럼 키우기</h2>
+
+  <div class="card teal">
+    <p><b class="tl">핵심 한 줄:</b> 시작 정점 하나에서 출발해, <b>"지금 트리에 붙일 수 있는 간선 중 가장 싼 것"</b>을 골라 정점을 하나씩 빨아들인다. 정점을 N개 다 먹으면 끝.</p>
+    <p style="margin-top:8px" class="small">사람이 손으로 풀 땐 "트리 밖으로 나가는 간선들을 눈으로 훑어서 최소 고르기"지만, 컴퓨터는 그걸 매번 훑기 아까우니 <b class="hl">우선순위 큐</b>에 후보를 담아 둡니다.</p>
+  </div>
+
+  <h3>세 화면을 동시에 보세요</h3>
+  <p class="small">왼쪽 <b>그래프</b>가 변할 때 가운데 <b>코드의 어느 줄</b>이 실행 중인지, 오른쪽 <b>key/parent 배열과 우선순위 큐</b>가 어떻게 바뀌는지 — 이 셋이 항상 같은 순간을 가리킵니다.</p>
+
+  <div class="sim">
+    <div class="simbar">
+      <button class="btn" onclick="P.reset()">⟲ 처음</button>
+      <button class="btn" onclick="P.prev()">◀ 이전</button>
+      <button class="btn pri" id="pPlay" onclick="P.toggle()">▶ 자동 재생</button>
+      <button class="btn" onclick="P.next()">다음 ▶</button>
+      <button class="btn" onclick="P.end()">끝까지 ⏭</button>
+      <span style="color:#8fa3c0;font-size:13px;margin-left:8px">시작점</span>
+      <select id="pStart" onchange="P.setStart()">
+        <option value="0">A</option><option value="1">B</option><option value="2">C</option>
+        <option value="3">D</option><option value="4">E</option><option value="5">F</option><option value="6">G</option>
+      </select>
+      <span style="color:#8fa3c0;font-size:13px">속도</span>
+      <input type="range" id="pSpd" min="200" max="1800" value="900" step="100" style="width:90px">
+      <span class="stepnum">STEP <b id="pNo">0</b> / <span id="pTot">0</span></span>
+    </div>
+    <div class="bar-wrap"><div class="bar" id="pBar"></div></div>
+
+    <div class="simgrid">
+      <div class="pane">
+        <h4>① 그래프 — 트리가 자라는 모습</h4>
+        <svg id="pSvg" viewBox="0 0 560 420"></svg>
+        <div class="legend">
+          <span><i style="background:#2dd4bf"></i>트리 확정</span>
+          <span><i style="background:#fbbf24"></i>검사 중</span>
+          <span><i style="background:#38bdf8"></i>후보(key)</span>
+          <span><i style="background:#f87171"></i>버림</span>
+        </div>
+      </div>
+      <div class="pane">
+        <h4>② 코드 — 지금 실행 중인 줄</h4>
+        <div class="code" id="pCode"></div>
+        <p class="small" style="margin-top:9px;font-size:12.5px">
+          <b class="hl">key[v]</b> = 정점 v를 트리에 붙이는 현재 최소 비용<br>
+          <b class="hl">parent[v]</b> = 그때 사용할 트리 쪽 정점<br>
+          <b class="hl">inMST[u]</b> = u가 이미 트리에 들어왔는가
+        </p>
+      </div>
+      <div class="pane">
+        <h4>③ 상태 — 배열과 우선순위 큐</h4>
+        <div id="pState"></div>
+      </div>
+    </div>
+    <div class="narr" id="pDesc"></div>
+  </div>
+
+  <h3>여기가 헷갈립니다 — 자주 나오는 질문 3개</h3>
+  <div class="grid3">
+    <div class="card">
+      <p><b class="hl">Q. 5번 줄 <code>if(inMST[u]) continue;</code> 는 왜 필요한가요?</b></p>
+      <p class="small" style="margin-top:7px">우선순위 큐에 같은 정점이 <b>여러 번</b> 들어가기 때문입니다. key를 갱신할 때 예전에 넣은 (더 비싼) 후보를 지울 방법이 없어서 그냥 두고, 꺼낼 때 "이미 트리에 있으면 버린다"로 처리합니다. 이걸 <b class="tl">지연 삭제(lazy deletion)</b>라고 합니다.</p>
+    </div>
+    <div class="card">
+      <p><b class="hl">Q. key 배열이 없으면 안 되나요?</b></p>
+      <p class="small" style="margin-top:7px">없어도 답은 나오지만 큐에 쓰레기 후보가 훨씬 많이 쌓입니다. key는 "이미 더 싼 길을 알고 있으니 이 후보는 넣지 말자"는 <b>가지치기</b> 역할입니다.</p>
+    </div>
+    <div class="card">
+      <p><b class="hl">Q. 다익스트라랑 코드가 똑같아 보여요.</b></p>
+      <p class="small" style="margin-top:7px">거의 같지만 <b class="rd">비교 대상이 다릅니다</b>. 다익스트라는 <code>dist[u]+cost &lt; dist[v]</code> (시작점부터의 누적 거리), 프림은 <code>cost &lt; key[v]</code> (간선 하나의 무게). 이 한 줄이 최단경로냐 MST냐를 가릅니다.</p>
+    </div>
+  </div>
+
+  <h3>전체 코드 (C++)</h3>
+  <pre class="src" id="pFull"></pre>
+  <div class="card">
+    <p class="small"><b class="tl">시간복잡도 O(E log V)</b> — 간선마다 최대 1번 큐에 들어가고, 큐 연산이 log 시간.<br>
+    정점 수는 적은데 간선이 빽빽한 <b>밀집 그래프</b>(E ≈ V²)에서는 큐 없이 O(V²) 배열 방식이 오히려 빠릅니다. 그래서 "정점 1000개 이하 + 완전그래프" 문제는 프림 O(V²)가 정석입니다.</p>
+  </div>
+</section>
+<!-- ============ SEC 2 : KRUSKAL ============ -->
+<section class="sec" id="sec2">
+  <h2>크루스칼(Kruskal) — 싼 간선부터 줍고, 사이클이면 버리기</h2>
+
+  <div class="card teal">
+    <p><b class="tl">핵심 한 줄:</b> 모든 간선을 <b>가중치 오름차순으로 정렬</b>한 뒤 위에서부터 하나씩 본다. 그 간선을 넣어도 <b>사이클이 안 생기면 채택</b>, 생기면 버린다. 간선이 N−1개 모이면 끝.</p>
+    <p style="margin-top:8px" class="small">프림은 <b>정점</b>을 하나씩 먹었지만, 크루스칼은 <b>간선</b>을 하나씩 줍습니다. 그래서 트리가 한 덩어리로 자라는 게 아니라, <b class="hl">여기저기 흩어진 조각(숲)이 점점 합쳐지는</b> 모습이 됩니다.</p>
+  </div>
+
+  <div class="card orange">
+    <p><b>유일한 난관: "이 간선을 넣으면 사이클이 생기나?"를 어떻게 빨리 판단하지?</b></p>
+    <p style="margin-top:7px">간선 (u,v)를 넣었을 때 사이클이 생긴다 ⟺ <b class="hl">u와 v가 이미 같은 덩어리(연결 요소)에 속해 있다</b>. 매번 DFS로 확인하면 O(V) → 전체 O(EV)로 느립니다.<br>
+    그래서 <b class="tl">유니온 파인드</b>가 등장합니다. "같은 덩어리냐?"를 거의 O(1)에 답해 주니까요. (자세한 건 03번 탭)</p>
+  </div>
+
+  <h3>세 화면 동시 시뮬레이터</h3>
+  <p class="small">가운데 코드가 <code>find(u)==find(v)</code>를 검사할 때, 오른쪽 <b>집합 현황</b>에서 두 정점이 같은 괄호 안에 있는지 확인해 보세요. 같으면 왼쪽 그래프에서 그 간선이 <b class="rd">빨간 점선</b>으로 버려집니다.</p>
+
+  <div class="sim">
+    <div class="simbar">
+      <button class="btn" onclick="K.reset()">⟲ 처음</button>
+      <button class="btn" onclick="K.prev()">◀ 이전</button>
+      <button class="btn pri" id="kPlay" onclick="K.toggle()">▶ 자동 재생</button>
+      <button class="btn" onclick="K.next()">다음 ▶</button>
+      <button class="btn" onclick="K.end()">끝까지 ⏭</button>
+      <span style="color:#8fa3c0;font-size:13px;margin-left:8px">속도</span>
+      <input type="range" id="kSpd" min="200" max="1800" value="900" step="100" style="width:90px">
+      <span class="stepnum">STEP <b id="kNo">0</b> / <span id="kTot">0</span></span>
+    </div>
+    <div class="bar-wrap"><div class="bar" id="kBar"></div></div>
+
+    <div class="simgrid">
+      <div class="pane">
+        <h4>① 그래프 — 숲이 합쳐지는 모습</h4>
+        <svg id="kSvg" viewBox="0 0 560 420"></svg>
+        <div class="legend">
+          <span><i style="background:#2dd4bf"></i>채택</span>
+          <span><i style="background:#fbbf24"></i>검사 중</span>
+          <span><i style="background:#f87171"></i>사이클 → 버림</span>
+        </div>
+      </div>
+      <div class="pane">
+        <h4>② 코드 — 지금 실행 중인 줄</h4>
+        <div class="code" id="kCode"></div>
+        <div class="blk">
+          <h4>정렬된 간선 목록</h4>
+          <div id="kEdges"></div>
+        </div>
+      </div>
+      <div class="pane">
+        <h4>③ 상태 — 집합 &amp; parent 배열</h4>
+        <div id="kState"></div>
+      </div>
+    </div>
+    <div class="narr" id="kDesc"></div>
+  </div>
+
+  <h3>전체 코드 (C++)</h3>
+  <pre class="src" id="kFull"></pre>
+  <div class="card">
+    <p class="small"><b class="tl">시간복잡도 O(E log E)</b> — 사실상 <b>정렬 비용이 전부</b>입니다. 유니온 파인드 부분은 거의 상수시간이라 무시할 수준.<br>
+    간선이 적은 <b>희소 그래프</b>에서 특히 유리하고, 구현이 짧아서 대회에서 가장 많이 쓰입니다.</p>
+  </div>
+</section>
+
+<!-- ============ SEC 3 : UNION-FIND ============ -->
+<section class="sec" id="sec3">
+  <h2>유니온 파인드(서로소 집합) — 크루스칼의 심장</h2>
+
+  <div class="card teal">
+    <p>딱 두 가지만 하는 자료구조입니다.</p>
+    <ul class="li">
+      <li><b class="tl">find(x)</b> : x가 속한 집합의 <b>대표(루트)</b>가 누구인지 알려 줘</li>
+      <li><b class="tl">unite(a,b)</b> : a가 속한 집합과 b가 속한 집합을 <b>하나로 합쳐 줘</b></li>
+    </ul>
+    <p style="margin-top:8px">"a와 b가 같은 집합인가?" → <code>find(a) == find(b)</code> 한 줄이면 끝. 이게 크루스칼의 사이클 판정입니다.</p>
+  </div>
+
+  <h3>구조: 배열 하나로 '거꾸로 매달린 트리'를 만든다</h3>
+  <p><code>parent[x]</code> = x의 부모. 자기 자신이 부모(<code>parent[x] == x</code>)이면 그 노드가 <b class="hl">루트 = 집합의 대표</b>입니다. find는 부모를 계속 타고 올라가 루트를 찾는 일이고, unite는 한쪽 루트를 다른 쪽 루트 밑에 매다는 일입니다.</p>
+
+  <div class="card orange">
+    <p><b>그냥 만들면 망합니다.</b> 운 나쁘게 매달다 보면 트리가 <b class="rd">일자 사슬</b>이 되어 find가 O(N)이 됩니다. 그래서 두 가지 최적화를 씁니다.</p>
+    <ul class="li">
+      <li><b class="tl">경로 압축(Path Compression):</b> find로 올라가는 김에, 지나온 노드들을 <b>전부 루트에 직접 붙여 버린다</b>. 다음부터 한 방에 끝.</li>
+      <li><b class="cy">랭크/크기 합치기(Union by Rank):</b> 합칠 때 <b>얕은 트리를 깊은 트리 밑에</b> 붙인다. 그래야 높이가 잘 안 자란다.</li>
+    </ul>
+    <p style="margin-top:8px" class="small">둘 다 쓰면 연산당 평균 <b class="hl">O(α(N))</b> — 아커만 역함수라 N이 우주의 원자 수여도 5 이하. 사실상 상수입니다.</p>
+  </div>
+
+  <h3>데모 A — 경로 압축이 트리를 납작하게 만드는 순간</h3>
+  <p class="small">최악의 사슬 <code>4→3→2→1→0</code> 에서 <code>find(4)</code> 를 부르면 어떤 일이 벌어지는지, <b>재귀 호출 스택이 쌓였다가 풀리는 것</b>까지 한 스텝씩 봅니다.</p>
+
+  <div class="sim">
+    <div class="simbar">
+      <button class="btn" onclick="U.reset()">⟲ 처음</button>
+      <button class="btn" onclick="U.prev()">◀ 이전</button>
+      <button class="btn pri" id="uPlay" onclick="U.toggle()">▶ 자동 재생</button>
+      <button class="btn" onclick="U.next()">다음 ▶</button>
+      <button class="btn" onclick="U.end()">끝까지 ⏭</button>
+      <span style="color:#8fa3c0;font-size:13px;margin-left:8px">속도</span>
+      <input type="range" id="uSpd" min="200" max="1800" value="1000" step="100" style="width:90px">
+      <span class="stepnum">STEP <b id="uNo">0</b> / <span id="uTot">0</span></span>
+    </div>
+    <div class="bar-wrap"><div class="bar" id="uBar"></div></div>
+    <div class="simgrid" style="grid-template-columns:1.15fr 1.1fr .95fr">
+      <div class="pane">
+        <h4>① 트리 모양</h4>
+        <svg id="uSvg" viewBox="0 0 520 340"></svg>
+      </div>
+      <div class="pane">
+        <h4>② 코드</h4>
+        <div class="code" id="uCode"></div>
+      </div>
+      <div class="pane">
+        <h4>③ 재귀 호출 스택 &amp; parent 배열</h4>
+        <div id="uState"></div>
+      </div>
+    </div>
+    <div class="narr" id="uDesc"></div>
+  </div>
+
+  <h3>데모 B — 직접 눌러 보는 유니온 파인드 (경로 압축 + 랭크)</h3>
+  <p class="small">정점 0~7. 두 정점을 골라 <b>합치기</b>를 누르거나, 한 정점의 <b>대표 찾기</b>를 눌러 보세요. 트리 모양과 로그가 바로 갱신됩니다.</p>
+  <div class="sim">
+    <div class="simbar">
+      <span style="color:#8fa3c0;font-size:13px">합치기</span>
+      <select id="ua"></select><span style="color:#8fa3c0">＋</span><select id="ub"></select>
+      <button class="btn pri" onclick="playUnite()">unite 실행</button>
+      <span style="color:#8fa3c0;font-size:13px;margin-left:10px">대표 찾기</span>
+      <select id="uf"></select>
+      <button class="btn" onclick="playFind()">find 실행</button>
+      <button class="btn" onclick="playReset()" style="margin-left:auto">⟲ 초기화</button>
+    </div>
+    <div class="simgrid" style="grid-template-columns:1.4fr 1fr">
+      <div class="pane"><h4>숲(forest) 모양 · 루트에 ◎ 표시, 옆 숫자는 rank</h4><svg id="fSvg" viewBox="0 0 620 300"></svg></div>
+      <div class="pane"><h4>실행 로그</h4><div id="fLog" style="font-size:12.8px;font-family:'D2Coding',Consolas,monospace;max-height:270px;overflow:auto"></div></div>
+    </div>
+  </div>
+
+  <h3>전체 코드 (C++)</h3>
+  <pre class="src" id="uFull"></pre>
+</section>
+
+<!-- ============ SEC 4 ============ -->
+<section class="sec" id="sec4">
+  <h2>둘을 나란히 비교 · 실전 문제</h2>
+
+  <table class="cmp">
+    <tr><th style="width:15%"></th><th>프림 (Prim)</th><th>크루스칼 (Kruskal)</th></tr>
+    <tr><td><b>자라는 방식</b></td><td>한 덩어리 트리가 <b class="tl">정점을 하나씩</b> 흡수</td><td>흩어진 <b class="cy">숲의 조각들이 합쳐짐</b></td></tr>
+    <tr><td><b>선택 기준</b></td><td>트리 밖으로 나가는 간선 중 최소</td><td>전체 간선 중 최소 (사이클이면 스킵)</td></tr>
+    <tr><td><b>핵심 도구</b></td><td>우선순위 큐 + key 배열</td><td>정렬 + 유니온 파인드</td></tr>
+    <tr><td><b>시간복잡도</b></td><td>O(E log V) — 배열 방식은 O(V²)</td><td>O(E log E)</td></tr>
+    <tr><td><b>유리한 상황</b></td><td><b class="hl">간선이 빽빽할 때</b> (E ≈ V²)<br>· 좌표가 주어져 모든 쌍을 이어야 할 때</td><td><b class="hl">간선이 희소할 때</b><br>· 간선 목록이 그대로 주어질 때</td></tr>
+    <tr><td><b>구현 난이도</b></td><td>중 (다익스트라와 헷갈림 주의)</td><td>하 (짧고 실수 적음) — <b>대회 기본기</b></td></tr>
+    <tr><td><b>비연결 그래프</b></td><td>시작점의 연결 요소만 얻음</td><td>자동으로 <b>최소 신장 숲</b>이 됨</td></tr>
+  </table>
+
+  <div class="card teal">
+    <p><b>중요:</b> 두 알고리즘은 <b class="hl">항상 같은 최소 비용</b>을 냅니다. 같은 가중치 간선이 여러 개면 고르는 간선 집합이 달라질 수 있지만, <b>합은 반드시 같습니다</b>. 위 예제 그래프에서도 둘 다 <b class="tl">39</b>가 나오는 걸 확인했죠.</p>
+  </div>
+
+  <h3>실전에서 자주 나오는 변형</h3>
+  <div class="grid2">
+    <div class="card">
+      <p><b class="hl">① 도시 분할 계획형 (MST에서 가장 비싼 간선 K−1개 제거)</b></p>
+      <p class="small">"마을을 K개 그룹으로 나누되 남는 도로 유지비 최소" → MST를 구한 뒤, 채택한 간선 중 <b>가장 비싼 것부터 K−1개를 빼면</b> 끝. 크루스칼로 풀면 마지막에 뽑은 간선들이 이미 비싼 순이라 편합니다.</p>
+    </div>
+    <div class="card">
+      <p><b class="hl">② 좌표가 주어지는 형 (별자리 만들기 등)</b></p>
+      <p class="small">간선이 안 주어지고 점 좌표만 주어짐 → <b>모든 쌍의 거리를 간선으로 직접 만들어</b>(N²개) MST. N이 100 이하면 마음 편히 크루스칼, N이 1000 넘으면 프림 O(V²) 고려.</p>
+    </div>
+    <div class="card">
+      <p><b class="hl">③ 이미 지어진 도로가 있는 형</b></p>
+      <p class="small">"이미 연결된 도로는 비용 0" → 그 간선들을 미리 <code>unite</code> 해 두고 크루스칼 시작. 또는 가중치를 0으로 넣어도 됩니다.</p>
+    </div>
+    <div class="card">
+      <p><b class="hl">④ 유니온 파인드만 쓰는 형</b></p>
+      <p class="small">MST 없이 "같은 팀인가?", "연결 요소 개수는?" 같은 질문만 나오는 문제도 많습니다. 유니온 파인드는 그 자체로 독립 주제예요.</p>
+    </div>
+  </div>
+
+  <h3>추천 문제 (BOJ)</h3>
+  <table class="cmp">
+    <tr><th>번호</th><th>제목</th><th>포인트</th></tr>
+    <tr><td><b class="tl">1197</b></td><td>최소 스패닝 트리</td><td>MST 기본형. 프림·크루스칼 둘 다 짜 보기</td></tr>
+    <tr><td><b class="tl">1922</b></td><td>네트워크 연결</td><td>1197과 사실상 동일. 손에 익히기용</td></tr>
+    <tr><td><b class="cy">1717</b></td><td>집합의 표현</td><td>순수 유니온 파인드. 경로 압축 필수</td></tr>
+    <tr><td><b class="cy">1976</b></td><td>여행 가자</td><td>같은 집합 판정 응용</td></tr>
+    <tr><td><b class="hl">1647</b></td><td>도시 분할 계획</td><td>MST − 가장 비싼 간선 1개</td></tr>
+    <tr><td><b class="hl">4386</b></td><td>별자리 만들기</td><td>좌표 → 모든 쌍 간선 생성, 실수 가중치</td></tr>
+    <tr><td><b class="hl">1774</b></td><td>우주신과의 교감</td><td>기존 연결 + 좌표 MST 복합</td></tr>
+    <tr><td><b style="color:#a78bfa">17472</b></td><td>다리 만들기 2</td><td>BFS로 섬 라벨링 후 MST. 삼성 기출 유형</td></tr>
+    <tr><td><b style="color:#a78bfa">10021</b></td><td>Watering the Fields</td><td>조건 만족 간선만 사용하는 MST</td></tr>
+  </table>
+
+  <h3>이해도 점검</h3>
+  <div id="quiz"></div>
+</section>
+</div>
+
+<footer>
+  <div>세영코딩연구소 · KOI 알고리즘 시리즈 — 최소 신장 트리</div>
+  <div style="margin-top:6px;font-size:12px">예제 그래프: 정점 7 · 간선 11 · MST 가중치 합 39</div>
+</footer>
+<script>
+/* ==================== 공통 유틸 ==================== */
+var NS='http://www.w3.org/2000/svg';
+function sv(tag,at,par){var e=document.createElementNS(NS,tag);for(var k in at)e.setAttribute(k,at[k]);if(par)par.appendChild(e);return e;}
+function hx(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined&&txt!==null)e.textContent=txt;return e;}
+function clr(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function $(id){return document.getElementById(id);}
+
+function goSec(i){
+  var s=document.querySelectorAll('section.sec'),t=document.querySelectorAll('.tab');
+  for(var k=0;k<s.length;k++){s[k].classList.toggle('on',k===i);t[k].classList.toggle('on',k===i);}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ==================== 예제 그래프 ==================== */
+var GN=[
+  {n:'A',x:95,y:75},{n:'B',x:300,y:52},{n:'C',x:495,y:98},
+  {n:'D',x:180,y:222},{n:'E',x:370,y:205},{n:'F',x:120,y:355},{n:'G',x:452,y:342}
+];
+var GE=[[0,1,7],[0,3,5],[1,2,8],[1,3,9],[1,4,7],[2,4,5],[3,4,15],[3,5,6],[4,5,8],[4,6,9],[5,6,11]];
+var N=GN.length;
+var ADJ=(function(){var a=[];for(var i=0;i<N;i++)a.push([]);
+  GE.forEach(function(e){a[e[0]].push([e[1],e[2]]);a[e[1]].push([e[0],e[2]]);});
+  a.forEach(function(l){l.sort(function(p,q){return p[0]-q[0];});});return a;})();
+function ek(u,v){return Math.min(u,v)+'-'+Math.max(u,v);}
+function nm(i){return GN[i].n;}
+function kv(x){return x===Infinity?'\u221E':x;}
+
+/* 간선/정점 상태에 따른 그래프 그리기 */
+var ORD={none:0,cand:1,reject:1,check:2,tree:3};
+function drawGraph(svg,st){
+  clr(svg);
+  var es=st.edgeState||{}, ns=st.nodeState||{}, keys=st.keys;
+  var list=GE.map(function(e,i){return {e:e,s:es[ek(e[0],e[1])]||'none'};});
+  list.sort(function(a,b){return ORD[a.s]-ORD[b.s];});
+  list.forEach(function(it){
+    var u=it.e[0],v=it.e[1],a=GN[u],b=GN[v];
+    var col='#2b3a55',w=3,dash='',op=1;
+    if(it.s==='cand'){col='#38bdf8';w=3.5;dash='8 5';}
+    if(it.s==='reject'){col='#f87171';w=3;dash='3 6';op=.6;}
+    if(it.s==='check'){col='#fbbf24';w=7;}
+    if(it.s==='tree'){col='#2dd4bf';w=7.5;}
+    sv('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:col,'stroke-width':w,
+      'stroke-dasharray':dash,'stroke-linecap':'round',opacity:op},svg);
+  });
+  list.forEach(function(it){
+    var u=it.e[0],v=it.e[1],w=it.e[2],a=GN[u],b=GN[v];
+    var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    var col='#8fa3c0',bd='#2b3a55';
+    if(it.s==='cand'){col='#38bdf8';bd='#38bdf8';}
+    if(it.s==='reject'){col='#f87171';bd='#f87171';}
+    if(it.s==='check'){col='#fbbf24';bd='#fbbf24';}
+    if(it.s==='tree'){col='#2dd4bf';bd='#2dd4bf';}
+    sv('rect',{x:mx-15,y:my-13,width:30,height:25,rx:7,fill:'#080e1a',stroke:bd,'stroke-width':1.8},svg);
+    var t=sv('text',{x:mx,y:my+5,'text-anchor':'middle','font-size':14,'font-family':'monospace',
+      'font-weight':'bold',fill:col},svg); t.textContent=w;
+  });
+  for(var i=0;i<N;i++){
+    var s=ns[i]||'none',g=GN[i];
+    var fill='#16253f',bd='#3d5273',tc='#cfdcec',r=24;
+    if(s==='cand'){bd='#38bdf8';tc='#38bdf8';}
+    if(s==='tree'){fill='#134e4a';bd='#2dd4bf';tc='#5eead4';}
+    if(s==='cur'){fill='#fb923c';bd='#fed7aa';tc='#2a0d00';r=27;
+      sv('circle',{cx:g.x,cy:g.y,r:34,fill:'none',stroke:'#fb923c','stroke-width':2,opacity:.45},svg);}
+    sv('circle',{cx:g.x,cy:g.y,r:r,fill:fill,stroke:bd,'stroke-width':3},svg);
+    var t2=sv('text',{x:g.x,y:g.y+7,'text-anchor':'middle','font-size':19,'font-family':'monospace',
+      'font-weight':'bold',fill:tc},svg); t2.textContent=g.n;
+    if(keys){
+      var lab=sv('text',{x:g.x,y:g.y-32,'text-anchor':'middle','font-size':12.5,
+        'font-family':'monospace',fill:keys[i]===Infinity?'#4d6684':'#fbbf24'},svg);
+      lab.textContent='key='+kv(keys[i]);
+    }
+  }
+}
+
+/* ==================== 코드 하이라이터 ==================== */
+var KW={'if':1,'else':1,'for':1,'while':1,'return':1,'break':1,'continue':1,'true':1,'false':1,'auto':1};
+var TY={'int':1,'void':1,'bool':1,'vector':1,'priority_queue':1,'greater':1,'pair':1,'pii':1,'long':1};
+function renderCode(box,lines,cur){
+  clr(box);
+  lines.forEach(function(src,idx){
+    var ln=idx+1;
+    var row=hx('div','cl'+(ln===cur?' on':''));
+    row.appendChild(hx('span','ln',ln));
+    var ct=hx('span','ct');
+    var ci=src.indexOf('//');
+    var main=ci>=0?src.slice(0,ci):src, cm=ci>=0?src.slice(ci):'';
+    var toks=main.match(/[A-Za-z_][A-Za-z0-9_]*|\d+|\s+|./g)||[];
+    toks.forEach(function(t){
+      var c='';
+      if(KW[t])c='tokk'; else if(TY[t])c='tokt'; else if(/^\d+$/.test(t))c='tokn';
+      ct.appendChild(c?hx('span',c,t):document.createTextNode(t));
+    });
+    if(cm)ct.appendChild(hx('span','tokc',cm));
+    row.appendChild(ct);
+    box.appendChild(row);
+  });
+}
+
+/* ==================== 시뮬레이터 프레임 ==================== */
+function Sim(o){this.o=o;this.i=0;this.steps=[];this.timer=null;}
+Sim.prototype.load=function(s){this.stop();this.steps=s;this.i=0;this.draw();};
+Sim.prototype.draw=function(){
+  var st=this.steps[this.i];
+  $(this.o.no).textContent=this.i+1;
+  $(this.o.tot).textContent=this.steps.length;
+  $(this.o.bar).style.width=((this.i+1)/this.steps.length*100)+'%';
+  this.o.render(st,this.i);
+  var d=$(this.o.desc); clr(d);
+  d.appendChild(hx('span','tag','STEP '+(this.i+1)));
+  d.appendChild(document.createTextNode(st.desc));
+};
+Sim.prototype.next=function(){if(this.i<this.steps.length-1){this.i++;this.draw();}else{this.stop();}};
+Sim.prototype.prev=function(){this.stop();if(this.i>0){this.i--;this.draw();}};
+Sim.prototype.reset=function(){this.stop();this.i=0;this.draw();};
+Sim.prototype.end=function(){this.stop();this.i=this.steps.length-1;this.draw();};
+Sim.prototype.stop=function(){if(this.timer){clearInterval(this.timer);this.timer=null;
+  var b=$(this.o.play);if(b){b.textContent='\u25B6 자동 재생';b.classList.remove('playing');}}};
+Sim.prototype.toggle=function(){
+  var self=this;
+  if(this.timer){this.stop();return;}
+  if(this.i>=this.steps.length-1)this.i=0;
+  var b=$(this.o.play); b.textContent='\u23F8 일시정지'; b.classList.add('playing');
+  var sp=parseInt($(this.o.spd).value,10);
+  this.timer=setInterval(function(){self.next();},sp);
+  this.draw();
+};
+
+/* ==================== 프림 ==================== */
+var PRIM_CODE=[
+"priority_queue<pii, vector<pii>, greater<pii>> pq;  // (가중치, 정점)",
+"key[start] = 0;   pq.push({0, start});",
+"while (!pq.empty()) {",
+"    auto [w, u] = pq.top();  pq.pop();     // 가장 싼 후보",
+"    if (inMST[u]) continue;                // 이미 트리 → 버림",
+"    inMST[u] = true;   total += w;         // u를 트리에 편입",
+"    for (auto [v, cost] : adj[u]) {",
+"        if (!inMST[v] && cost < key[v]) {  // 더 싼 연결 발견",
+"            key[v] = cost;   parent[v] = u;",
+"            pq.push({cost, v});",
+"        }",
+"    }",
+"}"];
+
+function buildPrim(start){
+  var inM=[],key=[],par=[],pq=[],mst=[],total=0,steps=[],i;
+  for(i=0;i<N;i++){inM.push(false);key.push(Infinity);par.push(-1);}
+  function snap(line,desc,ex){
+    var s={line:line,desc:desc,inM:inM.slice(),key:key.slice(),par:par.slice(),
+      pq:pq.map(function(o){return {w:o.w,v:o.v,f:o.f};}).sort(function(a,b){return a.w-b.w||a.v-b.v;}),
+      mst:mst.map(function(e){return e.slice();}),total:total,cur:-1,focus:null,fs:null};
+    if(ex)for(var k in ex)s[k]=ex[k];
+    steps.push(s);
+  }
+  key[start]=0; pq.push({w:0,v:start,f:-1});
+  snap(2,'시작 정점 '+nm(start)+'의 key를 0으로 두고 우선순위 큐에 (0, '+nm(start)+')를 넣습니다. 나머지 정점의 key는 아직 \u221E(무한대)입니다.');
+  while(pq.length){
+    snap(3,'우선순위 큐에 후보가 '+pq.length+'개 남아 있으므로 반복을 계속합니다.');
+    pq.sort(function(a,b){return a.w-b.w||a.v-b.v;});
+    var top=pq.shift();
+    snap(4,'큐에서 가장 가벼운 후보 (w='+top.w+', 정점 '+nm(top.v)+')를 꺼냅니다.',
+      {cur:top.v,focus:top.f>=0?[top.f,top.v]:null,fs:'check'});
+    if(inM[top.v]){
+      snap(5,nm(top.v)+'는 이미 트리 안에 있습니다. 예전에 넣어 둔 낡은 후보이므로 그냥 버립니다 (지연 삭제).',
+        {cur:top.v,focus:top.f>=0?[top.f,top.v]:null,fs:'reject'});
+      continue;
+    }
+    inM[top.v]=true; total+=top.w;
+    if(top.f>=0)mst.push([top.f,top.v,top.w]);
+    snap(6, top.f<0
+        ? nm(top.v)+'를 트리에 넣습니다. 시작 정점이라 비용은 0입니다.'
+        : '\u2714 '+nm(top.v)+'를 트리에 편입! 간선 '+nm(top.f)+'\u2013'+nm(top.v)+'(w='+top.w+')이 MST에 확정되었습니다. 누적 가중치 '+total,
+      {cur:top.v,focus:top.f>=0?[top.f,top.v]:null,fs:'tree'});
+    ADJ[top.v].forEach(function(p){
+      var v=p[0],c=p[1];
+      if(inM[v]){
+        snap(8,'간선 '+nm(top.v)+'\u2013'+nm(v)+'(w='+c+') 검사 \u2192 '+nm(v)+'는 이미 트리 안이므로 무시합니다.',
+          {cur:top.v,focus:[top.v,v],fs:'reject'});
+        return;
+      }
+      if(c<key[v]){
+        var old=key[v];
+        key[v]=c; par[v]=top.v; pq.push({w:c,v:v,f:top.v});
+        snap(10,'간선 '+nm(top.v)+'\u2013'+nm(v)+'(w='+c+') 검사 \u2192 기존 key['+nm(v)+']='+kv(old)+'보다 싸므로 key를 '+c+'로 갱신하고 parent['+nm(v)+']='+nm(top.v)+', 큐에 ('+c+', '+nm(v)+') 삽입.',
+          {cur:top.v,focus:[top.v,v],fs:'cand'});
+      }else{
+        snap(8,'간선 '+nm(top.v)+'\u2013'+nm(v)+'(w='+c+') 검사 \u2192 이미 알고 있는 key['+nm(v)+']='+key[v]+'가 더 싸거나 같으므로 갱신하지 않습니다.',
+          {cur:top.v,focus:[top.v,v],fs:'reject'});
+      }
+    });
+  }
+  snap(13,'\u2714 큐가 비었습니다. MST 완성! 간선 '+mst.length+'개(=N\u22121), 총 가중치 '+total+'.');
+  return steps;
+}
+
+function renderPrim(st){
+  var es={},ns={},i;
+  for(i=0;i<N;i++){
+    if(st.par[i]>=0&&!st.inM[i])es[ek(st.par[i],i)]='cand';
+  }
+  st.mst.forEach(function(e){es[ek(e[0],e[1])]='tree';});
+  if(st.focus)es[ek(st.focus[0],st.focus[1])]=st.fs;
+  for(i=0;i<N;i++){
+    if(st.inM[i])ns[i]='tree';
+    else if(st.key[i]!==Infinity)ns[i]='cand';
+  }
+  if(st.cur>=0)ns[st.cur]='cur';
+  drawGraph($('pSvg'),{edgeState:es,nodeState:ns,keys:st.key});
+  renderCode($('pCode'),PRIM_CODE,st.line);
+
+  var box=$('pState'); clr(box);
+  var tb=hx('table','st'),hr=hx('tr');
+  ['정점','key','parent','inMST'].forEach(function(h){hr.appendChild(hx('th',null,h));});
+  tb.appendChild(hr);
+  for(i=0;i<N;i++){
+    var r=hx('tr');
+    var c0=hx('td',null,nm(i));
+    var c1=hx('td',st.key[i]===Infinity?'inf':null,kv(st.key[i]));
+    var c2=hx('td',null,st.par[i]<0?'-':nm(st.par[i]));
+    var c3=hx('td',st.inM[i]?'in':null,st.inM[i]?'T':'F');
+    if(i===st.cur){c0.className='cur';c1.className='cur';c2.className='cur';c3.className='cur';}
+    else if(st.inM[i])c0.className='in';
+    [c0,c1,c2,c3].forEach(function(c){r.appendChild(c);});
+    tb.appendChild(r);
+  }
+  box.appendChild(tb);
+
+  var b1=hx('div','blk'); b1.appendChild(hx('h4',null,'우선순위 큐 (가중치 오름차순)'));
+  var ch=hx('div','chips');
+  if(!st.pq.length)ch.appendChild(hx('div','emp','(비어 있음)'));
+  st.pq.forEach(function(o){
+    ch.appendChild(hx('div','chip'+(st.inM[o.v]?' r':''),'('+o.w+', '+nm(o.v)+')'));
+  });
+  b1.appendChild(ch); box.appendChild(b1);
+
+  var b2=hx('div','blk'); b2.appendChild(hx('h4',null,'MST 확정 간선 '+st.mst.length+' / '+(N-1)));
+  var ch2=hx('div','chips');
+  if(!st.mst.length)ch2.appendChild(hx('div','emp','(아직 없음)'));
+  st.mst.forEach(function(e){ch2.appendChild(hx('div','chip t',nm(e[0])+'\u2013'+nm(e[1])+' : '+e[2]));});
+  b2.appendChild(ch2); box.appendChild(b2);
+  box.appendChild(hx('div','tot','누적 가중치 합 = '+st.total));
+}
+var P=new Sim({no:'pNo',tot:'pTot',bar:'pBar',desc:'pDesc',play:'pPlay',spd:'pSpd',render:renderPrim});
+P.setStart=function(){this.load(buildPrim(parseInt($('pStart').value,10)));};
+
+/* ==================== 크루스칼 ==================== */
+var KRUS_CODE=[
+"sort(edges.begin(), edges.end());        // (w, u, v) 오름차순",
+"for (int i = 0; i < n; i++) parent[i] = i;   // 각자 독립 집합",
+"for (auto [w, u, v] : edges) {",
+"    if (find(u) == find(v)) continue;    // 같은 집합 → 사이클!",
+"    unite(u, v);                         // 다른 집합 → 합치기",
+"    mst.push_back({u, v, w});",
+"    total += w;",
+"    if (mst.size() == n - 1) break;      // 간선 n−1개 → 완성",
+"}"];
+
+function buildKruskal(){
+  var SE=GE.map(function(e){return e.slice();})
+    .sort(function(a,b){return a[2]-b[2]||a[0]-b[0]||a[1]-b[1];});
+  var ds=[],i,steps=[],mst=[],total=0,stat=SE.map(function(){return '';});
+  for(i=0;i<N;i++)ds.push(i);
+  function find(x){while(ds[x]!==x)x=ds[x];return x;}
+  function snap(line,desc,ex){
+    var s={line:line,desc:desc,ds:ds.slice(),mst:mst.map(function(e){return e.slice();}),
+      total:total,stat:stat.slice(),idx:-1,focus:null,fs:null};
+    if(ex)for(var k in ex)s[k]=ex[k];
+    steps.push(s);
+  }
+  snap(1,'간선 11개를 가중치 오름차순으로 정렬했습니다. 이제 위에서부터 하나씩 훑기만 하면 됩니다.');
+  snap(2,'parent 배열을 자기 자신으로 초기화합니다. 지금은 정점 7개가 모두 따로 노는 7개의 집합입니다.');
+  for(i=0;i<SE.length;i++){
+    var u=SE[i][0],v=SE[i][1],w=SE[i][2];
+    snap(3,(i+1)+'번째 간선 '+nm(u)+'\u2013'+nm(v)+'(w='+w+')을 꺼냅니다.',
+      {idx:i,focus:[u,v],fs:'check'});
+    var ru=find(u),rv=find(v);
+    if(ru===rv){
+      stat[i]='cyc';
+      snap(4,'\u2718 find('+nm(u)+')='+nm(ru)+', find('+nm(v)+')='+nm(rv)+' \u2014 대표가 같습니다! 이미 연결된 두 정점이라 이 간선을 넣으면 사이클이 생깁니다. 버립니다.',
+        {idx:i,focus:[u,v],fs:'reject'});
+      continue;
+    }
+    snap(4,'find('+nm(u)+')='+nm(ru)+', find('+nm(v)+')='+nm(rv)+' \u2014 대표가 다릅니다. 서로 다른 덩어리이므로 이어도 사이클이 안 생깁니다.',
+      {idx:i,focus:[u,v],fs:'check'});
+    ds[rv]=ru;
+    snap(5,'unite('+nm(u)+', '+nm(v)+') \u2014 '+nm(rv)+'의 부모를 '+nm(ru)+'로 바꿔 두 덩어리를 하나로 합칩니다.',
+      {idx:i,focus:[u,v],fs:'check'});
+    stat[i]='ok'; mst.push([u,v,w]); total+=w;
+    snap(7,'\u2714 간선 '+nm(u)+'\u2013'+nm(v)+'(w='+w+') 채택! 현재 '+mst.length+'개, 누적 가중치 '+total,
+      {idx:i,focus:[u,v],fs:'tree'});
+    if(mst.length===N-1){
+      snap(8,'\u2714 간선이 '+(N-1)+'개(=N\u22121) 모였습니다. 더 볼 필요 없이 종료! 최종 MST 가중치 = '+total,
+        {idx:i,focus:null,fs:null});
+      break;
+    }
+  }
+  steps.SE=SE;
+  return steps;
+}
+var KSE=null;
+
+function renderKruskal(st){
+  var es={};
+  st.mst.forEach(function(e){es[ek(e[0],e[1])]='tree';});
+  for(var i=0;i<KSE.length;i++)if(st.stat[i]==='cyc')es[ek(KSE[i][0],KSE[i][1])]='reject';
+  if(st.focus)es[ek(st.focus[0],st.focus[1])]=st.fs;
+  var ns={},root={},j;
+  function find(x){while(st.ds[x]!==x)x=st.ds[x];return x;}
+  for(j=0;j<N;j++){root[j]=find(j);if(st.ds[j]!==j||hasChild(st.ds,j))ns[j]='tree';}
+  if(st.focus){ns[st.focus[0]]='cur';ns[st.focus[1]]='cur';}
+  drawGraph($('kSvg'),{edgeState:es,nodeState:ns});
+  renderCode($('kCode'),KRUS_CODE,st.line);
+
+  var eb=$('kEdges'); clr(eb);
+  var tb=hx('table','st'),hr=hx('tr');
+  ['#','간선','w','결과'].forEach(function(h){hr.appendChild(hx('th',null,h));});
+  tb.appendChild(hr);
+  KSE.forEach(function(e,i){
+    var r=hx('tr');
+    var c=[hx('td',null,i+1),hx('td',null,nm(e[0])+'\u2013'+nm(e[1])),hx('td',null,e[2]),
+           hx('td',null,st.stat[i]==='ok'?'\u2714 채택':(st.stat[i]==='cyc'?'\u2718 사이클':'-'))];
+    if(i===st.idx)c.forEach(function(x){x.className='cur';});
+    else if(st.stat[i]==='ok')c.forEach(function(x){x.className='in';});
+    else if(st.stat[i]==='cyc')c.forEach(function(x){x.style.color='#f87171';x.style.opacity='.7';});
+    c.forEach(function(x){r.appendChild(x);});
+    tb.appendChild(r);
+  });
+  eb.appendChild(tb);
+
+  var box=$('kState'); clr(box);
+  box.appendChild(hx('h4',null,'현재 집합(덩어리) 현황'));
+  var groups={};
+  for(j=0;j<N;j++){var r2=find(j);(groups[r2]=groups[r2]||[]).push(nm(j));}
+  var ch=hx('div','chips');
+  Object.keys(groups).forEach(function(k){
+    ch.appendChild(hx('div','chip'+(groups[k].length>1?' t':''),'{ '+groups[k].join(', ')+' }'));
+  });
+  box.appendChild(ch);
+
+  var b0=hx('div','blk'); b0.appendChild(hx('h4',null,'parent 배열'));
+  var t2=hx('table','st'),h2=hx('tr'),r3=hx('tr');
+  h2.appendChild(hx('th',null,'x'));r3.appendChild(hx('td',null,'p[x]'));
+  for(j=0;j<N;j++){h2.appendChild(hx('th',null,nm(j)));
+    var td=hx('td',st.ds[j]===j?'in':null,nm(st.ds[j]));r3.appendChild(td);}
+  t2.appendChild(h2);t2.appendChild(r3);b0.appendChild(t2);box.appendChild(b0);
+
+  var b1=hx('div','blk'); b1.appendChild(hx('h4',null,'MST 확정 간선 '+st.mst.length+' / '+(N-1)));
+  var ch2=hx('div','chips');
+  if(!st.mst.length)ch2.appendChild(hx('div','emp','(아직 없음)'));
+  st.mst.forEach(function(e){ch2.appendChild(hx('div','chip t',nm(e[0])+'\u2013'+nm(e[1])+' : '+e[2]));});
+  b1.appendChild(ch2); box.appendChild(b1);
+  box.appendChild(hx('div','tot','누적 가중치 합 = '+st.total));
+}
+function hasChild(ds,j){for(var i=0;i<ds.length;i++)if(i!==j&&ds[i]===j)return true;return false;}
+var K=new Sim({no:'kNo',tot:'kTot',bar:'kBar',desc:'kDesc',play:'kPlay',spd:'kSpd',render:renderKruskal});
+
+/* ==================== 유니온 파인드 ==================== */
+var UF_CODE=[
+"int find(int x) {",
+"    if (parent[x] == x) return x;        // 나 자신이 대표 → 루트",
+"    return parent[x] = find(parent[x]);  // 경로 압축!",
+"}",
+"",
+"void unite(int a, int b) {",
+"    a = find(a);   b = find(b);",
+"    if (a == b) return;                  // 이미 같은 집합",
+"    if (rnk[a] < rnk[b]) swap(a, b);     // 랭크 큰 쪽이 부모",
+"    parent[b] = a;",
+"    if (rnk[a] == rnk[b]) rnk[a]++;",
+"}"];
+
+function drawForest(svg,par,opt){
+  opt=opt||{}; clr(svg);
+  var n=par.length,ch=[],roots=[],i;
+  for(i=0;i<n;i++)ch.push([]);
+  for(i=0;i<n;i++){if(par[i]===i)roots.push(i);else ch[par[i]].push(i);}
+  var pos={},lx=0;
+  function lay(u,d){
+    if(!ch[u].length){pos[u]={c:lx++,d:d};return pos[u].c;}
+    var s=0;ch[u].forEach(function(c){s+=lay(c,d+1);});
+    pos[u]={c:s/ch[u].length,d:d};return pos[u].c;
+  }
+  roots.forEach(function(r){lay(r,0);lx+=0.65;});
+  var XS=opt.xs||66,YS=opt.ys||64,PX=42,PY=38,md=0;
+  for(var k in pos)if(pos[k].d>md)md=pos[k].d;
+  var W=Math.max(opt.minW||420,PX*2+lx*XS),H=PY*2+md*YS;
+  svg.setAttribute('viewBox','0 0 '+Math.round(W)+' '+Math.round(H));
+  function X(u){return PX+pos[u].c*XS;} function Y(u){return PY+pos[u].d*YS;}
+  for(i=0;i<n;i++)if(par[i]!==i){
+    var hi=opt.hiEdge&&opt.hiEdge.indexOf(i)>=0;
+    sv('line',{x1:X(i),y1:Y(i)-21,x2:X(par[i]),y2:Y(par[i])+21,
+      stroke:hi?'#fbbf24':'#2b3a55','stroke-width':hi?5:2.5,'stroke-linecap':'round'},svg);
+  }
+  for(i=0;i<n;i++){
+    var isR=par[i]===i,hi2=opt.hi&&opt.hi.indexOf(i)>=0;
+    if(isR)sv('circle',{cx:X(i),cy:Y(i),r:25,fill:'none',stroke:'#2dd4bf','stroke-width':1.5,opacity:.6},svg);
+    sv('circle',{cx:X(i),cy:Y(i),r:19,fill:hi2?'#fb923c':(isR?'#134e4a':'#16253f'),
+      stroke:hi2?'#fed7aa':(isR?'#2dd4bf':'#3d5273'),'stroke-width':2.6},svg);
+    var t=sv('text',{x:X(i),y:Y(i)+6,'text-anchor':'middle','font-size':15,'font-family':'monospace',
+      'font-weight':'bold',fill:hi2?'#2a0d00':(isR?'#5eead4':'#cfdcec')},svg); t.textContent=i;
+    if(opt.rank){var rt=sv('text',{x:X(i)+25,y:Y(i)-13,'font-size':11,'font-family':'monospace',fill:'#8fa3c0'},svg);
+      rt.textContent='r'+opt.rank[i];}
+  }
+}
+
+function buildUF(){
+  var par=[0,0,1,2,3],steps=[],stack=[];
+  function snap(line,desc,ex){
+    var s={line:line,desc:desc,par:par.slice(),stack:stack.slice(),hi:[],hiEdge:[],ret:null};
+    if(ex)for(var k in ex)s[k]=ex[k];
+    steps.push(s);
+  }
+  snap(0,'랭크를 쓰지 않고 마구 합치면 이렇게 4\u21923\u21922\u21921\u21920 사슬이 만들어질 수 있습니다. 이 상태에서 find(4)는 4번을 거슬러 올라가야 해서 O(N)입니다.');
+  snap(1,'find(4)를 호출합니다.',{stack:['find(4)'],hi:[4]});
+  stack=['find(4)'];
+  var chain=[4,3,2,1];
+  chain.forEach(function(x){
+    snap(2,'parent['+x+'] = '+par[x]+' \u2260 '+x+' 이므로 '+x+'는 루트가 아닙니다. 더 올라가야 합니다.',{stack:stack.slice(),hi:[x]});
+    stack=stack.concat(['find('+par[x]+')']);
+    snap(3,'재귀로 find('+par[x]+')를 호출합니다. 호출 스택이 한 칸 쌓입니다.',{stack:stack.slice(),hi:[par[x]],hiEdge:[x]});
+  });
+  snap(2,'parent[0] = 0 \u2014 자기 자신이 부모! 0이 이 집합의 대표(루트)입니다. 0을 반환합니다.',{stack:stack.slice(),hi:[0],ret:0});
+  var order=[1,2,3,4];
+  order.forEach(function(x){
+    stack.pop();
+    var changed=par[x]!==0;
+    par[x]=0;
+    snap(3,'find('+x+')가 반환값 0을 받았습니다. '+(changed
+        ? '\u2728 경로 압축! parent['+x+']를 '+0+'으로 바꿔 루트에 직접 매답니다.'
+        : 'parent['+x+']는 이미 0이라 그대로입니다.')+' 그리고 0을 위로 반환합니다.',
+      {stack:stack.slice(),hi:[x,0],hiEdge:[x],ret:0});
+  });
+  stack=[];
+  snap(4,'\u2714 find(4) 종료. 트리 높이가 4에서 1로 납작해졌습니다. 이제 0~4 어느 노드에서 find를 불러도 한 번에 끝납니다. 이것이 경로 압축의 힘입니다.',{stack:[],hi:[0,1,2,3,4]});
+  return steps;
+}
+
+function renderUF(st){
+  drawForest($('uSvg'),st.par,{hi:st.hi,hiEdge:st.hiEdge,minW:340,xs:72,ys:62});
+  renderCode($('uCode'),UF_CODE,st.line);
+  var box=$('uState'); clr(box);
+  box.appendChild(hx('h4',null,'재귀 호출 스택 (위가 최근)'));
+  var ch=hx('div','chips'); ch.style.flexDirection='column-reverse'; ch.style.alignItems='flex-start';
+  if(!st.stack.length)ch.appendChild(hx('div','emp','(비어 있음)'));
+  st.stack.forEach(function(s,i){ch.appendChild(hx('div','chip'+(i===st.stack.length-1?' o':''),s));});
+  box.appendChild(ch);
+  if(st.ret!==null){
+    var r=hx('div','tot','반환값 return '+st.ret); box.appendChild(r);
+  }
+  var b=hx('div','blk'); b.appendChild(hx('h4',null,'parent 배열'));
+  var t=hx('table','st'),h=hx('tr'),rr=hx('tr');
+  h.appendChild(hx('th',null,'x')); rr.appendChild(hx('td',null,'p[x]'));
+  for(var i=0;i<st.par.length;i++){
+    h.appendChild(hx('th',null,i));
+    rr.appendChild(hx('td',st.par[i]===i?'in':(st.hi.indexOf(i)>=0?'cur':null),st.par[i]));
+  }
+  t.appendChild(h);t.appendChild(rr);b.appendChild(t);box.appendChild(b);
+  var note=hx('div','blk');
+  note.appendChild(hx('h4',null,'트리 높이'));
+  var mx=0;
+  for(i=0;i<st.par.length;i++){var d=0,c=i;while(st.par[c]!==c){c=st.par[c];d++;}if(d>mx)mx=d;}
+  note.appendChild(hx('div','chip'+(mx<=1?' t':' o'),'현재 최대 깊이 = '+mx));
+  box.appendChild(note);
+}
+var U=new Sim({no:'uNo',tot:'uTot',bar:'uBar',desc:'uDesc',play:'uPlay',spd:'uSpd',render:renderUF});
+
+/* ---- 데모 B: 자유 실습 ---- */
+var FN=8,fpar=[],frnk=[],flog=[];
+function fReset(){fpar=[];frnk=[];flog=[];for(var i=0;i<FN;i++){fpar.push(i);frnk.push(0);}}
+function ffind(x,path){while(fpar[x]!==x){if(path)path.push(x);x=fpar[x];}
+  if(path)path.forEach(function(p){fpar[p]=x;});return x;}
+function addLog(txt,cls){
+  flog.unshift({t:txt,c:cls||''});
+  var box=$('fLog'); clr(box);
+  if(!flog.length)box.appendChild(hx('div','emp','(아직 실행 기록이 없습니다)'));
+  flog.forEach(function(l){
+    var d=hx('div',null,l.t);
+    d.style.padding='5px 8px';d.style.marginBottom='4px';d.style.borderRadius='6px';
+    d.style.background=l.c==='ok'?'rgba(45,212,191,.12)':(l.c==='no'?'rgba(248,113,113,.12)':'rgba(255,255,255,.03)');
+    d.style.color=l.c==='ok'?'#2dd4bf':(l.c==='no'?'#f87171':'#cfdcec');
+    box.appendChild(d);
+  });
+}
+function fDraw(hi){drawForest($('fSvg'),fpar,{rank:frnk,hi:hi||[],minW:560,xs:64,ys:66});}
+function playUnite(){
+  var a=parseInt($('ua').value,10),b=parseInt($('ub').value,10);
+  var ra=ffind(a),rb=ffind(b);
+  if(ra===rb){addLog('unite('+a+','+b+') \u2192 이미 같은 집합 (대표 '+ra+'). 아무 일도 안 일어남 = 사이클!','no');fDraw([a,b]);return;}
+  if(frnk[ra]<frnk[rb]){var t=ra;ra=rb;rb=t;}
+  fpar[rb]=ra;
+  var up=false;
+  if(frnk[ra]===frnk[rb]){frnk[ra]++;up=true;}
+  addLog('unite('+a+','+b+') \u2192 대표 '+rb+'를 대표 '+ra+' 밑에 붙임'+(up?' · rank['+ra+'] 증가 \u2192 '+frnk[ra]:''),'ok');
+  fDraw([ra,rb]);
+}
+function playFind(){
+  var x=parseInt($('uf').value,10),path=[],r=ffind(x,path);
+  addLog('find('+x+') = '+r+(path.length?' · 경로 압축된 노드: '+path.join(', '):' · (이미 루트라 압축 없음)'),'ok');
+  fDraw([x,r]);
+}
+function playReset(){fReset();addLog('초기화 \u2014 0~7이 각각 독립 집합','');fDraw([]);}
+
+/* ==================== 개념 탭 그래프 ==================== */
+var introOn=false;
+var MSTSET={'0-3':1,'3-5':1,'0-1':1,'1-4':1,'2-4':1,'4-6':1};
+function drawIntro(){
+  var es={},ns={};
+  if(introOn){for(var k in MSTSET)es[k]='tree';for(var i=0;i<N;i++)ns[i]='tree';}
+  drawGraph($('introSvg'),{edgeState:es,nodeState:ns});
+}
+function toggleIntroMST(){
+  introOn=!introOn; drawIntro();
+  $('introBtn').textContent=introOn?'원래 그래프로 돌아가기':'정답 MST 보여주기';
+  var d=$('introDesc'); clr(d);
+  d.appendChild(hx('span','tag','그래프'));
+  if(introOn){
+    d.appendChild(document.createTextNode('MST는 A\u2013D(5), D\u2013F(6), A\u2013B(7), B\u2013E(7), C\u2013E(5), E\u2013G(9) \u2014 간선 6개, 합 39입니다. 프림으로 풀든 크루스칼로 풀든 결과는 같습니다.'));
+  }else{
+    d.appendChild(document.createTextNode('간선 11개 중 6개(=7\u22121)만 골라서 모든 정점을 잇되, 합을 최소로 만드는 게 목표입니다.'));
+  }
+}
+
+/* ==================== 전체 소스 ==================== */
+$('pFull').textContent=
+'#include <bits/stdc++.h>\nusing namespace std;\ntypedef pair<int,int> pii;\n\n'+
+'int n, m;\nvector<pii> adj[10001];        // adj[u] = { (v, cost), ... }\n'+
+'bool inMST[10001];\nint  key_[10001], parent_[10001];\n\n'+
+'int prim(int start){\n'+
+'    for(int i=1;i<=n;i++){ key_[i]=INT_MAX; parent_[i]=-1; }\n'+
+'    priority_queue<pii, vector<pii>, greater<pii>> pq;   // (가중치, 정점)\n'+
+'    key_[start]=0;  pq.push({0,start});\n'+
+'    int total=0, cnt=0;\n\n'+
+'    while(!pq.empty()){\n'+
+'        auto [w,u]=pq.top(); pq.pop();\n'+
+'        if(inMST[u]) continue;              // 지연 삭제\n'+
+'        inMST[u]=true;  total+=w;  cnt++;\n'+
+'        for(auto [v,cost] : adj[u]){\n'+
+'            if(!inMST[v] && cost<key_[v]){\n'+
+'                key_[v]=cost;  parent_[v]=u;\n'+
+'                pq.push({cost,v});\n'+
+'            }\n'+
+'        }\n'+
+'    }\n'+
+'    return (cnt==n) ? total : -1;           // -1이면 그래프가 끊겨 있음\n}\n\n'+
+'int main(){\n    scanf("%d %d",&n,&m);\n'+
+'    for(int i=0;i<m;i++){\n'+
+'        int u,v,w; scanf("%d %d %d",&u,&v,&w);\n'+
+'        adj[u].push_back({v,w});\n        adj[v].push_back({u,w});\n    }\n'+
+'    printf("%d\\n", prim(1));\n}';
+
+$('kFull').textContent=
+'#include <bits/stdc++.h>\nusing namespace std;\n\n'+
+'int n, m, parent_[10001], rnk[10001];\nvector<array<int,3>> edges;   // {w, u, v}\n\n'+
+'int find(int x){ return parent_[x]==x ? x : parent_[x]=find(parent_[x]); }\n'+
+'bool unite(int a,int b){\n'+
+'    a=find(a); b=find(b);\n'+
+'    if(a==b) return false;                  // 사이클\n'+
+'    if(rnk[a]<rnk[b]) swap(a,b);\n'+
+'    parent_[b]=a;\n'+
+'    if(rnk[a]==rnk[b]) rnk[a]++;\n'+
+'    return true;\n}\n\n'+
+'int main(){\n    scanf("%d %d",&n,&m);\n'+
+'    for(int i=0;i<m;i++){\n'+
+'        int u,v,w; scanf("%d %d %d",&u,&v,&w);\n'+
+'        edges.push_back({w,u,v});\n    }\n'+
+'    sort(edges.begin(), edges.end());        // 가중치 오름차순\n'+
+'    for(int i=1;i<=n;i++){ parent_[i]=i; rnk[i]=0; }\n\n'+
+'    long long total=0; int cnt=0;\n'+
+'    for(auto& e : edges){\n'+
+'        if(!unite(e[1], e[2])) continue;     // 같은 집합 → 사이클 → 스킵\n'+
+'        total += e[0];\n'+
+'        if(++cnt == n-1) break;              // 간선 n-1개면 완성\n'+
+'    }\n'+
+'    printf("%lld\\n", total);\n}';
+
+$('uFull').textContent=
+'int parent_[100001], rnk[100001];\n\n'+
+'void init(int n){\n'+
+'    for(int i=1;i<=n;i++){ parent_[i]=i; rnk[i]=0; }\n}\n\n'+
+'int find(int x){\n'+
+'    if(parent_[x]==x) return x;\n'+
+'    return parent_[x] = find(parent_[x]);    // 경로 압축\n}\n\n'+
+'bool unite(int a,int b){\n'+
+'    a=find(a); b=find(b);\n'+
+'    if(a==b) return false;                   // 이미 같은 집합\n'+
+'    if(rnk[a]<rnk[b]) swap(a,b);             // 랭크 큰 쪽을 부모로\n'+
+'    parent_[b]=a;\n'+
+'    if(rnk[a]==rnk[b]) rnk[a]++;\n'+
+'    return true;\n}\n\n'+
+'bool same(int a,int b){ return find(a)==find(b); }\n\n'+
+'// 반복문 버전 (재귀 깊이가 걱정될 때)\n'+
+'int find_iter(int x){\n'+
+'    int r=x;\n'+
+'    while(parent_[r]!=r) r=parent_[r];       // 1단계: 루트 찾기\n'+
+'    while(parent_[x]!=r){ int nx=parent_[x]; parent_[x]=r; x=nx; }  // 2단계: 압축\n'+
+'    return r;\n}';
+
+/* ==================== 퀴즈 ==================== */
+var QZ=[
+ {q:'정점이 12개인 연결 그래프의 최소 신장 트리에 들어가는 간선의 개수는?',
+  o:['11개','12개','13개','그래프에 따라 다르다'],a:0,
+  e:'신장 트리는 항상 정점 수 N보다 하나 적은 N\u22121개의 간선을 가집니다. 12\u22121 = 11개.'},
+ {q:'프림 코드에서 <code>if(inMST[u]) continue;</code> 를 지우면 어떻게 될까요?',
+  o:['컴파일 에러가 난다','이미 트리에 있는 정점을 다시 넣어 잘못된 답이 나온다','아무 문제 없다','무한 루프에 빠진다'],a:1,
+  e:'우선순위 큐에는 같은 정점의 낡은 후보가 여러 번 들어 있습니다. 이 검사를 빼면 그 정점이 두 번 이상 트리에 편입되어 가중치가 중복으로 더해집니다.'},
+ {q:'크루스칼에서 간선 (u,v)를 버려야 하는 조건은?',
+  o:['w가 지금까지 최댓값일 때','find(u) != find(v)일 때','find(u) == find(v)일 때','u나 v가 아직 트리에 없을 때'],a:2,
+  e:'대표가 같다 = 이미 같은 덩어리에 속해 있다 = 그 간선을 넣으면 사이클이 생긴다. 그래서 버립니다.'},
+ {q:'경로 압축(path compression)이 하는 일은?',
+  o:['간선을 가중치순으로 정렬한다','find 도중 지나온 노드들을 루트에 직접 연결한다','트리의 간선을 삭제한다','작은 트리를 큰 트리 밑에 붙인다'],a:1,
+  e:'find로 루트까지 올라간 김에, 지나온 모든 노드의 parent를 루트로 바꿔 트리를 납작하게 만듭니다. 마지막 보기는 union by rank 설명입니다.'},
+ {q:'정점 1000개에 간선이 약 50만 개인 밀집 그래프에서 더 유리한 쪽은?',
+  o:['크루스칼 (정렬이 빠르므로)','프림 (특히 O(V\u00B2) 배열 방식)','둘이 완전히 같다','MST를 구할 수 없다'],a:1,
+  e:'E가 V\u00B2에 가까우면 크루스칼의 정렬 O(E log E)가 부담됩니다. 프림 O(V\u00B2)=10\u2076 정도로 오히려 가볍습니다.'}
+];
+function buildQuiz(){
+  var box=$('quiz');
+  QZ.forEach(function(item,qi){
+    var d=hx('div','q');
+    var t=hx('div','qq'); t.textContent='Q'+(qi+1)+'. '+item.q.replace(/<\/?code>/g,'');
+    d.appendChild(t);
+    var ans=hx('div','qa'); ans.textContent='\u2192 '+item.e;
+    item.o.forEach(function(op,oi){
+      var b=hx('button','opt',(oi+1)+') '+op);
+      b.onclick=function(){
+        var sib=d.querySelectorAll('.opt');
+        for(var s=0;s<sib.length;s++){sib[s].className='opt';sib[s].disabled=false;}
+        if(oi===item.a)b.className='opt ok';
+        else{b.className='opt no';sib[item.a].className='opt ok';}
+        ans.className='qa show';
+      };
+      d.appendChild(b);
+    });
+    d.appendChild(ans);
+    box.appendChild(d);
+  });
+}
+
+/* ==================== 초기화 ==================== */
+(function(){
+  drawIntro();
+  P.load(buildPrim(0));
+  var ks=buildKruskal(); KSE=ks.SE; K.load(ks);
+  U.load(buildUF());
+  ['ua','ub','uf'].forEach(function(id,ix){
+    var s=$(id);
+    for(var i=0;i<FN;i++){var o=document.createElement('option');o.value=i;o.textContent=i;s.appendChild(o);}
+    if(id==='ub')s.value=1;
+  });
+  fReset(); addLog('초기화 \u2014 0~7이 각각 독립 집합','');
+  fDraw([]);
+  buildQuiz();
+  document.addEventListener('keydown',function(e){
+    var on=document.querySelector('section.sec.on').id;
+    var s=on==='sec1'?P:(on==='sec2'?K:(on==='sec3'?U:null));
+    if(!s)return;
+    if(e.key==='ArrowRight'){s.stop();s.next();e.preventDefault();}
+    if(e.key==='ArrowLeft'){s.prev();e.preventDefault();}
+  });
+})();
+</script>
+</body>
+</html>
