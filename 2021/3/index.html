@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4804 일이 이어져야 좋다 - 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --blue:#1d4ed8;--blue2:#2563eb;--sky:#eff6ff;--sky2:#dbeafe;
+  --green:#047857;--greenbg:#d1fae5;--red:#dc2626;--redbg:#fee2e2;
+  --yellow:#b45309;--yellowbg:#fef3c7;--slate:#334155;--line:#cbd5e1;
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+  background:#f8fbff;
+  color:#111827;
+  font-size:18px;
+  line-height:1.7;
+}
+header{
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
+  color:#fff;
+  text-align:center;
+  padding:38px 18px;
+}
+header h1{margin:0;font-size:40px}
+header p{margin:10px 0 0;font-size:21px}
+nav{
+  position:sticky;top:0;z-index:20;
+  display:flex;gap:8px;overflow:auto;
+  background:#ffffffee;border-bottom:2px solid #dbeafe;
+  padding:10px 14px;backdrop-filter:blur(8px)
+}
+nav a{
+  white-space:nowrap;text-decoration:none;color:#1e3a8a;
+  background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;
+  padding:7px 12px;font-weight:800;font-size:14px
+}
+main{max-width:1320px;margin:auto;padding:24px}
+section{
+  background:#fff;border:2px solid #dbeafe;border-radius:18px;
+  padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)
+}
+h2{
+  margin-top:0;font-size:30px;color:var(--blue);
+  border-left:8px solid #60a5fa;padding-left:14px
+}
+h3{font-size:23px;margin:12px 0}
+h4{font-size:19px;margin:8px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.box{
+  background:var(--sky);border:2px solid #bfdbfe;border-radius:14px;padding:16px
+}
+.good{background:var(--greenbg);border-color:#6ee7b7}
+.warn{background:var(--yellowbg);border-color:#fbbf24}
+.bad{background:var(--redbg);border-color:#fca5a5}
+.formula{
+  background:var(--yellowbg);border:2px solid #f59e0b;border-radius:14px;
+  padding:15px;text-align:center;font-size:24px;font-weight:900
+}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+input,select{
+  font-size:18px;padding:10px;border:2px solid #93c5fd;border-radius:10px;background:#fff
+}
+button{
+  font-size:17px;font-weight:900;padding:10px 15px;border:0;border-radius:10px;
+  background:var(--blue2);color:#fff;cursor:pointer
+}
+button.green{background:#047857}button.orange{background:#b45309}button.gray{background:#64748b}
+button:hover{filter:brightness(.95)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}
+.stat{
+  background:var(--sky);border:2px solid #bfdbfe;border-radius:13px;
+  padding:12px;text-align:center
+}
+.stat b{display:block;font-size:28px;color:var(--blue)}
+.binary{
+  font-family:Consolas,monospace;font-size:28px;letter-spacing:4px;
+  font-weight:900;text-align:center;background:#0f172a;color:#e2e8f0;
+  padding:16px;border-radius:13px;word-break:break-all
+}
+.bitline{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.bit{
+  width:58px;text-align:center;padding:8px 3px;border:2px solid #94a3b8;
+  border-radius:10px;background:#fff
+}
+.bit.active{background:#fef3c7;border-color:#f59e0b}
+.bit .pos{font-size:12px;color:#64748b}.bit .val{font-size:25px;font-weight:900}
+.string-view{
+  display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;
+  min-height:100px;padding:13px;background:#f8fafc;border:2px solid var(--line);border-radius:13px
+}
+.cell{
+  width:46px;text-align:center;border:2px solid #94a3b8;border-radius:9px;
+  background:#fff;padding:5px 2px;transition:.2s
+}
+.cell .idx{font-size:11px;color:#64748b}.cell .ch{font-size:24px;font-weight:900}
+.cell.query{background:#dbeafe;border-color:#2563eb}
+.cell.best{background:#d1fae5;border-color:#059669;transform:translateY(-5px)}
+.cell.zero{color:#dc2626}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.flow .node{
+  padding:12px 14px;border-radius:12px;background:#eff6ff;border:2px solid #93c5fd;
+  text-align:center;font-weight:900
+}
+.arrow{font-size:28px;color:#2563eb}
+.tree{font-family:Consolas,monospace;white-space:pre;overflow:auto;background:#f8fafc;border:2px solid var(--line);border-radius:13px;padding:16px}
+.list{max-height:420px;overflow:auto;background:#f8fafc;border:2px solid var(--line);border-radius:13px;padding:10px}
+.item{padding:8px 10px;border-bottom:1px solid #e2e8f0}
+.item.active{background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;font-weight:900}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid #bfdbfe;padding:7px;text-align:center}
+th{background:#dbeafe;position:sticky;top:0}
+.scroll{max-height:440px;overflow:auto;border:2px solid #dbeafe;border-radius:13px}
+pre{
+  background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;
+  font-size:15px;line-height:1.6;font-family:Consolas,"Courier New",monospace;white-space:pre
+}
+.code-title{font-weight:900;color:#fff;background:#334155;padding:8px 12px;border-radius:10px 10px 0 0}
+.answer{font-size:34px;font-weight:900;text-align:center;color:#dc2626;word-break:break-all}
+.small{font-size:14px;color:#475569}
+.unit-card{
+  border:2px solid #94a3b8;border-radius:14px;padding:14px;background:#f8fafc
+}
+.array-bar{display:flex;gap:6px;flex-wrap:wrap}
+.arrval{min-width:58px;padding:8px;text-align:center;background:#fff;border:2px solid #93c5fd;border-radius:9px;font-weight:800}
+canvas{width:100%;height:270px;background:#fff;border:2px solid var(--line);border-radius:13px}
+.quiz-result{font-weight:900;color:#047857}
+@media(max-width:900px){
+  .grid,.grid3{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  header h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>정올 4804 일이 이어져야 좋다</h1>
+  <p>재귀 문자열 · 완전 이진트리 · 구간 분할 · Unit 병합을 단계별로 이해하는 강의자료</p>
+</header>
+
+<nav>
+  <a href="#concept">문제 이해</a>
+  <a href="#build">문자열 생성</a>
+  <a href="#position">위치 문자</a>
+  <a href="#query">질의 실험</a>
+  <a href="#unit">Unit</a>
+  <a href="#merge">병합</a>
+  <a href="#divide">분할정복</a>
+  <a href="#complexity">복잡도</a>
+  <a href="#code">정답 코드</a>
+</nav>
+
+<main>
+
+<section id="concept">
+<h2>1. 문제를 가장 쉽게 이해하기</h2>
+<div class="grid3">
+  <div class="box">
+    <h3>문자열은 직접 주어지지 않는다</h3>
+    <p>N을 계속 2로 나누면서 같은 문자열을 좌우에 복사하고, 가운데에 N의 홀짝에 따른 문자를 넣습니다.</p>
+  </div>
+  <div class="box good">
+    <h3>질의는 연속 부분문자열</h3>
+    <p>주어진 구간 안에서 0을 최대 k개 포함하는 가장 긴 연속 구간을 찾습니다.</p>
+  </div>
+  <div class="box warn">
+    <h3>직접 생성은 불가능</h3>
+    <p>N은 최대 10<sup>18</sup>이므로 문자열 길이는 매우 큽니다. 재귀 블록 정보만 계산해야 합니다.</p>
+  </div>
+</div>
+<div class="formula" style="margin-top:16px">S<sub>N</sub> = S<sub>⌊N/2⌋</sub> + (N의 홀짝 문자) + S<sub>⌊N/2⌋</sub></div>
+</section>
+
+<section id="build">
+<h2>2. S<sub>N</sub>이 만들어지는 과정을 직접 보기</h2>
+<div class="controls">
+  <label><b>N</b></label>
+  <input id="nInput" type="number" min="1" max="1000000000000000000" value="13" style="width:230px">
+  <button onclick="buildStringDemo()">재귀 생성 보기</button>
+  <button class="orange" onclick="nextBuildStep()">한 단계씩 보기</button>
+  <button class="gray" onclick="loadN13()">N=13 복원</button>
+</div>
+
+<div class="stats">
+  <div class="stat">최고 레벨<b id="levelStat">-</b></div>
+  <div class="stat">문자열 길이<b id="lengthStat">-</b></div>
+  <div class="stat">현재 단계<b id="stepStat">-</b></div>
+  <div class="stat">현재 가운데 문자<b id="middleStat">-</b></div>
+</div>
+
+<h3>N의 이진수</h3>
+<div id="binaryView" class="binary"></div>
+<div id="bitLine" class="bitline" style="margin-top:12px"></div>
+
+<div class="grid" style="margin-top:16px">
+  <div>
+    <h3>재귀 전개</h3>
+    <div id="buildLog" class="list"></div>
+  </div>
+  <div>
+    <h3>현재 문자열</h3>
+    <div id="builtString" class="string-view"></div>
+  </div>
+</div>
+<p class="small">학습용 화면에서는 문자열이 너무 길어지지 않도록 N이 작은 경우에만 실제 문자열을 펼쳐 보여줍니다.</p>
+</section>
+
+<section id="position">
+<h2>3. 특정 위치의 문자를 문자열 없이 구하기</h2>
+<p>위치 x의 문자는 x가 2로 몇 번 나누어지는지, 즉 trailing zero 개수로 결정됩니다.</p>
+<div class="formula">문자 위치 레벨 c = x의 trailing zero 개수</div>
+<div class="controls">
+  <label><b>위치 x</b></label>
+  <input id="posInput" type="number" min="1" value="4" style="width:140px">
+  <button onclick="inspectPosition()">문자 확인</button>
+</div>
+<div class="grid">
+  <div class="box">
+    <h3>계산 과정</h3>
+    <div id="positionExplain">위치를 입력하고 확인 버튼을 누르세요.</div>
+  </div>
+  <div class="box good">
+    <h3>결과</h3>
+    <div id="positionResult" class="answer">-</div>
+  </div>
+</div>
+</section>
+
+<section id="query">
+<h2>4. 작은 문자열에서 질의를 직접 실험</h2>
+<div class="controls">
+  <label><b>i</b></label><input id="iInput" type="number" min="1" value="1" style="width:100px">
+  <label><b>j</b></label><input id="jInput" type="number" min="1" value="15" style="width:100px">
+  <label><b>k</b></label><input id="kInput" type="number" min="0" value="0" style="width:100px">
+  <button onclick="runQuery()">질의 실행</button>
+  <button class="green" onclick="nextWindow()">슬라이딩 윈도우 한 단계</button>
+</div>
+
+<div id="queryString" class="string-view"></div>
+
+<div class="grid" style="margin-top:16px">
+  <div>
+    <h3>슬라이딩 윈도우 진행</h3>
+    <div id="windowLog" class="list"></div>
+  </div>
+  <div>
+    <h3>가장 긴 결과</h3>
+    <div id="queryAnswer" class="answer">-</div>
+    <div id="bestExplain" class="box"></div>
+  </div>
+</div>
+</section>
+
+<section id="unit">
+<h2>5. 정답 알고리즘의 핵심 자료구조 Unit</h2>
+<div class="grid3">
+  <div class="unit-card">
+    <h3>left[t]</h3>
+    <p>왼쪽 끝에서 시작하면서 0을 최대 t개 포함하는 가장 긴 접두사 길이입니다.</p>
+  </div>
+  <div class="unit-card">
+    <h3>right[t]</h3>
+    <p>오른쪽 끝에서 끝나면서 0을 최대 t개 포함하는 가장 긴 접미사 길이입니다.</p>
+  </div>
+  <div class="unit-card">
+    <h3>best</h3>
+    <p>구간 안에서 0을 최대 K개 포함하는 가장 긴 연속 부분문자열 길이입니다.</p>
+  </div>
+</div>
+
+<div class="controls">
+  <label><b>문자열 X</b></label>
+  <input id="unitString" value="110111" style="width:250px">
+  <label><b>K</b></label>
+  <input id="unitK" type="number" min="0" value="2" style="width:100px">
+  <button onclick="analyzeUnit()">Unit 분석</button>
+</div>
+
+<div class="grid">
+  <div class="box">
+    <h3>left 배열</h3>
+    <div id="leftArray" class="array-bar"></div>
+  </div>
+  <div class="box">
+    <h3>right 배열</h3>
+    <div id="rightArray" class="array-bar"></div>
+  </div>
+</div>
+<div class="stats">
+  <div class="stat">구간 길이<b id="unitLen">-</b></div>
+  <div class="stat">전체 0 개수<b id="unitZero">-</b></div>
+  <div class="stat">best<b id="unitBest">-</b></div>
+  <div class="stat">K<b id="unitKStat">-</b></div>
+</div>
+</section>
+
+<section id="merge">
+<h2>6. 두 Unit을 합치는 원리</h2>
+<div class="controls">
+  <label><b>X</b></label><input id="mergeX" value="1110" style="width:180px">
+  <label><b>Y</b></label><input id="mergeY" value="1111" style="width:180px">
+  <label><b>K</b></label><input id="mergeK" type="number" min="0" value="1" style="width:90px">
+  <button onclick="mergeDemo()">병합 실험</button>
+</div>
+
+<div class="flow">
+  <div class="node">X 내부의 best</div><span class="arrow">↘</span>
+  <div class="node">max</div><span class="arrow">→</span>
+  <div class="node">결과 best</div>
+  <span class="arrow">←</span><div class="node">Y 내부의 best</div>
+</div>
+<div class="formula" style="margin-top:14px">경계 통과 후보 = X.right[t] + Y.left[K-t]</div>
+
+<div class="grid" style="margin-top:16px">
+  <div>
+    <h3>0의 개수 분배표</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>X에 배분</th><th>Y에 배분</th><th>X 접미사</th><th>Y 접두사</th><th>합</th></tr></thead>
+        <tbody id="mergeBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h3>병합 결과</h3>
+    <div id="mergeAnswer" class="answer">-</div>
+    <div id="mergeExplain" class="box"></div>
+  </div>
+</div>
+</section>
+
+<section id="divide">
+<h2>7. 질의 구간을 완전 블록으로 나누기</h2>
+<p>문자열 전체를 완전 이진트리 구간으로 보고, 질의가 완전히 포함하는 블록은 더 내려가지 않고 미리 계산한 Unit을 사용합니다.</p>
+<div class="controls">
+  <button onclick="showDivision()">현재 질의 분할 보기</button>
+</div>
+<div class="grid">
+  <div>
+    <h3>분할 과정</h3>
+    <div id="divisionTree" class="tree"></div>
+  </div>
+  <div>
+    <h3>선택된 블록</h3>
+    <div id="blockList" class="list"></div>
+  </div>
+</div>
+</section>
+
+<section id="complexity">
+<h2>8. 시간복잡도 이해하기</h2>
+<div class="grid3">
+  <div class="box">
+    <h3>레벨 수</h3>
+    <p>N ≤ 10<sup>18</sup>이므로 재귀 깊이는 약 60입니다.</p>
+  </div>
+  <div class="box good">
+    <h3>한 번의 병합</h3>
+    <p>left/right 배열 길이가 K+1이므로 O(K+1)입니다.</p>
+  </div>
+  <div class="box warn">
+    <h3>전체</h3>
+    <p>O((Σk + Q) log N)으로 처리할 수 있습니다.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>9. 이해 확인 문제</h2>
+<div class="grid">
+  <div class="box">
+    <h3>문제 1</h3>
+    <p>N=13일 때 S<sub>N</sub>의 길이는?</p>
+    <button onclick="quiz(1)">정답 확인</button>
+    <p id="quiz1" class="quiz-result"></p>
+  </div>
+  <div class="box">
+    <h3>문제 2</h3>
+    <p>두 구간을 합칠 때 경계를 넘는 후보는 무엇을 더해야 할까요?</p>
+    <button onclick="quiz(2)">정답 확인</button>
+    <p id="quiz2" class="quiz-result"></p>
+  </div>
+</div>
+</section>
+
+<section id="code">
+<h2>10. 정답 C 코드</h2>
+<p class="small">요청하신 대로 전체 정답 코드는 강의자료의 가장 마지막에 배치했습니다.</p>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#define MAX_LEVEL 64
+
+static int currentK;
+static long long queryLeft;
+static long long queryRight;
+static int highestLevel;
+
+typedef struct {
+    long long *left;
+    long long *right;
+
+    int leftSize;
+    int rightSize;
+
+    long long best;
+    long long zeroCount;
+} Unit;
+
+static Unit singleUnit[MAX_LEVEL];
+static Unit precomputed[MAX_LEVEL];
+
+static long long maximum(
+    long long a,
+    long long b
+)
+{
+    return (a &gt; b) ? a : b;
+}
+
+static Unit emptyUnit(void)
+{
+    Unit result;
+
+    result.left = NULL;
+    result.right = NULL;
+
+    result.leftSize = 0;
+    result.rightSize = 0;
+
+    result.best = 0;
+    result.zeroCount = 0;
+
+    return result;
+}
+
+static void freeUnit(Unit *unit)
+{
+    free(unit-&gt;left);
+    free(unit-&gt;right);
+
+    unit-&gt;left = NULL;
+    unit-&gt;right = NULL;
+
+    unit-&gt;leftSize = 0;
+    unit-&gt;rightSize = 0;
+}
+
+static Unit copyUnit(const Unit *source)
+{
+    Unit result = emptyUnit();
+
+    result.leftSize =
+        source-&gt;leftSize;
+
+    result.rightSize =
+        source-&gt;rightSize;
+
+    result.best =
+        source-&gt;best;
+
+    result.zeroCount =
+        source-&gt;zeroCount;
+
+    result.left =
+        (long long *)malloc(
+            sizeof(long long) *
+            result.leftSize
+        );
+
+    result.right =
+        (long long *)malloc(
+            sizeof(long long) *
+            result.rightSize
+        );
+
+    memcpy(
+        result.left,
+        source-&gt;left,
+        sizeof(long long) *
+        result.leftSize
+    );
+
+    memcpy(
+        result.right,
+        source-&gt;right,
+        sizeof(long long) *
+        result.rightSize
+    );
+
+    return result;
+}
+
+static Unit makeSingleUnit(int bit)
+{
+    Unit result = emptyUnit();
+
+    result.zeroCount =
+        (bit == 0) ? 1 : 0;
+
+    if (currentK == 0) {
+        result.best = bit;
+    } else {
+        result.best = 1;
+    }
+
+    result.leftSize =
+        1 +
+        (
+            currentK &gt; 0 &amp;&amp;
+            bit == 0
+        );
+
+    result.rightSize =
+        result.leftSize;
+
+    result.left =
+        (long long *)malloc(
+            sizeof(long long) *
+            result.leftSize
+        );
+
+    result.right =
+        (long long *)malloc(
+            sizeof(long long) *
+            result.rightSize
+        );
+
+    result.left[0] = bit;
+    result.right[0] = bit;
+
+    if (
+        currentK &gt; 0 &amp;&amp;
+        bit == 0
+    ) {
+        result.left[1] = 1;
+        result.right[1] = 1;
+    }
+
+    return result;
+}
+
+static Unit mergeUnit(
+    const Unit *x,
+    const Unit *y
+)
+{
+    Unit result = emptyUnit();
+
+    result.zeroCount =
+        x-&gt;zeroCount +
+        y-&gt;zeroCount;
+
+    result.best =
+        maximum(
+            x-&gt;best,
+            y-&gt;best
+        );
+
+    result.left =
+        (long long *)malloc(
+            sizeof(long long) *
+            (currentK + 1)
+        );
+
+    result.right =
+        (long long *)malloc(
+            sizeof(long long) *
+            (currentK + 1)
+        );
+
+    result.leftSize =
+        x-&gt;leftSize;
+
+    for (int i = 0;
+         i &lt; x-&gt;leftSize;
+         i++) {
+
+        result.left[i] =
+            x-&gt;left[i];
+    }
+
+    if (x-&gt;zeroCount &lt;= currentK) {
+
+        result.leftSize--;
+
+        for (
+            int i = 0;
+            i &lt; y-&gt;leftSize &amp;&amp;
+            result.leftSize &lt;= currentK;
+            i++
+        ) {
+            result.left[
+                result.leftSize++
+            ] =
+                x-&gt;best +
+                y-&gt;left[i];
+        }
+    }
+
+    result.rightSize =
+        y-&gt;rightSize;
+
+    for (int i = 0;
+         i &lt; y-&gt;rightSize;
+         i++) {
+
+        result.right[i] =
+            y-&gt;right[i];
+    }
+
+    if (y-&gt;zeroCount &lt;= currentK) {
+
+        result.rightSize--;
+
+        for (
+            int i = 0;
+            i &lt; x-&gt;rightSize &amp;&amp;
+            result.rightSize &lt;= currentK;
+            i++
+        ) {
+            result.right[
+                result.rightSize++
+            ] =
+                y-&gt;best +
+                x-&gt;right[i];
+        }
+    }
+
+    int allowed;
+
+    if (result.zeroCount &lt; currentK) {
+        allowed =
+            (int)result.zeroCount;
+    } else {
+        allowed =
+            currentK;
+    }
+
+    int firstLeftZero =
+        allowed -
+        (y-&gt;leftSize - 1);
+
+    if (firstLeftZero &lt; 0) {
+        firstLeftZero = 0;
+    }
+
+    int lastLeftZero =
+        x-&gt;rightSize - 1;
+
+    if (lastLeftZero &gt; allowed) {
+        lastLeftZero = allowed;
+    }
+
+    for (
+        int leftZero = firstLeftZero;
+        leftZero &lt;= lastLeftZero;
+        leftZero++
+    ) {
+        int rightZero =
+            allowed - leftZero;
+
+        long long candidate =
+            x-&gt;right[leftZero] +
+            y-&gt;left[rightZero];
+
+        if (candidate &gt; result.best) {
+            result.best = candidate;
+        }
+    }
+
+    return result;
+}
+
+static int trailingZeroCount(
+    unsigned long long value
+)
+{
+    return __builtin_ctzll(value);
+}
+
+static void prepareUnits(
+    unsigned long long N
+)
+{
+    for (int level = 0;
+         level &lt;= highestLevel;
+         level++) {
+
+        int bitPosition =
+            highestLevel - level;
+
+        int bit =
+            (int)(
+                (N &gt;&gt; bitPosition) &amp; 1ULL
+            );
+
+        singleUnit[level] =
+            makeSingleUnit(bit);
+    }
+
+    precomputed[0] =
+        copyUnit(
+            &amp;singleUnit[0]
+        );
+
+    for (int level = 1;
+         level &lt;= highestLevel;
+         level++) {
+
+        Unit temporary =
+            mergeUnit(
+                &amp;precomputed[level - 1],
+                &amp;singleUnit[level]
+            );
+
+        precomputed[level] =
+            mergeUnit(
+                &amp;temporary,
+                &amp;precomputed[level - 1]
+            );
+
+        freeUnit(&amp;temporary);
+    }
+}
+
+static void clearUnits(void)
+{
+    for (int level = 0;
+         level &lt;= highestLevel;
+         level++) {
+
+        freeUnit(
+            &amp;singleUnit[level]
+        );
+
+        freeUnit(
+            &amp;precomputed[level]
+        );
+    }
+}
+
+static Unit divideAndConquer(
+    long long start,
+    long long end
+)
+{
+    long long middle =
+        start +
+        (end - start) / 2;
+
+    int currentLevel =
+        trailingZeroCount(
+            (unsigned long long)middle
+        );
+
+    if (
+        queryLeft &lt;= start &amp;&amp;
+        end &lt;= queryRight
+    ) {
+        return copyUnit(
+            &amp;precomputed[currentLevel]
+        );
+    }
+
+    if (queryRight &lt; middle) {
+        return divideAndConquer(
+            start,
+            middle - 1
+        );
+    }
+
+    if (queryLeft &gt; middle) {
+        return divideAndConquer(
+            middle + 1,
+            end
+        );
+    }
+
+    if (queryLeft == middle) {
+        Unit rightPart =
+            divideAndConquer(
+                middle + 1,
+                end
+            );
+
+        Unit result =
+            mergeUnit(
+                &amp;singleUnit[currentLevel],
+                &amp;rightPart
+            );
+
+        freeUnit(&amp;rightPart);
+
+        return result;
+    }
+
+    Unit leftPart =
+        divideAndConquer(
+            start,
+            middle - 1
+        );
+
+    if (queryRight == middle) {
+        Unit result =
+            mergeUnit(
+                &amp;leftPart,
+                &amp;singleUnit[currentLevel]
+            );
+
+        freeUnit(&amp;leftPart);
+
+        return result;
+    }
+
+    Unit rightPart =
+        divideAndConquer(
+            middle + 1,
+            end
+        );
+
+    Unit leftAndMiddle =
+        mergeUnit(
+            &amp;leftPart,
+            &amp;singleUnit[currentLevel]
+        );
+
+    Unit result =
+        mergeUnit(
+            &amp;leftAndMiddle,
+            &amp;rightPart
+        );
+
+    freeUnit(&amp;leftPart);
+    freeUnit(&amp;rightPart);
+    freeUnit(&amp;leftAndMiddle);
+
+    return result;
+}
+
+int main(void)
+{
+    unsigned long long N;
+    int Q;
+
+    scanf(
+        "%llu %d",
+        &amp;N,
+        &amp;Q
+    );
+
+    highestLevel =
+        63 -
+        __builtin_clzll(N);
+
+    unsigned long long totalLength =
+        (
+            1ULL &lt;&lt;
+            (highestLevel + 1)
+        ) - 1ULL;
+
+    for (int query = 0;
+         query &lt; Q;
+         query++) {
+
+        scanf(
+            "%lld %lld %d",
+            &amp;queryLeft,
+            &amp;queryRight,
+            &amp;currentK
+        );
+
+        prepareUnits(N);
+
+        Unit answer;
+
+        if (queryLeft == queryRight) {
+            int level =
+                trailingZeroCount(
+                    (unsigned long long)
+                    queryLeft
+                );
+
+            answer =
+                copyUnit(
+                    &amp;singleUnit[level]
+                );
+        } else {
+            answer =
+                divideAndConquer(
+                    1,
+                    (long long)totalLength
+                );
+        }
+
+        printf(
+            "%lld\n",
+            answer.best
+        );
+
+        freeUnit(&amp;answer);
+        clearUnits();
+    }
+
+    return 0;
+}</pre>
+</section>
+
+</main>
+
+<script>
+let buildSteps=[], buildCursor=0, demoString="";
+let windowSteps=[], windowCursor=0, currentBest={l:0,r:-1,len:0};
+
+function highestLevelOf(n){
+  let x=BigInt(n), level=-1;
+  while(x>0n){x >>= 1n; level++}
+  return level;
+}
+function toBinary(n){return BigInt(n).toString(2)}
+
+function buildStringSmall(n){
+  n=BigInt(n);
+  if(n===1n)return "1";
+  const half=buildStringSmall(n/2n);
+  return half + (n%2n===0n?"0":"1") + half;
+}
+
+function buildStringDemo(){
+  const n=BigInt(nInput.value);
+  if(n<1n){alert("N은 1 이상이어야 합니다.");return}
+  const level=highestLevelOf(n);
+  const len=(1n<<BigInt(level+1))-1n;
+  levelStat.textContent=level;
+  lengthStat.textContent=len.toString();
+  binaryView.textContent=toBinary(n);
+
+  const bits=toBinary(n).split("");
+  bitLine.innerHTML=bits.map((b,i)=>`<div class="bit"><div class="pos">level ${i}</div><div class="val">${b}</div></div>`).join("");
+
+  buildSteps=[];
+  let cur="1";
+  buildSteps.push({level:0,mid:"1",str:cur,n:1n});
+  let path=[];
+  let x=n;
+  while(x>1n){path.push(x);x/=2n}
+  path.reverse();
+  for(let idx=0;idx<path.length;idx++){
+    const v=path[idx];
+    const mid=v%2n===0n?"0":"1";
+    cur=cur+mid+cur;
+    buildSteps.push({level:idx+1,mid,str:cur,n:v});
+  }
+  buildCursor=buildSteps.length;
+  renderBuildStep(buildSteps.length-1);
+  buildLog.innerHTML=buildSteps.map((s,i)=>`<div class="item">${i}. S<sub>${s.n}</sub> = 이전 블록 + <b>${s.mid}</b> + 이전 블록 → 길이 ${s.str.length}</div>`).join("");
+}
+
+function nextBuildStep(){
+  if(buildSteps.length===0){buildStringDemo();buildCursor=0}
+  if(buildCursor>=buildSteps.length)buildCursor=0;
+  renderBuildStep(buildCursor++);
+}
+function renderBuildStep(idx){
+  const s=buildSteps[idx];
+  if(!s)return;
+  stepStat.textContent=idx;
+  middleStat.textContent=s.mid;
+  [...bitLine.children].forEach((el,i)=>el.classList.toggle("active",i===idx));
+  if(s.str.length<=255){
+    builtString.innerHTML=s.str.split("").map((ch,i)=>`<div class="cell ${ch==="0"?"zero":""}"><div class="idx">${i+1}</div><div class="ch">${ch}</div></div>`).join("");
+  }else{
+    builtString.innerHTML=`<div class="box warn">문자열 길이가 ${s.str.length}이라 화면 표시를 생략했습니다.</div>`;
+  }
+}
+function loadN13(){nInput.value="13";buildStringDemo();posInput.value=4;iInput.value=1;jInput.value=15;kInput.value=0;runQuery()}
+
+function ctzBigInt(x){
+  let c=0n;
+  while((x&1n)===0n){x>>=1n;c++}
+  return Number(c);
+}
+function inspectPosition(){
+  const n=BigInt(nInput.value),x=BigInt(posInput.value);
+  const level=highestLevelOf(n);
+  const len=(1n<<BigInt(level+1))-1n;
+  if(x<1n||x>len){alert("위치는 1부터 문자열 길이 사이여야 합니다.");return}
+  const c=ctzBigInt(x);
+  const bitPos=level-c;
+  const bit=(n>>BigInt(bitPos))&1n;
+  positionExplain.innerHTML=
+    `1. x = ${x}<br>`+
+    `2. trailing zero 개수 c = ${c}<br>`+
+    `3. 확인할 N의 비트 위치 = ${level} - ${c} = ${bitPos}<br>`+
+    `4. 해당 비트 = ${bit}`;
+  positionResult.textContent=bit.toString();
+}
+
+function runQuery(){
+  const n=BigInt(nInput.value);
+  const level=highestLevelOf(n);
+  if(level>12){alert("질의 시각화는 N이 작을 때 사용하세요. N=13을 권장합니다.");return}
+  demoString=buildStringSmall(n);
+  const i=Number(iInput.value),j=Number(jInput.value),k=Number(kInput.value);
+  if(i<1||j>demoString.length||i>j||k<0){alert("i, j, k 범위를 확인하세요.");return}
+  currentBest={l:i-1,r:i-2,len:0};
+  windowSteps=[];
+  let left=i-1,zeros=0,bestLen=0,bestL=left,bestR=left-1;
+  for(let right=i-1;right<=j-1;right++){
+    if(demoString[right]==="0")zeros++;
+    while(zeros>k){
+      if(demoString[left]==="0")zeros--;
+      left++;
+    }
+    const len=right-left+1;
+    if(len>bestLen){bestLen=len;bestL=left;bestR=right}
+    windowSteps.push({left,right,zeros,bestLen,bestL,bestR});
+  }
+  currentBest={l:bestL,r:bestR,len:bestLen};
+  windowCursor=0;
+  renderQueryString(i,j,bestL,bestR);
+  queryAnswer.textContent=bestLen;
+  bestExplain.innerHTML=`최장 구간: [${bestL+1}, ${bestR+1}]<br>문자열: <b>${demoString.slice(bestL,bestR+1)}</b><br>0의 개수: ${(demoString.slice(bestL,bestR+1).match(/0/g)||[]).length}`;
+  windowLog.innerHTML=windowSteps.map((s,idx)=>`<div class="item">단계 ${idx+1}: left=${s.left+1}, right=${s.right+1}, zero=${s.zeros}, 현재 best=${s.bestLen}</div>`).join("");
+}
+function nextWindow(){
+  if(windowSteps.length===0)runQuery();
+  if(windowCursor>=windowSteps.length)windowCursor=0;
+  const s=windowSteps[windowCursor++];
+  renderQueryString(Number(iInput.value),Number(jInput.value),s.left,s.right);
+  [...windowLog.children].forEach((el,i)=>el.classList.toggle("active",i===windowCursor-1));
+}
+function renderQueryString(i,j,bL,bR){
+  queryString.innerHTML=demoString.split("").map((ch,idx)=>{
+    let cls="cell";
+    if(idx>=i-1&&idx<=j-1)cls+=" query";
+    if(idx>=bL&&idx<=bR)cls+=" best";
+    if(ch==="0")cls+=" zero";
+    return `<div class="${cls}"><div class="idx">${idx+1}</div><div class="ch">${ch}</div></div>`;
+  }).join("");
+}
+
+function bruteUnit(s,K){
+  const left=[],right=[];
+  for(let t=0;t<=K;t++){
+    let z=0,len=0;
+    for(let i=0;i<s.length;i++){if(s[i]==="0")z++;if(z>t)break;len++}
+    left.push(len);
+    z=0;len=0;
+    for(let i=s.length-1;i>=0;i--){if(s[i]==="0")z++;if(z>t)break;len++}
+    right.push(len);
+  }
+  let l=0,z=0,best=0;
+  for(let r=0;r<s.length;r++){
+    if(s[r]==="0")z++;
+    while(z>K){if(s[l]==="0")z--;l++}
+    best=Math.max(best,r-l+1);
+  }
+  return {left,right,best,zero:(s.match(/0/g)||[]).length,len:s.length}
+}
+function renderArr(el,arr){
+  el.innerHTML=arr.map((v,i)=>`<div class="arrval">t=${i}<br><b>${v}</b></div>`).join("");
+}
+function analyzeUnit(){
+  const s=unitString.value.trim(),K=Number(unitK.value);
+  if(!/^[01]+$/.test(s)||K<0){alert("0과 1로만 이루어진 문자열과 K를 입력하세요.");return}
+  const u=bruteUnit(s,K);
+  renderArr(leftArray,u.left);renderArr(rightArray,u.right);
+  unitLen.textContent=u.len;unitZero.textContent=u.zero;unitBest.textContent=u.best;unitKStat.textContent=K;
+}
+
+function mergeDemo(){
+  const X=mergeX.value.trim(),Y=mergeY.value.trim(),K=Number(mergeK.value);
+  if(!/^[01]+$/.test(X)||!/^[01]+$/.test(Y)){alert("X와 Y는 0과 1로만 입력하세요.");return}
+  const ux=bruteUnit(X,K),uy=bruteUnit(Y,K),uz=bruteUnit(X+Y,K);
+  let rows=[];
+  for(let t=0;t<=K;t++){
+    const a=t,b=K-t;
+    if(a<ux.right.length&&b<uy.left.length){
+      rows.push(`<tr><td>${a}</td><td>${b}</td><td>${ux.right[a]}</td><td>${uy.left[b]}</td><td>${ux.right[a]+uy.left[b]}</td></tr>`)
+    }
+  }
+  mergeBody.innerHTML=rows.join("");
+  mergeAnswer.textContent=uz.best;
+  mergeExplain.innerHTML=`X.best=${ux.best}, Y.best=${uy.best}<br>경계를 넘는 후보들을 비교한 뒤<br><b>최종 best=${uz.best}</b>`;
+}
+
+function showDivision(){
+  const n=BigInt(nInput.value),level=highestLevelOf(n),len=Number((1n<<BigInt(level+1))-1n);
+  const ql=Number(iInput.value),qr=Number(jInput.value);
+  if(level>20){divisionTree.textContent="시각화는 N이 작을 때 사용하세요.";return}
+  let lines=[],blocks=[];
+  function rec(s,e,depth){
+    const pad="  ".repeat(depth);
+    if(qr<s||e<ql){lines.push(`${pad}[${s},${e}] 제외`);return}
+    if(ql<=s&&e<=qr){lines.push(`${pad}[${s},${e}] 완전 포함 → 전처리 Unit 사용`);blocks.push([s,e]);return}
+    const m=Math.floor((s+e)/2);
+    lines.push(`${pad}[${s},${e}] 분할, middle=${m}`);
+    if(s<=m-1)rec(s,m-1,depth+1);
+    if(ql<=m&&m<=qr){lines.push(`${pad}  [${m},${m}] 가운데 문자`);blocks.push([m,m])}
+    if(m+1<=e)rec(m+1,e,depth+1);
+  }
+  rec(1,len,0);
+  divisionTree.textContent=lines.join("\n");
+  blockList.innerHTML=blocks.map((b,i)=>`<div class="item">${i+1}. [${b[0]}, ${b[1]}] 길이 ${b[1]-b[0]+1}</div>`).join("");
+}
+
+function quiz(n){
+  if(n===1)quiz1.innerHTML="15입니다. floor(log₂13)=3이므로 2⁴-1=15입니다.";
+  else quiz2.innerHTML="왼쪽 구간의 접미사 길이와 오른쪽 구간의 접두사 길이를 더합니다.";
+}
+
+buildStringDemo();
+runQuery();
+analyzeUnit();
+mergeDemo();
+</script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4803 누적 거리 - 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --blue:#1d4ed8;--blue2:#2563eb;--sky:#eff6ff;--sky2:#dbeafe;
+  --green:#047857;--greenbg:#d1fae5;--red:#dc2626;--redbg:#fee2e2;
+  --yellow:#b45309;--yellowbg:#fef3c7;--slate:#334155;--line:#cbd5e1;
+}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.7}
+header{background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;text-align:center;padding:38px 18px}
+header h1{margin:0;font-size:40px} header p{margin:10px 0 0;font-size:21px}
+nav{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow:auto;background:#ffffffee;border-bottom:2px solid #dbeafe;padding:10px 14px;backdrop-filter:blur(8px)}
+nav a{white-space:nowrap;text-decoration:none;color:#1e3a8a;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:7px 12px;font-weight:800;font-size:14px}
+main{max-width:1320px;margin:auto;padding:24px}
+section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)}
+h2{margin-top:0;font-size:30px;color:var(--blue);border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:23px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.box{background:var(--sky);border:2px solid #bfdbfe;border-radius:14px;padding:16px}
+.good{background:var(--greenbg);border-color:#6ee7b7}.warn{background:var(--yellowbg);border-color:#fbbf24}.bad{background:var(--redbg);border-color:#fca5a5}
+.formula{background:var(--yellowbg);border:2px solid #f59e0b;border-radius:14px;padding:15px;text-align:center;font-size:24px;font-weight:900}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+input,textarea{font-size:18px;padding:10px;border:2px solid #93c5fd;border-radius:10px;background:#fff}
+button{font-size:17px;font-weight:900;padding:10px 15px;border:0;border-radius:10px;background:var(--blue2);color:#fff;cursor:pointer}
+button.green{background:#047857}button.orange{background:#b45309}button.gray{background:#64748b}
+button:hover{filter:brightness(.95)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}
+.stat{background:var(--sky);border:2px solid #bfdbfe;border-radius:13px;padding:12px;text-align:center}
+.stat b{display:block;font-size:28px;color:var(--blue)}
+canvas{width:100%;height:330px;background:#fff;border:2px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid #bfdbfe;padding:7px;text-align:center}
+th{background:#dbeafe;position:sticky;top:0}
+.scroll{max-height:440px;overflow:auto;border:2px solid #dbeafe;border-radius:13px}
+.item{padding:8px 10px;border-bottom:1px solid #e2e8f0}
+.item.active{background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;font-weight:900}
+.list{max-height:420px;overflow:auto;background:#f8fafc;border:2px solid var(--line);border-radius:13px;padding:10px}
+pre{background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;font-size:15px;line-height:1.6;font-family:Consolas,"Courier New",monospace;white-space:pre}
+.answer{font-size:34px;font-weight:900;text-align:center;color:#dc2626;word-break:break-all}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.flow .node{padding:12px 14px;border-radius:12px;background:#eff6ff;border:2px solid #93c5fd;text-align:center;font-weight:900}
+.arrow{font-size:28px;color:#2563eb}
+.array-bar{display:flex;gap:6px;flex-wrap:wrap}
+.arrval{min-width:70px;padding:8px;text-align:center;background:#fff;border:2px solid #93c5fd;border-radius:9px;font-weight:800}
+.small{font-size:14px;color:#475569}
+@media(max-width:900px){.grid,.grid3{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}header h1{font-size:30px}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4803 누적 거리</h1>
+<p>수직선 · 절댓값 · 정렬 · 이분 탐색 · 누적합을 한 번에 이해하는 인터렉티브 강의자료</p>
+</header>
+
+<nav>
+<a href="#concept">문제 이해</a>
+<a href="#visual">거리 시각화</a>
+<a href="#brute">완전탐색</a>
+<a href="#sort">정렬</a>
+<a href="#prefix">누적합</a>
+<a href="#query">질의 계산</a>
+<a href="#binary">이분 탐색</a>
+<a href="#proof">공식 이해</a>
+<a href="#code">정답 코드</a>
+</nav>
+
+<main>
+<section id="concept">
+<h2>1. 문제를 가장 쉽게 이해하기</h2>
+<div class="grid3">
+<div class="box"><h3>마을</h3><p>각 마을은 위치 x와 인구수 a를 가지고 있습니다.</p></div>
+<div class="box good"><h3>후보 장소 q</h3><p>모임 장소가 q일 때 모든 사람이 이동한 거리의 합을 구합니다.</p></div>
+<div class="box warn"><h3>핵심 수식</h3><p>마을 하나의 기여도는 a × |x-q|입니다.</p></div>
+</div>
+<div class="formula" style="margin-top:16px">f(q) = Σ aᵢ × |xᵢ - q|</div>
+</section>
+
+<section id="visual">
+<h2>2. 수직선에서 마을과 후보 위치 움직이기</h2>
+<div class="controls">
+<label><b>마을 정보</b></label>
+<textarea id="villageInput" rows="4" style="width:420px">2 1
+1 3
+3 6</textarea>
+<label><b>후보 q</b></label>
+<input id="qInput" type="number" value="4" style="width:130px">
+<button onclick="loadVillages()">그래프 그리기</button>
+<button class="green" onclick="calculateDirect()">직접 계산</button>
+<button class="gray" onclick="loadExample()">예제 복원</button>
+</div>
+<canvas id="lineCanvas" width="1200" height="330"></canvas>
+<div class="stats">
+<div class="stat">마을 수<b id="vCount">-</b></div>
+<div class="stat">전체 인구<b id="popTotal">-</b></div>
+<div class="stat">후보 위치<b id="qStat">-</b></div>
+<div class="stat">누적 거리<b id="distTotal">-</b></div>
+</div>
+</section>
+
+<section id="brute">
+<h2>3. 완전탐색으로 먼저 이해하기</h2>
+<div class="grid">
+<div>
+<h3>마을별 계산</h3>
+<div class="scroll">
+<table>
+<thead><tr><th>마을</th><th>인구 a</th><th>위치 x</th><th>|x-q|</th><th>a×|x-q|</th></tr></thead>
+<tbody id="bruteBody"></tbody>
+</table>
+</div>
+</div>
+<div>
+<h3>현재 합</h3>
+<div id="bruteAnswer" class="answer">-</div>
+<div class="box bad"><p>질의 하나마다 모든 마을을 확인하면 O(N), 전체는 O(NQ)입니다.</p></div>
+</div>
+</div>
+</section>
+
+<section id="sort">
+<h2>4. 마을을 위치순으로 정렬하는 이유</h2>
+<div class="controls">
+<button onclick="showSorted()">정렬 전/후 보기</button>
+</div>
+<div class="grid">
+<div class="box">
+<h3>정렬 전</h3>
+<div id="beforeSort" class="array-bar"></div>
+</div>
+<div class="box good">
+<h3>정렬 후</h3>
+<div id="afterSort" class="array-bar"></div>
+</div>
+</div>
+<p>정렬해야 후보 q보다 왼쪽에 있는 마을과 오른쪽에 있는 마을을 한 번에 나눌 수 있습니다.</p>
+</section>
+
+<section id="prefix">
+<h2>5. 두 종류의 누적합 만들기</h2>
+<div class="grid">
+<div class="box">
+<h3>인구수 누적합</h3>
+<p>prefixPopulation[i] = 앞에서부터 i개 마을의 인구수 합</p>
+<div id="prefixPop" class="array-bar"></div>
+</div>
+<div class="box">
+<h3>가중 위치 누적합</h3>
+<p>prefixWeighted[i] = 앞에서부터 i개 마을의 a×x 합</p>
+<div id="prefixWeight" class="array-bar"></div>
+</div>
+</div>
+<div class="controls">
+<button onclick="buildPrefix()">누적합 만들기</button>
+</div>
+<div class="scroll">
+<table>
+<thead><tr><th>i</th><th>위치 x</th><th>인구 a</th><th>a×x</th><th>인구 누적합</th><th>가중 누적합</th></tr></thead>
+<tbody id="prefixBody"></tbody>
+</table>
+</div>
+</section>
+
+<section id="query">
+<h2>6. 한 질의를 누적합으로 계산하기</h2>
+<div class="formula">왼쪽 거리 = q × 왼쪽 인구수 - 왼쪽 가중 위치 합</div>
+<div class="formula" style="margin-top:10px">오른쪽 거리 = 오른쪽 가중 위치 합 - q × 오른쪽 인구수</div>
+<div class="controls">
+<button onclick="calculateFast()">빠른 방식으로 계산</button>
+</div>
+<div class="grid3">
+<div class="box">
+<h3>왼쪽 정보</h3>
+<div id="leftInfo">-</div>
+</div>
+<div class="box">
+<h3>오른쪽 정보</h3>
+<div id="rightInfo">-</div>
+</div>
+<div class="box good">
+<h3>최종 답</h3>
+<div id="fastAnswer" class="answer">-</div>
+</div>
+</div>
+</section>
+
+<section id="binary">
+<h2>7. 이분 탐색으로 경계 찾기</h2>
+<p>정렬된 마을 중 처음으로 위치가 q 이상인 인덱스를 찾습니다.</p>
+<div class="controls">
+<button onclick="prepareBinary()">이분 탐색 준비</button>
+<button class="orange" onclick="nextBinary()">한 단계 진행</button>
+</div>
+<div id="binaryArray" class="array-bar"></div>
+<div id="binaryLog" class="list" style="margin-top:14px"></div>
+</section>
+
+<section id="proof">
+<h2>8. 왜 공식이 맞는가?</h2>
+<div class="grid">
+<div class="box">
+<h3>왼쪽 마을</h3>
+<p>x &lt; q 이므로 |x-q| = q-x</p>
+<p>a(q-x) = aq-ax</p>
+<p>모두 더하면 qΣa - Σax</p>
+</div>
+<div class="box good">
+<h3>오른쪽 마을</h3>
+<p>x ≥ q 이므로 |x-q| = x-q</p>
+<p>a(x-q) = ax-aq</p>
+<p>모두 더하면 Σax - qΣa</p>
+</div>
+</div>
+<div class="flow" style="margin-top:16px">
+<div class="node">정렬</div><span class="arrow">→</span>
+<div class="node">lower_bound</div><span class="arrow">→</span>
+<div class="node">왼쪽/오른쪽 분리</div><span class="arrow">→</span>
+<div class="node">누적합 공식</div><span class="arrow">→</span>
+<div class="node">O(log N)</div>
+</div>
+</section>
+
+<section>
+<h2>9. 시간복잡도 비교</h2>
+<div class="grid3">
+<div class="box bad"><h3>완전탐색</h3><p>질의 하나 O(N), 전체 O(NQ)</p></div>
+<div class="box warn"><h3>전처리</h3><p>정렬 O(N log N), 누적합 O(N)</p></div>
+<div class="box good"><h3>질의</h3><p>이분 탐색 O(log N), 전체 O(Q log N)</p></div>
+</div>
+</section>
+
+<section>
+<h2>10. 이해 확인 문제</h2>
+<div class="grid">
+<div class="box">
+<h3>문제 1</h3>
+<p>q보다 왼쪽에 있는 마을에서는 절댓값이 무엇으로 바뀔까요?</p>
+<button onclick="quiz(1)">정답 확인</button>
+<p id="quiz1"></p>
+</div>
+<div class="box">
+<h3>문제 2</h3>
+<p>prefixWeighted에는 무엇을 누적해야 할까요?</p>
+<button onclick="quiz(2)">정답 확인</button>
+<p id="quiz2"></p>
+</div>
+</div>
+</section>
+
+<section id="code">
+<h2>11. 정답 C 코드</h2>
+<p class="small">전체 정답 코드는 요청하신 대로 강의자료 맨 뒤에 배치했습니다.</p>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct {
+    long long population;
+    long long position;
+} Village;
+
+int compareVillage(
+    const void *left,
+    const void *right
+)
+{
+    const Village *a =
+        (const Village *)left;
+
+    const Village *b =
+        (const Village *)right;
+
+    if (a-&gt;position &lt; b-&gt;position) {
+        return -1;
+    }
+
+    if (a-&gt;position &gt; b-&gt;position) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int lowerBound(
+    const Village village[],
+    int size,
+    long long target
+)
+{
+    int left = 0;
+    int right = size;
+
+    while (left &lt; right) {
+        int middle =
+            left + (right - left) / 2;
+
+        if (
+            village[middle].position
+            &lt; target
+        ) {
+            left = middle + 1;
+        } else {
+            right = middle;
+        }
+    }
+
+    return left;
+}
+
+int main(void)
+{
+    int N;
+    int Q;
+
+    scanf("%d %d", &amp;N, &amp;Q);
+
+    Village *village =
+        (Village *)malloc(
+            sizeof(Village) * N
+        );
+
+    for (int i = 0; i &lt; N; i++) {
+        scanf(
+            "%lld %lld",
+            &amp;village[i].population,
+            &amp;village[i].position
+        );
+    }
+
+    qsort(
+        village,
+        N,
+        sizeof(Village),
+        compareVillage
+    );
+
+    long long *prefixPopulation =
+        (long long *)malloc(
+            sizeof(long long) *
+            (N + 1)
+        );
+
+    long long *prefixWeighted =
+        (long long *)malloc(
+            sizeof(long long) *
+            (N + 1)
+        );
+
+    prefixPopulation[0] = 0;
+    prefixWeighted[0] = 0;
+
+    for (int i = 0; i &lt; N; i++) {
+        prefixPopulation[i + 1] =
+            prefixPopulation[i]
+            + village[i].population;
+
+        prefixWeighted[i + 1] =
+            prefixWeighted[i]
+            + village[i].population
+              * village[i].position;
+    }
+
+    for (int query = 0;
+         query &lt; Q;
+         query++) {
+
+        long long meetingPosition;
+
+        scanf(
+            "%lld",
+            &amp;meetingPosition
+        );
+
+        int boundary =
+            lowerBound(
+                village,
+                N,
+                meetingPosition
+            );
+
+        long long leftPopulation =
+            prefixPopulation[boundary];
+
+        long long leftWeighted =
+            prefixWeighted[boundary];
+
+        long long rightPopulation =
+            prefixPopulation[N]
+            - prefixPopulation[boundary];
+
+        long long rightWeighted =
+            prefixWeighted[N]
+            - prefixWeighted[boundary];
+
+        long long leftDistance =
+            meetingPosition
+            * leftPopulation
+            - leftWeighted;
+
+        long long rightDistance =
+            rightWeighted
+            - meetingPosition
+              * rightPopulation;
+
+        long long answer =
+            leftDistance
+            + rightDistance;
+
+        printf("%lld\n", answer);
+    }
+
+    free(prefixWeighted);
+    free(prefixPopulation);
+    free(village);
+
+    return 0;
+}</pre>
+</section>
+</main>
+
+<script>
+let villages=[], sortedVillages=[], prefixP=[], prefixW=[];
+let binarySteps=[], binaryCursor=0;
+
+function parseVillages(){
+  const lines=villageInput.value.trim().split(/\n+/);
+  const arr=[];
+  for(const line of lines){
+    const p=line.trim().split(/\s+/).map(Number);
+    if(p.length!==2||!Number.isFinite(p[0])||!Number.isFinite(p[1]))continue;
+    arr.push({a:p[0],x:p[1]});
+  }
+  return arr;
+}
+function loadVillages(){
+  villages=parseVillages();
+  if(!villages.length){alert("마을 정보를 입력하세요.");return}
+  sortedVillages=[...villages].sort((u,v)=>u.x-v.x);
+  const q=Number(qInput.value);
+  vCount.textContent=villages.length;
+  popTotal.textContent=villages.reduce((s,v)=>s+v.a,0);
+  qStat.textContent=q;
+  drawLine(q);
+  showSorted();
+  buildPrefix();
+  calculateDirect();
+}
+function drawLine(q){
+  const c=lineCanvas,ctx=c.getContext("2d"),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  const xs=villages.map(v=>v.x).concat([q]);
+  let min=Math.min(...xs),max=Math.max(...xs);
+  if(min===max){min--;max++}
+  const px=x=>70+(x-min)*(W-140)/(max-min);
+  const y=210;
+  ctx.strokeStyle="#334155";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(50,y);ctx.lineTo(W-50,y);ctx.stroke();
+  for(let t=Math.ceil(min);t<=Math.floor(max);t++){
+    const x=px(t);ctx.strokeStyle="#cbd5e1";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x,y+8);ctx.stroke();
+  }
+  villages.forEach((v,i)=>{
+    const x=px(v.x);
+    ctx.fillStyle="#2563eb";ctx.fillRect(x-12,y-55,24,55);
+    ctx.fillStyle="#111827";ctx.font="16px Arial";ctx.textAlign="center";
+    ctx.fillText(`마을${i+1}`,x,y-65);ctx.fillText(`x=${v.x}`,x,y+28);ctx.fillText(`a=${v.a}`,x,y-20);
+  });
+  const qx=px(q);ctx.strokeStyle="#dc2626";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(qx,50);ctx.lineTo(qx,y+40);ctx.stroke();
+  ctx.fillStyle="#dc2626";ctx.font="bold 18px Arial";ctx.fillText(`q=${q}`,qx,38);
+}
+function calculateDirect(){
+  if(!villages.length)loadVillages();
+  const q=Number(qInput.value);
+  let sum=0;
+  bruteBody.innerHTML=villages.map((v,i)=>{
+    const d=Math.abs(v.x-q),w=v.a*d;sum+=w;
+    return `<tr><td>${i+1}</td><td>${v.a}</td><td>${v.x}</td><td>${d}</td><td>${w}</td></tr>`;
+  }).join("");
+  bruteAnswer.textContent=sum;distTotal.textContent=sum;qStat.textContent=q;drawLine(q);
+}
+function showSorted(){
+  if(!villages.length)villages=parseVillages();
+  sortedVillages=[...villages].sort((u,v)=>u.x-v.x);
+  beforeSort.innerHTML=villages.map(v=>`<div class="arrval">x=${v.x}<br>a=${v.a}</div>`).join("");
+  afterSort.innerHTML=sortedVillages.map(v=>`<div class="arrval">x=${v.x}<br>a=${v.a}</div>`).join("");
+}
+function buildPrefix(){
+  if(!sortedVillages.length)showSorted();
+  prefixP=[0];prefixW=[0];
+  sortedVillages.forEach(v=>{
+    prefixP.push(prefixP[prefixP.length-1]+v.a);
+    prefixW.push(prefixW[prefixW.length-1]+v.a*v.x);
+  });
+  prefixPop.innerHTML=prefixP.map((v,i)=>`<div class="arrval">P[${i}]<br>${v}</div>`).join("");
+  prefixWeight.innerHTML=prefixW.map((v,i)=>`<div class="arrval">W[${i}]<br>${v}</div>`).join("");
+  prefixBody.innerHTML=sortedVillages.map((v,i)=>`<tr><td>${i}</td><td>${v.x}</td><td>${v.a}</td><td>${v.a*v.x}</td><td>${prefixP[i+1]}</td><td>${prefixW[i+1]}</td></tr>`).join("");
+}
+function lowerBoundPos(q){
+  let l=0,r=sortedVillages.length;
+  while(l<r){const m=Math.floor((l+r)/2);if(sortedVillages[m].x<q)l=m+1;else r=m}
+  return l;
+}
+function calculateFast(){
+  if(!prefixP.length)buildPrefix();
+  const q=Number(qInput.value),b=lowerBoundPos(q),N=sortedVillages.length;
+  const lp=prefixP[b],lw=prefixW[b],rp=prefixP[N]-prefixP[b],rw=prefixW[N]-prefixW[b];
+  const ld=q*lp-lw,rd=rw-q*rp,ans=ld+rd;
+  leftInfo.innerHTML=`boundary=${b}<br>인구수 합=${lp}<br>a×x 합=${lw}<br>거리=${q}×${lp}-${lw}=<b>${ld}</b>`;
+  rightInfo.innerHTML=`인구수 합=${rp}<br>a×x 합=${rw}<br>거리=${rw}-${q}×${rp}=<b>${rd}</b>`;
+  fastAnswer.textContent=ans;
+}
+function prepareBinary(){
+  if(!sortedVillages.length)showSorted();
+  const q=Number(qInput.value);
+  binarySteps=[];let l=0,r=sortedVillages.length;
+  while(l<r){
+    const m=Math.floor((l+r)/2);
+    binarySteps.push({l,r,m,x:sortedVillages[m].x,move:sortedVillages[m].x<q?"left=m+1":"right=m"});
+    if(sortedVillages[m].x<q)l=m+1;else r=m;
+  }
+  binarySteps.push({done:true,l});
+  binaryCursor=0;
+  binaryArray.innerHTML=sortedVillages.map((v,i)=>`<div class="arrval" id="b${i}">i=${i}<br>x=${v.x}</div>`).join("");
+  binaryLog.innerHTML="";
+}
+function nextBinary(){
+  if(!binarySteps.length)prepareBinary();
+  if(binaryCursor>=binarySteps.length)binaryCursor=0;
+  const s=binarySteps[binaryCursor++];
+  document.querySelectorAll("#binaryArray .arrval").forEach(el=>el.style.background="#fff");
+  if(s.done){
+    binaryLog.innerHTML+=`<div class="item active">탐색 종료: boundary=${s.l}</div>`;
+  }else{
+    const el=document.getElementById("b"+s.m);if(el)el.style.background="#fef3c7";
+    binaryLog.innerHTML+=`<div class="item">left=${s.l}, right=${s.r}, middle=${s.m}, x=${s.x} → ${s.move}</div>`;
+  }
+}
+function quiz(n){
+  if(n===1)quiz1.innerHTML="<b>q-x</b>로 바뀝니다.";
+  else quiz2.innerHTML="<b>a×x</b>를 누적해야 합니다.";
+}
+function loadExample(){
+  villageInput.value="2 1\n1 3\n3 6";qInput.value="4";loadVillages();
+}
+loadVillages();
+</script>
+</body>
+</html>

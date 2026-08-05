@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4797 계산 로봇 - 인터렉티브 강의자료</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --blue:#1d4ed8;--blue2:#2563eb;--sky:#eff6ff;--sky2:#dbeafe;
+  --green:#047857;--greenbg:#d1fae5;--red:#dc2626;--redbg:#fee2e2;
+  --yellow:#b45309;--yellowbg:#fef3c7;--slate:#334155;--line:#cbd5e1;
+}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.7}
+header{background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:white;text-align:center;padding:38px 18px}
+header h1{margin:0;font-size:40px} header p{margin:10px 0 0;font-size:21px}
+nav{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow:auto;background:#ffffffee;border-bottom:2px solid #dbeafe;padding:10px 14px;backdrop-filter:blur(8px)}
+nav a{white-space:nowrap;text-decoration:none;color:#1e3a8a;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:7px 12px;font-weight:800;font-size:14px}
+main{max-width:1320px;margin:auto;padding:24px}
+section{background:white;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(30,64,175,.08)}
+h2{margin-top:0;font-size:30px;color:var(--blue);border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:23px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.box{background:var(--sky);border:2px solid #bfdbfe;border-radius:14px;padding:16px}
+.good{background:var(--greenbg);border-color:#6ee7b7}.warn{background:var(--yellowbg);border-color:#fbbf24}.bad{background:var(--redbg);border-color:#fca5a5}
+.formula{background:var(--yellowbg);border:2px solid #f59e0b;border-radius:14px;padding:15px;text-align:center;font-size:24px;font-weight:900}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+input,textarea,select{font-size:18px;padding:10px;border:2px solid #93c5fd;border-radius:10px;background:white}
+button{font-size:17px;font-weight:900;padding:10px 15px;border:0;border-radius:10px;background:var(--blue2);color:white;cursor:pointer}
+button.green{background:#047857}button.orange{background:#b45309}button.gray{background:#64748b}button.red{background:#dc2626}
+button:hover{filter:brightness(.95)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}
+.stat{background:var(--sky);border:2px solid #bfdbfe;border-radius:13px;padding:12px;text-align:center}
+.stat b{display:block;font-size:28px;color:var(--blue)}
+.robot-grid{display:grid;gap:7px;justify-content:center;overflow:auto;padding:12px;background:#f8fafc;border:2px solid var(--line);border-radius:14px}
+.cell{width:92px;min-height:88px;border:2px solid #94a3b8;border-radius:12px;background:white;padding:7px;text-align:center;cursor:pointer;transition:.15s}
+.cell:hover{transform:translateY(-2px)}
+.cell .coord{font-size:12px;color:#64748b}.cell .weight{font-size:25px;font-weight:900}.cell .sub{font-size:12px}
+.cell.reachable{background:#dbeafe;border-color:#2563eb}
+.cell.selected{background:#fee2e2;border-color:#dc2626;transform:scale(1.04)}
+.cell.prev3{background:#fef3c7;border-color:#f59e0b}
+.cell.done{background:#d1fae5;border-color:#059669}
+.cell.current{box-shadow:0 0 0 4px #7c3aed inset}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid #bfdbfe;padding:7px;text-align:center}
+th{background:#dbeafe;position:sticky;top:0}
+.scroll{max-height:440px;overflow:auto;border:2px solid #dbeafe;border-radius:13px}
+.array-bar{display:flex;gap:6px;flex-wrap:wrap}
+.arrval{min-width:76px;padding:8px;text-align:center;background:white;border:2px solid #93c5fd;border-radius:9px;font-weight:800}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.flow .node{padding:12px 14px;border-radius:12px;background:#eff6ff;border:2px solid #93c5fd;text-align:center;font-weight:900}
+.arrow{font-size:28px;color:#2563eb}
+.answer{font-size:34px;font-weight:900;text-align:center;color:#dc2626;word-break:break-all}
+.list{max-height:420px;overflow:auto;background:#f8fafc;border:2px solid var(--line);border-radius:13px;padding:10px}
+.item{padding:8px 10px;border-bottom:1px solid #e2e8f0}
+.item.active{background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;font-weight:900}
+pre{background:#0f172a;color:#e5e7eb;padding:20px;border-radius:14px;overflow:auto;font-size:15px;line-height:1.6;font-family:Consolas,"Courier New",monospace;white-space:pre}
+.small{font-size:14px;color:#475569}
+@media(max-width:900px){.grid,.grid3{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}header h1{font-size:30px}.cell{width:76px}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4797 계산 로봇</h1>
+<p>넓은 입력 영역이 왜 이전 열 3칸으로 줄어드는지 직접 확인하는 DP 강의자료</p>
+</header>
+
+<nav>
+<a href="#concept">문제 이해</a>
+<a href="#grid">격자 실험</a>
+<a href="#reach">입력 영역</a>
+<a href="#dp">DP 실행</a>
+<a href="#table">열별 표</a>
+<a href="#proof">점화식</a>
+<a href="#complexity">복잡도</a>
+<a href="#code">정답 코드</a>
+</nav>
+
+<main>
+<section id="concept">
+<h2>1. 문제 핵심</h2>
+<div class="grid3">
+<div class="box"><h3>저장 값</h3><p>현재 로봇이 입력받은 모든 출력값 중 최댓값입니다.</p></div>
+<div class="box good"><h3>출력 값</h3><p>저장 값에 현재 칸의 가중치를 더한 값입니다.</p></div>
+<div class="box warn"><h3>정답</h3><p>모든 로봇의 <b>저장 값</b> 중 최댓값입니다. 출력값 최댓값이 아닙니다.</p></div>
+</div>
+<div class="formula" style="margin-top:16px">output[i][j] = store[i][j] + D[i][j]</div>
+</section>
+
+<section id="grid">
+<h2>2. 격자 직접 만들기</h2>
+<div class="controls">
+<label><b>가중치 격자</b></label>
+<textarea id="gridInput" rows="5" style="width:360px">1234
+2341
+3412</textarea>
+<button onclick="loadGrid()">격자 생성</button>
+<button class="gray" onclick="loadExample()">예제 복원</button>
+</div>
+<div class="stats">
+<div class="stat">행 M<b id="mStat">-</b></div>
+<div class="stat">열 N<b id="nStat">-</b></div>
+<div class="stat">현재 열<b id="colStat">-</b></div>
+<div class="stat">정답 후보<b id="ansStat">-</b></div>
+</div>
+<div id="robotGrid" class="robot-grid" style="margin-top:15px"></div>
+<p class="small">칸을 클릭하면 해당 로봇이 입력받을 수 있는 과거 영역을 표시합니다.</p>
+</section>
+
+<section id="reach">
+<h2>3. 넓은 입력 영역과 이전 열 3칸 비교</h2>
+<div class="grid">
+<div class="box">
+<h3>파란색 영역</h3>
+<p>선택한 로봇이 문제 정의상 직접 입력받을 수 있는 모든 과거 로봇입니다.</p>
+</div>
+<div class="box warn">
+<h3>노란색 3칸</h3>
+<p>실제 DP에서는 바로 이전 열의 위·가운데·아래 출력값만 보면 됩니다.</p>
+</div>
+</div>
+<div id="reachExplain" class="box" style="margin-top:14px">격자에서 두 번째 열 이후의 칸을 선택하세요.</div>
+</section>
+
+<section id="dp">
+<h2>4. DP를 한 칸씩 실행하기</h2>
+<div class="controls">
+<button onclick="resetDP()">초기화</button>
+<button class="orange" onclick="nextDP()">한 칸 진행</button>
+<button class="green" onclick="nextColumn()">한 열 진행</button>
+<button class="red" onclick="runAll()">끝까지 실행</button>
+</div>
+
+<div class="grid">
+<div>
+<h3>이전 열 출력값 prev</h3>
+<div id="prevArray" class="array-bar"></div>
+</div>
+<div>
+<h3>현재 열 출력값 curr</h3>
+<div id="currArray" class="array-bar"></div>
+</div>
+</div>
+
+<div class="grid" style="margin-top:16px">
+<div class="box">
+<h3>현재 계산</h3>
+<div id="calcExplain">초기화 버튼을 누르세요.</div>
+</div>
+<div class="box good">
+<h3>현재까지 저장 값 최댓값</h3>
+<div id="dpAnswer" class="answer">0</div>
+</div>
+</div>
+</section>
+
+<section id="table">
+<h2>5. 예제의 열별 계산표</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr><th>열</th><th>행</th><th>위</th><th>가운데</th><th>아래</th><th>저장 값</th><th>가중치</th><th>출력 값</th></tr>
+</thead>
+<tbody id="dpBody"></tbody>
+</table>
+</div>
+</section>
+
+<section id="proof">
+<h2>6. 핵심 점화식 이해</h2>
+<div class="formula">store[i][j] = max(output[i-1][j-1], output[i][j-1], output[i+1][j-1])</div>
+<div class="flow" style="margin-top:18px">
+<div class="node">과거의 넓은 삼각형 영역</div>
+<span class="arrow">→</span>
+<div class="node">이전 열 위 로봇이 요약</div>
+<span class="arrow">+</span>
+<div class="node">가운데 로봇이 요약</div>
+<span class="arrow">+</span>
+<div class="node">아래 로봇이 요약</div>
+</div>
+<div class="grid" style="margin-top:16px">
+<div class="box">
+<h3>왜 가능한가?</h3>
+<p>이전 열의 세 로봇은 각각 자신까지 도달 가능한 모든 과거 출력값의 최댓값을 이미 저장하고 있습니다.</p>
+</div>
+<div class="box good">
+<h3>그래서</h3>
+<p>현재 로봇은 과거 모든 칸을 다시 볼 필요 없이 세 출력값만 비교하면 됩니다.</p>
+</div>
+</div>
+</section>
+
+<section id="complexity">
+<h2>7. 완전탐색과 DP 비교</h2>
+<div class="grid3">
+<div class="box bad"><h3>완전탐색</h3><p>각 로봇이 왼쪽 전체 영역을 다시 검사하므로 매우 느립니다.</p></div>
+<div class="box warn"><h3>DP 한 칸</h3><p>위·가운데·아래 최대 3개만 비교하므로 O(1)입니다.</p></div>
+<div class="box good"><h3>전체</h3><p>M×N칸을 한 번씩 처리하므로 O(MN)입니다.</p></div>
+</div>
+</section>
+
+<section>
+<h2>8. 이해 확인 문제</h2>
+<div class="grid">
+<div class="box">
+<h3>문제 1</h3>
+<p>첫 번째 열 로봇의 저장 값은?</p>
+<button onclick="quiz(1)">정답 확인</button>
+<p id="quiz1"></p>
+</div>
+<div class="box">
+<h3>문제 2</h3>
+<p>정답을 갱신할 때 사용하는 값은 저장 값일까요, 출력 값일까요?</p>
+<button onclick="quiz(2)">정답 확인</button>
+<p id="quiz2"></p>
+</div>
+</div>
+</section>
+
+<section id="code">
+<h2>9. 정답 C 코드</h2>
+<p class="small">요청하신 대로 정답 코드는 강의자료의 가장 마지막에 배치했습니다.</p>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    int M, N;
+
+    if (scanf("%d %d", &amp;M, &amp;N) != 2) {
+        return 0;
+    }
+
+    char *row =
+        (char *)malloc(
+            sizeof(char) * (N + 1)
+        );
+
+    unsigned char *weight =
+        (unsigned char *)malloc(
+            sizeof(unsigned char)
+            * (size_t)M
+            * (size_t)N
+        );
+
+    if (row == NULL || weight == NULL) {
+        free(row);
+        free(weight);
+        return 0;
+    }
+
+    for (int i = 0; i &lt; M; i++) {
+        scanf("%s", row);
+
+        for (int j = 0; j &lt; N; j++) {
+            weight[
+                (size_t)i * N + j
+            ] =
+                (unsigned char)(
+                    row[j] - '0'
+                );
+        }
+    }
+
+    int *prev =
+        (int *)malloc(
+            sizeof(int) * M
+        );
+
+    int *curr =
+        (int *)malloc(
+            sizeof(int) * M
+        );
+
+    if (prev == NULL || curr == NULL) {
+        free(curr);
+        free(prev);
+        free(weight);
+        free(row);
+        return 0;
+    }
+
+    int answer = 0;
+
+    /*
+     * 첫 번째 열
+     *
+     * 저장 값은 모두 0
+     * 출력 값은 가중치와 같다.
+     */
+    for (int i = 0; i &lt; M; i++) {
+        prev[i] =
+            weight[(size_t)i * N];
+    }
+
+    /*
+     * 두 번째 열부터 처리
+     */
+    for (int j = 1; j &lt; N; j++) {
+
+        for (int i = 0; i &lt; M; i++) {
+
+            /*
+             * 이전 열의 가운데 출력값
+             */
+            int best = prev[i];
+
+            /*
+             * 이전 열의 위쪽 출력값
+             */
+            if (
+                i &gt; 0 &amp;&amp;
+                prev[i - 1] &gt; best
+            ) {
+                best = prev[i - 1];
+            }
+
+            /*
+             * 이전 열의 아래쪽 출력값
+             */
+            if (
+                i + 1 &lt; M &amp;&amp;
+                prev[i + 1] &gt; best
+            ) {
+                best = prev[i + 1];
+            }
+
+            /*
+             * best는 현재 로봇의 저장 값
+             */
+            if (best &gt; answer) {
+                answer = best;
+            }
+
+            /*
+             * 현재 로봇의 출력 값
+             */
+            curr[i] =
+                best +
+                weight[
+                    (size_t)i * N + j
+                ];
+        }
+
+        /*
+         * 배열을 복사하지 않고
+         * 포인터만 교환
+         */
+        int *temp = prev;
+        prev = curr;
+        curr = temp;
+    }
+
+    printf("%d\n", answer);
+
+    free(curr);
+    free(prev);
+    free(weight);
+    free(row);
+
+    return 0;
+}</pre>
+</section>
+</main>
+
+<script>
+let W=[],M=0,N=0;
+let prev=[],curr=[],dpCol=1,dpRow=0,answer=0,initialized=false;
+let tableRows=[];
+
+function parseGrid(){
+  const lines=gridInput.value.trim().split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  if(!lines.length)return null;
+  const n=lines[0].length;
+  if(n===0)return null;
+  for(const line of lines){
+    if(line.length!==n||!/^[1-9]+$/.test(line))return null;
+  }
+  return lines.map(line=>line.split("").map(Number));
+}
+function loadGrid(){
+  const g=parseGrid();
+  if(!g){alert("각 줄의 길이가 같고 1~9로만 이루어진 격자를 입력하세요.");return}
+  W=g;M=W.length;N=W[0].length;
+  mStat.textContent=M;nStat.textContent=N;
+  robotGrid.style.gridTemplateColumns=`repeat(${N},92px)`;
+  renderGrid();
+  resetDP();
+}
+function renderGrid(){
+  robotGrid.innerHTML="";
+  for(let i=0;i<M;i++){
+    for(let j=0;j<N;j++){
+      const d=document.createElement("div");
+      d.className="cell";
+      d.id=`c-${i}-${j}`;
+      d.innerHTML=`<div class="coord">(${i+1}, ${j+1})</div><div class="weight">${W[i][j]}</div><div class="sub">가중치</div>`;
+      d.onclick=()=>selectCell(i,j);
+      robotGrid.appendChild(d);
+    }
+  }
+}
+function clearClasses(){
+  document.querySelectorAll(".cell").forEach(c=>c.classList.remove("reachable","selected","prev3","current"));
+}
+function selectCell(i,j){
+  clearClasses();
+  const selected=document.getElementById(`c-${i}-${j}`);
+  selected.classList.add("selected");
+  let reachable=[];
+  for(let a=0;a<M;a++){
+    for(let b=0;b<j;b++){
+      if(Math.abs(i-a)<=j-b){
+        document.getElementById(`c-${a}-${b}`).classList.add("reachable");
+        reachable.push(`(${a+1},${b+1})`);
+      }
+    }
+  }
+  const prev3=[];
+  if(j>0){
+    for(const r of [i-1,i,i+1]){
+      if(r>=0&&r<M){
+        document.getElementById(`c-${r}-${j-1}`).classList.add("prev3");
+        prev3.push(`(${r+1},${j})`);
+      }
+    }
+  }
+  selected.classList.add("selected");
+  reachExplain.innerHTML=
+    `<b>선택 로봇: (${i+1}, ${j+1})</b><br>`+
+    `직접 입력 가능한 과거 로봇 수: ${reachable.length}<br>`+
+    `DP에서 확인할 이전 열 로봇: ${prev3.length?prev3.join(", "):"첫 번째 열이므로 입력값은 0 하나"}<br>`+
+    `<span style="color:#1d4ed8">파란색</span> 전체 영역의 최댓값은 `+
+    `<span style="color:#b45309">노란색</span> 이전 열 로봇들의 출력값에 이미 요약되어 있습니다.`;
+}
+function resetDP(){
+  prev=[];curr=new Array(M).fill(null);answer=0;dpCol=1;dpRow=0;initialized=true;tableRows=[];
+  if(!W.length)return;
+  for(let i=0;i<M;i++)prev[i]=W[i][0];
+  colStat.textContent=N===1?1:2;
+  ansStat.textContent=0;dpAnswer.textContent=0;
+  calcExplain.innerHTML=`첫 번째 열 초기화 완료<br>저장 값은 모두 0<br>출력 값은 가중치와 같음`;
+  renderArrays();
+  document.querySelectorAll(".cell").forEach(c=>c.classList.remove("done","current"));
+  for(let i=0;i<M;i++)document.getElementById(`c-${i}-0`).classList.add("done");
+  dpBody.innerHTML="";
+}
+function renderArrays(){
+  prevArray.innerHTML=prev.map((v,i)=>`<div class="arrval">행 ${i+1}<br>${v}</div>`).join("");
+  currArray.innerHTML=curr.map((v,i)=>`<div class="arrval">행 ${i+1}<br>${v===null?"-":v}</div>`).join("");
+}
+function nextDP(){
+  if(!initialized)resetDP();
+  if(N===1){calcExplain.innerHTML="열이 하나뿐이므로 모든 저장 값은 0입니다.";return}
+  if(dpCol>=N){calcExplain.innerHTML=`계산 완료. 정답은 ${answer}입니다.`;return}
+
+  document.querySelectorAll(".cell").forEach(c=>c.classList.remove("current","prev3"));
+  const i=dpRow,j=dpCol;
+  const candidates=[];
+  if(i>0)candidates.push({name:"위",value:prev[i-1],row:i-1});
+  candidates.push({name:"가운데",value:prev[i],row:i});
+  if(i+1<M)candidates.push({name:"아래",value:prev[i+1],row:i+1});
+  const best=Math.max(...candidates.map(x=>x.value));
+  const out=best+W[i][j];
+  curr[i]=out;
+  answer=Math.max(answer,best);
+
+  document.getElementById(`c-${i}-${j}`).classList.add("current");
+  for(const c of candidates)document.getElementById(`c-${c.row}-${j-1}`).classList.add("prev3");
+
+  calcExplain.innerHTML=
+    `현재 로봇: (${i+1}, ${j+1})<br>`+
+    candidates.map(c=>`${c.name} 출력값 = ${c.value}`).join("<br>")+
+    `<br><b>저장 값 = ${best}</b><br>`+
+    `출력 값 = ${best} + 가중치 ${W[i][j]} = <b>${out}</b>`;
+
+  tableRows.push({
+    col:j+1,row:i+1,
+    up:i>0?prev[i-1]:"-",
+    mid:prev[i],
+    down:i+1<M?prev[i+1]:"-",
+    best,weight:W[i][j],out
+  });
+  renderTable();
+  ansStat.textContent=answer;dpAnswer.textContent=answer;
+  renderArrays();
+
+  dpRow++;
+  if(dpRow===M){
+    for(let r=0;r<M;r++)document.getElementById(`c-${r}-${j}`).classList.add("done");
+    const temp=prev;prev=curr;curr=new Array(M).fill(null);
+    dpRow=0;dpCol++;
+    colStat.textContent=Math.min(dpCol+1,N);
+    renderArrays();
+  }
+}
+function nextColumn(){
+  const target=dpCol;
+  if(target>=N){nextDP();return}
+  do{nextDP()}while(dpCol===target&&dpCol<N);
+}
+function runAll(){
+  while(dpCol<N)nextDP();
+  calcExplain.innerHTML=`모든 계산 완료<br><b>저장 값 최댓값 = ${answer}</b>`;
+}
+function renderTable(){
+  dpBody.innerHTML=tableRows.map(r=>`<tr><td>${r.col}</td><td>${r.row}</td><td>${r.up}</td><td>${r.mid}</td><td>${r.down}</td><td>${r.best}</td><td>${r.weight}</td><td>${r.out}</td></tr>`).join("");
+}
+function quiz(n){
+  if(n===1)quiz1.innerHTML="<b>0</b>입니다. 첫 번째 열의 입력값은 0 하나입니다.";
+  else quiz2.innerHTML="<b>저장 값</b>으로 갱신해야 합니다. 가중치를 더하기 전의 best입니다.";
+}
+function loadExample(){gridInput.value="1234\n2341\n3412";loadGrid()}
+loadGrid();
+</script>
+</body>
+</html>

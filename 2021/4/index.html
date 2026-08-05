@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정올 4805 공통 괄호 문자열 사전</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --blue:#1d4ed8;--sky:#dbeafe;--green:#047857;--greenbg:#d1fae5;
+  --red:#dc2626;--yellow:#f59e0b;--yellowbg:#fef3c7;--slate:#334155;
+}
+body{margin:0;font-family:"Malgun Gothic",Arial,sans-serif;background:#f8fbff;color:#111827;font-size:18px;line-height:1.65}
+header{background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;text-align:center;padding:36px 18px}
+header h1{margin:0;font-size:38px} header p{margin:8px 0 0;font-size:20px}
+main{max-width:1300px;margin:auto;padding:24px}
+section{background:#fff;border:2px solid #dbeafe;border-radius:18px;padding:24px;margin-bottom:24px;box-shadow:0 8px 25px rgba(30,64,175,.08)}
+h2{font-size:29px;color:var(--blue);margin-top:0;border-left:8px solid #60a5fa;padding-left:14px}
+h3{font-size:22px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.box{background:#eff6ff;border:2px solid #bfdbfe;border-radius:14px;padding:16px}
+.good{background:var(--greenbg);border-color:#6ee7b7}.warn{background:var(--yellowbg);border-color:#fbbf24}.bad{background:#fee2e2;border-color:#fca5a5}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input{font-size:18px;padding:10px;border:2px solid #93c5fd;border-radius:10px}
+.strInput{width:310px}
+button{font-size:17px;font-weight:800;padding:10px 15px;border:0;border-radius:10px;background:#2563eb;color:#fff;cursor:pointer}
+button.green{background:#047857}button.orange{background:#b45309}button.gray{background:#64748b}
+button:hover{filter:brightness(.95)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}
+.stat{padding:13px;text-align:center;background:#eff6ff;border:2px solid #bfdbfe;border-radius:13px}
+.stat b{display:block;font-size:27px;color:var(--blue)}
+.formula{font-size:23px;font-weight:900;text-align:center;background:#fef3c7;border:2px solid #f59e0b;border-radius:13px;padding:14px}
+.char-row{display:flex;flex-wrap:wrap;gap:7px;padding:12px;background:#f8fafc;border:2px solid #cbd5e1;border-radius:13px}
+.char{width:49px;text-align:center;border:2px solid #94a3b8;border-radius:9px;background:#fff;padding:6px 2px}
+.char .idx{font-size:12px;color:#64748b}.char .sym{font-size:25px;font-weight:900}.char .height{font-size:13px;color:#1d4ed8}
+.char.active{background:#fee2e2;border-color:#dc2626}.char.valid{background:#dcfce7;border-color:#16a34a}
+.list{max-height:390px;overflow:auto;border:2px solid #cbd5e1;border-radius:13px;background:#f8fafc;padding:10px}
+.item{padding:9px 11px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;gap:12px}
+.item.selected{background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;font-weight:900}
+.tag{font-size:13px;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1e40af;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{border:1px solid #bfdbfe;padding:7px;text-align:center}th{background:#dbeafe;position:sticky;top:0}
+.scroll{max-height:420px;overflow:auto;border:2px solid #dbeafe;border-radius:13px}
+pre{background:#0f172a;color:#e5e7eb;padding:18px;border-radius:13px;overflow:auto;font-size:15px;line-height:1.6;font-family:Consolas,monospace;white-space:pre}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+.flow div{padding:12px;border-radius:12px;background:#eff6ff;border:2px solid #93c5fd;font-weight:800;text-align:center}
+.arrow{font-size:28px;color:#2563eb}
+.answer{font-size:33px;color:#dc2626;font-weight:900;text-align:center;word-break:break-all}
+canvas{width:100%;height:260px;background:#fff;border:2px solid #cbd5e1;border-radius:13px}
+.note{font-size:15px;color:#475569}
+@media(max-width:900px){.grid,.grid3{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}header h1{font-size:29px}.strInput{width:100%}}
+</style>
+</head>
+<body>
+<header>
+<h1>정올 4805 공통 괄호 문자열 사전</h1>
+<p>완전탐색에서 접미사 배열·LCP·괄호 높이까지 연결하는 인터렉티브 강의자료</p>
+</header>
+
+<main>
+<section>
+<h2>1. 문제를 세 문장으로 이해하기</h2>
+<div class="grid3">
+<div class="box"><h3>공통</h3><p>A에도 연속으로 나오고 B에도 연속으로 나오는 문자열만 남깁니다.</p></div>
+<div class="box good"><h3>올바른 괄호열</h3><p>중간 높이가 음수가 되지 않고 마지막 높이가 0인 문자열만 남깁니다.</p></div>
+<div class="box warn"><h3>중복 제거 후 K번째</h3><p>같은 문자열은 한 번만 넣고, 사전순으로 정렬하여 K번째를 찾습니다.</p></div>
+</div>
+</section>
+
+<section>
+<h2>2. 작은 예제로 직접 실행</h2>
+<div class="controls">
+<label><b>A</b></label><input id="aInput" class="strInput" value="()((()))">
+<label><b>B</b></label><input id="bInput" class="strInput" value="(()((())))()">
+<label><b>K</b></label><input id="kInput" type="number" min="1" value="3" style="width:120px">
+<button onclick="analyze()">전체 분석</button>
+<button class="orange" onclick="nextCandidate()">후보 한 개 보기</button>
+<button class="green" onclick="showKth()">K번째 찾기</button>
+<button class="gray" onclick="loadExample()">예제 복원</button>
+</div>
+<div class="stats">
+<div class="stat">A 부분문자열 수<b id="subCount">-</b></div>
+<div class="stat">B에도 존재<b id="commonCount">-</b></div>
+<div class="stat">올바른 괄호열<b id="validCount">-</b></div>
+<div class="stat">서로 다른 결과<b id="uniqueCount">-</b></div>
+</div>
+<p class="note">학습용 시각화는 문자열 길이 16 이하에서 사용하세요. 실제 정답 알고리즘은 길이 500,000도 처리합니다.</p>
+</section>
+
+<section>
+<h2>3. 괄호 높이로 올바른 괄호열 판정</h2>
+<div class="formula">‘(’이면 +1, ‘)’이면 -1 · 중간 높이 ≥ 0 · 마지막 높이 = 0</div>
+<div class="grid" style="margin-top:15px">
+<div>
+<h3>선택한 후보</h3>
+<div id="candidateChars" class="char-row"></div>
+<div id="candidateJudge" class="box">후보 한 개 보기를 눌러주세요.</div>
+</div>
+<div>
+<h3>높이 그래프</h3>
+<canvas id="heightCanvas" width="600" height="260"></canvas>
+</div>
+</div>
+</section>
+
+<section>
+<h2>4. 완전탐색 단계 관찰</h2>
+<div class="grid">
+<div>
+<h3>A에서 만든 후보</h3>
+<div id="candidateList" class="list"></div>
+</div>
+<div>
+<h3>현재 후보 판정</h3>
+<div id="judgeLog" class="box warn">아직 분석하지 않았습니다.</div>
+<h3>판정 순서</h3>
+<div class="flow">
+<div>A의 부분문자열</div><span class="arrow">→</span>
+<div>B에 존재?</div><span class="arrow">→</span>
+<div>올바른 괄호열?</div><span class="arrow">→</span>
+<div>Set에 삽입</div>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>5. S(A,B)를 사전순으로 정렬</h2>
+<div class="grid">
+<div>
+<h3>서로 다른 문자열 목록</h3>
+<div id="resultList" class="list"></div>
+</div>
+<div>
+<h3>K번째 결과</h3>
+<div id="kthResult" class="answer">-</div>
+<div class="box">
+<p><b>사전순 핵심</b></p>
+<p>‘(’가 ‘)’보다 앞섭니다. 한 문자열이 다른 문자열의 접두사라면 짧은 문자열이 먼저입니다.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>6. 왜 완전탐색은 사용할 수 없는가?</h2>
+<div class="grid">
+<div class="box bad">
+<h3>완전탐색</h3>
+<p>A의 부분문자열은 최대 약 N²/2개입니다. N=500,000이면 생성 자체가 불가능합니다.</p>
+</div>
+<div class="box good">
+<h3>정답 방향</h3>
+<p>부분문자열을 직접 만들지 않고, 각 접미사의 접두사로 묶어 처리합니다.</p>
+</div>
+</div>
+<div class="flow" style="margin-top:16px">
+<div>모든 부분문자열</div><span class="arrow">→</span>
+<div>A의 접미사</div><span class="arrow">→</span>
+<div>접두사 길이 범위</div><span class="arrow">→</span>
+<div>개수만 계산</div>
+</div>
+</section>
+
+<section>
+<h2>7. 접미사 배열을 직접 관찰</h2>
+<p>A와 구분문자, B를 합친 문자열의 접미사를 사전순으로 정렬합니다. 학습용 표에서는 실제 문자열을 직접 정렬합니다.</p>
+<div class="controls">
+<button onclick="buildSuffixDemo()">접미사 배열 만들기</button>
+</div>
+<div class="scroll">
+<table>
+<thead><tr><th>순위</th><th>구간</th><th>시작 위치</th><th>접미사</th><th>이전 접미사와 LCP</th></tr></thead>
+<tbody id="suffixBody"></tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>8. 한 A 접미사에서 새 문자열만 세기</h2>
+<div class="grid3">
+<div class="box">
+<h3>common[i]</h3>
+<p>A[i..]와 B의 어떤 접미사가 공유하는 최대 접두사 길이입니다.</p>
+</div>
+<div class="box warn">
+<h3>prevLcp[i]</h3>
+<p>사전순 이전 A 접미사와 이미 겹치는 접두사 길이입니다. 이 길이 이하는 중복입니다.</p>
+</div>
+<div class="box good">
+<h3>괄호 높이</h3>
+<p>끝 높이가 시작 높이와 같고, 중간에 더 낮아지지 않는 끝점만 선택합니다.</p>
+</div>
+</div>
+<div class="formula" style="margin-top:15px">새 후보 길이: prevLcp[i]+1 이상, common[i] 이하</div>
+</section>
+
+<section>
+<h2>9. 정답 알고리즘 전체 흐름</h2>
+<div class="flow">
+<div>A + # + B</div><span class="arrow">→</span>
+<div>접미사 배열</div><span class="arrow">→</span>
+<div>LCP 배열</div><span class="arrow">→</span>
+<div>common[i]</div><span class="arrow">→</span>
+<div>prevLcp[i]</div><span class="arrow">→</span>
+<div>괄호 높이</div><span class="arrow">→</span>
+<div>K번째 생성</div>
+</div>
+</section>
+
+<section>
+<h2>10. 코드 작성 단계 핵심</h2>
+<div class="grid">
+<div class="box">
+<h3>1단계. 높이 배열</h3>
+<pre>height[0] = 0;
+
+for (int i = 0; i &lt; n; i++) {
+    height[i + 1] =
+        height[i] +
+        (A[i] == '(' ? 1 : -1);
+}</pre>
+</div>
+<div class="box">
+<h3>2단계. 유효 끝 범위</h3>
+<pre>left =
+    start + prevLcp[start] + 1;
+
+right =
+    start + common[start];
+
+right = min(
+    right,
+    bad[start] - 1
+);</pre>
+</div>
+<div class="box">
+<h3>3단계. 같은 높이 개수</h3>
+<pre>count =
+    upper_bound(right)
+    - lower_bound(left);</pre>
+</div>
+<div class="box">
+<h3>4단계. K번째 선택</h3>
+<pre>if (K &gt; count) {
+    K -= count;
+} else {
+    answerEnd =
+        positions[first + K - 1];
+}</pre>
+</div>
+</div>
+</section>
+
+<section>
+<h2>11. 학습 확인 문제</h2>
+<div class="grid">
+<div class="box">
+<h3>문제 1</h3>
+<p><code>(()())</code>의 높이는 중간에 음수가 되는가?</p>
+<button onclick="quiz(1)">정답 확인</button>
+<p id="q1"></p>
+</div>
+<div class="box">
+<h3>문제 2</h3>
+<p>현재 A 접미사의 앞 4글자가 이전 A 접미사와 같다면, 새 문자열은 몇 글자부터 시작하는가?</p>
+<button onclick="quiz(2)">정답 확인</button>
+<p id="q2"></p>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+let candidates=[], cursor=0, resultSet=[], currentA="", currentB="";
+
+function validParen(s){
+  let h=0, trace=[0];
+  for(const ch of s){
+    h += ch==="("?1:-1;
+    trace.push(h);
+    if(h<0) return {ok:false, trace, reason:"중간 높이가 음수가 되었습니다."};
+  }
+  if(h!==0) return {ok:false, trace, reason:"마지막 높이가 0이 아닙니다."};
+  return {ok:true, trace, reason:"모든 접두사의 높이가 0 이상이고 마지막이 0입니다."};
+}
+
+function analyze(){
+  const A=aInput.value.trim(), B=bInput.value.trim();
+  if(!/^[()]+$/.test(A)||!/^[()]+$/.test(B)){alert("A와 B에는 (와 )만 입력하세요.");return}
+  if(A.length>16||B.length>16){alert("시각화는 각 문자열 길이 16 이하를 권장합니다.");}
+  currentA=A; currentB=B; candidates=[]; cursor=0;
+  let common=0, valid=0; const set=new Set();
+
+  for(let i=0;i<A.length;i++){
+    for(let j=i+1;j<=A.length;j++){
+      const s=A.slice(i,j);
+      const inB=B.includes(s);
+      const v=validParen(s).ok;
+      if(inB) common++;
+      if(inB&&v){valid++;set.add(s)}
+      candidates.push({s,i,j,inB,v});
+    }
+  }
+  resultSet=[...set].sort();
+  subCount.textContent=candidates.length;
+  commonCount.textContent=common;
+  validCount.textContent=valid;
+  uniqueCount.textContent=resultSet.length;
+  renderCandidateList();
+  renderResultList();
+  candidateJudge.textContent="후보 한 개 보기를 눌러 판정 과정을 확인하세요.";
+  judgeLog.textContent="총 "+candidates.length+"개의 A 부분문자열을 준비했습니다.";
+  kthResult.textContent="-";
+  drawHeight([0]);
+}
+
+function nextCandidate(){
+  if(candidates.length===0) analyze();
+  if(cursor>=candidates.length){cursor=0}
+  const c=candidates[cursor++];
+  const v=validParen(c.s);
+  renderChars(c.s,v.trace);
+  drawHeight(v.trace);
+  candidateJudge.className="box "+(c.inB&&c.v?"good":c.inB?"warn":"bad");
+  candidateJudge.innerHTML=
+    `<b>A[${c.i+1}..${c.j}] = ${escapeHtml(c.s)}</b><br>`+
+    `B에 존재: ${c.inB?"예":"아니오"}<br>`+
+    `올바른 괄호열: ${c.v?"예":"아니오"}<br>`+
+    `${v.reason}`;
+  judgeLog.innerHTML=
+    `1. A에서 후보 <b>${escapeHtml(c.s)}</b> 생성<br>`+
+    `2. B.includes(candidate) → <b>${c.inB}</b><br>`+
+    `3. 괄호 높이 검사 → <b>${c.v}</b><br>`+
+    `4. ${c.inB&&c.v?"집합 S에 삽입":"버림"}`;
+  document.querySelectorAll("#candidateList .item").forEach((el,i)=>el.classList.toggle("selected",i===cursor-1));
+}
+
+function renderCandidateList(){
+  candidateList.innerHTML=candidates.map((c,i)=>
+    `<div class="item"><span>${i+1}. ${escapeHtml(c.s)}</span><span class="tag">A[${c.i+1}..${c.j}]</span></div>`
+  ).join("");
+}
+function renderResultList(selected=-1){
+  resultList.innerHTML=resultSet.length?resultSet.map((s,i)=>
+    `<div class="item ${i===selected?"selected":""}"><span>${i+1}. ${escapeHtml(s)}</span><span class="tag">길이 ${s.length}</span></div>`
+  ).join(""):"<div class='item'>결과 없음</div>";
+}
+function showKth(){
+  if(candidates.length===0) analyze();
+  const K=Number(kInput.value);
+  if(K<1||K>resultSet.length){
+    kthResult.textContent="-1";
+    renderResultList();
+  }else{
+    kthResult.textContent=resultSet[K-1];
+    renderResultList(K-1);
+  }
+}
+
+function renderChars(s,trace){
+  candidateChars.innerHTML=s.split("").map((ch,i)=>
+    `<div class="char ${trace[i+1]>=0?"valid":"active"}">
+      <div class="idx">${i+1}</div><div class="sym">${ch}</div><div class="height">h=${trace[i+1]}</div>
+    </div>`).join("");
+}
+
+function drawHeight(trace){
+  const c=heightCanvas,ctx=c.getContext("2d"),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  const min=Math.min(...trace,-1),max=Math.max(...trace,1);
+  const px=i=>40+i*(W-70)/Math.max(1,trace.length-1);
+  const py=v=>25+(max-v)*(H-55)/(max-min);
+  ctx.strokeStyle="#cbd5e1";ctx.lineWidth=1;
+  for(let v=min;v<=max;v++){ctx.beginPath();ctx.moveTo(35,py(v));ctx.lineTo(W-20,py(v));ctx.stroke();ctx.fillStyle="#475569";ctx.fillText(v,10,py(v)+4)}
+  ctx.strokeStyle="#2563eb";ctx.lineWidth=4;ctx.beginPath();
+  trace.forEach((v,i)=>i?ctx.lineTo(px(i),py(v)):ctx.moveTo(px(i),py(v)));ctx.stroke();
+  trace.forEach((v,i)=>{ctx.fillStyle=v<0?"#dc2626":"#047857";ctx.beginPath();ctx.arc(px(i),py(v),5,0,Math.PI*2);ctx.fill()});
+}
+
+function buildSuffixDemo(){
+  const A=aInput.value.trim(),B=bInput.value.trim(),C=A+"#"+B;
+  const arr=[];
+  for(let i=0;i<C.length;i++)arr.push({pos:i,s:C.slice(i)});
+  arr.sort((x,y)=>x.s<y.s?-1:x.s>y.s?1:0);
+  function lcp(x,y){let k=0;while(k<x.length&&k<y.length&&x[k]===y[k])k++;return k}
+  suffixBody.innerHTML=arr.map((x,i)=>{
+    const region=x.pos<A.length?"A":x.pos===A.length?"#":"B";
+    return `<tr><td>${i}</td><td>${region}</td><td>${x.pos}</td><td style="text-align:left">${escapeHtml(x.s)}</td><td>${i?lcp(arr[i-1].s,x.s):0}</td></tr>`;
+  }).join("");
+}
+function loadExample(){aInput.value="()((()))";bInput.value="(()((())))()";kInput.value=3;analyze()}
+function quiz(n){
+  if(n===1)q1.textContent="아니오. 높이는 0,1,2,1,2,1,0으로 한 번도 음수가 되지 않습니다.";
+  else q2.textContent="5글자부터입니다. 길이 1~4는 이전 접미사에서 이미 등장한 중복 접두사입니다.";
+}
+function escapeHtml(s){return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
+analyze();
+</script>
+</body>
+</html>
