@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>트리 순회 시각화 - 전위·중위·후위</title>
+<style>
+  :root{
+    --pink-900:#8f1d55;
+    --pink-800:#ad2466;
+    --pink-700:#c83d7b;
+    --pink-600:#df5b96;
+    --pink-500:#ed78aa;
+    --pink-300:#f7b6d2;
+    --pink-200:#ffd2e3;
+    --pink-100:#ffe7f0;
+    --pink-50:#fff6fa;
+    --ink:#3d2432;
+    --muted:#765666;
+    --card:#ffffff;
+    --line:#f1b3ce;
+    --green:#2f9f72;
+    --blue:#4f74d9;
+    --amber:#c98922;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Pretendard","Noto Sans KR","Malgun Gothic",Arial,sans-serif;
+    background:linear-gradient(180deg,#fff9fc 0%,#fff1f7 100%);
+    color:var(--ink);
+    line-height:1.65;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:24px}
+  .hero{
+    background:linear-gradient(135deg,#fff 0%,#ffe2ee 100%);
+    border:2px solid var(--pink-200);
+    border-radius:28px;
+    padding:32px;
+    box-shadow:0 12px 30px rgba(173,36,102,.10);
+    margin-bottom:22px;
+  }
+  h1{margin:0 0 10px;font-size:clamp(28px,4vw,48px);color:var(--pink-900);letter-spacing:-1px}
+  .hero p{margin:0;font-size:18px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px}
+  .card{
+    background:var(--card);
+    border:1.5px solid var(--pink-200);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 22px rgba(143,29,85,.06);
+    min-width:0;
+  }
+  h2{margin:0 0 14px;color:var(--pink-800);font-size:24px}
+  h3{color:var(--pink-800);margin:18px 0 8px}
+  .concepts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .concept{
+    border:1px solid var(--pink-200);
+    border-radius:16px;
+    padding:14px;
+    background:var(--pink-50);
+  }
+  .concept strong{display:block;color:var(--pink-900);font-size:18px;margin-bottom:4px}
+  .concept code{font-weight:700;color:var(--pink-700)}
+  .rule{
+    background:#fff9fc;border-left:5px solid var(--pink-600);
+    padding:12px 14px;border-radius:10px;margin-top:12px
+  }
+  .tree-area{
+    position:relative;
+    width:100%;
+    min-height:430px;
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 50% 10%,#fff 0%,#fff7fb 48%,#ffeaf3 100%);
+    border:1px dashed var(--pink-300);
+    overflow:hidden;
+  }
+  svg{width:100%;height:430px;display:block}
+  .edge{stroke:#d79ab7;stroke-width:4}
+  .node circle{
+    fill:#fff;
+    stroke:var(--pink-600);
+    stroke-width:4;
+    transition:.2s ease;
+    filter:drop-shadow(0 4px 5px rgba(143,29,85,.10));
+  }
+  .node text{font-size:22px;font-weight:800;fill:var(--pink-900);pointer-events:none}
+  .node.visited circle{fill:#ffd4e5;stroke:var(--pink-800)}
+  .node.current circle{fill:#fff0a9;stroke:#d18c00;stroke-width:5}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:14px}
+  .dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-2px;margin-right:5px;border:2px solid}
+  .dot.normal{background:#fff;border-color:var(--pink-600)}
+  .dot.visited{background:#ffd4e5;border-color:var(--pink-800)}
+  .dot.current{background:#fff0a9;border-color:#d18c00}
+  .tabs,.controls{display:flex;gap:10px;flex-wrap:wrap}
+  button{
+    border:0;border-radius:12px;padding:12px 16px;
+    font-size:16px;font-weight:800;cursor:pointer;
+    background:#f6d3e2;color:var(--pink-900);
+    transition:.18s ease;
+  }
+  button:hover{transform:translateY(-1px);filter:brightness(.99)}
+  button.active,button.primary{background:var(--pink-700);color:#fff}
+  button.secondary{background:#fff;border:1.5px solid var(--pink-300)}
+  button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .status{
+    margin-top:15px;padding:14px;border-radius:14px;background:var(--pink-50);
+    border:1px solid var(--pink-200)
+  }
+  .sequence{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:42px
+  }
+  .pill{
+    min-width:38px;height:38px;border-radius:50%;
+    display:grid;place-items:center;font-weight:800;
+    background:#fff;border:2px solid var(--pink-300);color:var(--pink-900)
+  }
+  .pill.latest{background:#fff0a9;border-color:#d18c00}
+  .explain{
+    margin-top:12px;background:#fff;border:1px solid var(--pink-200);
+    padding:12px;border-radius:12px;min-height:76px
+  }
+  .codebox{
+    background:#2e1b27;color:#fff5fa;border-radius:16px;padding:16px;overflow:auto;
+    font-family:Consolas,Monaco,monospace;font-size:14px;line-height:1.6
+  }
+  .code-line{display:block;padding:1px 6px;border-radius:6px;white-space:pre}
+  .code-line.hl{background:#7d2b56;color:#fff}
+  .table{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+  .table th,.table td{border:1px solid var(--pink-200);padding:10px;text-align:center}
+  .table th{background:var(--pink-100);color:var(--pink-900)}
+  .tip{background:#fff6d9;border:1px solid #efcf75;border-radius:14px;padding:14px;margin-top:14px}
+  .quiz{margin-top:22px}
+  .quiz-item{padding:14px;border:1px solid var(--pink-200);border-radius:14px;background:#fff;margin:10px 0}
+  .answer{margin-top:10px;font-weight:800}
+  .ok{color:var(--green)} .no{color:#c0465d}
+  footer{
+    text-align:center;margin:26px 0 10px;padding:18px;
+    color:var(--pink-800);font-weight:800;border-top:1px solid var(--pink-200)
+  }
+  @media(max-width:900px){
+    .grid{grid-template-columns:1fr}
+  }
+  @media(max-width:640px){
+    .wrap{padding:12px}
+    .hero{padding:22px 18px;border-radius:20px}
+    .concepts{grid-template-columns:1fr}
+    svg{height:360px}
+    .tree-area{min-height:360px}
+    button{width:100%}
+    .tabs button{width:auto;flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>트리 순회 쉽게 이해하기</h1>
+    <p>전위(Preorder), 중위(Inorder), 후위(Postorder)를 같은 트리에서 직접 실행하며 순서를 확인하는 인터랙티브 강의자료입니다.</p>
+  </section>
+
+  <section class="card">
+    <h2>1. 트리 순회란?</h2>
+    <p><b>트리 순회(Tree Traversal)</b>는 트리의 모든 노드를 어떤 규칙에 따라 한 번씩 방문하는 방법입니다. 핵심은 <b>부모 노드를 언제 방문하느냐</b>입니다.</p>
+    <div class="concepts">
+      <div class="concept"><strong>전위 순회</strong><code>부모 → 왼쪽 → 오른쪽</code><br>부모를 가장 먼저 방문합니다.</div>
+      <div class="concept"><strong>중위 순회</strong><code>왼쪽 → 부모 → 오른쪽</code><br>부모를 가운데에서 방문합니다.</div>
+      <div class="concept"><strong>후위 순회</strong><code>왼쪽 → 오른쪽 → 부모</code><br>부모를 가장 마지막에 방문합니다.</div>
+    </div>
+    <div class="rule"><b>기억법:</b> “전·중·후”는 <b>부모(루트)가 앞/중간/뒤 중 어디에 오는지</b>만 보면 됩니다.</div>
+  </section>
+
+  <div class="grid" style="margin-top:22px">
+    <section class="card">
+      <h2>2. 순회 시각화</h2>
+      <div class="tabs">
+        <button id="preBtn" class="active">전위</button>
+        <button id="inBtn">중위</button>
+        <button id="postBtn">후위</button>
+      </div>
+
+      <div class="tree-area" style="margin-top:14px">
+        <svg viewBox="0 0 700 430" aria-label="이진 트리">
+          <line class="edge" x1="350" y1="70" x2="210" y2="170"/>
+          <line class="edge" x1="350" y1="70" x2="490" y2="170"/>
+          <line class="edge" x1="210" y1="170" x2="130" y2="290"/>
+          <line class="edge" x1="210" y1="170" x2="290" y2="290"/>
+          <line class="edge" x1="490" y1="170" x2="410" y2="290"/>
+          <line class="edge" x1="490" y1="170" x2="570" y2="290"/>
+
+          <g class="node" data-node="A" transform="translate(350,70)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">A</text>
+          </g>
+          <g class="node" data-node="B" transform="translate(210,170)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">B</text>
+          </g>
+          <g class="node" data-node="C" transform="translate(490,170)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">C</text>
+          </g>
+          <g class="node" data-node="D" transform="translate(130,290)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">D</text>
+          </g>
+          <g class="node" data-node="E" transform="translate(290,290)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">E</text>
+          </g>
+          <g class="node" data-node="F" transform="translate(410,290)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">F</text>
+          </g>
+          <g class="node" data-node="G" transform="translate(570,290)">
+            <circle r="36"/><text text-anchor="middle" dominant-baseline="central">G</text>
+          </g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot normal"></i>방문 전</span>
+        <span><i class="dot visited"></i>방문 완료</span>
+        <span><i class="dot current"></i>현재 방문</span>
+      </div>
+
+      <div class="controls" style="margin-top:14px">
+        <button class="primary" id="startBtn">자동 실행</button>
+        <button class="secondary" id="stepBtn">한 단계</button>
+        <button class="secondary" id="resetBtn">초기화</button>
+      </div>
+
+      <div class="status">
+        <div><b>현재 방식:</b> <span id="modeText">전위 순회</span></div>
+        <div><b>방문 순서:</b></div>
+        <div id="sequence" class="sequence"></div>
+        <div id="explain" class="explain">전위 순회는 부모 노드 A부터 방문합니다.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. C 재귀 코드와 실행 위치</h2>
+      <p>세 순회는 코드가 거의 같습니다. <b>printf의 위치만 달라지는 것</b>이 핵심입니다.</p>
+
+      <h3>전위 순회</h3>
+      <div class="codebox" id="preCode">
+<span class="code-line" data-line="p1">void preorder(Node *root) {</span>
+<span class="code-line" data-line="p2">    if (root == NULL) return;</span>
+<span class="code-line" data-line="p3">    printf("%c ", root->data);</span>
+<span class="code-line" data-line="p4">    preorder(root->left);</span>
+<span class="code-line" data-line="p5">    preorder(root->right);</span>
+<span class="code-line" data-line="p6">}</span>
+      </div>
+
+      <h3>중위 순회</h3>
+      <div class="codebox" id="inCode">
+<span class="code-line" data-line="i1">void inorder(Node *root) {</span>
+<span class="code-line" data-line="i2">    if (root == NULL) return;</span>
+<span class="code-line" data-line="i3">    inorder(root->left);</span>
+<span class="code-line" data-line="i4">    printf("%c ", root->data);</span>
+<span class="code-line" data-line="i5">    inorder(root->right);</span>
+<span class="code-line" data-line="i6">}</span>
+      </div>
+
+      <h3>후위 순회</h3>
+      <div class="codebox" id="postCode">
+<span class="code-line" data-line="o1">void postorder(Node *root) {</span>
+<span class="code-line" data-line="o2">    if (root == NULL) return;</span>
+<span class="code-line" data-line="o3">    postorder(root->left);</span>
+<span class="code-line" data-line="o4">    postorder(root->right);</span>
+<span class="code-line" data-line="o5">    printf("%c ", root->data);</span>
+<span class="code-line" data-line="o6">}</span>
+      </div>
+
+      <div class="tip"><b>포인트:</b> 전위는 printf가 재귀호출보다 <b>앞</b>, 중위는 <b>가운데</b>, 후위는 <b>뒤</b>에 있습니다.</div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:22px">
+    <h2>4. 같은 트리의 결과 비교</h2>
+    <table class="table">
+      <thead><tr><th>순회</th><th>규칙</th><th>방문 결과</th></tr></thead>
+      <tbody>
+        <tr><td>전위</td><td>부모 → 왼쪽 → 오른쪽</td><td>A B D E C F G</td></tr>
+        <tr><td>중위</td><td>왼쪽 → 부모 → 오른쪽</td><td>D B E A F C G</td></tr>
+        <tr><td>후위</td><td>왼쪽 → 오른쪽 → 부모</td><td>D E B F G C A</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card quiz">
+    <h2>5. 미니 퀴즈</h2>
+    <div class="quiz-item">
+      <b>Q1. 전위 순회에서 가장 먼저 방문하는 노드는?</b>
+      <div class="controls" style="margin-top:8px">
+        <button class="secondary quiz-btn" data-q="1" data-a="A">A</button>
+        <button class="secondary quiz-btn" data-q="1" data-a="D">D</button>
+        <button class="secondary quiz-btn" data-q="1" data-a="G">G</button>
+      </div>
+      <div id="ans1" class="answer"></div>
+    </div>
+    <div class="quiz-item">
+      <b>Q2. 후위 순회에서 가장 마지막에 방문하는 노드는?</b>
+      <div class="controls" style="margin-top:8px">
+        <button class="secondary quiz-btn" data-q="2" data-a="A">A</button>
+        <button class="secondary quiz-btn" data-q="2" data-a="B">B</button>
+        <button class="secondary quiz-btn" data-q="2" data-a="G">G</button>
+      </div>
+      <div id="ans2" class="answer"></div>
+    </div>
+  </section>
+
+  <footer>-세영코딩연구소- &nbsp;&nbsp;&nbsp; ph.D KIM</footer>
+</div>
+
+<script>
+(function(){
+  const orders = {
+    pre: ["A","B","D","E","C","F","G"],
+    in: ["D","B","E","A","F","C","G"],
+    post: ["D","E","B","F","G","C","A"]
+  };
+
+  const descriptions = {
+    pre: {
+      A:"부모 A를 먼저 방문합니다.",
+      B:"A의 왼쪽 서브트리로 이동하여 B를 방문합니다.",
+      D:"B의 왼쪽 자식 D를 방문합니다.",
+      E:"B의 오른쪽 자식 E를 방문합니다.",
+      C:"왼쪽 서브트리를 끝낸 뒤 A의 오른쪽 자식 C를 방문합니다.",
+      F:"C의 왼쪽 자식 F를 방문합니다.",
+      G:"C의 오른쪽 자식 G를 방문합니다."
+    },
+    in: {
+      D:"가장 왼쪽 노드 D까지 내려간 뒤 D를 방문합니다.",
+      B:"D 방문 후 부모 B를 방문합니다.",
+      E:"B의 오른쪽 자식 E를 방문합니다.",
+      A:"왼쪽 서브트리를 모두 방문한 뒤 루트 A를 방문합니다.",
+      F:"오른쪽 서브트리 C의 왼쪽 자식 F를 방문합니다.",
+      C:"F 방문 후 부모 C를 방문합니다.",
+      G:"마지막으로 C의 오른쪽 자식 G를 방문합니다."
+    },
+    post: {
+      D:"왼쪽 끝 D를 먼저 방문합니다.",
+      E:"B의 오른쪽 자식 E를 방문합니다.",
+      B:"D와 E를 모두 방문한 뒤 부모 B를 방문합니다.",
+      F:"오른쪽 서브트리에서 F를 방문합니다.",
+      G:"C의 오른쪽 자식 G를 방문합니다.",
+      C:"F와 G를 방문한 뒤 부모 C를 방문합니다.",
+      A:"모든 자식을 방문한 뒤 루트 A를 가장 마지막에 방문합니다."
+    }
+  };
+
+  const lineMap = { pre:"p3", in:"i4", post:"o5" };
+  let mode = "pre";
+  let idx = 0;
+  let timer = null;
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => [...document.querySelectorAll(sel)];
+
+  function modeName(m){ return m==="pre"?"전위 순회":m==="in"?"중위 순회":"후위 순회"; }
+
+  function clearCodeHighlight(){
+    $$(".code-line").forEach(el=>el.classList.remove("hl"));
+  }
+
+  function highlightCode(){
+    clearCodeHighlight();
+    const el = document.querySelector('[data-line="'+lineMap[mode]+'"]');
+    if(el) el.classList.add("hl");
+  }
+
+  function reset(){
+    if(timer){ clearInterval(timer); timer=null; }
+    idx=0;
+    $$(".node").forEach(n=>n.classList.remove("visited","current"));
+    $("#sequence").innerHTML="";
+    $("#explain").textContent = mode==="pre"
+      ? "전위 순회는 부모 노드 A부터 방문합니다."
+      : mode==="in"
+      ? "중위 순회는 가장 왼쪽 노드부터 방문합니다."
+      : "후위 순회는 자식들을 먼저 방문하고 부모를 마지막에 방문합니다.";
+    $("#startBtn").textContent="자동 실행";
+    clearCodeHighlight();
+  }
+
+  function setMode(m){
+    mode=m;
+    $("#preBtn").classList.toggle("active",m==="pre");
+    $("#inBtn").classList.toggle("active",m==="in");
+    $("#postBtn").classList.toggle("active",m==="post");
+    $("#modeText").textContent=modeName(m);
+    reset();
+  }
+
+  function step(){
+    if(idx>=orders[mode].length){
+      if(timer){clearInterval(timer);timer=null;$("#startBtn").textContent="자동 실행";}
+      return;
+    }
+
+    $$(".node.current").forEach(n=>{
+      n.classList.remove("current");
+      n.classList.add("visited");
+    });
+
+    const nodeName=orders[mode][idx];
+    const node=document.querySelector('[data-node="'+nodeName+'"]');
+    node.classList.add("current");
+
+    const pill=document.createElement("span");
+    pill.className="pill latest";
+    pill.textContent=nodeName;
+    $$("#sequence .pill").forEach(p=>p.classList.remove("latest"));
+    $("#sequence").appendChild(pill);
+
+    $("#explain").textContent = (idx+1)+"단계: "+descriptions[mode][nodeName];
+    highlightCode();
+    idx++;
+
+    if(idx>=orders[mode].length){
+      setTimeout(()=>{
+        node.classList.remove("current");
+        node.classList.add("visited");
+      },350);
+      if(timer){clearInterval(timer);timer=null;$("#startBtn").textContent="자동 실행";}
+    }
+  }
+
+  $("#preBtn").addEventListener("click",()=>setMode("pre"));
+  $("#inBtn").addEventListener("click",()=>setMode("in"));
+  $("#postBtn").addEventListener("click",()=>setMode("post"));
+  $("#stepBtn").addEventListener("click",step);
+  $("#resetBtn").addEventListener("click",reset);
+
+  $("#startBtn").addEventListener("click",()=>{
+    if(timer){
+      clearInterval(timer); timer=null;
+      $("#startBtn").textContent="자동 실행";
+      return;
+    }
+    if(idx>=orders[mode].length) reset();
+    $("#startBtn").textContent="일시정지";
+    step();
+    timer=setInterval(step,900);
+  });
+
+  $$(".quiz-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const q=btn.dataset.q;
+      const a=btn.dataset.a;
+      const correct=(q==="1" && a==="A") || (q==="2" && a==="A");
+      const out=$("#ans"+q);
+      out.className="answer "+(correct?"ok":"no");
+      out.textContent=correct
+        ? "정답입니다! 부모 A의 위치를 떠올려 보세요."
+        : "다시 생각해 보세요. 전·중·후는 부모 노드를 언제 방문하는지가 핵심입니다.";
+    });
+  });
+})();
+</script>
+</body>
+</html>
