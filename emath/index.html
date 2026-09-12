@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중등 정보올림피아드 이산수학 — 전체 커리큘럼 설계서</title>
+<style>
+:root{
+  --ink:#172033; --sub:#52607a; --pale:#8d99ad; --line:#d6dde8; --soft:#f4f6f9; --desk:#e4e8ee;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:var(--desk);color:var(--ink);
+  font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR','Malgun Gothic','맑은 고딕',sans-serif;
+  font-size:13px;line-height:1.6;padding:64px 12px 24px;word-break:keep-all}
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;background:#172033;color:#e8edf5;
+  display:flex;align-items:center;gap:14px;padding:9px 18px;font-size:13px}
+.bar b{color:#fff}
+.bar button{margin-left:auto;background:#fff;color:#172033;border:0;border-radius:4px;
+  padding:6px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.bar button:focus-visible{outline:3px solid #7fb0ff;outline-offset:2px}
+.bar .hint{font-size:12px;color:#aab6c8}
+.page{width:210mm;height:297mm;margin:0 auto 14px;background:#fff;position:relative;
+  padding:12mm 12mm 15mm;box-shadow:0 1px 3px rgba(23,32,51,.18);overflow:hidden}
+.head{display:flex;align-items:flex-end;gap:12px;border-bottom:3px double var(--ink);
+  padding-bottom:6px;margin-bottom:10px}
+.head h1{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1.3}
+.head .sub{font-size:12px;color:var(--sub)}
+.head .meta{margin-left:auto;text-align:right;font-size:11px;color:var(--sub);line-height:1.45;white-space:nowrap}
+.foot{position:absolute;left:12mm;right:12mm;bottom:6mm;display:flex;border-top:1px solid var(--line);
+  padding-top:4px;font-size:10.5px;color:var(--pale)}
+.foot .r{margin-left:auto}
+h2{font-size:15px;font-weight:800;margin:12px 0 6px;padding-left:9px;border-left:4px solid var(--ink);line-height:1.35}
+h2:first-of-type{margin-top:4px}
+p.lead{font-size:13.2px;line-height:1.7;margin-bottom:4px}
+.note{font-size:11.3px;color:var(--sub);margin-top:4px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.5}
+th,td{border:1px solid var(--line);padding:4px 7px;vertical-align:top;text-align:left}
+th{background:var(--soft);font-weight:700;white-space:nowrap}
+td.c,th.c{text-align:center}
+td.num{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{display:inline-block;min-width:24px;text-align:center;font-weight:700;font-size:11px;color:#fff;
+  border-radius:3px;padding:0 4px;margin:1px 2px 1px 0;font-variant-numeric:tabular-nums;line-height:17px}
+.abadge{display:inline-block;font-weight:800;color:#fff;border-radius:3px;padding:0 6px;margin-right:5px;font-size:11.5px}
+.lvhead{border:1px solid var(--ink);border-top:6px solid var(--ink);padding:9px 12px 8px;margin-bottom:9px}
+.lvhead .t{display:flex;align-items:baseline;gap:10px}
+.lvhead .big{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.lvhead .motto{font-size:15px;font-weight:700;color:var(--sub)}
+.lvhead .who{margin-left:auto;font-size:12px;color:var(--sub)}
+.lvhead dl{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:3px 10px;margin-top:6px;font-size:12px}
+.lvhead dt{font-weight:700;color:var(--sub);white-space:nowrap}
+/* 주제 카드 */
+.tc{border:1px solid var(--line);border-left:5px solid var(--ac);margin-bottom:6px;background:#fff;break-inside:avoid}
+.tc-h{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 8px;background:var(--tint);border-bottom:1px solid var(--line)}
+.tc-h .no{font-weight:800;color:#fff;background:var(--ac);border-radius:3px;font-size:13px;padding:0 6px;
+  font-variant-numeric:tabular-nums;line-height:20px}
+.tc-h .ttl{font-weight:800;font-size:14.6px;letter-spacing:-.2px}
+.tc-h .ar{font-size:11px;font-weight:700;color:var(--ac)}
+.tc-h .pre{margin-left:auto;font-size:11px;color:var(--sub);white-space:nowrap}
+.tc .goal{padding:3px 11px 1px;font-size:12.4px;font-weight:600}
+.tc-b{display:grid;grid-template-columns:52% 1fr;gap:10px;padding:1px 11px 4px}
+.lb{font-size:10.8px;font-weight:700;color:var(--ac);margin:2px 0 1px}
+ul.it{padding-left:14px;font-size:11.8px;line-height:1.47}
+ul.it li::marker{color:var(--ac)}
+.pb{background:var(--soft);border-radius:3px;padding:4px 8px 4px;font-size:11.8px;line-height:1.47}
+.pb .st{float:right;font-size:10.5px;font-weight:700;color:var(--ac);border:1px solid var(--ac);border-radius:9px;padding:0 6px;margin:1px 0 2px 6px;background:#fff}
+.pb .an{margin-top:3px;padding-top:3px;border-top:1px dashed var(--line);font-weight:700}
+.pb .an span{color:var(--ac);margin-right:4px}
+.tc-f{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px dashed var(--line);font-size:11.3px;line-height:1.45}
+.tc-f>div{padding:2px 11px 3px}
+.tc-f>div+div{border-left:1px dashed var(--line)}
+.tc-f b{display:block;font-size:10.5px;color:var(--ac)}
+/* 전체 지도 */
+.wk td,.wk th{padding:3px 6px;font-size:11.6px;line-height:1.45}
+.wk tr.ev td{background:var(--soft)}
+.map td{font-size:11.6px;line-height:1.55;padding:4px 6px}
+.map .tp{display:flex;gap:5px}
+.map .tp .n{font-weight:800;font-variant-numeric:tabular-nums;min-width:17px}
+.map .tp .pg{margin-left:auto;color:var(--pale);font-variant-numeric:tabular-nums;font-size:10.5px;white-space:nowrap}
+.map th.ar{white-space:normal;width:84px;color:#fff;vertical-align:middle;text-align:center;line-height:1.35}
+.sumrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.sumrow>div{border:1px solid var(--line);padding:6px 10px}
+.sumrow .k{font-size:11px;color:var(--sub);font-weight:700}
+.sumrow .v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.3}
+.sumrow .v small{font-size:12px;font-weight:600;color:var(--sub);margin-left:3px}
+.bars{margin-top:3px}
+.bars .row{display:grid;grid-template-columns:160px 1fr 44px;align-items:center;gap:8px;font-size:11.5px;margin:2px 0}
+.bars .track{height:11px;background:var(--soft);position:relative}
+.bars .fill{position:absolute;left:0;top:0;bottom:0}
+@page{size:A4;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .bar{display:none}
+  .page{margin:0;box-shadow:none;break-after:page}
+  .page:last-child{break-after:auto}
+}
+@media screen and (max-width:820px){
+  body{padding:60px 0 0}
+  .page{width:auto;height:auto;min-height:0;overflow:visible;padding:16px 14px 40px;margin:0 0 10px}
+  .tc-b,.tc-f,.sumrow{grid-template-columns:1fr}
+  .tc-f>div+div{border-left:0;border-top:1px dashed var(--line)}
+  .lvhead dl{grid-template-columns:auto 1fr}
+  .bar .hint{display:none}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .head .meta{white-space:normal}
+}
+</style>
+</head>
+<body>
+<div class="bar"><span><b>중등 정보올림피아드 이산수학</b> 전체 커리큘럼 설계서</span>
+<span class="hint">A4 · 배율 100% · 여백 없음 · 배경 그래픽 켜기로 인쇄하세요</span>
+<button type="button" onclick="window.print()">인쇄 / PDF 저장</button></div>
+<div class="page">
+<div class="head"><div><h1>중등 정보올림피아드 이산수학 커리큘럼</h1><div class="sub">전체 목차 설계서 · 3단계 6영역 72주제</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>1 / 27쪽</div></div>
+<p class="lead">한국정보올림피아드(KOI) 1차 대회 1교시는 손으로 푸는 사고력 문항과 화면을 조작하는 인터랙티브 문항으로 치러집니다. 이 설계서는 그 1교시를 기준으로 중등 이산수학 전체를 72개 주제로 나누고, 주제마다 <b>손 풀이 → 코드로 확인 → 기출 연결 → 서술·증명</b>의 흐름을 정해 두었습니다.</p>
+
+<h2>1. 설계의 세 원칙</h2>
+<table>
+<tr><th style="width:23%">손 풀이와 코드 검증을 한 몸으로</th><td>모든 주제에서 손으로 구한 답을 C·Python 전수 조사로 다시 확인합니다. 1교시의 수학적 사고와 2교시 실기의 구현력을 따로 가르치지 않습니다.</td></tr>
+<tr><th>기출에서 거꾸로 설계</th><td>2026년 중등부 1교시 20문항 전부를 72개 주제 중 어디에서 배우는지 연결했습니다(2쪽). 주제 카드의 “기출·유형 연결” 칸이 그 근거입니다.</td></tr>
+<tr><th>답에서 증명으로</th><td>1단계는 과정을 기록하고, 2단계는 방법이 옳음을 설명하고, 3단계는 “왜 최소인가·왜 불가능한가”를 증명합니다. 인터랙티브 만점은 이 증명에서 나옵니다.</td></tr>
+</table>
+
+<h2>2. KOI 1차 대회의 구성 (2026년 기준)</h2>
+<table>
+<tr><th style="width:8%">교시</th><th style="width:31%">내용</th><th class="c" style="width:22%">문항 · 시간 · 배점</th><th>이 커리큘럼의 역할</th></tr>
+<tr><td class="num"><b>1교시</b></td><td>사고력 문제(객관식·주관식)와 비버챌린지 인터랙티브 유형 문제</td><td class="num">20~25문항 · 80분 · 200점</td><td><b>직접 대비.</b> 대표·연습·도전 문항이 이 형식을 따릅니다.</td></tr>
+<tr><td class="num"><b>2교시</b></td><td>실기(프로그래밍) 문제</td><td class="num">3문항 · 100분 · 400점</td><td><b>연계.</b> “코드로 확인” 과제로 구현을 함께 익힙니다.</td></tr>
+</table>
+<p class="note">2026년 1차 대회는 5월 10일, 2차 대회는 7월 18일에 온라인으로 치러졌습니다. 형식·배점·진출 기준은 해마다 바뀔 수 있으니 매년 공고를 확인해 반영합니다.</p>
+
+<h2>3. 세 단계</h2>
+<table>
+<tr><th>단계</th><th class="c">대상</th><th class="c">주제</th><th>목표</th><th>1교시 연결 구간</th></tr>
+<tr><td style="white-space:nowrap"><b>1단계 기본</b><br><span style="color:var(--sub)">도구를 알게 한다</span></td><td class="num">중1 (초6 심화반 가능)</td><td class="num">01 ~ 24</td><td>문제를 보자마자 계산하지 않고 표·그림·나열로 구조부터 드러내는 습관을 만든다.</td><td>1교시 앞 번호의 4~10점 객관식·주관식 유형</td></tr><tr><td style="white-space:nowrap"><b>2단계 발전</b><br><span style="color:var(--sub)">도구를 골라 쓴다</span></td><td class="num">중1 ~ 중2</td><td class="num">25 ~ 48</td><td>문제를 읽고 여사건·점화식·BFS·그리디 가운데 알맞은 도구를 스스로 고른다.</td><td>1교시 중간 번호의 5~13점 문항과 인터랙티브 입문</td></tr><tr><td style="white-space:nowrap"><b>3단계 심화</b><br><span style="color:var(--sub)">도구를 엮고 증명한다</span></td><td class="num">중2 ~ 중3</td><td class="num">49 ~ 72</td><td>두세 가지 도구를 엮어 최적값을 구하고, 그 값이 최선임을 증명한다.</td><td>1교시 인터랙티브 9~16점 문항, 2차 대회·영재고 대비</td></tr>
+</table>
+
+<h2>4. 여섯 영역</h2>
+<table>
+<tr><th style="width:19%">영역</th><th>다루는 내용</th><th class="c" style="width:21%">주제 번호 (1·2·3단계)</th><th class="c" style="width:10%">2026 배점</th></tr>
+<tr><td style="white-space:nowrap"><span class="abadge" style="background:#2451b8">A</span><b>논리와 증명</b></td><td style="font-size:11.3px">명제·진리표, 참말 퍼즐, 귀류법, 불변량, 지식 추론, 귀납법, 교환 논증, 구성·백트래킹</td><td class="num">01~04 · 25~28 · 49~52</td><td class="num">47점</td></tr><tr><td style="white-space:nowrap"><span class="abadge" style="background:#0e7a6f">B</span><b>수와 정수론</b></td><td style="font-size:11.3px">진법·비트, 약수·소수, 합동식, 호제법, 자릿수 구성, 원형 순환, 페르마·CRT·오일러 함수</td><td class="num">05~08 · 29~32 · 53~56</td><td class="num">27점</td></tr><tr><td style="white-space:nowrap"><span class="abadge" style="background:#b5570b">C</span><b>경우의 수와 확률</b></td><td style="font-size:11.3px">합·곱의 법칙, 순열·조합, 격자 경로, 포함배제, 비둘기집, 분배, 확률, 교란순열, 기댓값</td><td class="num">09~12 · 33~36 · 57~60</td><td class="num">30점</td></tr><tr><td style="white-space:nowrap"><span class="abadge" style="background:#6d3fc4">D</span><b>수열·점화식·DP</b></td><td style="font-size:11.3px">규칙·시그마, 점화식, 표 채우기, 상태 점화식, 카탈란, 경로·부분열·배낭·구간·비트마스크 DP</td><td class="num">13~16 · 37~40 · 61~64</td><td class="num">24점</td></tr><tr><td style="white-space:nowrap"><span class="abadge" style="background:#b8264a">E</span><b>그래프와 트리</b></td><td style="font-size:11.3px">차수·오일러 경로, 트리·순회, BFS, 최단 경로, MST, 색칠, 위상 정렬, 최소 컷, 병목 경로</td><td class="num">17~20 · 41~44 · 65~68</td><td class="num">19점</td></tr><tr><td style="white-space:nowrap"><span class="abadge" style="background:#2e7d32">F</span><b>알고리즘 전략과 게임</b></td><td style="font-size:11.3px">실행 추적, 완전 탐색, 정렬·스택·큐, 그리디, 이분 탐색, 시뮬레이션, 님·그런디, 인터랙티브 전략</td><td class="num">21~24 · 45~48 · 69~72</td><td class="num">53점</td></tr>
+</table>
+<p class="note">“2026 배점”은 2026 중등부 1교시 각 문항을 주 연결 주제의 영역으로 분류해 더한 값입니다(합계 200점).</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 설계 원칙</span><span class="r">1 / 27</span></div>
+</div>
+<div class="page">
+<div class="head"><div><h1>2026 중등부 1교시 20문항과 연결 주제</h1><div class="sub">공개 문제를 바탕으로 문항마다 필요한 도구와 배우는 주제를 짝지었습니다</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>2 / 27쪽</div></div>
+<table>
+<tr><th class="c">번호</th><th>문항</th><th class="c">형식</th><th class="c">배점</th><th>풀이의 핵심 도구</th><th class="c">영역</th><th>연결 주제</th></tr>
+<tr><td class="num">1</td><td><b>수직선과 수평선</b></td><td class="num">객관식</td><td class="num">4</td><td>같은 좌표끼리 묶어 중복 없이 세기</td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b5570b">09</span></td></tr><tr><td class="num">2</td><td><b>증가 부분열</b></td><td class="num">객관식</td><td class="num">5</td><td>i번째에서 시작하는 증가 부분열 표</td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td style="white-space:nowrap"><span class="chip" style="background:#6d3fc4">40</span></td></tr><tr><td class="num">3</td><td><b>신발 찾기</b></td><td class="num">객관식</td><td class="num">5</td><td>여사건과 조합으로 확률 계산</td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b5570b">36</span></td></tr><tr><td class="num">4</td><td><b>1과 2</b></td><td class="num">주관식</td><td class="num">6</td><td>연속 구간(블록) 구조로 수 구성</td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td style="white-space:nowrap"><span class="chip" style="background:#0e7a6f">31</span></td></tr><tr><td class="num">5</td><td><b>연속한 1이 없는 이진수</b></td><td class="num">객관식</td><td class="num">7</td><td>끝 상태로 나눈 점화식</td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td style="white-space:nowrap"><span class="chip" style="background:#6d3fc4">37</span><span class="chip" style="background:#0e7a6f">05</span></td></tr><tr><td class="num">6</td><td><b>가장 짧은 경로</b></td><td class="num">주관식</td><td class="num">8</td><td>격자 덧셈 표</td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b5570b">12</span></td></tr><tr><td class="num">7</td><td><b>스트라이크</b></td><td class="num">주관식</td><td class="num">8</td><td>조건 표 소거와 유일성 확인</td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2451b8">04</span><span class="chip" style="background:#2451b8">52</span></td></tr><tr><td class="num">8</td><td><b>꼬리합</b></td><td class="num">주관식</td><td class="num">9</td><td>자리값 가중합으로 식 세우기</td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td style="white-space:nowrap"><span class="chip" style="background:#0e7a6f">31</span></td></tr><tr><td class="num">9</td><td><b>이진 트리의 거리</b></td><td class="num">주관식</td><td class="num">10</td><td>중위 순회 번호와 트리 복원</td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b8264a">20</span><span class="chip" style="background:#b8264a">67</span></td></tr><tr><td class="num">10</td><td><b>모자 색 맞추기</b></td><td class="num">객관식</td><td class="num">11</td><td>가능한 경우 지우기</td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2451b8">27</span></td></tr><tr><td class="num">11</td><td><b>원형 점프</b></td><td class="num">주관식</td><td class="num">12</td><td>mod 순환 구조 세기</td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td style="white-space:nowrap"><span class="chip" style="background:#0e7a6f">32</span></td></tr><tr><td class="num">12</td><td><b>만나는 반직선</b></td><td class="num">주관식</td><td class="num">13</td><td>경우 분류와 여사건</td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b5570b">33</span></td></tr><tr><td class="num">13</td><td><b>조 나누기</b></td><td class="num">인터랙티브</td><td class="num">9</td><td>한계 계산 후 그리디 배치</td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2e7d32">45</span><span class="chip" style="background:#2e7d32">72</span></td></tr><tr><td class="num">14</td><td><b>철도</b></td><td class="num">인터랙티브</td><td class="num">9</td><td>최소 컷</td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td style="white-space:nowrap"><span class="chip" style="background:#b8264a">66</span></td></tr><tr><td class="num">15</td><td><b>직사각형 만들기</b></td><td class="num">인터랙티브</td><td class="num">12</td><td>합을 반으로 나누는 부분집합 합</td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td style="white-space:nowrap"><span class="chip" style="background:#6d3fc4">61</span></td></tr><tr><td class="num">16</td><td><b>스택 큐 정렬</b></td><td class="num">인터랙티브</td><td class="num">12</td><td>스택·큐 동작 설계</td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2e7d32">24</span></td></tr><tr><td class="num">17</td><td><b>양팔 저울</b></td><td class="num">인터랙티브</td><td class="num">12</td><td>조건을 지키며 차례로 구성</td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2451b8">51</span></td></tr><tr><td class="num">18</td><td><b>뒤집기</b></td><td class="num">인터랙티브</td><td class="num">16</td><td>상태 공간 최소 이동과 불변량</td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2e7d32">69</span><span class="chip" style="background:#2451b8">26</span></td></tr><tr><td class="num">19</td><td><b>로봇</b></td><td class="num">인터랙티브</td><td class="num">16</td><td>교환 논증으로 순서 결정</td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2451b8">50</span></td></tr><tr><td class="num">20</td><td><b>간선 게임</b></td><td class="num">인터랙티브</td><td class="num">16</td><td>병목 경로와 게임 전략</td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td style="white-space:nowrap"><span class="chip" style="background:#2e7d32">71</span><span class="chip" style="background:#b8264a">68</span></td></tr>
+</table>
+<p class="note">형식·배점은 공개 문제지, 도구·영역·연결 주제는 이 설계서의 분류이며 첫 번호가 주 연결 주제입니다. 형식별: 객관식 5문항 32점 · 주관식 7문항 66점 · 인터랙티브 8문항 102점.</p>
+
+<h2>단계별 연결 배점</h2>
+<div class="sumrow">
+  <div><div class="k">1단계 주제로 연결 (01~24)</div><div class="v">42<small>점 / 200</small></div><div class="note" style="margin:0">앞 번호 세기·추론·트리 순회, 스택·큐 조작</div></div>
+  <div><div class="k">2단계 주제로 연결 (25~48)</div><div class="v">77<small>점 / 200</small></div><div class="note" style="margin:0">DP·확률·합동식·지식 추론이 몰린 중간 번호</div></div>
+  <div><div class="k">3단계 주제로 연결 (49~72)</div><div class="v">81<small>점 / 200</small></div><div class="note" style="margin:0">9~16점 인터랙티브: 최소 컷, 교환 논증, 게임</div></div>
+</div>
+
+<h2>영역별 연결 배점</h2>
+<div class="bars" style="white-space:nowrap"><div class="row"><span><span class="abadge" style="background:#2451b8">A</span>논리와 증명</span><div class="track"><div class="fill" style="width:88.7%;background:#2451b8"></div></div><span style="text-align:right;font-weight:700">47점</span></div><div class="row"><span><span class="abadge" style="background:#0e7a6f">B</span>수와 정수론</span><div class="track"><div class="fill" style="width:50.9%;background:#0e7a6f"></div></div><span style="text-align:right;font-weight:700">27점</span></div><div class="row"><span><span class="abadge" style="background:#b5570b">C</span>경우의 수와 확률</span><div class="track"><div class="fill" style="width:56.6%;background:#b5570b"></div></div><span style="text-align:right;font-weight:700">30점</span></div><div class="row"><span><span class="abadge" style="background:#6d3fc4">D</span>수열·점화식·DP</span><div class="track"><div class="fill" style="width:45.3%;background:#6d3fc4"></div></div><span style="text-align:right;font-weight:700">24점</span></div><div class="row"><span><span class="abadge" style="background:#b8264a">E</span>그래프와 트리</span><div class="track"><div class="fill" style="width:35.8%;background:#b8264a"></div></div><span style="text-align:right;font-weight:700">19점</span></div><div class="row"><span><span class="abadge" style="background:#2e7d32">F</span>알고리즘 전략과 게임</span><div class="track"><div class="fill" style="width:100.0%;background:#2e7d32"></div></div><span style="text-align:right;font-weight:700">53점</span></div></div>
+<p class="note">배점이 가장 큰 뒷번호 인터랙티브 문항(16점 3개)은 모두 3단계 주제와 연결됩니다. 문항 수로는 1·2단계 주제가 14문항이므로 앞 단계가 탄탄해야 인터랙티브에 쓸 시간이 생깁니다.</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2026 기출 분석</span><span class="r">2 / 27</span></div>
+</div>
+<div class="page">
+<div class="head"><div><h1>72주제 전체 지도</h1><div class="sub">영역(가로줄)과 단계(세로줄)로 본 전체 목차 — 오른쪽 숫자는 주제 카드가 실린 쪽</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>3 / 27쪽</div></div>
+<table class="map">
+<tr><th></th><th class="c">1단계 기본 · 도구를 알게 한다</th><th class="c">2단계 발전 · 도구를 골라 쓴다</th><th class="c">3단계 심화 · 도구를 엮고 증명한다</th></tr>
+<tr><th class="ar" style="background:#2451b8">A<br>논리와 증명</th><td style="background:#eef3fd"><div class="tp"><span class="n" style="color:#2451b8">01</span><span>명제와 진리표</span><span class="pg">6쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">02</span><span>조건명제와 대우</span><span class="pg">6쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">03</span><span>참말·거짓말 퍼즐</span><span class="pg">6쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">04</span><span>조건 표로 푸는 추론</span><span class="pg">6쪽</span></div></td><td style="background:#eef3fd"><div class="tp"><span class="n" style="color:#2451b8">25</span><span>반례와 귀류법</span><span class="pg">13쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">26</span><span>불변량과 홀짝</span><span class="pg">13쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">27</span><span>지식 추론 퍼즐</span><span class="pg">13쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">28</span><span>논리 회로와 불 대수</span><span class="pg">13쪽</span></div></td><td style="background:#eef3fd"><div class="tp"><span class="n" style="color:#2451b8">49</span><span>수학적 귀납법</span><span class="pg">20쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">50</span><span>극단 원리와 교환 논증</span><span class="pg">20쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">51</span><span>구성적 증명</span><span class="pg">20쪽</span></div><div class="tp"><span class="n" style="color:#2451b8">52</span><span>백트래킹과 제약 추론</span><span class="pg">20쪽</span></div></td></tr><tr><th class="ar" style="background:#0e7a6f">B<br>수와 정수론</th><td style="background:#e8f5f3"><div class="tp"><span class="n" style="color:#0e7a6f">05</span><span>진법과 자리값</span><span class="pg">7쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">06</span><span>비트 연산</span><span class="pg">7쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">07</span><span>약수와 배수</span><span class="pg">7쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">08</span><span>소수와 에라토스테네스의 체</span><span class="pg">7쪽</span></div></td><td style="background:#e8f5f3"><div class="tp"><span class="n" style="color:#0e7a6f">29</span><span>나머지와 합동식</span><span class="pg">14쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">30</span><span>유클리드 호제법</span><span class="pg">14쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">31</span><span>자릿수와 수의 구성</span><span class="pg">14쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">32</span><span>원형 구조와 순환</span><span class="pg">14쪽</span></div></td><td style="background:#e8f5f3"><div class="tp"><span class="n" style="color:#0e7a6f">53</span><span>빠른 거듭제곱과 페르마 소정리</span><span class="pg">21쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">54</span><span>일차 부정방정식</span><span class="pg">21쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">55</span><span>중국인의 나머지 정리</span><span class="pg">21쪽</span></div><div class="tp"><span class="n" style="color:#0e7a6f">56</span><span>오일러 함수와 약수 합 기법</span><span class="pg">21쪽</span></div></td></tr><tr><th class="ar" style="background:#b5570b">C<br>경우의 수와 확률</th><td style="background:#fcf1e6"><div class="tp"><span class="n" style="color:#b5570b">09</span><span>합의 법칙과 곱의 법칙</span><span class="pg">8쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">10</span><span>순열</span><span class="pg">8쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">11</span><span>조합과 파스칼 삼각형</span><span class="pg">8쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">12</span><span>격자 최단경로</span><span class="pg">8쪽</span></div></td><td style="background:#fcf1e6"><div class="tp"><span class="n" style="color:#b5570b">33</span><span>포함배제의 원리</span><span class="pg">15쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">34</span><span>비둘기집 원리</span><span class="pg">15쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">35</span><span>중복조합과 분배</span><span class="pg">15쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">36</span><span>확률의 기초</span><span class="pg">15쪽</span></div></td><td style="background:#fcf1e6"><div class="tp"><span class="n" style="color:#b5570b">57</span><span>이항정리와 조합 항등식</span><span class="pg">22쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">58</span><span>분배와 스털링 수</span><span class="pg">22쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">59</span><span>교란순열과 대칭 세기</span><span class="pg">22쪽</span></div><div class="tp"><span class="n" style="color:#b5570b">60</span><span>기댓값과 선형성</span><span class="pg">22쪽</span></div></td></tr><tr><th class="ar" style="background:#6d3fc4">D<br>수열·점화식·DP</th><td style="background:#f2edfc"><div class="tp"><span class="n" style="color:#6d3fc4">13</span><span>규칙 찾기와 일반항</span><span class="pg">9쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">14</span><span>합의 계산과 시그마</span><span class="pg">9쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">15</span><span>점화식 세우기</span><span class="pg">9쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">16</span><span>표 채우기 — DP 첫걸음</span><span class="pg">9쪽</span></div></td><td style="background:#f2edfc"><div class="tp"><span class="n" style="color:#6d3fc4">37</span><span>상태를 나눈 점화식</span><span class="pg">16쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">38</span><span>카탈란 수</span><span class="pg">16쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">39</span><span>DP ① 최적 경로</span><span class="pg">16쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">40</span><span>DP ② 부분열</span><span class="pg">16쪽</span></div></td><td style="background:#f2edfc"><div class="tp"><span class="n" style="color:#6d3fc4">61</span><span>배낭과 부분집합 합</span><span class="pg">23쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">62</span><span>구간 DP</span><span class="pg">23쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">63</span><span>비트마스크 DP</span><span class="pg">23쪽</span></div><div class="tp"><span class="n" style="color:#6d3fc4">64</span><span>점화식 풀기와 복잡도</span><span class="pg">23쪽</span></div></td></tr><tr><th class="ar" style="background:#b8264a">E<br>그래프와 트리</th><td style="background:#fcecf0"><div class="tp"><span class="n" style="color:#b8264a">17</span><span>그래프의 기본</span><span class="pg">10쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">18</span><span>한붓그리기 (오일러 경로)</span><span class="pg">10쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">19</span><span>트리의 성질</span><span class="pg">10쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">20</span><span>이진 트리와 순회</span><span class="pg">10쪽</span></div></td><td style="background:#fcecf0"><div class="tp"><span class="n" style="color:#b8264a">41</span><span>너비 우선 탐색 (BFS)</span><span class="pg">17쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">42</span><span>가중치 최단 경로</span><span class="pg">17쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">43</span><span>최소 신장 트리</span><span class="pg">17쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">44</span><span>그래프 색칠과 이분 그래프</span><span class="pg">17쪽</span></div></td><td style="background:#fcecf0"><div class="tp"><span class="n" style="color:#b8264a">65</span><span>위상 정렬과 DAG</span><span class="pg">24쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">66</span><span>최대 흐름과 최소 컷</span><span class="pg">24쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">67</span><span>트리 심화</span><span class="pg">24쪽</span></div><div class="tp"><span class="n" style="color:#b8264a">68</span><span>서로소 집합과 병목 경로</span><span class="pg">24쪽</span></div></td></tr><tr><th class="ar" style="background:#2e7d32">F<br>알고리즘 전략과 게임</th><td style="background:#ecf6ed"><div class="tp"><span class="n" style="color:#2e7d32">21</span><span>알고리즘과 실행 추적</span><span class="pg">11쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">22</span><span>완전 탐색의 사고</span><span class="pg">11쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">23</span><span>정렬의 원리</span><span class="pg">11쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">24</span><span>스택과 큐</span><span class="pg">11쪽</span></div></td><td style="background:#ecf6ed"><div class="tp"><span class="n" style="color:#2e7d32">45</span><span>그리디 전략</span><span class="pg">18쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">46</span><span>이분 탐색</span><span class="pg">18쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">47</span><span>시뮬레이션과 주기</span><span class="pg">18쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">48</span><span>님 게임과 필승 전략</span><span class="pg">18쪽</span></div></td><td style="background:#ecf6ed"><div class="tp"><span class="n" style="color:#2e7d32">69</span><span>상태 공간과 최소 이동</span><span class="pg">25쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">70</span><span>분할 정복</span><span class="pg">25쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">71</span><span>게임 트리와 그런디 수</span><span class="pg">25쪽</span></div><div class="tp"><span class="n" style="color:#2e7d32">72</span><span>인터랙티브 최적화 전략</span><span class="pg">25쪽</span></div></td></tr>
+</table>
+<h2>같은 영역 안에서 이어지는 줄기</h2>
+<table>
+<tr><th><span class="abadge" style="background:#2451b8">A</span>논리와 증명</th><td>진리표·참말 퍼즐(01~04) → 귀류법·불변량·지식 추론(25~28) → 귀납법·교환 논증·구성·백트래킹(49~52)</td></tr>
+<tr><th><span class="abadge" style="background:#0e7a6f">B</span>수와 정수론</th><td>진법·비트·약수·소수(05~08) → 합동식·호제법·자릿수·순환(29~32) → 페르마·부정방정식·CRT·오일러 함수(53~56)</td></tr>
+<tr><th><span class="abadge" style="background:#b5570b">C</span>경우의 수와 확률</th><td>합·곱·순열·조합·격자(09~12) → 포함배제·비둘기집·분배·확률(33~36) → 이항정리·스털링·교란순열·기댓값(57~60)</td></tr>
+<tr><th><span class="abadge" style="background:#6d3fc4">D</span>수열·점화식·DP</th><td>규칙·시그마·점화식·표 채우기(13~16) → 상태 점화식·카탈란·경로·부분열 DP(37~40) → 배낭·구간·비트마스크·복잡도(61~64)</td></tr>
+<tr><th><span class="abadge" style="background:#b8264a">E</span>그래프와 트리</th><td>차수·한붓그리기·트리·순회(17~20) → BFS·최단 경로·MST·색칠(41~44) → 위상 정렬·최소 컷·트리 심화·병목(65~68)</td></tr>
+<tr><th><span class="abadge" style="background:#2e7d32">F</span>알고리즘 전략과 게임</th><td>추적·완전 탐색·정렬·스택과 큐(21~24) → 그리디·이분 탐색·시뮬레이션·님(45~48) → 상태 공간·분할 정복·그런디·인터랙티브(69~72)</td></tr>
+</table>
+<p class="note">단계 안에서는 영역 순서(A→F)가 아니라 선수 주제를 지키는 한 자유롭게 섞어 진행할 수 있습니다. 단계별 주차 진행표는 5·12·19쪽에 있으며, 카드의 “선수 주제”를 먼저 확인합니다.</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 전체 지도</span><span class="r">3 / 27</span></div>
+</div>
+<div class="page">
+<div class="head"><div><h1>한 주제의 표준 구성과 카드 읽는 법</h1><div class="sub">세부 교재를 만들 때 모든 주제에 똑같이 적용하는 틀</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>4 / 27쪽</div></div>
+<h2>1. 한 주제(1차시)의 일곱 단계</h2>
+<table>
+<tr><th class="c">단계</th><th class="c">분량</th><th class="c">수업 시간</th><th>내용</th><th>카드의 근거 칸</th></tr>
+<tr><td><b>① 상황 열기</b></td><td class="num">½쪽</td><td class="num" rowspan="2">30분</td><td>퍼즐이나 기출 장면으로 시작해 답이 아니라 질문을 던진다. 선수 주제 1문항으로 복습한다.</td><td>선수 주제</td></tr>
+<tr><td><b>② 개념과 정리</b></td><td class="num">1½쪽</td><td>정의·성질·짧은 증명. 그림이나 표를 반드시 넣고, 공식은 유도 과정과 함께 제시한다.</td><td>목표, 배우는 내용(절 제목)</td></tr>
+<tr><td><b>③ 손으로 따라가기</b></td><td class="num">1쪽</td><td class="num" rowspan="2">35분</td><td>예제 2개. 풀이 과정의 표·식을 빈칸으로 두어 학생이 채운다. 예제 1은 대표 문제 수준.</td><td>대표 문제, 전략</td></tr>
+<tr><td><b>④ 연습</b></td><td class="num">1쪽</td><td>6~8문항. 객관식·단답형으로 1교시 앞 번호 형식과 속도를 맞춘다.</td><td>배우는 내용</td></tr>
+<tr><td><b>⑤ 코드로 확인</b></td><td class="num">½쪽</td><td class="num">15분</td><td>손으로 푼 답을 C·Python 짧은 코드(전수 조사·시뮬레이션)로 검증한다. 두 언어의 출력이 같아야 한다.</td><td>코드로 확인</td></tr>
+<tr><td><b>⑥ 도전·기출 연결</b></td><td class="num">1쪽</td><td class="num" rowspan="2">20분</td><td>2~3문항. 1교시 중·후반 난이도 또는 인터랙티브형(조작·최적화) 문항.</td><td>기출·유형 연결</td></tr>
+<tr><td><b>⑦ 서술·증명</b></td><td class="num">½쪽</td><td>1문항. “왜 빠짐없는가 / 왜 최소인가 / 왜 불가능한가”를 문장으로 쓴다.</td><td>서술·증명</td></tr>
+</table>
+<p class="note">한 주제는 약 6쪽, 수업 100분과 과제로 운영합니다. 주 1회 1주제면 한 단계가 약 6개월입니다.</p>
+
+<h2>2. 주제 카드 읽는 법</h2>
+<table>
+<tr><th style="width:22%">카드의 칸</th><th>의미</th><th style="width:31%">세부 교재에서의 쓰임</th></tr>
+<tr><td><b>번호 · 주제명 · 영역</b></td><td>01~72 전체 번호와 여섯 영역(A~F) 중 소속. 색은 영역을 뜻한다.</td><td>파일 이름과 교재 표지</td></tr>
+<tr><td><b>선수 주제</b></td><td>이 주제 전에 끝내야 하는 주제 번호</td><td>① 상황 열기의 복습 문항</td></tr>
+<tr><td><b>목표</b></td><td>학생이 차시 끝에 할 수 있어야 하는 것 한 문장</td><td>교재 첫 쪽 학습 목표, 확인 테스트 기준</td></tr>
+<tr><td><b>배우는 내용</b></td><td>다룰 개념과 기법 4~5개, 위에서 아래로 가르치는 순서</td><td>② 개념과 정리의 절 제목</td></tr>
+<tr><td><b>대표 문제 · 전략 · 답</b></td><td>주제를 대표하는 난이도의 문제와 풀이 전략. 답은 Python으로 검증함</td><td>③ 예제 1, 교사용 해설의 기준 문항</td></tr>
+<tr><td><b>코드로 확인</b></td><td>손 풀이를 검증하거나 알고리즘으로 옮기는 과제</td><td>⑤ 코드로 확인, 2교시 연계</td></tr>
+<tr><td><b>기출·유형 연결</b></td><td>2026 중등부 1교시 연결 문항 또는 연결되는 문항 유형</td><td>⑥ 도전 문항 설계의 출발점</td></tr>
+<tr><td><b>서술·증명</b></td><td>차시에서 반드시 쓰게 할 설명 또는 증명 한 가지</td><td>⑦ 서술·증명과 채점 기준</td></tr>
+</table>
+
+<h2>3. 제작 규칙</h2>
+<table>
+<tr><th style="width:22%">주제별 산출물</th><td>이론 학습지, 워크북(연습·도전·서술), 교사용 해설(정답·풀이·지도 방법·자주 하는 오답), 코드 파일(C·Python 한 쌍), 필요하면 인터랙티브 HTML</td></tr>
+<tr><th>검증</th><td>모든 정답은 Python 전수 조사로 확인하고, C와 Python 코드의 출력이 일치하는지 확인한다. 인쇄물은 A4 쪽 넘침을 자동 검사한다.</td></tr>
+<tr><th>파일 이름</th><td>영문으로 <b>dm_L단계_번호_종류</b> — 예) dm_L1_01_theory.html, dm_L1_01_workbook.html, dm_L1_01_answer.html, dm_L1_01_check.c, dm_L1_01_check.py</td></tr>
+<tr><th>문항 출처 표기</th><td>기출을 변형할 때는 원 문항의 연도·부문·번호를 해설에 적는다. KOI 공개 문제는 CC BY-NC-SA 4.0 조건으로 이용한다.</td></tr>
+</table>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 표준 구성</span><span class="r">4 / 27</span></div>
+</div>
+<div class="page">
+<div class="head"><div><h1>1단계 기본: 단계 안내와 주차별 진행표</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>5 / 27쪽</div></div><div class="lvhead">
+  <div class="t"><span class="big">1단계 기본</span><span class="motto">도구를 알게 한다</span><span class="who">대상 중1 (초6 심화반 가능) · 주제 01 ~ 24</span></div>
+  <dl>
+    <dt>목표</dt><dd>문제를 보자마자 계산하지 않고 표·그림·나열로 구조부터 드러내는 습관을 만든다.</dd><dt>1교시 연결</dt><dd>1교시 앞 번호의 4~10점 객관식·주관식 유형</dd>
+    <dt>코드</dt><dd>반복문과 배열로 전수 조사해 손으로 푼 답을 검증한다.</dd><dt>서술 목표</dt><dd>풀이 과정을 표나 그림으로 남기고, 결론을 한 문장으로 쓴다.</dd>
+  </dl>
+</div>
+<h2>주차별 진행표 (정규 트랙, 주 1주제)</h2>
+<table class="wk">
+<tr><th class="c" style="width:7%">주차</th><th>주제</th><th class="c" style="width:6%">영역</th><th style="width:14%">선수 주제</th><th style="width:19%">대표 문제 전략</th><th class="c" style="width:14%">2026 연결 문항</th><th class="c" style="width:7%">카드</th></tr>
+<tr><td class="num">1주</td><td><span class="chip" style="background:#2451b8">01</span> <b>명제와 진리표</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td>—</td><td>모든 경우 나열</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">6쪽</td></tr><tr><td class="num">2주</td><td><span class="chip" style="background:#0e7a6f">05</span> <b>진법과 자리값</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td>—</td><td>자리마다 따로 보기</td><td class="num">5번</td><td class="num">7쪽</td></tr><tr><td class="num">3주</td><td><span class="chip" style="background:#b5570b">09</span> <b>합의 법칙과 곱의 법칙</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td>—</td><td>겹치지 않게 나누기</td><td class="num"><b>1번</b></td><td class="num">8쪽</td></tr><tr><td class="num">4주</td><td><span class="chip" style="background:#2e7d32">21</span> <b>알고리즘과 실행 추적</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td>—</td><td>추적표 기록</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">11쪽</td></tr><tr><td class="num">5주</td><td><span class="chip" style="background:#2451b8">02</span> <b>조건명제와 대우</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">01</span></td><td>집합 그림으로 바꾸기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">6쪽</td></tr><tr><td class="num">6주</td><td><span class="chip" style="background:#0e7a6f">06</span> <b>비트 연산</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">05</span></td><td>자리별로 계산</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">7쪽</td></tr><tr><td class="num">7주</td><td><span class="chip" style="background:#b5570b">10</span> <b>순열</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">09</span></td><td>묶기 · 사이에 넣기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">8쪽</td></tr><tr><td class="num">8주</td><td><span class="chip" style="background:#6d3fc4">13</span> <b>규칙 찾기와 일반항</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td>—</td><td>차이를 적어 보기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">9쪽</td></tr><tr><td class="num">9주</td><td><span class="chip" style="background:#2451b8">03</span> <b>참말·거짓말 퍼즐</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">01</span></td><td>가정 후 모순 찾기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">6쪽</td></tr><tr><td class="num">10주</td><td><span class="chip" style="background:#0e7a6f">07</span> <b>약수와 배수</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td>—</td><td>소인수분해로 구조 보기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">7쪽</td></tr><tr><td class="num">11주</td><td><span class="chip" style="background:#b5570b">11</span> <b>조합과 파스칼 삼각형</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">10</span></td><td>여사건으로 빼기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">8쪽</td></tr><tr><td class="num">12주</td><td><span class="chip" style="background:#b8264a">17</span> <b>그래프의 기본</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td>—</td><td>관계를 그래프로</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">10쪽</td></tr><tr class="ev"><td class="num">13주</td><td colspan="6"><b>단계 중간 평가</b> · 1~12주 주제에서 10문항, 40분 · 전반부 점검과 보충 계획</td></tr><tr><td class="num">14주</td><td><span class="chip" style="background:#2451b8">04</span> <b>조건 표로 푸는 추론</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">03</span></td><td>강한 조건부터 소거</td><td class="num"><b>7번</b></td><td class="num">6쪽</td></tr><tr><td class="num">15주</td><td><span class="chip" style="background:#0e7a6f">08</span> <b>소수와 에라토스테네스의 체</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">07</span></td><td>한꺼번에 지우기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">7쪽</td></tr><tr><td class="num">16주</td><td><span class="chip" style="background:#b5570b">12</span> <b>격자 최단경로</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">11</span></td><td>덧셈 표 채우기</td><td class="num"><b>6번</b></td><td class="num">8쪽</td></tr><tr><td class="num">17주</td><td><span class="chip" style="background:#6d3fc4">14</span> <b>합의 계산과 시그마</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">13</span></td><td>짝짓기 · 망원합</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">9쪽</td></tr><tr><td class="num">18주</td><td><span class="chip" style="background:#6d3fc4">15</span> <b>점화식 세우기</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">13</span></td><td>마지막 단계로 나누기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">9쪽</td></tr><tr><td class="num">19주</td><td><span class="chip" style="background:#2e7d32">22</span> <b>완전 탐색의 사고</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#b5570b">09</span></td><td>후보 공간 정의</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">11쪽</td></tr><tr><td class="num">20주</td><td><span class="chip" style="background:#b8264a">18</span> <b>한붓그리기 (오일러 경로)</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">17</span></td><td>차수의 홀짝 보기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">10쪽</td></tr><tr><td class="num">21주</td><td><span class="chip" style="background:#b8264a">19</span> <b>트리의 성질</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">17</span></td><td>차수 합으로 식 세우기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">10쪽</td></tr><tr><td class="num">22주</td><td><span class="chip" style="background:#6d3fc4">16</span> <b>표 채우기 — DP 첫걸음</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">15</span></td><td>표의 의미부터 정의</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">9쪽</td></tr><tr><td class="num">23주</td><td><span class="chip" style="background:#2e7d32">23</span> <b>정렬의 원리</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">22</span></td><td>역순쌍 세기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">11쪽</td></tr><tr><td class="num">24주</td><td><span class="chip" style="background:#b8264a">20</span> <b>이진 트리와 순회</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">19</span></td><td>루트 기준으로 쪼개기</td><td class="num"><b>9번</b></td><td class="num">10쪽</td></tr><tr><td class="num">25주</td><td><span class="chip" style="background:#2e7d32">24</span> <b>스택과 큐</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">21</span></td><td>상태를 그림으로 추적</td><td class="num"><b>16번</b></td><td class="num">11쪽</td></tr><tr class="ev"><td class="num">26주</td><td colspan="6"><b>단계 마무리 평가</b> · 24주제 전체 12문항 + 인터랙티브형 2문항, 70분 · Set A/B, 70% 이상이면 다음 단계</td></tr>
+</table>
+<p class="note">선수 주제가 모두 앞 주차에 오도록 배치했습니다(빌드 과정에서 자동 점검). 앞 단계의 선수 주제는 마친 것으로 봅니다. 연결 문항의 굵은 번호는 그 문항의 주 연결 주제라는 뜻입니다.</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">5 / 27</span></div>
+</div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 01~04</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>6 / 27쪽</div></div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">01</span><span class="ttl">명제와 진리표</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">문장을 참·거짓이 분명한 명제로 바꾸고, 진리표로 복합 명제의 값을 빠짐없이 계산한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>명제와 명제가 아닌 문장 구별, 명제의 부정</li><li>그리고(∧) · 또는(∨) · 아니다(¬) · 배타적 또는(XOR)</li><li>변수 n개의 진리표는 2ⁿ행 — 빠짐없이 나열하는 순서</li><li>드모르간 법칙 ¬(p∧q) = ¬p ∨ ¬q</li><li>두 식이 같은지 진리표로 확인하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">모든 경우 나열</span>세 명제 p, q, r로 만든 식 (p ∧ q) ∨ ¬r 이 참이 되는 경우는 진리표 8행 중 몇 행인가?<div class="an"><span>답</span>5행</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>C의 &amp;&amp;, ||, !, ^ 로 2ⁿ행 진리표를 출력하는 프로그램</div>
+    <div><b>기출·유형 연결</b>1교시 조건 해석 문항 전반의 기초</div>
+    <div><b>서술·증명</b>두 식이 같음을 진리표 한 장으로 보이고 결론을 한 문장으로 쓰기</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">02</span><span class="ttl">조건명제와 대우</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 01</span></div>
+  <div class="goal">“~이면 ~이다”의 역·이·대우를 구별하고, “모든/어떤”이 들어간 문장을 정확히 부정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>p → q 가 거짓인 경우는 단 하나 (p 참, q 거짓)</li><li>역 · 이 · 대우 — 대우만 원래 명제와 참·거짓이 같다</li><li>필요조건과 충분조건을 집합의 포함으로 이해</li><li>“모든 x에 대해”의 부정은 “어떤 x는 아니다”</li><li>문제의 “단, ~” 조건을 기호로 옮겨 적기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">집합 그림으로 바꾸기</span>“4의 배수이면 짝수이다”의 역, 이, 대우를 쓰고 각각의 참·거짓을 판정하시오.<div class="an"><span>답</span>역 거짓, 이 거짓, 대우 “짝수가 아니면 4의 배수가 아니다” 참</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>1~100 전수 조사로 명제와 역의 반례를 찾는 프로그램</div>
+    <div><b>기출·유형 연결</b>선택지 판정 문항, 반례 찾기</div>
+    <div><b>서술·증명</b>거짓인 명제에 반례 하나를 들어 거짓임을 보이기</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">03</span><span class="ttl">참말·거짓말 퍼즐</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 01</span></div>
+  <div class="goal">가정을 세우고 모순을 찾는 방식으로 기사(항상 참)·건달(항상 거짓) 문제를 푼다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>기사의 발언은 참, 건달의 발언은 거짓</li><li>한 사람을 기사라고 가정 → 연쇄 추론 → 모순 확인</li><li>2ⁿ가지 경우를 표로 모두 검사하는 방법</li><li>“나는 건달이다”라는 발언이 불가능한 이유</li><li>해가 여러 개이거나 없는 경우 판정하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">가정 후 모순 찾기</span>A “우리 셋 중 기사는 정확히 한 명이다.” B “A는 건달이다.” C “A와 B는 같은 종류다.” 세 사람의 정체는?<div class="an"><span>답</span>A 기사, B 건달, C 건달 (유일)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>참/거짓 2³가지를 반복문으로 검사해 조건을 만족하는 경우만 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 10번 「모자 색 맞추기」 추론의 기초</div>
+    <div><b>서술·증명</b>나머지 경우가 모두 모순임을 표로 보여 해가 유일함을 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">04</span><span class="ttl">조건 표로 푸는 추론</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 03</span></div>
+  <div class="goal">여러 조건을 표에 기록하고 소거해 답을 하나로 좁히며, 유일성까지 확인한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>논리 격자(사람 × 속성) 표 그리기와 O/X 소거</li><li>가장 강한 조건부터 적용하기</li><li>부분 일치 정보(몇 자리가 맞았는가)의 해석</li><li>후보를 나열하고 조건마다 걸러 내기</li><li>마지막에 답이 유일한지 반드시 검증</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">강한 조건부터 소거</span>세 자리 수를 맞힌다. 추측과 “자리까지 일치한 숫자의 개수”가 372→2, 528→1, 521→1, 352→1 일 때 정한 수는?<div class="an"><span>답</span>572</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>100~999 전수 조사로 조건을 모두 만족하는 수를 찾아 유일성 확인</div>
+    <div><b>기출·유형 연결</b>2026 중등 7번 「스트라이크」</div>
+    <div><b>서술·증명</b>첫 추측에서 어느 두 자리가 맞았는지 경우를 나눈 과정 쓰기</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">6 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 05~08</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>7 / 27쪽</div></div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">05</span><span class="ttl">진법과 자리값</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">2진·8진·16진법의 자리값을 이해하고, 수를 자유롭게 변환하며 자릿수를 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>자리값 전개 1011₍₂₎ = 8 + 2 + 1</li><li>10진 → 2진: 2로 나눈 나머지를 거꾸로 읽기</li><li>2진 ↔ 8진·16진은 3자리·4자리씩 묶기</li><li>k비트로 나타낼 수 있는 수는 0 ~ 2ᵏ − 1</li><li>이진수의 1의 개수와 자릿수 세기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">자리마다 따로 보기</span>2026을 2진수와 16진수로 나타내고, 2진수의 자릿수와 숫자 1의 개수를 구하시오.<div class="an"><span>답</span>11111101010₍₂₎ (11자리, 1은 8개), 7EA₍₁₆₎</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>진법 변환 함수 (C: 나머지 배열 역순 출력, Python: bin · format)</div>
+    <div><b>기출·유형 연결</b>2026 중등 5번 「연속한 1이 없는 이진수」</div>
+    <div><b>서술·증명</b>2로 나눈 나머지를 거꾸로 읽는 이유를 자리값으로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">06</span><span class="ttl">비트 연산</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 05</span></div>
+  <div class="goal">AND·OR·XOR·시프트를 손으로 계산하고, 비트로 집합과 홀짝·2의 거듭제곱을 판정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>자리별 AND · OR · XOR 계산표</li><li>왼쪽 시프트는 ×2, 오른쪽 시프트는 ÷2의 몫</li><li>x &amp; 1 로 홀짝, x &amp; (x − 1) 로 2의 거듭제곱 판정</li><li>XOR의 성질 a^a = 0, a^0 = a, 교환·결합법칙</li><li>비트마스크로 부분집합 표현 (원소 i ↔ i번째 비트)</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">자리별로 계산</span>13 AND 27 과 13 XOR 27 의 값을 각각 구하시오.<div class="an"><span>답</span>AND 9, XOR 22</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>부분집합 2ⁿ개를 비트마스크 반복문으로 모두 출력</div>
+    <div><b>기출·유형 연결</b>1교시 이진 표현 문항, 2교시 부분집합 완전 탐색</div>
+    <div><b>서술·증명</b>a ^ b ^ a = b 가 성립하는 이유를 자리별로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">07</span><span class="ttl">약수와 배수</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">소인수분해로 약수의 개수와 합을 구하고, 최대공약수·최소공배수의 관계를 활용한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>소인수분해와 약수의 구조 (지수 고르기)</li><li>약수의 개수 (a+1)(b+1)…, 약수의 합 공식</li><li>1~N 중 k의 배수 개수는 ⌊N/k⌋</li><li>gcd × lcm = a × b</li><li>약수는 √N 까지만 찾으면 짝이 정해진다</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">소인수분해로 구조 보기</span>360의 약수의 개수와 약수의 총합을 구하시오.<div class="an"><span>답</span>24개, 합 1170</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>√N 까지 반복하며 약수 쌍을 찾아 개수·합 출력</div>
+    <div><b>기출·유형 연결</b>1교시 수 조건 문항, 2교시 약수 활용 구현</div>
+    <div><b>서술·증명</b>약수의 개수가 홀수인 수는 제곱수뿐인 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">08</span><span class="ttl">소수와 에라토스테네스의 체</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 07</span></div>
+  <div class="goal">소수를 판정하고, 체를 이용해 범위 안의 소수를 빠르게 모두 찾는다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>소수 · 합성수 · 1의 구별, 판정은 √n 까지</li><li>에라토스테네스의 체 — p² 부터 지우는 이유</li><li>2, 3이 아닌 소수는 6k ± 1 꼴</li><li>소수가 무한히 많다는 증명 맛보기</li><li>연속한 합성수 구간 만들기 (n!+2 … n!+n)</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">한꺼번에 지우기</span>1부터 100까지의 자연수 중 소수는 몇 개인가? 체를 사용해 구하시오.<div class="an"><span>답</span>25개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>체 배열로 N 이하 소수 출력, 하나씩 판정하는 방법과 속도 비교</div>
+    <div><b>기출·유형 연결</b>1교시 수 조건 문항, 2교시 전처리 기법</div>
+    <div><b>서술·증명</b>체에서 p² 보다 작은 p의 배수는 이미 지워졌음을 설명</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">7 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 09~12</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>8 / 27쪽</div></div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">09</span><span class="ttl">합의 법칙과 곱의 법칙</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">경우를 겹치지 않게 나누어 더하고, 단계별 선택은 곱해서 빠짐없이 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>합의 법칙 — 동시에 일어나지 않는 경우로 나누기</li><li>곱의 법칙 — 단계마다 선택지 수 곱하기</li><li>수형도와 표로 경우 나열</li><li>같은 대상을 두 번 세는 실수 찾기 (중복 제거)</li><li>조건이 걸린 자리부터 먼저 정하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">겹치지 않게 나누기</span>서로 다른 주사위 두 개를 던질 때 나온 눈의 합이 4의 배수인 경우의 수는?<div class="an"><span>답</span>9가지 (합 4: 3, 합 8: 5, 합 12: 1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>중첩 반복문으로 경우를 세어 손 계산과 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 1번 「수직선과 수평선」</div>
+    <div><b>서술·증명</b>경우를 나눈 기준이 서로 겹치지 않음을 한 문장으로</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">10</span><span class="ttl">순열</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 09</span></div>
+  <div class="goal">순서가 있는 배열을 세고, 같은 것이 있거나 원형으로 놓이는 경우를 구별한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>n!, nPr 의 의미와 계산</li><li>이웃하는 것은 묶고, 이웃하지 않는 것은 사이에 넣기</li><li>같은 것이 있는 순열 n! / (a! b! …)</li><li>원순열 (n − 1)! — 회전하면 같은 배치</li><li>사전순 k번째 순열 찾기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">묶기 · 사이에 넣기</span>BANANA의 여섯 글자를 한 줄로 배열하는 방법은 몇 가지인가?<div class="an"><span>답</span>60가지 (6! ÷ 3! ÷ 2!)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>다음 순열(next permutation) 원리로 사전순 나열</div>
+    <div><b>기출·유형 연결</b>1교시 배열·순서 문항, 2교시 순열 완전 탐색</div>
+    <div><b>서술·증명</b>3!과 2!로 나누는 이유를 “같은 배열이 몇 번 세어졌나”로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">11</span><span class="ttl">조합과 파스칼 삼각형</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 10</span></div>
+  <div class="goal">순서가 없는 선택을 조합으로 세고, 파스칼 삼각형의 규칙과 연결한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>nCr = nPr ÷ r!, nCr = nC(n−r)</li><li>“적어도 하나”는 전체에서 빼기 (여사건)</li><li>파스칼 삼각형 nCr = (n−1)C(r−1) + (n−1)Cr</li><li>같은 크기의 조로 나누기 — 조의 순서로 나누기</li><li>대각선 개수, 삼각형 개수 세기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">여사건으로 빼기</span>남학생 5명, 여학생 4명 중 대표 3명을 뽑을 때 여학생이 적어도 1명 포함되는 경우의 수는?<div class="an"><span>답</span>74가지 (9C3 − 5C3)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>2차원 배열로 파스칼 삼각형을 만들어 nCr 표 출력</div>
+    <div><b>기출·유형 연결</b>1교시 선택·배정 문항, 확률의 기초</div>
+    <div><b>서술·증명</b>파스칼 점화식을 “특정 원소를 뽑느냐 마느냐”로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">12</span><span class="ttl">격자 최단경로</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 11</span></div>
+  <div class="goal">격자의 최단경로 수를 조합과 덧셈 표 두 방법으로 구하고, 막힌 길을 처리한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>오른쪽 a번, 위쪽 b번 → (a+b)Ca</li><li>교차점마다 “왼쪽 + 아래”를 더하는 표</li><li>반드시 지나는 점 — 두 구간 경로 수의 곱</li><li>지나면 안 되는 점·끊긴 길은 표에서 0 처리</li><li>대각선 이동이 섞인 경로</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">덧셈 표 채우기</span>가로 5칸, 세로 4칸 격자의 왼쪽 아래에서 오른쪽 위로 가는 최단경로 중 점 (2, 2)를 지나지 않는 것은 몇 가지인가?<div class="an"><span>답</span>66가지 (126 − 60)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>2차원 DP 배열로 막힌 점이 있는 경로 수 계산</div>
+    <div><b>기출·유형 연결</b>2026 중등 6번 「가장 짧은 경로」</div>
+    <div><b>서술·증명</b>표의 각 칸이 “그 점까지의 경로 수”인 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">8 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 13~16</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>9 / 27쪽</div></div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">13</span><span class="ttl">규칙 찾기와 일반항</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">수열의 차이·비율을 관찰해 규칙을 찾고 n번째 항을 식으로 나타낸다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>등차수열 · 등비수열의 일반항</li><li>계차수열 — 차이의 수열로 규칙 찾기</li><li>삼각수 · 사각수 같은 도형수</li><li>군수열 — 몇 번째 묶음의 몇 번째 수인가</li><li>찾은 식을 작은 항에 넣어 검산하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">차이를 적어 보기</span>1, 3, 7, 13, 21, … 의 20번째 항을 구하시오.<div class="an"><span>답</span>381 (일반항 n² − n + 1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>규칙대로 항을 만들며 식의 값과 일치하는지 비교</div>
+    <div><b>기출·유형 연결</b>1교시 규칙성 문항, 2교시 패턴 출력</div>
+    <div><b>서술·증명</b>계차가 2, 4, 6, … 임을 이용해 일반항 유도</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">14</span><span class="ttl">합의 계산과 시그마</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 13</span></div>
+  <div class="goal">시그마 기호를 읽고 쓰며, 짝짓기·공식·망원합으로 합을 효율적으로 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>Σ 기호의 의미와 성질 (상수배, 합의 분리)</li><li>1 + 2 + … + n — 거꾸로 더해 짝짓기</li><li>제곱의 합 n(n+1)(2n+1) / 6</li><li>k(k+1) 꼴의 합 — 망원합 (앞뒤 지우기)</li><li>반복문 누적합과 공식의 실행 시간 비교</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">짝짓기 · 망원합</span>1×2 + 2×3 + 3×4 + … + 20×21 의 값은?<div class="an"><span>답</span>3080 (= 20·21·22 ÷ 3)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>누적합 반복문과 공식 결과를 함께 출력</div>
+    <div><b>기출·유형 연결</b>1교시 계산 구조 문항, 2교시 반복 횟수 계산</div>
+    <div><b>서술·증명</b>k(k+1)을 두 항의 차로 바꾸어 망원합이 되는 과정</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">15</span><span class="ttl">점화식 세우기</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 13</span></div>
+  <div class="goal">큰 문제를 한 단계 작은 문제로 표현해 점화식과 초기값을 세운다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>점화식 = 관계식 + 초기값</li><li>하노이 탑 Hₙ = 2Hₙ₋₁ + 1</li><li>계단 오르기 — 마지막 걸음으로 나누기</li><li>작은 n부터 표를 채워 규칙 확인</li><li>재귀 호출과 반복문 계산의 차이</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">마지막 단계로 나누기</span>계단을 한 번에 1칸 또는 2칸씩 올라 10칸을 오르는 방법은 몇 가지인가?<div class="an"><span>답</span>89가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀 함수와 반복문 두 가지로 계산해 속도 비교</div>
+    <div><b>기출·유형 연결</b>1교시 점화식형 세기, 2교시 DP 입문</div>
+    <div><b>서술·증명</b>aₙ = aₙ₋₁ + aₙ₋₂ 의 두 경우가 겹치지 않는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">16</span><span class="ttl">표 채우기 — DP 첫걸음</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 15</span></div>
+  <div class="goal">“표의 한 칸이 무엇을 뜻하는가”를 정하고 작은 칸부터 채워 답을 얻는다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>부분 문제와 표(배열)의 의미 정의하기</li><li>동전 가짓수 — 순서를 구별할 때와 안 할 때</li><li>표를 채우는 순서 (작은 것 → 큰 것)</li><li>초기값과 답의 위치 정하기</li><li>손으로 채운 표와 코드 결과 대조</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">표의 의미부터 정의</span>1원, 2원, 5원 동전으로 10원을 만드는 방법은 몇 가지인가? (동전의 순서는 구별하지 않는다)<div class="an"><span>답</span>10가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>1차원 DP 배열로 동전 종류별 누적 계산</div>
+    <div><b>기출·유형 연결</b>1교시 세기 문항, 2교시 DP 기본</div>
+    <div><b>서술·증명</b>동전 종류 반복을 바깥에 두면 순서가 구별되지 않는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">9 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 17~20</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>10 / 27쪽</div></div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">17</span><span class="ttl">그래프의 기본</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">정점·간선·차수를 이해하고 그래프를 행렬과 목록으로 표현한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>정점 · 간선 · 차수, 방향 / 무방향, 가중치</li><li>차수의 합 = 간선 수 × 2 (악수 정리)</li><li>차수가 홀수인 정점은 짝수 개</li><li>인접 행렬과 인접 리스트</li><li>실생활의 관계를 그래프로 모델링하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">관계를 그래프로</span>정점이 7개이고 모든 정점의 차수가 3인 그래프는 존재하는가?<div class="an"><span>답</span>존재하지 않는다 (차수의 합 21이 홀수)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>간선 목록을 입력받아 인접 행렬과 차수 출력</div>
+    <div><b>기출·유형 연결</b>1교시 그래프 문항 전반, 2교시 그래프 입력 처리</div>
+    <div><b>서술·증명</b>간선 하나가 차수의 합을 2 늘린다는 것으로 악수 정리 증명</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">18</span><span class="ttl">한붓그리기 (오일러 경로)</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 17</span></div>
+  <div class="goal">차수의 홀짝으로 한붓그리기 가능성을 판정하고 실제 경로를 찾는다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>오일러 회로 — 연결 그래프에서 모든 차수가 짝수</li><li>오일러 경로 — 홀수 차수 정점이 0개 또는 2개</li><li>출발점은 홀수 차수 정점</li><li>필요한 최소 획 수 = 홀수 차수 정점 수 ÷ 2</li><li>해밀턴 경로(모든 정점을 한 번씩)와의 차이</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">차수의 홀짝 보기</span>점 3×3개로 된 2×2 정사각형 격자(선분 12개)를 한붓그리기 할 수 있는가? 안 되면 최소 몇 획이 필요한가?<div class="an"><span>답</span>불가능, 최소 2획 (홀수 차수 정점 4개)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>차수를 계산해 오일러 경로 존재를 판정하는 프로그램</div>
+    <div><b>기출·유형 연결</b>1교시 그래프 판정 문항</div>
+    <div><b>서술·증명</b>중간에 지나가는 정점의 차수가 짝수여야 하는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">19</span><span class="ttl">트리의 성질</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 17</span></div>
+  <div class="goal">트리의 정의와 “간선 = 정점 − 1”을 이해하고 루트 트리의 용어를 익힌다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>트리 — 연결되어 있고 사이클이 없는 그래프</li><li>정점 n개인 트리의 간선은 n − 1개</li><li>두 정점을 잇는 경로는 유일하다</li><li>루트 · 부모 · 자식 · 깊이 · 높이 · 리프</li><li>차수 조건으로 리프 개수 구하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">차수 합으로 식 세우기</span>차수가 3인 정점이 8개이고 나머지가 모두 리프(차수 1)인 트리에서 리프는 몇 개인가?<div class="an"><span>답</span>10개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>부모 배열로 트리를 저장해 깊이와 리프 수 출력</div>
+    <div><b>기출·유형 연결</b>1교시 트리 구조 문항, 2교시 트리 입력</div>
+    <div><b>서술·증명</b>리프를 하나씩 떼어 내며 간선이 n − 1개인 이유 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">20</span><span class="ttl">이진 트리와 순회</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 19</span></div>
+  <div class="goal">전위·중위·후위 순회를 수행하고, 두 순회 결과로 트리를 복원한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>이진 트리, 포화 · 완전 이진 트리</li><li>전위(루트-왼-오), 중위(왼-루트-오), 후위(왼-오-루트)</li><li>전위 + 중위 결과로 트리 복원</li><li>배열 저장 — i번 노드의 자식은 2i, 2i + 1</li><li>중위 순회 번호와 왼쪽·오른쪽 위치의 관계</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">루트 기준으로 쪼개기</span>전위 순회가 ABDECF, 중위 순회가 DBEAFC인 이진 트리의 후위 순회 결과는?<div class="an"><span>답</span>DEBFCA</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀 함수로 세 가지 순회 출력, 복원 함수 작성</div>
+    <div><b>기출·유형 연결</b>2026 중등 9번 「이진 트리의 거리」</div>
+    <div><b>서술·증명</b>중위 순회에서 루트의 위치로 왼쪽·오른쪽이 나뉘는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">10 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>1단계 기본: 주제 21~24</h1><div class="sub">도구를 알게 한다 · 대상 중1 (초6 심화반 가능)</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>11 / 27쪽</div></div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">21</span><span class="ttl">알고리즘과 실행 추적</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 —</span></div>
+  <div class="goal">주어진 절차를 정확히 따라가며 변수의 변화를 표로 기록하고 반복 횟수를 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>입력 · 처리 · 출력과 순서도 기호</li><li>변수 추적표(trace table) 작성</li><li>반복문이 몇 번 도는지 세기</li><li>종료 조건과 무한 반복 찾기</li><li>의사코드를 C · Python 코드로 옮기기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">추적표 기록</span>짝수이면 2로 나누고 홀수이면 3배 하고 1을 더한다. 7에서 시작해 1이 될 때까지 연산은 몇 번인가?<div class="an"><span>답</span>16번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>while 문으로 과정과 횟수 출력</div>
+    <div><b>기출·유형 연결</b>1교시 절차 실행 문항, 2교시 구현</div>
+    <div><b>서술·증명</b>추적표 한 행이 한 번의 반복임을 밝히며 과정 기록</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">22</span><span class="ttl">완전 탐색의 사고</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 09</span></div>
+  <div class="goal">모든 후보를 체계적으로 나열해 조건을 검사하고, 경우의 수로 실행 가능성을 가늠한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>후보 공간 정의 — 무엇을 나열할 것인가</li><li>중첩 반복문 · 순열 · 부분집합으로 나열</li><li>중복 없이 나열하기 (a &lt; b &lt; c)</li><li>경우의 수 추정 — 2ⁿ, n!, 1초에 약 10⁸번</li><li>손 풀이는 규칙으로, 검증은 전수 조사로</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">후보 공간 정의</span>1~9에서 서로 다른 세 수를 골라 합이 15가 되게 하는 방법은 몇 가지인가? (고르는 순서는 무시)<div class="an"><span>답</span>8가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>a &lt; b &lt; c 삼중 반복문으로 개수와 목록 출력</div>
+    <div><b>기출·유형 연결</b>1교시 전 문항의 검증 도구, 2교시 1번 완전 탐색</div>
+    <div><b>서술·증명</b>a &lt; b &lt; c 조건이 중복을 없애는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">23</span><span class="ttl">정렬의 원리</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 22</span></div>
+  <div class="goal">기본 정렬의 동작을 손으로 따라가고, 교환 횟수를 역순쌍으로 설명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>버블 · 선택 · 삽입 정렬 한 단계씩 추적</li><li>비교 횟수와 교환 횟수 세기</li><li>역순쌍(i &lt; j, aᵢ &gt; aⱼ)의 개수 = 인접 교환 횟수</li><li>안정 정렬의 의미</li><li>여러 기준 정렬 (점수 내림차순, 이름 오름차순)</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">역순쌍 세기</span>[5, 1, 4, 2, 3]을 버블 정렬할 때 인접한 두 수의 교환은 모두 몇 번 일어나는가?<div class="an"><span>답</span>6번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>교환 횟수를 세는 버블 정렬과 역순쌍 이중 반복문 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 18번 「뒤집기」 사고의 기초</div>
+    <div><b>서술·증명</b>인접 교환 한 번이 역순쌍을 정확히 1 줄이는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">24</span><span class="ttl">스택과 큐</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 21</span></div>
+  <div class="goal">스택(LIFO)과 큐(FIFO)의 동작을 시뮬레이션하고, 만들 수 있는 출력 순서를 판정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>push / pop, enqueue / dequeue 동작 추적</li><li>올바른 괄호 판정</li><li>스택 수열 — 가능한 출력 순서인지 판정</li><li>큐 시뮬레이션 — 줄 서기, 순서 돌리기</li><li>배열로 스택과 큐 구현</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">상태를 그림으로 추적</span>1, 2, 3, 4를 차례로 스택에 넣으면서 중간중간 꺼낼 때 만들 수 있는 출력 순서는 몇 가지인가? 3, 1, 2, 4는 가능한가?<div class="an"><span>답</span>14가지, 3 1 2 4는 불가능</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>스택 수열 판정 함수로 4! 순열 중 가능한 것 세기</div>
+    <div><b>기출·유형 연결</b>2026 중등 16번 「스택 큐 정렬」</div>
+    <div><b>서술·증명</b>3이 먼저 나오면 1보다 2가 먼저 나와야 하는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 1단계 기본</span><span class="r">11 / 27</span></div></div>
+<div class="page">
+<div class="head"><div><h1>2단계 발전: 단계 안내와 주차별 진행표</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>12 / 27쪽</div></div><div class="lvhead">
+  <div class="t"><span class="big">2단계 발전</span><span class="motto">도구를 골라 쓴다</span><span class="who">대상 중1 ~ 중2 · 주제 25 ~ 48</span></div>
+  <dl>
+    <dt>목표</dt><dd>문제를 읽고 여사건·점화식·BFS·그리디 가운데 알맞은 도구를 스스로 고른다.</dd><dt>1교시 연결</dt><dd>1교시 중간 번호의 5~13점 문항과 인터랙티브 입문</dd>
+    <dt>코드</dt><dd>DP·BFS·정렬을 직접 구현해 2교시 실기로 연결한다.</dd><dt>서술 목표</dt><dd>빠짐없이·중복 없이 셌다는 것과 고른 방법이 옳다는 것을 설명한다.</dd>
+  </dl>
+</div>
+<h2>주차별 진행표 (정규 트랙, 주 1주제)</h2>
+<table class="wk">
+<tr><th class="c" style="width:7%">주차</th><th>주제</th><th class="c" style="width:6%">영역</th><th style="width:14%">선수 주제</th><th style="width:19%">대표 문제 전략</th><th class="c" style="width:14%">2026 연결 문항</th><th class="c" style="width:7%">카드</th></tr>
+<tr><td class="num">1주</td><td><span class="chip" style="background:#2451b8">25</span> <b>반례와 귀류법</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">02</span> <span class="chip" style="background:#0e7a6f">08</span></td><td>결론 부정 후 모순</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">13쪽</td></tr><tr><td class="num">2주</td><td><span class="chip" style="background:#0e7a6f">29</span> <b>나머지와 합동식</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">07</span></td><td>주기 찾기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">14쪽</td></tr><tr><td class="num">3주</td><td><span class="chip" style="background:#b5570b">33</span> <b>포함배제의 원리</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">09</span> <span class="chip" style="background:#b5570b">11</span></td><td>더하고 겹친 만큼 빼기</td><td class="num"><b>12번</b></td><td class="num">15쪽</td></tr><tr><td class="num">4주</td><td><span class="chip" style="background:#b8264a">41</span> <b>너비 우선 탐색 (BFS)</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">17</span> <span class="chip" style="background:#2e7d32">24</span></td><td>상태를 정점으로</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">17쪽</td></tr><tr><td class="num">5주</td><td><span class="chip" style="background:#2e7d32">45</span> <b>그리디 전략</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">23</span></td><td>정렬 기준 선택</td><td class="num"><b>13번</b></td><td class="num">18쪽</td></tr><tr><td class="num">6주</td><td><span class="chip" style="background:#0e7a6f">30</span> <b>유클리드 호제법</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">07</span></td><td>큰 수를 작은 수로 줄이기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">14쪽</td></tr><tr><td class="num">7주</td><td><span class="chip" style="background:#2451b8">26</span> <b>불변량과 홀짝</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">25</span></td><td>변하지 않는 것 찾기</td><td class="num">18번</td><td class="num">13쪽</td></tr><tr><td class="num">8주</td><td><span class="chip" style="background:#b5570b">34</span> <b>비둘기집 원리</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#2451b8">25</span></td><td>상자 설계</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">15쪽</td></tr><tr><td class="num">9주</td><td><span class="chip" style="background:#b5570b">35</span> <b>중복조합과 분배</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">11</span></td><td>칸막이 모형</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">15쪽</td></tr><tr><td class="num">10주</td><td><span class="chip" style="background:#6d3fc4">37</span> <b>상태를 나눈 점화식</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">15</span> <span class="chip" style="background:#6d3fc4">16</span></td><td>끝 상태로 나누기</td><td class="num"><b>5번</b></td><td class="num">16쪽</td></tr><tr><td class="num">11주</td><td><span class="chip" style="background:#b8264a">42</span> <b>가중치 최단 경로</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">41</span></td><td>확정 → 갱신 반복</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">17쪽</td></tr><tr><td class="num">12주</td><td><span class="chip" style="background:#2e7d32">46</span> <b>이분 탐색</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">21</span></td><td>절반씩 줄이기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">18쪽</td></tr><tr class="ev"><td class="num">13주</td><td colspan="6"><b>단계 중간 평가</b> · 1~12주 주제에서 10문항, 40분 · 전반부 점검과 보충 계획</td></tr><tr><td class="num">14주</td><td><span class="chip" style="background:#2451b8">27</span> <b>지식 추론 퍼즐</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">03</span> <span class="chip" style="background:#2451b8">04</span></td><td>가능한 경우 지우기</td><td class="num"><b>10번</b></td><td class="num">13쪽</td></tr><tr><td class="num">15주</td><td><span class="chip" style="background:#0e7a6f">31</span> <b>자릿수와 수의 구성</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">05</span> <span class="chip" style="background:#0e7a6f">29</span></td><td>자리값으로 식 세우기</td><td class="num"><b>4번</b> <b>8번</b></td><td class="num">14쪽</td></tr><tr><td class="num">16주</td><td><span class="chip" style="background:#b5570b">36</span> <b>확률의 기초</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">11</span> <span class="chip" style="background:#b5570b">33</span></td><td>여사건</td><td class="num"><b>3번</b></td><td class="num">15쪽</td></tr><tr><td class="num">17주</td><td><span class="chip" style="background:#6d3fc4">39</span> <b>DP ① 최적 경로</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">16</span></td><td>상태 정의 4단계</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">16쪽</td></tr><tr><td class="num">18주</td><td><span class="chip" style="background:#b8264a">43</span> <b>최소 신장 트리</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">19</span> <span class="chip" style="background:#b8264a">42</span></td><td>싼 것부터, 사이클 금지</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">17쪽</td></tr><tr><td class="num">19주</td><td><span class="chip" style="background:#b8264a">44</span> <b>그래프 색칠과 이분 그래프</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">17</span> <span class="chip" style="background:#b8264a">41</span></td><td>홀수 사이클 찾기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">17쪽</td></tr><tr><td class="num">20주</td><td><span class="chip" style="background:#2451b8">28</span> <b>논리 회로와 불 대수</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">01</span> <span class="chip" style="background:#0e7a6f">06</span></td><td>진리표를 식으로</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">13쪽</td></tr><tr><td class="num">21주</td><td><span class="chip" style="background:#0e7a6f">32</span> <b>원형 구조와 순환</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">29</span> <span class="chip" style="background:#0e7a6f">30</span></td><td>gcd로 순환 길이</td><td class="num"><b>11번</b></td><td class="num">14쪽</td></tr><tr><td class="num">22주</td><td><span class="chip" style="background:#6d3fc4">38</span> <b>카탈란 수</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#b5570b">12</span> <span class="chip" style="background:#2e7d32">24</span></td><td>일대일 대응</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">16쪽</td></tr><tr><td class="num">23주</td><td><span class="chip" style="background:#6d3fc4">40</span> <b>DP ② 부분열</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">39</span></td><td>i번째 원소 기준 상태</td><td class="num"><b>2번</b></td><td class="num">16쪽</td></tr><tr><td class="num">24주</td><td><span class="chip" style="background:#2e7d32">47</span> <b>시뮬레이션과 주기</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">24</span> <span class="chip" style="background:#0e7a6f">32</span></td><td>주기 발견</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">18쪽</td></tr><tr><td class="num">25주</td><td><span class="chip" style="background:#2e7d32">48</span> <b>님 게임과 필승 전략</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#0e7a6f">06</span> <span class="chip" style="background:#6d3fc4">16</span></td><td>거꾸로 채우기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">18쪽</td></tr><tr class="ev"><td class="num">26주</td><td colspan="6"><b>단계 마무리 평가</b> · 24주제 전체 12문항 + 인터랙티브형 2문항, 70분 · Set A/B, 70% 이상이면 다음 단계</td></tr>
+</table>
+<p class="note">선수 주제가 모두 앞 주차에 오도록 배치했습니다(빌드 과정에서 자동 점검). 앞 단계의 선수 주제는 마친 것으로 봅니다. 연결 문항의 굵은 번호는 그 문항의 주 연결 주제라는 뜻입니다.</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">12 / 27</span></div>
+</div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 25~28</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>13 / 27쪽</div></div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">25</span><span class="ttl">반례와 귀류법</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 02, 08</span></div>
+  <div class="goal">반례 하나로 거짓을 보이고, 결론을 부정해 모순을 이끄는 귀류법으로 참을 증명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>“항상 성립한다”의 부정은 반례 하나</li><li>작은 수부터 체계적으로 반례 찾기</li><li>귀류법의 구조 — 가정 → 전개 → 모순 → 결론</li><li>소수가 무한함, √2가 무리수임의 증명</li><li>“불가능하다”를 귀류법으로 보이기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">결론 부정 후 모순</span>n² + n + 41 은 모든 자연수 n에 대해 소수인가? 아니라면 가장 작은 반례를 구하시오.<div class="an"><span>답</span>아니다. n = 40 (1681 = 41²)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>n을 늘려 가며 소수 판정해 첫 반례 출력</div>
+    <div><b>기출·유형 연결</b>1교시 “항상 / 반드시” 선택지 판정</div>
+    <div><b>서술·증명</b>n = 40일 때 식이 41²이 되는 이유를 인수분해로</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">26</span><span class="ttl">불변량과 홀짝</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 25</span></div>
+  <div class="goal">조작을 반복해도 변하지 않는 양을 찾아 도달 가능성과 결과를 판정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>불변량 — 매 조작에서 보존되는 값</li><li>홀짝(패리티) 불변 — 합, 개수, 역순쌍 수</li><li>색칠 논법 — 판을 칠해 개수 차이 비교</li><li>단조량 — 계속 줄어드는 값이면 반드시 끝난다</li><li>불변량으로 “불가능”을 증명하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">변하지 않는 것 찾기</span>칠판에 1부터 10까지 적혀 있다. 두 수 a, b를 지우고 |a − b|를 적는 조작을 한 수만 남을 때까지 반복한다. 남은 수는 홀수인가 짝수인가?<div class="an"><span>답</span>홀수 (합의 홀짝이 보존, 처음 합 55)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>무작위 조작을 여러 번 시뮬레이션해 결과의 홀짝 확인</div>
+    <div><b>기출·유형 연결</b>2026 중등 18번 「뒤집기」 — 역순쌍의 홀짝</div>
+    <div><b>서술·증명</b>한 번의 조작에서 합이 짝수만큼 변함을 보이기</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">27</span><span class="ttl">지식 추론 퍼즐</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 03, 04</span></div>
+  <div class="goal">“모른다”는 대답도 정보임을 이해하고, 가능한 경우를 지워 가며 추론한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>각자 볼 수 있는 정보와 볼 수 없는 정보 정리</li><li>가능한 경우(세계)의 목록 만들기</li><li>“모른다” → 그 사람이 알 수 있었을 경우 제거</li><li>앞사람의 대답이 뒷사람의 추론에 주는 영향</li><li>질문 순서가 바뀌면 결론이 바뀌는지 확인</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">가능한 경우 지우기</span>빨간 모자 3개, 흰 모자 2개 중 3개를 A, B, C가 쓴다. C는 A·B를, B는 A를 볼 수 있고 A는 아무도 못 본다. C가 “모른다”, B가 “모른다”고 한 뒤 A는 자기 모자 색을 아는가?<div class="an"><span>답</span>안다 — 빨간색</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>가능한 세계를 리스트로 두고 대답마다 걸러 내는 프로그램</div>
+    <div><b>기출·유형 연결</b>2026 중등 10번 「모자 색 맞추기」</div>
+    <div><b>서술·증명</b>B의 “모른다”에서 A가 흰색이 아님을 이끄는 과정</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">28</span><span class="ttl">논리 회로와 불 대수</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 01, 06</span></div>
+  <div class="goal">논리 게이트로 회로를 만들고, 진리표를 식으로 바꾸어 간단히 한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>AND · OR · NOT · NAND · NOR · XOR 게이트</li><li>반가산기 (합 = A XOR B, 올림 = A AND B), 전가산기</li><li>진리표 → 곱의 합(최소항) 식 만들기</li><li>불 대수 법칙으로 식 간단히 하기</li><li>NAND 하나로 모든 게이트 만들기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">진리표를 식으로</span>NAND 게이트만으로 NOT, AND, OR를 만들 때 각각 최소 몇 개가 필요한가?<div class="an"><span>답</span>NOT 1개, AND 2개, OR 3개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>비트 연산 함수로 회로를 구현해 진리표 비교</div>
+    <div><b>기출·유형 연결</b>1교시 논리 연산 문항, 비트 연산 심화</div>
+    <div><b>서술·증명</b>OR = NAND(NOT A, NOT B)를 드모르간 법칙으로 설명</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">13 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 29~32</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>14 / 27쪽</div></div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">29</span><span class="ttl">나머지와 합동식</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 07</span></div>
+  <div class="goal">합동식의 연산 규칙으로 큰 수의 나머지와 거듭제곱의 일의 자리를 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>a ≡ b (mod m) 의 의미</li><li>합 · 차 · 곱은 나머지끼리 계산해도 된다</li><li>거듭제곱의 나머지는 주기를 가진다</li><li>요일 · 시각 · 일의 자리 계산</li><li>음수의 나머지와 C의 % 연산 주의</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">주기 찾기</span>7²⁰²⁶ 의 일의 자리 숫자는?<div class="an"><span>답</span>9 (일의 자리 주기 7, 9, 3, 1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>(a*b)%m 누적으로 거듭제곱 나머지 계산, 오버플로 확인</div>
+    <div><b>기출·유형 연결</b>1교시 수 계산 문항, 2교시 “나머지를 출력” 조건</div>
+    <div><b>서술·증명</b>곱의 나머지를 나머지끼리 곱해 구해도 되는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">30</span><span class="ttl">유클리드 호제법</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 07</span></div>
+  <div class="goal">gcd(a, b) = gcd(b, a mod b)를 이해하고, 최대공약수와 정수해의 존재 조건에 활용한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>호제법의 원리 — 공약수 집합이 보존된다</li><li>나눗셈 단계 수 세기</li><li>ax + by 로 만들 수 있는 수는 gcd의 배수</li><li>ax + by = c 의 정수해 존재 조건</li><li>직사각형을 정사각형으로 잘라 내는 모델</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">큰 수를 작은 수로 줄이기</span>gcd(1071, 1029)를 호제법으로 구하고, 나눗셈이 몇 번 필요한지 쓰시오.<div class="an"><span>답</span>21, 나눗셈 3번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀와 반복으로 호제법을 구현하고 단계 출력</div>
+    <div><b>기출·유형 연결</b>1교시 정수 문항, 2교시 gcd 활용</div>
+    <div><b>서술·증명</b>a, b의 공약수가 b, a mod b의 공약수와 같은 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">31</span><span class="ttl">자릿수와 수의 구성</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 05, 29</span></div>
+  <div class="goal">자리값 전개로 수의 성질을 식으로 바꾸고, 조건을 만족하는 수를 구성한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>abc = 100a + 10b + c 전개</li><li>3 · 9 · 11의 배수 판정법의 원리</li><li>뒤집은 수와의 합 · 차 성질</li><li>끝자리부터 잘라 더하는 합을 식으로 세우기</li><li>조건을 만족하는 가장 작은 / 큰 수 만들기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">자리값으로 식 세우기</span>네 자리 수 N과, N의 끝 세 자리·끝 두 자리·끝 한 자리 수를 모두 더한 값이 2026이다. N은?<div class="an"><span>답</span>1474 (1000a + 200b + 30c + 4d = 2026)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>1000~9999 전수 조사로 해와 유일성 확인</div>
+    <div><b>기출·유형 연결</b>2026 중등 8번 「꼬리합」, 4번 「1과 2」</div>
+    <div><b>서술·증명</b>이 합이 항상 짝수임을 식으로 보이기</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">32</span><span class="ttl">원형 구조와 순환</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 29, 30</span></div>
+  <div class="goal">원을 따라 도는 이동을 mod로 표현하고, 순환의 길이를 gcd로 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>원형 위치 (i + k) mod n</li><li>k칸씩 뛰면 n / gcd(n, k)개의 점을 돈다</li><li>모든 점을 방문하는 조건 gcd(n, k) = 1</li><li>각 점에서 화살표가 하나씩 → 반드시 사이클이 생긴다</li><li>요세푸스 문제 맛보기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">gcd로 순환 길이</span>원 위 12개 점에서 0부터 k칸씩 계속 뛸 때 모든 점을 방문하는 k (1 ≤ k ≤ 11)는 몇 개인가? k = 8이면 몇 개의 점을 방문하는가?<div class="an"><span>답</span>4개 (1, 5, 7, 11), k = 8이면 3개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>원형 배열 인덱스로 방문한 점을 표시하고 개수 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 11번 「원형 점프」</div>
+    <div><b>서술·증명</b>방문하는 점의 수가 n / gcd(n, k)인 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">14 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 33~36</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>15 / 27쪽</div></div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">33</span><span class="ttl">포함배제의 원리</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 09, 11</span></div>
+  <div class="goal">겹치는 집합의 크기를 더하고 빼는 규칙으로 정확히 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>|A ∪ B| = |A| + |B| − |A ∩ B|</li><li>세 집합의 포함배제</li><li>“어느 것도 아닌 것” = 전체 − 합집합</li><li>배수 조건 세기 ⌊N/k⌋ 와 결합</li><li>경우를 나눠 셀 때 겹침 점검표 만들기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">더하고 겹친 만큼 빼기</span>1부터 1000까지의 자연수 중 2, 3, 5 어느 것으로도 나누어떨어지지 않는 수는 몇 개인가?<div class="an"><span>답</span>266개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>전수 조사 결과와 포함배제 식 결과 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 12번 「만나는 반직선」 경우 분류</div>
+    <div><b>서술·증명</b>세 집합에서 교집합을 다시 더하는 이유를 벤 다이어그램으로</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">34</span><span class="ttl">비둘기집 원리</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 25</span></div>
+  <div class="goal">상자와 물건을 설계해 “반드시 존재한다”를 증명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>n + 1개를 n개 상자에 넣으면 한 상자에 2개 이상</li><li>일반형 — 어떤 상자에는 적어도 ⌈N/k⌉개</li><li>무엇을 상자로 삼을지 설계 (나머지, 구간, 홀수 부분)</li><li>최악의 경우를 만들어 최소 개수 확인</li><li>연속한 수의 합이 n의 배수가 되는 구간의 존재</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">상자 설계</span>1부터 20까지의 수 중 몇 개를 고르면 반드시 한 수가 다른 수의 약수인 두 수가 포함되는가? 가장 작은 개수는?<div class="an"><span>답</span>11개 (10개는 11~20을 골라 피할 수 있다)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>조합 전수 조사로 10개 반례와 11개의 필연성 확인</div>
+    <div><b>기출·유형 연결</b>1교시 “반드시 · 최소 몇 개” 문항</div>
+    <div><b>서술·증명</b>수를 2ᵏ × (홀수)로 써서 상자 10개를 만드는 증명</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">35</span><span class="ttl">중복조합과 분배</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 11</span></div>
+  <div class="goal">같은 물건을 나누어 주는 경우를 칸막이 모형(막대와 별)으로 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>중복조합 nHr = (n + r − 1)Cr</li><li>x + y + z = n 의 음이 아닌 정수해</li><li>“각각 1개 이상” 조건은 먼저 하나씩 나눠 주기</li><li>상한 조건은 포함배제와 결합</li><li>같은/다른 물건 × 같은/다른 상자 구별표</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">칸막이 모형</span>x + y + z = 10 을 만족하는 자연수 해 (x, y, z)의 개수는?<div class="an"><span>답</span>36개 (9C2)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>삼중 반복문 전수 조사와 공식 비교</div>
+    <div><b>기출·유형 연결</b>1교시 배분 문항</div>
+    <div><b>서술·증명</b>별 사이 9칸에서 칸막이 자리 2개를 고르는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">36</span><span class="ttl">확률의 기초</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 11, 33</span></div>
+  <div class="goal">경우의 수로 확률을 계산하고, 여사건과 독립을 알맞게 활용한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>수학적 확률 = 해당 경우 ÷ 전체 경우 (같은 가능성 전제)</li><li>여사건 — 1 − P(아닌 경우)</li><li>뽑기 확률을 조합으로 계산</li><li>독립인 사건의 곱셈</li><li>표본공간은 구별 가능한 대상으로 설정하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">여사건</span>동전 5개를 동시에 던질 때 앞면이 2개 이상 나올 확률은?<div class="an"><span>답</span>13/16</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>모든 경우를 나열해 확률을 분수(Fraction)로 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 3번 「신발 찾기」</div>
+    <div><b>서술·증명</b>동전을 서로 구별해야 “같은 가능성”이 성립하는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">15 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 37~40</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>16 / 27쪽</div></div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">37</span><span class="ttl">상태를 나눈 점화식</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 15, 16</span></div>
+  <div class="goal">마지막 상태(끝 글자, 끝 모양)로 경우를 나누어 점화식을 세운다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>aₙ(끝이 0), bₙ(끝이 1)처럼 상태 나누기</li><li>연속한 1이 없는 이진 문자열 → 피보나치</li><li>타일링 — 2×n 판을 여러 타일로 채우기</li><li>상태 전이표 그리기</li><li>점화식 표를 코드 배열로 옮기기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">끝 상태로 나누기</span>2×10 판을 1×2 도미노와 2×2 정사각형 타일로 빈틈없이 채우는 방법은 몇 가지인가?<div class="an"><span>답</span>683가지 (aₙ = aₙ₋₁ + 2aₙ₋₂)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>상태 배열 DP, 작은 n은 완전 탐색으로 검증</div>
+    <div><b>기출·유형 연결</b>2026 중등 5번 「연속한 1이 없는 이진수」</div>
+    <div><b>서술·증명</b>오른쪽 끝 모양이 세 가지뿐인 이유를 그림으로</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">38</span><span class="ttl">카탈란 수</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 12, 24</span></div>
+  <div class="goal">모습이 다른 문제들이 같은 수열로 세어짐을 일대일 대응으로 이해한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>올바른 괄호 문자열</li><li>대각선을 넘지 않는 격자 경로</li><li>이진 트리 모양의 수, 볼록다각형의 삼각분할</li><li>Cₙ = (2n)Cn ÷ (n + 1) 과 반사 원리</li><li>점화식 Cₙ₊₁ = Σ Cᵢ Cₙ₋ᵢ</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">일대일 대응</span>괄호 5쌍으로 만들 수 있는 올바른 괄호 문자열은 몇 가지인가?<div class="an"><span>답</span>42가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>백트래킹으로 괄호 문자열을 생성해 개수를 공식과 비교</div>
+    <div><b>기출·유형 연결</b>1교시 괄호·경로 세기, 스택 수열(24)과 연결</div>
+    <div><b>서술·증명</b>괄호 문자열과 격자 경로가 일대일로 대응하는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">39</span><span class="ttl">DP ① 최적 경로</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 16</span></div>
+  <div class="goal">최댓값·최솟값 DP에서 상태·점화식·초기값·답의 위치를 스스로 정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>DP 4단계 — 상태 → 점화식 → 초기값 → 답</li><li>삼각형 · 격자에서 최대 합 경로</li><li>연속 제약(세 칸 연속 금지 등) 처리</li><li>역추적으로 실제 경로 복원</li><li>그리디가 실패하는 반례와 비교</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">상태 정의 4단계</span>삼각형 5 / 7 6 / 1 2 9 / 3 4 1 8 에서 맨 위부터 바로 아래 또는 오른쪽 아래로 내려갈 때 지나는 수의 합의 최댓값은?<div class="an"><span>답</span>28 (5 → 6 → 9 → 8), 매번 큰 수를 고르면 18</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>아래에서 위로 채우는 DP와 경로 역추적</div>
+    <div><b>기출·유형 연결</b>1교시 최적화 문항, 2교시 DP</div>
+    <div><b>서술·증명</b>매 단계 큰 수를 고르는 방법이 실패하는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">40</span><span class="ttl">DP ② 부분열</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 39</span></div>
+  <div class="goal">부분열 문제에서 “i번째에서 시작하는/끝나는” 상태를 정의해 표를 채운다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>부분열과 부분 문자열의 구별</li><li>최장 증가 부분열 L(i)의 정의와 O(n²) 점화</li><li>최장 공통 부분열(LCS)의 2차원 표</li><li>편집 거리 맛보기</li><li>표에서 실제 부분열 복원</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">i번째 원소 기준 상태</span>수열 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8 의 가장 긴 증가 부분열의 길이는?<div class="an"><span>답</span>5 (예: 1, 4, 5, 6, 8)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>L[i] 배열을 계산하고 부분열 복원 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 2번 「증가 부분열」</div>
+    <div><b>서술·증명</b>L(i)를 “시작”과 “끝” 기준으로 정의할 때의 차이</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">16 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 41~44</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>17 / 27쪽</div></div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">41</span><span class="ttl">너비 우선 탐색 (BFS)</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 17, 24</span></div>
+  <div class="goal">가중치가 없는 그래프에서 BFS로 최단 거리를 구하고, 상태를 정점으로 보는 법을 익힌다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>층별 탐색과 거리 표</li><li>큐를 이용한 방문 순서</li><li>격자 미로의 최단 거리</li><li>상태 공간 그래프 (물통, 퍼즐)</li><li>방문 표시로 중복 탐색 막기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">상태를 정점으로</span>3L 물통과 5L 물통으로 채우기·비우기·옮겨 붓기만 할 때 정확히 4L를 만드는 최소 조작 횟수는?<div class="an"><span>답</span>6번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>큐로 (x, y) 상태를 BFS 하고 경로 출력</div>
+    <div><b>기출·유형 연결</b>1교시 최소 이동 문항, 2교시 BFS</div>
+    <div><b>서술·증명</b>BFS가 처음 도달한 거리가 최단인 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">42</span><span class="ttl">가중치 최단 경로</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 41</span></div>
+  <div class="goal">간선마다 길이가 있을 때 다익스트라 방식으로 최단 거리를 손으로 계산한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>거리 표 초기화와 확정 순서</li><li>가장 가까운 미확정 정점 고르기</li><li>거리 갱신(완화) 과정 기록</li><li>직전 정점을 기록해 경로 복원</li><li>음수 간선이 있으면 안 되는 이유</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">확정 → 갱신 반복</span>간선 A–B 4, A–C 2, B–C 1, B–D 5, C–D 8, C–E 10, D–E 2, D–F 6, E–F 3 인 그래프에서 A에서 F까지의 최단 거리는?<div class="an"><span>답</span>13 (A–C–B–D–E–F)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>우선순위 큐 다익스트라 구현, 손 계산표와 대조</div>
+    <div><b>기출·유형 연결</b>1교시 경로 비용 문항, 2교시 최단 경로</div>
+    <div><b>서술·증명</b>확정된 정점의 거리가 다시 줄어들 수 없는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">43</span><span class="ttl">최소 신장 트리</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 19, 42</span></div>
+  <div class="goal">크루스칼·프림 방법으로 모든 정점을 최소 비용으로 연결한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>신장 트리와 최소 신장 트리</li><li>크루스칼 — 짧은 간선부터, 사이클이 생기면 건너뛰기</li><li>프림 — 연결된 부분에서 가장 싼 간선 추가</li><li>사이클 속성 — 사이클의 가장 비싼 간선은 필요 없다</li><li>최소 신장 트리가 유일할 조건</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">싼 것부터, 사이클 금지</span>주제 42의 그래프에서 최소 신장 트리의 비용 합은?<div class="an"><span>답</span>13 (B–C, A–C, D–E, E–F, B–D)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>정렬 + 서로소 집합으로 크루스칼 구현</div>
+    <div><b>기출·유형 연결</b>1교시 연결 비용 문항, 2교시 MST</div>
+    <div><b>서술·증명</b>크루스칼이 최적인 이유를 사이클 속성으로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">44</span><span class="ttl">그래프 색칠과 이분 그래프</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 17, 41</span></div>
+  <div class="goal">이웃한 정점을 다른 색으로 칠하는 최소 색 수를 구하고 이분 그래프를 판정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>채색수 — 필요한 최소 색의 수</li><li>이분 그래프 ⇔ 홀수 사이클이 없다</li><li>BFS로 두 색 번갈아 칠하기</li><li>시간표 · 배정 문제의 모델링</li><li>4색 정리 소개와 그 한계</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">홀수 사이클 찾기</span>가운데 정점 하나가 오각형의 다섯 꼭짓점과 모두 연결된 그래프(바퀴)를 칠하는 최소 색의 수는?<div class="an"><span>답</span>4색</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>색 조합 완전 탐색으로 채색수 확인, BFS 이분 판정</div>
+    <div><b>기출·유형 연결</b>1교시 배정·색칠 문항</div>
+    <div><b>서술·증명</b>테두리 오각형에 이미 3색이 필요한 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">17 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>2단계 발전: 주제 45~48</h1><div class="sub">도구를 골라 쓴다 · 대상 중1 ~ 중2</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>18 / 27쪽</div></div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">45</span><span class="ttl">그리디 전략</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 23</span></div>
+  <div class="goal">매 순간의 최선이 전체 최적이 되는 조건을 이해하고, 반례로 한계를 확인한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>회의실 배정 — 끝나는 시간이 빠른 것부터</li><li>거스름돈 — 동전 체계에 따라 성공 또는 실패</li><li>정렬 기준 정하기</li><li>교환 논증 맛보기</li><li>그리디가 실패하는 반례 만들기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">정렬 기준 선택</span>구간 (1,4) (3,5) (0,6) (5,7) (3,9) (5,9) (6,10) (8,11) (8,12) (2,14) (12,16) 중 겹치지 않게 고를 수 있는 최대 개수는? (끝점이 같으면 이어 붙일 수 있다)<div class="an"><span>답</span>4개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>끝점 정렬 후 선택, 전수 조사로 최댓값 검증</div>
+    <div><b>기출·유형 연결</b>2026 중등 13번 「조 나누기」 최적 배치</div>
+    <div><b>서술·증명</b>가장 빨리 끝나는 구간을 먼저 골라도 손해가 없는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">46</span><span class="ttl">이분 탐색</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 21</span></div>
+  <div class="goal">범위를 절반씩 줄이는 탐색의 원리와 최악의 질문 횟수를 이해한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>정렬된 배열에서 이분 탐색</li><li>최악 비교 횟수 ⌈log₂(N + 1)⌉</li><li>lower bound / upper bound</li><li>업다운 게임의 최적 전략</li><li>답을 정해 놓고 가능 여부를 판정 (매개변수 탐색)</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">절반씩 줄이기</span>1부터 1000 중 하나를 “크다 / 작다 / 맞다”로만 답해 줄 때, 반드시 맞히려면 최소 몇 번 물어야 하는가?<div class="an"><span>답</span>10번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>이분 탐색 구현, 1~1000 전체에 대해 질문 횟수 최댓값 측정</div>
+    <div><b>기출·유형 연결</b>1교시 최소 질문 수 문항, 2교시 매개변수 탐색</div>
+    <div><b>서술·증명</b>9번으로 구별할 수 있는 수가 최대 511개임을 보여 부족함을 증명</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">47</span><span class="ttl">시뮬레이션과 주기</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 24, 32</span></div>
+  <div class="goal">규칙대로 상태를 추적하되, 반복되는 상태를 찾아 큰 횟수를 건너뛴다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>상태 정의와 상태표 기록</li><li>원형 큐로 요세푸스 문제</li><li>상태가 반복되면 주기로 건너뛰기</li><li>격자 이동 시뮬레이션 (방향 배열)</li><li>경계 조건과 처리 순서 실수 점검</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">주기 발견</span>1~7번이 원형으로 서 있다. 1번부터 세어 3번째 사람을 계속 빼낼 때 마지막에 남는 사람은?<div class="an"><span>답</span>4번 (빠지는 순서 3, 6, 2, 7, 5, 1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>큐 회전으로 요세푸스를 구현하고 제거 순서 출력</div>
+    <div><b>기출·유형 연결</b>1교시 과정 추적 문항, 2교시 구현</div>
+    <div><b>서술·증명</b>상태가 한 번 반복되면 이후도 똑같이 반복되는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">48</span><span class="ttl">님 게임과 필승 전략</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 06, 16</span></div>
+  <div class="goal">이기는 위치·지는 위치를 거꾸로 채우고, 상대를 지는 위치로 보내는 전략을 세운다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>필승 위치(N)와 필패 위치(P)의 정의</li><li>0부터 거꾸로 승패 표 채우기</li><li>1~k개 가져가기 → (k + 1)의 배수 전략</li><li>대칭 전략 (따라 하기)</li><li>여러 더미의 님 — XOR 합이 0이면 필패</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">거꾸로 채우기</span>돌 21개에서 번갈아 1~3개를 가져가고 마지막 돌을 가져가는 사람이 이긴다. 먼저 하는 사람이 이기려면 처음에 몇 개를 가져가야 하는가?<div class="an"><span>답</span>1개 (남은 수를 4의 배수로)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>win[n] 배열로 필승 위치 표 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 20번 「간선 게임」 사고의 기초</div>
+    <div><b>서술·증명</b>4의 배수를 남기면 상대가 무엇을 해도 되돌려 줄 수 있는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 2단계 발전</span><span class="r">18 / 27</span></div></div>
+<div class="page">
+<div class="head"><div><h1>3단계 심화: 단계 안내와 주차별 진행표</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>19 / 27쪽</div></div><div class="lvhead">
+  <div class="t"><span class="big">3단계 심화</span><span class="motto">도구를 엮고 증명한다</span><span class="who">대상 중2 ~ 중3 · 주제 49 ~ 72</span></div>
+  <dl>
+    <dt>목표</dt><dd>두세 가지 도구를 엮어 최적값을 구하고, 그 값이 최선임을 증명한다.</dd><dt>1교시 연결</dt><dd>1교시 인터랙티브 9~16점 문항, 2차 대회·영재고 대비</dd>
+    <dt>코드</dt><dd>분할 정복·비트마스크·흐름 알고리즘을 구현하고 복잡도를 판단한다.</dd><dt>서술 목표</dt><dd>최소·최대·불가능을 한계 증명과 구성으로 보인다.</dd>
+  </dl>
+</div>
+<h2>주차별 진행표 (정규 트랙, 주 1주제)</h2>
+<table class="wk">
+<tr><th class="c" style="width:7%">주차</th><th>주제</th><th class="c" style="width:6%">영역</th><th style="width:14%">선수 주제</th><th style="width:19%">대표 문제 전략</th><th class="c" style="width:14%">2026 연결 문항</th><th class="c" style="width:7%">카드</th></tr>
+<tr><td class="num">1주</td><td><span class="chip" style="background:#2451b8">49</span> <b>수학적 귀납법</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#6d3fc4">15</span> <span class="chip" style="background:#2451b8">25</span></td><td>k에서 k + 1로</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">20쪽</td></tr><tr><td class="num">2주</td><td><span class="chip" style="background:#0e7a6f">53</span> <b>빠른 거듭제곱과 페르마 소정리</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">29</span></td><td>지수 줄이기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">21쪽</td></tr><tr><td class="num">3주</td><td><span class="chip" style="background:#b5570b">57</span> <b>이항정리와 조합 항등식</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">11</span></td><td>두 가지로 세기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">22쪽</td></tr><tr><td class="num">4주</td><td><span class="chip" style="background:#b8264a">65</span> <b>위상 정렬과 DAG</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">41</span></td><td>먼저 할 수 있는 것부터</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">24쪽</td></tr><tr><td class="num">5주</td><td><span class="chip" style="background:#2451b8">50</span> <b>극단 원리와 교환 논증</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2e7d32">45</span></td><td>인접 교환 비교</td><td class="num"><b>19번</b></td><td class="num">20쪽</td></tr><tr><td class="num">6주</td><td><span class="chip" style="background:#0e7a6f">54</span> <b>일차 부정방정식</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">30</span></td><td>한 해 → 모든 해</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">21쪽</td></tr><tr><td class="num">7주</td><td><span class="chip" style="background:#0e7a6f">55</span> <b>중국인의 나머지 정리</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">29</span> <span class="chip" style="background:#0e7a6f">54</span></td><td>큰 법부터 거르기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">21쪽</td></tr><tr><td class="num">8주</td><td><span class="chip" style="background:#b5570b">58</span> <b>분배와 스털링 수</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">33</span> <span class="chip" style="background:#b5570b">35</span></td><td>빈 상자를 빼기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">22쪽</td></tr><tr><td class="num">9주</td><td><span class="chip" style="background:#6d3fc4">61</span> <b>배낭과 부분집합 합</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#0e7a6f">06</span> <span class="chip" style="background:#6d3fc4">39</span></td><td>만들 수 있는 합의 표</td><td class="num"><b>15번</b></td><td class="num">23쪽</td></tr><tr><td class="num">10주</td><td><span class="chip" style="background:#6d3fc4">64</span> <b>점화식 풀기와 복잡도</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">15</span> <span class="chip" style="background:#2451b8">49</span></td><td>펼쳐서 규칙 보기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">23쪽</td></tr><tr><td class="num">11주</td><td><span class="chip" style="background:#b8264a">66</span> <b>최대 흐름과 최소 컷</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">41</span> <span class="chip" style="background:#b8264a">42</span></td><td>흐름으로 컷 찾기</td><td class="num"><b>14번</b></td><td class="num">24쪽</td></tr><tr><td class="num">12주</td><td><span class="chip" style="background:#2451b8">52</span> <b>백트래킹과 제약 추론</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">04</span> <span class="chip" style="background:#2e7d32">22</span></td><td>막히면 되돌아가기</td><td class="num">7번</td><td class="num">20쪽</td></tr><tr class="ev"><td class="num">13주</td><td colspan="6"><b>단계 중간 평가</b> · 1~12주 주제에서 10문항, 40분 · 전반부 점검과 보충 계획</td></tr><tr><td class="num">14주</td><td><span class="chip" style="background:#2451b8">51</span> <b>구성적 증명</b></td><td class="num"><span class="abadge" style="background:#2451b8">A</span></td><td><span class="chip" style="background:#2451b8">26</span> <span class="chip" style="background:#b5570b">34</span></td><td>강한 조건부터 배치</td><td class="num"><b>17번</b></td><td class="num">20쪽</td></tr><tr><td class="num">15주</td><td><span class="chip" style="background:#0e7a6f">56</span> <b>오일러 함수와 약수 합 기법</b></td><td class="num"><span class="abadge" style="background:#0e7a6f">B</span></td><td><span class="chip" style="background:#0e7a6f">07</span> <span class="chip" style="background:#b5570b">33</span></td><td>관점 바꿔 세기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">21쪽</td></tr><tr><td class="num">16주</td><td><span class="chip" style="background:#b5570b">59</span> <b>교란순열과 대칭 세기</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#6d3fc4">15</span> <span class="chip" style="background:#b5570b">33</span></td><td>첫 원소의 행방으로 나누기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">22쪽</td></tr><tr><td class="num">17주</td><td><span class="chip" style="background:#6d3fc4">62</span> <b>구간 DP</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#6d3fc4">38</span> <span class="chip" style="background:#6d3fc4">39</span></td><td>마지막 분할 위치</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">23쪽</td></tr><tr><td class="num">18주</td><td><span class="chip" style="background:#b8264a">67</span> <b>트리 심화</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">19</span> <span class="chip" style="background:#b8264a">20</span> <span class="chip" style="background:#b8264a">41</span></td><td>루트 잡고 내려가기</td><td class="num">9번</td><td class="num">24쪽</td></tr><tr><td class="num">19주</td><td><span class="chip" style="background:#2e7d32">70</span> <b>분할 정복</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">23</span> <span class="chip" style="background:#6d3fc4">64</span></td><td>반으로 나누고 합치기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">25쪽</td></tr><tr><td class="num">20주</td><td><span class="chip" style="background:#b5570b">60</span> <b>기댓값과 선형성</b></td><td class="num"><span class="abadge" style="background:#b5570b">C</span></td><td><span class="chip" style="background:#b5570b">36</span></td><td>쪼개서 더하기</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">22쪽</td></tr><tr><td class="num">21주</td><td><span class="chip" style="background:#6d3fc4">63</span> <b>비트마스크 DP</b></td><td class="num"><span class="abadge" style="background:#6d3fc4">D</span></td><td><span class="chip" style="background:#0e7a6f">06</span> <span class="chip" style="background:#6d3fc4">39</span></td><td>집합을 비트로</td><td class="num"><span style="color:var(--pale)">—</span></td><td class="num">23쪽</td></tr><tr><td class="num">22주</td><td><span class="chip" style="background:#b8264a">68</span> <b>서로소 집합과 병목 경로</b></td><td class="num"><span class="abadge" style="background:#b8264a">E</span></td><td><span class="chip" style="background:#b8264a">43</span></td><td>가벼운 것부터 연결</td><td class="num">20번</td><td class="num">24쪽</td></tr><tr><td class="num">23주</td><td><span class="chip" style="background:#2e7d32">69</span> <b>상태 공간과 최소 이동</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2451b8">26</span> <span class="chip" style="background:#b8264a">41</span></td><td>하한 + 구성</td><td class="num"><b>18번</b></td><td class="num">25쪽</td></tr><tr><td class="num">24주</td><td><span class="chip" style="background:#2e7d32">71</span> <b>게임 트리와 그런디 수</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">48</span> <span class="chip" style="background:#b8264a">65</span></td><td>끝에서 거꾸로</td><td class="num"><b>20번</b></td><td class="num">25쪽</td></tr><tr><td class="num">25주</td><td><span class="chip" style="background:#2e7d32">72</span> <b>인터랙티브 최적화 전략</b></td><td class="num"><span class="abadge" style="background:#2e7d32">F</span></td><td><span class="chip" style="background:#2e7d32">45</span> <span class="chip" style="background:#2451b8">50</span> <span class="chip" style="background:#2e7d32">69</span></td><td>한계 증명 + 구성</td><td class="num">13번</td><td class="num">25쪽</td></tr><tr class="ev"><td class="num">26주</td><td colspan="6"><b>단계 마무리 평가</b> · 24주제 전체 12문항 + 인터랙티브형 2문항, 70분 · Set A/B, 70% 이상이면 다음 단계</td></tr>
+</table>
+<p class="note">선수 주제가 모두 앞 주차에 오도록 배치했습니다(빌드 과정에서 자동 점검). 앞 단계의 선수 주제는 마친 것으로 봅니다. 연결 문항의 굵은 번호는 그 문항의 주 연결 주제라는 뜻입니다.</p>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">19 / 27</span></div>
+</div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 49~52</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>20 / 27쪽</div></div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">49</span><span class="ttl">수학적 귀납법</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 15, 25</span></div>
+  <div class="goal">기본 단계와 귀납 단계로 모든 n에 대한 명제를 증명하고, 알고리즘의 정당성에 적용한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>귀납법의 구조 — n = 1, 그리고 k에서 k + 1로</li><li>합 공식과 부등식 증명</li><li>강한 귀납법 (k 이하 모두 가정)</li><li>L자 트로미노 타일링의 존재 증명</li><li>반복문 불변식으로 알고리즘 정당성 보이기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">k에서 k + 1로</span>2ⁿ×2ⁿ 판에서 한 칸을 빼면 항상 L자 트로미노로 채울 수 있다. 8×8 판에서 한 칸을 뺐을 때 필요한 트로미노는 몇 개인가?<div class="an"><span>답</span>21개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>분할 정복 재귀로 실제 타일 배치 출력</div>
+    <div><b>기출·유형 연결</b>3단계 증명 서술 전반, 분할 정복(70)의 기초</div>
+    <div><b>서술·증명</b>판을 4등분하고 가운데에 트로미노 하나를 놓는 귀납 단계</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">50</span><span class="ttl">극단 원리와 교환 논증</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 45</span></div>
+  <div class="goal">인접한 두 선택을 바꿔도 손해가 없음을 보여 최적의 정렬 기준을 증명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>가장 크거나 작은 대상을 먼저 고려하기</li><li>인접 교환 — 두 개만 바꿨을 때 차이 계산</li><li>정렬 기준 도출 (a·d 와 b·c 비교 등)</li><li>작업 순서 · 줄 서기 최적화</li><li>교환 논증이 성립하지 않는 경우 점검</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">인접 교환 비교</span>처리 시간이 3, 1, 4, 2, 5인 작업 5개를 한 사람이 차례로 처리한다. 각 작업이 끝나는 시각의 합의 최솟값은?<div class="an"><span>답</span>35 (짧은 작업부터)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>순열 전수 조사로 최솟값을 구해 정렬 결과와 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 19번 「로봇」 카드 순서</div>
+    <div><b>서술·증명</b>인접한 두 작업을 바꿀 때 합의 변화를 식으로</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">51</span><span class="ttl">구성적 증명</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 26, 34</span></div>
+  <div class="goal">“존재한다”를 실제 예로 보이고, 단계마다 조건을 지키는 구성 전략을 설계한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>존재 증명 — 예 하나를 직접 만들기</li><li>조건이 강한 곳부터 배치</li><li>막히면 되돌아가 고치는 설계</li><li>일반 n에 대한 구성 규칙 만들기</li><li>불가능 증명(26)과 짝지어 판단하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">강한 조건부터 배치</span>1부터 8까지를 원형으로 배치해 이웃한 두 수의 합이 모두 소수가 되게 하시오.<div class="an"><span>답</span>예: 1, 2, 3, 8, 5, 6, 7, 4 (홀짝이 번갈아야 한다)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>백트래킹으로 가능한 배치를 모두 세기</div>
+    <div><b>기출·유형 연결</b>2026 중등 17번 「양팔 저울」</div>
+    <div><b>서술·증명</b>홀수와 짝수가 번갈아 놓여야 하는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#2451b8;--tint:#eef3fd">
+  <div class="tc-h"><span class="no">52</span><span class="ttl">백트래킹과 제약 추론</span><span class="ar">A 논리와 증명</span><span class="pre">선수 주제 04, 22</span></div>
+  <div class="goal">조건을 어기는 순간 되돌아가는 탐색으로 해를 찾고, 가지치기 논리를 설명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>부분 해 → 조건 검사 → 되돌아가기</li><li>N-Queen — 행 · 열 · 대각선 충돌 검사</li><li>가지치기가 탐색량을 줄이는 원리</li><li>탐색 순서 (선택지가 적은 칸부터)</li><li>스도쿠형 · 스트라이크형 제약 퍼즐</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">막히면 되돌아가기</span>6×6 체스판에 서로 공격하지 않도록 퀸 6개를 놓는 방법은 몇 가지인가?<div class="an"><span>답</span>4가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀 백트래킹 N-Queen, 가지치기 전후 탐색 노드 수 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 7번 「스트라이크」 심화, 2교시 백트래킹</div>
+    <div><b>서술·증명</b>한 행에 퀸이 정확히 하나라는 관찰이 탐색을 줄이는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">20 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 53~56</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>21 / 27쪽</div></div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">53</span><span class="ttl">빠른 거듭제곱과 페르마 소정리</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 29</span></div>
+  <div class="goal">큰 거듭제곱의 나머지를 페르마 소정리와 분할 정복으로 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>aᵖ⁻¹ ≡ 1 (mod p) — p는 소수, a는 p의 배수가 아님</li><li>지수를 p − 1로 나눈 나머지로 줄이기</li><li>제곱을 반복하는 빠른 거듭제곱 O(log n)</li><li>모듈러 역원의 존재 조건</li><li>법이 합성수일 때의 주의점</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">지수 줄이기</span>3¹⁰⁰ 을 7로 나눈 나머지는?<div class="an"><span>답</span>4</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀·반복 빠른 거듭제곱 구현, pow(a, b, m)과 비교</div>
+    <div><b>기출·유형 연결</b>2교시 큰 수 나머지 출력, 1교시 정수 문항</div>
+    <div><b>서술·증명</b>3¹ ~ 3⁶ 의 나머지 표로 주기 6을 확인하는 과정</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">54</span><span class="ttl">일차 부정방정식</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 30</span></div>
+  <div class="goal">ax + by = c의 정수해를 확장 유클리드로 구하고, 만들 수 없는 금액 문제에 적용한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>확장 유클리드로 ax + by = gcd 의 해 구하기</li><li>해 하나에서 모든 해 만들기</li><li>자연수 해의 개수 세기</li><li>두 동전으로 만들 수 없는 최대 금액 ab − a − b</li><li>물통 계량 문제와의 연결</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">한 해 → 모든 해</span>4원짜리와 7원짜리 우표만 사용할 때 만들 수 없는 가장 큰 금액은?<div class="an"><span>답</span>17원</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>확장 유클리드 구현, 1~100원 가능 여부 표</div>
+    <div><b>기출·유형 연결</b>1교시 정수 조건, 물통 BFS(41)와 비교</div>
+    <div><b>서술·증명</b>18~21원이 모두 가능하면 그 뒤가 모두 가능한 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">55</span><span class="ttl">중국인의 나머지 정리</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 29, 54</span></div>
+  <div class="goal">서로소인 법에 대한 연립 합동식의 해를 구하고 해의 주기를 이해한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>연립 합동식의 뜻</li><li>큰 법부터 후보를 나열하고 거르기</li><li>서로소 조건과 해의 존재 · 유일성 (법의 곱 단위)</li><li>서로소가 아니면 해가 없을 수 있음</li><li>달력 · 주기 맞추기 모델</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">큰 법부터 거르기</span>3으로 나누면 2, 5로 나누면 3, 7로 나누면 2가 남는 가장 작은 자연수는?<div class="an"><span>답</span>23</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>후보 나열 방식과 공식 구성 방식을 비교</div>
+    <div><b>기출·유형 연결</b>1교시 주기 맞추기 문항</div>
+    <div><b>서술·증명</b>해가 105마다 반복되는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#0e7a6f;--tint:#e8f5f3">
+  <div class="tc-h"><span class="no">56</span><span class="ttl">오일러 함수와 약수 합 기법</span><span class="ar">B 수와 정수론</span><span class="pre">선수 주제 07, 33</span></div>
+  <div class="goal">서로소의 개수 φ(n)을 구하고, ⌊N/i⌋의 합 같은 약수 관련 합을 효율적으로 계산한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>φ(n) = n · Π(1 − 1/p)</li><li>포함배제로 φ 공식 유도</li><li>Σ⌊N/i⌋ = 1~N 약수 개수의 합</li><li>⌊N/i⌋ 의 서로 다른 값은 약 2√N 가지</li><li>체를 이용한 φ 표 만들기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">관점 바꿔 세기</span>1부터 100까지의 자연수 중 100과 서로소인 수는 몇 개인가?<div class="an"><span>답</span>40개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>φ 체 구현, Σ⌊N/i⌋ 를 O(√N)으로 계산</div>
+    <div><b>기출·유형 연결</b>1교시 수 세기, 2교시 수론 최적화</div>
+    <div><b>서술·증명</b>“약수 개수의 합”을 Σ⌊N/i⌋ 로 바꿔 세는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">21 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 57~60</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>22 / 27쪽</div></div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">57</span><span class="ttl">이항정리와 조합 항등식</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 11</span></div>
+  <div class="goal">조합 항등식을 식 계산과 “두 가지로 세기”로 증명한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>(a + b)ⁿ 의 전개와 계수</li><li>한 행의 합 2ⁿ, 교대합 0</li><li>하키스틱 항등식</li><li>방데르몽드 항등식</li><li>조합적 증명 — 같은 대상을 두 방법으로 세기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">두 가지로 세기</span>(10C0)² + (10C1)² + … + (10C10)² 의 값은?<div class="an"><span>답</span>184756 (= 20C10)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>큰 수 조합 계산으로 항등식 수치 검증</div>
+    <div><b>기출·유형 연결</b>1교시 조합 계산, 3단계 서술 증명</div>
+    <div><b>서술·증명</b>남 10명, 여 10명 중 10명 뽑기로 항등식 증명</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">58</span><span class="ttl">분배와 스털링 수</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 33, 35</span></div>
+  <div class="goal">서로 다른 물건을 상자에 나누는 경우를 전사 함수와 스털링 수로 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>서로 다른 공 → 서로 다른 상자는 kⁿ</li><li>빈 상자 없이 — 포함배제로 전사 함수 세기</li><li>제2종 스털링 수 S(n,k) = k·S(n−1,k) + S(n−1,k−1)</li><li>상자가 같으면 S(n, k), 다르면 k! · S(n, k)</li><li>자연수 분할 p(n) 맛보기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">빈 상자를 빼기</span>서로 다른 공 5개를 서로 다른 상자 3개에 빈 상자가 없도록 넣는 방법은 몇 가지인가?<div class="an"><span>답</span>150가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>3⁵ 전수 조사와 포함배제·스털링 표 비교</div>
+    <div><b>기출·유형 연결</b>1교시 배정 문항 심화</div>
+    <div><b>서술·증명</b>S(n, k) 점화식을 “n번째 공이 혼자인가”로 설명</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">59</span><span class="ttl">교란순열과 대칭 세기</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 15, 33</span></div>
+  <div class="goal">모두 제자리를 벗어나는 순열을 점화식으로 세고, 회전으로 같아지는 배치를 센다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>교란순열 Dₙ = (n − 1)(Dₙ₋₁ + Dₙ₋₂)</li><li>포함배제로 Dₙ 공식 만들기</li><li>Dₙ / n! 이 1/e 에 가까워짐</li><li>목걸이 · 원형 배치 — 회전 대칭 처리</li><li>대칭 세기에서 흔한 실수</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">첫 원소의 행방으로 나누기</span>편지 6통을 봉투 6개에 하나씩 넣을 때 모두 잘못 들어가는 경우의 수는?<div class="an"><span>답</span>265가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>순열 전수 조사와 점화식 결과 비교</div>
+    <div><b>기출·유형 연결</b>1교시 순열 조건 문항</div>
+    <div><b>서술·증명</b>점화식에 (n − 1)배와 두 경우가 생기는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b5570b;--tint:#fcf1e6">
+  <div class="tc-h"><span class="no">60</span><span class="ttl">기댓값과 선형성</span><span class="ar">C 경우의 수와 확률</span><span class="pre">선수 주제 36</span></div>
+  <div class="goal">기댓값의 선형성으로 복잡한 확률 상황의 평균을 간단히 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>기댓값 = Σ (값 × 확률)</li><li>선형성 — 합의 기댓값은 기댓값의 합 (독립 불필요)</li><li>지시 변수로 “개수의 기댓값” 구하기</li><li>성공 확률이 p일 때 기다리는 횟수의 기댓값 1/p</li><li>조건부 확률의 기초</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">쪼개서 더하기</span>주사위를 1~6이 모두 한 번 이상 나올 때까지 굴린다. 굴리는 횟수의 기댓값은?<div class="an"><span>답</span>14.7번 (= 6/6 + 6/5 + … + 6/1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>시뮬레이션 평균과 분수 계산 결과 비교</div>
+    <div><b>기출·유형 연결</b>1교시 확률 문항 심화</div>
+    <div><b>서술·증명</b>새로운 눈이 나오기까지를 단계로 나누어 더하는 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">22 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 61~64</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>23 / 27쪽</div></div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">61</span><span class="ttl">배낭과 부분집합 합</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 06, 39</span></div>
+  <div class="goal">만들 수 있는 합의 표를 관리해 나누기·담기 최적화를 푼다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>부분집합 합 가능 여부 표 dp[s]</li><li>0/1 배낭 — 무게 제한에서 최대 가치</li><li>한 번씩만 쓰려면 역순으로 갱신하는 이유</li><li>합을 반으로 나누기 (균형 분할)</li><li>2ⁿ 전수 조사와의 비교</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">만들 수 있는 합의 표</span>막대 3, 5, 7, 8, 9, 11을 두 묶음으로 나눠 각 묶음의 길이 합을 가로·세로로 하는 직사각형을 만들 때 넓이의 최댓값은?<div class="an"><span>답</span>462 (21 × 22, 예: 3 + 7 + 11)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>불리언 배열 부분집합 합으로 최적 분할 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 15번 「직사각형 만들기」</div>
+    <div><b>서술·증명</b>합이 일정할 때 두 수가 가까울수록 곱이 커지는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">62</span><span class="ttl">구간 DP</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 38, 39</span></div>
+  <div class="goal">구간 [i, j]를 상태로 두고 짧은 구간부터 채우는 DP를 설계한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>상태 dp[i][j]와 길이 순서로 채우기</li><li>마지막으로 합치는 위치 k로 나누기</li><li>행렬 곱셈 순서의 최소 비용</li><li>수식에 괄호를 넣어 최대 · 최소 만들기</li><li>팰린드롬 관련 구간 문제</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">마지막 분할 위치</span>크기가 10×20, 20×30, 30×40, 40×30 인 네 행렬을 곱할 때 필요한 원소 곱셈 횟수의 최솟값은?<div class="an"><span>답</span>30000</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>3중 반복 구간 DP로 최솟값과 괄호 구조 출력</div>
+    <div><b>기출·유형 연결</b>1교시 인터랙티브 최적화, 2차 대회 DP</div>
+    <div><b>서술·증명</b>구간 길이 순서로 채워야 하는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">63</span><span class="ttl">비트마스크 DP</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 06, 39</span></div>
+  <div class="goal">방문한 원소의 집합을 비트로 압축해 순서 최적화 문제를 푼다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>집합 상태를 정수 하나로 표현</li><li>dp[mask][last]의 정의</li><li>외판원 문제(TSP) 소규모</li><li>상태 수 2ⁿ × n 추정</li><li>부분집합 순회 기법</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">집합을 비트로</span>네 도시 사이 거리가 1–2: 10, 1–3: 15, 1–4: 20, 2–3: 35, 2–4: 25, 3–4: 30 일 때 1에서 출발해 모두 들르고 돌아오는 최소 거리는?<div class="an"><span>답</span>80 (1–2–4–3–1)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>비트마스크 DP TSP와 순열 전수 조사 비교</div>
+    <div><b>기출·유형 연결</b>2차 대회·영재고 대비, 1교시 순서 최적화</div>
+    <div><b>서술·증명</b>순열 전수 조사보다 상태 수가 줄어드는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#6d3fc4;--tint:#f2edfc">
+  <div class="tc-h"><span class="no">64</span><span class="ttl">점화식 풀기와 복잡도</span><span class="ar">D 수열·점화식·DP</span><span class="pre">선수 주제 15, 49</span></div>
+  <div class="goal">점화식을 펼쳐 닫힌 식을 구하고, 알고리즘 실행 시간을 점화식으로 분석한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>반복 대입(펼치기)</li><li>하노이 Hₙ = 2ⁿ − 1 유도</li><li>분할 정복 T(n) = 2T(n/2) + n → n log n</li><li>빅오 표기와 실행 시간 감각</li><li>행렬 거듭제곱으로 피보나치 빠르게 구하기</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">펼쳐서 규칙 보기</span>T(1) = 1, T(n) = 2T(n/2) + n 일 때 T(16)의 값은?<div class="an"><span>답</span>80 (= n log₂n + n)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀 호출 횟수 측정, 행렬 거듭제곱 피보나치</div>
+    <div><b>기출·유형 연결</b>2교시 시간 제한 판단, 분할 정복(70)</div>
+    <div><b>서술·증명</b>재귀 트리의 각 층의 합이 n인 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">23 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 65~68</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>24 / 27쪽</div></div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">65</span><span class="ttl">위상 정렬과 DAG</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 41</span></div>
+  <div class="goal">선후 관계가 있는 작업의 가능한 순서를 찾고, 그 개수와 최장 경로를 구한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>방향 비순환 그래프(DAG)</li><li>진입차수가 0인 정점부터 제거</li><li>사이클이 있으면 순서가 존재하지 않는다</li><li>가능한 순서의 개수 세기</li><li>작업 일정 — DAG 최장 경로</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">먼저 할 수 있는 것부터</span>작업 a, b, c, d, e에 대해 a→c, b→c, c→d, b→e (화살표 앞이 먼저)일 때 가능한 작업 순서는 몇 가지인가?<div class="an"><span>답</span>7가지</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>큐 위상 정렬, 순열 전수 조사로 개수 검증</div>
+    <div><b>기출·유형 연결</b>1교시 순서 조건 문항, 2교시 위상 정렬</div>
+    <div><b>서술·증명</b>사이클이 있으면 진입차수 0인 정점이 사라지는 이유</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">66</span><span class="ttl">최대 흐름과 최소 컷</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 41, 42</span></div>
+  <div class="goal">두 지점 사이를 끊는 최소 비용(최소 컷)을 구하고 최대 흐름과 같음을 이해한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>컷 — 출발 쪽과 도착 쪽으로 정점 나누기</li><li>컷의 용량 = 출발 쪽 → 도착 쪽 간선의 합</li><li>증가 경로로 흐름 늘리기</li><li>최대 흐름 = 최소 컷 (정리 소개)</li><li>겹치지 않는 경로 수와 끊어야 할 간선 수</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">흐름으로 컷 찾기</span>방향 간선 용량 S→A 4, S→B 3, A→B 2, A→C 3, B→D 4, C→T 5, D→C 1, D→T 2 인 네트워크의 최소 컷 용량은?<div class="an"><span>답</span>6 ({S, A, B, D} | {C, T})</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>컷 전수 조사와 에드몬드–카프 최대 흐름 비교</div>
+    <div><b>기출·유형 연결</b>2026 중등 14번 「철도」</div>
+    <div><b>서술·증명</b>실제로 흐름 6을 보내 컷 6이 최소임을 확인</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">67</span><span class="ttl">트리 심화</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 19, 20, 41</span></div>
+  <div class="goal">트리의 지름·거리·서브트리 크기를 구하고 트리 DP의 기초를 익힌다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>두 정점 거리 = 깊이의 합 − 2 × 공통 조상의 깊이</li><li>지름 — 아무 점에서 가장 먼 점, 거기서 다시 가장 먼 점</li><li>서브트리 크기와 DFS 순서</li><li>거리 정보로 트리 구조 추론</li><li>트리 DP — 최대 독립 집합</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">루트 잡고 내려가기</span>간선 1–2, 1–3, 2–4, 2–5, 3–6, 6–7, 6–8, 8–9, 4–10 인 트리의 지름(가장 먼 두 정점 사이의 간선 수)은?<div class="an"><span>답</span>7 (10–4–2–1–3–6–8–9)</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>BFS 두 번으로 지름, DFS로 서브트리 크기</div>
+    <div><b>기출·유형 연결</b>2026 중등 9번 「이진 트리의 거리」</div>
+    <div><b>서술·증명</b>BFS 두 번으로 지름을 얻는 이유의 스케치</div>
+  </div>
+</div><div class="tc" style="--ac:#b8264a;--tint:#fcecf0">
+  <div class="tc-h"><span class="no">68</span><span class="ttl">서로소 집합과 병목 경로</span><span class="ar">E 그래프와 트리</span><span class="pre">선수 주제 43</span></div>
+  <div class="goal">Union-Find로 연결 상태를 관리하고, 경로의 가장 큰 간선을 최소화하는 문제를 푼다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>서로소 집합 — find, union, 경로 압축</li><li>간선을 추가하며 연결 요소 수 추적</li><li>병목 값 — 경로 위에서 가장 큰 간선</li><li>가벼운 간선부터 이어 두 점이 연결되는 순간 = 최소 병목</li><li>최소 신장 트리 위 경로와의 관계</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">가벼운 것부터 연결</span>주제 42의 그래프에서 A→F 경로 중 “경로 위 가장 긴 간선”이 가장 짧은 경로의 그 값은?<div class="an"><span>답</span>5</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>정렬 + Union-Find로 병목 값 계산</div>
+    <div><b>기출·유형 연결</b>2026 중등 20번 「간선 게임」의 난이도 정의</div>
+    <div><b>서술·증명</b>처음 연결되는 순간의 간선이 최소 병목인 이유</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">24 / 27</span></div></div>
+<div class="page"><div class="head"><div><h1>3단계 심화: 주제 69~72</h1><div class="sub">도구를 엮고 증명한다 · 대상 중2 ~ 중3</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>25 / 27쪽</div></div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">69</span><span class="ttl">상태 공간과 최소 이동</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 26, 41</span></div>
+  <div class="goal">퍼즐의 상태를 정점으로 보고 BFS로 최소 조작 수를 구하며, 불변량으로 불가능을 가려낸다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>상태 표현과 상태 수 추정 (n!, 2ⁿ)</li><li>조작 = 간선, BFS로 최소 횟수</li><li>하한 증명 — 조작 한 번이 줄일 수 있는 양</li><li>불변량(홀짝)으로 도달 불가 판정</li><li>손 풀이 전략 — 목표에서 거꾸로</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">하한 + 구성</span>카드 [2, 4, 1, 3]에서 “앞에서부터 k장을 통째로 뒤집기”(2 ≤ k ≤ 4)만 써서 [1, 2, 3, 4]를 만드는 최소 횟수는?<div class="an"><span>답</span>4번</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>순열 상태 BFS로 최소 횟수와 경로 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 18번 「뒤집기」</div>
+    <div><b>서술·증명</b>3번 이하로는 안 됨을 BFS 층별 상태로 확인</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">70</span><span class="ttl">분할 정복</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 23, 64</span></div>
+  <div class="goal">문제를 반으로 나누어 풀고 합치는 방식으로 정렬·세기·계산을 빠르게 한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>분할 → 정복 → 합병의 구조</li><li>병합 정렬과 합병 단계의 비교 횟수</li><li>합병하면서 역순쌍 세기</li><li>최대 부분 배열 합 (가운데를 지나는 경우)</li><li>빠른 거듭제곱(53)과의 연결</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">반으로 나누고 합치기</span>수열 [3, 7, 1, 8, 2, 6, 5, 4]의 역순쌍(i &lt; j, aᵢ &gt; aⱼ)은 몇 개인가?<div class="an"><span>답</span>14개</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>병합 정렬 역순쌍 O(n log n)과 이중 반복문 비교</div>
+    <div><b>기출·유형 연결</b>1교시 정렬 조작 문항, 2교시 분할 정복</div>
+    <div><b>서술·증명</b>합병 때 오른쪽 원소가 먼저 내려오면 역순쌍이 몇 개 생기는지</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">71</span><span class="ttl">게임 트리와 그런디 수</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 48, 65</span></div>
+  <div class="goal">게임 트리를 끝에서 거꾸로 계산하고, 여러 게임의 합을 그런디 수로 다룬다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>게임 트리와 “둘 다 최선을 다한다”는 가정</li><li>미니맥스 — 내 차례는 최대, 상대 차례는 최소</li><li>가져가는 개수가 불규칙한 게임의 P위치 표</li><li>그런디 수 = mex{다음 상태의 그런디 수}</li><li>여러 게임의 합 — 그런디 수의 XOR</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">끝에서 거꾸로</span>돌 n개에서 한 번에 1개, 3개, 4개 중 하나만큼 가져가고 마지막 돌을 가져가면 이긴다. 1 ≤ n ≤ 10 중 먼저 하는 사람이 지는 n을 모두 구하시오.<div class="an"><span>답</span>2, 7, 9</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>재귀 + 메모이제이션으로 승패 표와 그런디 수 출력</div>
+    <div><b>기출·유형 연결</b>2026 중등 20번 「간선 게임」</div>
+    <div><b>서술·증명</b>n = 7에서 가능한 세 수가 모두 필승 위치로 가는지 확인</div>
+  </div>
+</div><div class="tc" style="--ac:#2e7d32;--tint:#ecf6ed">
+  <div class="tc-h"><span class="no">72</span><span class="ttl">인터랙티브 최적화 전략</span><span class="ar">F 알고리즘 전략과 게임</span><span class="pre">선수 주제 45, 50, 69</span></div>
+  <div class="goal">인터랙티브 문항에서 한계값을 먼저 증명하고, 그 값을 달성하는 배치를 구성해 만점을 확정한다.</div>
+  <div class="tc-b">
+    <div><div class="lb">배우는 내용</div><ul class="it"><li>목표값의 한계(더 좋아질 수 없는 값) 먼저 계산</li><li>한계값을 달성하는 구성 찾기</li><li>부분 점수 구조와 시간 배분</li><li>조작형 문항의 되돌리기 · 초기화 활용</li><li>모의 인터랙티브 세트로 실전 연습</li></ul></div>
+    <div><div class="lb">대표 문제</div><div class="pb"><span class="st">한계 증명 + 구성</span>1부터 12까지를 4개씩 세 조로 나눈다. 각 조의 점수를 “조에서 두 번째로 큰 수”라 할 때 세 조 점수 합의 최댓값은?<div class="an"><span>답</span>27 (예: {12, 11, 1, 2}, {10, 9, 3, 4}, {8, 7, 5, 6})</div></div></div>
+  </div>
+  <div class="tc-f">
+    <div><b>코드로 확인</b>모든 분할 5775가지 전수 조사로 최댓값 확인</div>
+    <div><b>기출·유형 연결</b>2026 중등 13~20번 인터랙티브 종합</div>
+    <div><b>서술·증명</b>각 조의 두 번째 수 위에 더 큰 수가 하나씩 필요함으로 27을 증명</div>
+  </div>
+</div><div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 3단계 심화</span><span class="r">25 / 27</span></div></div>
+<div class="page">
+<div class="head"><div><h1>사고 전략 트랙</h1><div class="sub">영역을 가로질러 반복해서 등장하는 12가지 전략 — 같은 전략을 단계를 올려 가며 다시 만난다</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>26 / 27쪽</div></div>
+<table>
+<tr><th class="c" style="width:5%">번호</th><th style="width:41%">전략</th><th class="c">1단계에서 처음</th><th class="c">2단계에서 넓히기</th><th class="c">3단계에서 증명으로</th></tr>
+<tr><td class="num">1</td><td><b>모든 경우 나열</b><br><span style="color:var(--sub);font-size:11.3px">진리표·수형도·전수 조사로 빠짐없이 적는다. 코드 검증의 출발점.</span></td><td><span class="chip" style="background:#2451b8">01</span><span class="chip" style="background:#2451b8">03</span><span class="chip" style="background:#b5570b">09</span><span class="chip" style="background:#2e7d32">22</span></td><td><span style='color:var(--pale)'>—</span></td><td><span class="chip" style="background:#2451b8">52</span></td></tr><tr><td class="num">2</td><td><b>겹치지 않게 나누기</b><br><span style="color:var(--sub);font-size:11.3px">기준 하나를 정해 경우를 분할하고 각각을 센다.</span></td><td><span class="chip" style="background:#b5570b">09</span><span class="chip" style="background:#6d3fc4">15</span></td><td><span class="chip" style="background:#b5570b">33</span><span class="chip" style="background:#6d3fc4">37</span></td><td><span class="chip" style="background:#b5570b">59</span></td></tr><tr><td class="num">3</td><td><b>여사건</b><br><span style="color:var(--sub);font-size:11.3px">구하려는 것이 복잡하면 아닌 경우를 세어 전체에서 뺀다.</span></td><td><span class="chip" style="background:#b5570b">11</span><span class="chip" style="background:#b5570b">12</span></td><td><span class="chip" style="background:#b5570b">33</span><span class="chip" style="background:#b5570b">36</span></td><td><span class="chip" style="background:#b5570b">58</span></td></tr><tr><td class="num">4</td><td><b>표 채우기</b><br><span style="color:var(--sub);font-size:11.3px">작은 문제의 답을 칸에 저장하고 큰 문제로 쌓아 올린다.</span></td><td><span class="chip" style="background:#b5570b">12</span><span class="chip" style="background:#6d3fc4">16</span></td><td><span class="chip" style="background:#6d3fc4">37</span><span class="chip" style="background:#6d3fc4">39</span><span class="chip" style="background:#6d3fc4">40</span></td><td><span class="chip" style="background:#6d3fc4">61</span><span class="chip" style="background:#6d3fc4">62</span><span class="chip" style="background:#6d3fc4">63</span></td></tr><tr><td class="num">5</td><td><b>거꾸로 생각하기</b><br><span style="color:var(--sub);font-size:11.3px">끝 상태에서 출발해 승패·순서·최소 이동을 역산한다.</span></td><td><span style='color:var(--pale)'>—</span></td><td><span class="chip" style="background:#2e7d32">48</span></td><td><span class="chip" style="background:#b8264a">65</span><span class="chip" style="background:#2e7d32">69</span><span class="chip" style="background:#2e7d32">71</span></td></tr><tr><td class="num">6</td><td><b>일대일 대응</b><br><span style="color:var(--sub);font-size:11.3px">세기 어려운 대상을 세기 쉬운 대상으로 바꾼다.</span></td><td><span class="chip" style="background:#0e7a6f">05</span></td><td><span class="chip" style="background:#b5570b">35</span><span class="chip" style="background:#6d3fc4">38</span></td><td><span class="chip" style="background:#b5570b">57</span></td></tr><tr><td class="num">7</td><td><b>불변량과 홀짝</b><br><span style="color:var(--sub);font-size:11.3px">조작해도 변하지 않는 값으로 결과를 예측하고 불가능을 증명한다.</span></td><td><span class="chip" style="background:#b8264a">17</span><span class="chip" style="background:#b8264a">18</span></td><td><span class="chip" style="background:#2451b8">26</span></td><td><span class="chip" style="background:#2451b8">51</span><span class="chip" style="background:#2e7d32">69</span></td></tr><tr><td class="num">8</td><td><b>극단과 교환</b><br><span style="color:var(--sub);font-size:11.3px">가장 큰·작은 것을 먼저 보거나, 인접한 두 선택을 바꿔 비교한다.</span></td><td><span class="chip" style="background:#2e7d32">23</span></td><td><span class="chip" style="background:#2e7d32">45</span></td><td><span class="chip" style="background:#2451b8">50</span></td></tr><tr><td class="num">9</td><td><b>가정 후 모순</b><br><span style="color:var(--sub);font-size:11.3px">한쪽을 가정해 끝까지 밀어붙이고 모순이 나면 버린다.</span></td><td><span class="chip" style="background:#2451b8">03</span></td><td><span class="chip" style="background:#2451b8">25</span><span class="chip" style="background:#2451b8">27</span></td><td><span class="chip" style="background:#2451b8">49</span></td></tr><tr><td class="num">10</td><td><b>그래프로 모델링</b><br><span style="color:var(--sub);font-size:11.3px">관계와 상태를 정점과 간선으로 바꾸어 알려진 알고리즘을 쓴다.</span></td><td><span class="chip" style="background:#b8264a">17</span></td><td><span class="chip" style="background:#b8264a">41</span><span class="chip" style="background:#b8264a">44</span></td><td><span class="chip" style="background:#b8264a">66</span><span class="chip" style="background:#b8264a">68</span></td></tr><tr><td class="num">11</td><td><b>주기와 나머지</b><br><span style="color:var(--sub);font-size:11.3px">반복되는 구조를 찾아 큰 수와 긴 과정을 짧게 줄인다.</span></td><td><span style='color:var(--pale)'>—</span></td><td><span class="chip" style="background:#0e7a6f">29</span><span class="chip" style="background:#0e7a6f">32</span><span class="chip" style="background:#2e7d32">47</span></td><td><span class="chip" style="background:#0e7a6f">53</span><span class="chip" style="background:#0e7a6f">55</span></td></tr><tr><td class="num">12</td><td><b>한계 증명과 구성</b><br><span style="color:var(--sub);font-size:11.3px">더 좋아질 수 없음을 보이고, 그 값을 실제로 만든다.</span></td><td><span style='color:var(--pale)'>—</span></td><td><span class="chip" style="background:#b5570b">34</span><span class="chip" style="background:#2e7d32">46</span></td><td><span class="chip" style="background:#2451b8">51</span><span class="chip" style="background:#2e7d32">69</span><span class="chip" style="background:#2e7d32">72</span></td></tr>
+</table>
+<p class="note">숫자는 주제 번호, 색은 영역입니다. 전략 이름은 모든 교재의 “전략” 표시와 해설에서 같은 말로 씁니다. 학생이 새 문제를 보고 “이건 몇 번 전략”이라고 말할 수 있게 하는 것이 목표입니다.</p>
+
+<h2>수업에서 전략 트랙을 쓰는 방법</h2>
+<table>
+<tr><th style="width:22%">차시 시작</th><td>지난 주제에서 쓴 전략 이름을 먼저 묻는다. 답을 묻지 않고 “어떤 전략을 썼는가”를 묻는다.</td></tr>
+<tr><th>풀이 기록</th><td>워크북 문항마다 전략 번호를 적는 칸을 둔다. 한 문항에 두 전략이 섞이면 두 번호를 모두 적게 한다.</td></tr>
+<tr><th>단계 마무리</th><td>12개 전략별로 대표 문항을 하나씩 모아 “전략 요약 카드”를 학생이 직접 만든다.</td></tr>
+<tr><th>기출 풀이</th><td>2쪽의 2026 문항을 풀기 전에 전략 번호부터 예측하게 한 뒤, 풀이 후 예측이 맞았는지 비교한다.</td></tr>
+</table>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 사고 전략 트랙</span><span class="r">26 / 27</span></div>
+</div>
+<div class="page">
+<div class="head"><div><h1>운영 로드맵과 평가 체계</h1><div class="sub">학원 수업에 맞춘 진행 속도, 대회 시즌 조정, 단계별 평가</div></div><div class="meta">세영코딩연구소 / Ph.D KIM<br>27 / 27쪽</div></div>
+<h2>1. 운영 트랙</h2>
+<table>
+<tr><th>트랙</th><th class="c">수업</th><th class="c">한 단계</th><th class="c">전체 72주제</th><th>추천 대상</th></tr>
+<tr><td><b>정규</b></td><td class="num">주 1회 · 1주제</td><td class="num">24주 + 평가 2주</td><td class="num">약 78주 (1년 6개월)</td><td>중1 봄에 시작해 중2~중3 대회를 목표로 하는 학생</td></tr>
+<tr><td><b>집중</b></td><td class="num">주 2회 · 2주제</td><td class="num">12주 + 평가 1주</td><td class="num">약 39주 (9개월)</td><td>C·Python 기초를 마친 중1~중2, 다음 해 1차 대회 목표</td></tr>
+<tr><td><b>방학 특강</b></td><td class="num">주 4회 · 4주제</td><td class="num">6주 + 평가 1주</td><td class="num">단계별 운영</td><td>한 단계 선행 또는 이미 배운 단계의 복습</td></tr>
+</table>
+
+<h2>2. 권장 진행 순서 (정규 트랙, 주 단위)</h2>
+<table>
+<tr><th class="c" style="width:12%">구간</th><th style="width:44%">배치 원칙</th><th>주차별 주제</th></tr>
+<tr><td class="num">1~6주</td><td>표현·세기·추적의 기본 도구를 먼저 익힌다</td><td rowspan="6" style="vertical-align:middle">1단계 5쪽 · 2단계 12쪽 · 3단계 19쪽의 주차별 진행표</td></tr><tr><td class="num">7~12주</td><td>세기 위에 점화식·그래프 입문을 올린다</td></tr><tr style="background:var(--soft)"><td class="num">13주</td><td>단계 중간 평가 (10문항 · 40분)</td></tr><tr><td class="num">14~19주</td><td>앞 도구를 둘 이상 결합하는 주제</td></tr><tr><td class="num">20~25주</td><td>전략·통합 주제를 마지막에 둔다</td></tr><tr style="background:var(--soft)"><td class="num">26주</td><td>단계 마무리 평가 Set A (미달 시 보충 후 Set B)</td></tr>
+</table>
+<p class="note">모든 주제가 선수 주제보다 뒤에 오도록 짠 기본안이며 빌드 과정에서 자동 점검했습니다. 집중 트랙은 한 주에 두 칸씩 진행합니다.</p>
+
+<h2>3. 대회 시즌 조정 (2026년 일정 기준)</h2>
+<table>
+<tr><th style="width:18%">시기</th><th>조정</th></tr>
+<tr><td><b>1차 대회 4주 전</b></td><td>진행 중인 단계 수업과 함께 매주 <b>실전 모의 1교시</b>(20문항·80분·200점)를 한 번씩 치른다. 2026년 1차 대회는 5월 10일이었다.</td></tr>
+<tr><td><b>1차 대회 후 ~ 2차 대회</b></td><td>2교시·2차 대회는 실기 중심이므로 각 주제의 “코드로 확인” 과제를 문제 풀이 수준으로 확장한다. 2026년 2차 대회는 7월 18일이었다.</td></tr>
+<tr><td><b>2차 대회 후</b></td><td>다음 단계로 진입하거나, 1교시에서 약했던 영역의 주제를 골라 재수업한다.</td></tr>
+</table>
+
+<h2>4. 평가 체계</h2>
+<table>
+<tr><th>평가</th><th class="c">시점</th><th class="c">형식</th><th>목적</th></tr>
+<tr><td><b>주제 확인 테스트</b></td><td class="num">매 차시 끝</td><td class="num">5문항 · 10분 · 답만</td><td>목표 문장을 달성했는지 즉시 확인</td></tr>
+<tr><td><b>영역 서술 과제</b></td><td class="num">영역 4주제 후</td><td class="num">서술·증명 1문항</td><td>설명하고 증명하는 힘을 누적 기록</td></tr>
+<tr><td><b>단계 중간 평가</b></td><td class="num">12주제 후</td><td class="num">10문항 · 40분</td><td>전반부 점검과 보충 계획</td></tr>
+<tr><td><b>단계 마무리 평가</b></td><td class="num">24주제 후</td><td class="num">12문항 + 인터랙티브형 2 · 70분</td><td>Set A / B 두 벌. 70% 이상이면 다음 단계 진입을 권장</td></tr>
+<tr><td><b>실전 모의 1교시</b></td><td class="num">대회 4주 전부터</td><td class="num">20문항 · 80분 · 200점</td><td>배점 4~16점 구조와 시간 배분 연습</td></tr>
+</table>
+<div class="foot"><span>중등 정보올림피아드 이산수학 커리큘럼 설계서 · 운영과 평가</span><span class="r">27 / 27</span></div>
+</div>
+</body>
+</html>
