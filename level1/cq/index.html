@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이산수학 1단계 기본 주제 09~12 확인 평가 20문항</title><style>
+:root{--ink:#172033;--sub:#52607a;--pale:#8d99ad;--line:#d3dae6;--soft:#f3f5f9;--desk:#e3e7ee;
+  --ac:#b45309;--tint:#fdf3e7;--warn:#a3324f;--warnt:#fbeef2;--tip:#1d6f9c;--tipt:#e9f3f9}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:var(--desk);color:var(--ink);font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR','Malgun Gothic',sans-serif;
+  font-size:13.2px;line-height:1.72;padding:62px 12px 24px;word-break:keep-all}
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;background:var(--ink);color:#e6ebf3;display:flex;align-items:center;gap:14px;padding:9px 18px;font-size:13px}
+.bar button{margin-left:auto;background:#fff;color:var(--ink);border:0;border-radius:4px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.bar button:focus-visible{outline:3px solid #8fb3ff;outline-offset:2px}
+.bar .hint{font-size:12px;color:#a9b5c7}
+.page{width:210mm;height:297mm;margin:0 auto 14px;background:#fff;position:relative;padding:17mm 15mm 16mm;overflow:hidden;box-shadow:0 1px 3px rgba(23,32,51,.2)}
+.rh{position:absolute;top:7mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale);border-bottom:1px solid var(--line);padding-bottom:3px}
+.rh b{color:var(--ac);font-weight:700;margin-right:6px}
+.rh .r{margin-left:auto}
+.foot{position:absolute;bottom:6mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale)}
+.foot .r{margin-left:auto;font-variant-numeric:tabular-nums}
+.blk{margin-bottom:10px}
+h2.sec{font-size:16.5px;font-weight:800;margin:2px 0 8px;display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+h2.sec .mk{color:var(--ac);font-size:18px}
+h2.sec .sub{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--sub)}
+h3{font-size:14.2px;font-weight:800;margin:10px 0 5px;color:var(--ink)}
+h3::before{content:'';display:inline-block;width:7px;height:7px;background:var(--ac);margin-right:7px;vertical-align:2px}
+p{margin:4px 0}
+p.small{font-size:12px;color:var(--sub)}
+ul{margin:4px 0 4px 20px}
+li{margin:1px 0}
+code{font-family:'D2Coding','Consolas','DejaVu Sans Mono',monospace;font-size:12px;background:var(--soft);padding:0 3px;border-radius:2px}
+.mx{font-family:'Cambria Math','DejaVu Sans','Noto Sans CJK KR',sans-serif;white-space:nowrap}
+table{border-collapse:collapse;margin:6px 0;font-size:12.4px;line-height:1.55;width:100%}
+th,td{border:1px solid var(--line);padding:4px 7px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:700}
+table.tt{width:auto;margin:6px 0;font-family:'DejaVu Sans','Noto Sans CJK KR',sans-serif}
+table.tt th,table.tt td{text-align:center;padding:2px 12px;min-width:34px;vertical-align:middle}
+table.tt th.v{background:#e6ebf3}
+table.tt th.mk{background:var(--ac);color:#fff}
+table.tt td.t{color:var(--ac);font-weight:700;background:var(--tint)}
+table.tt td.f{color:#9aa4b5}
+table.tt td.mk{border-left:2px solid var(--ac);border-right:2px solid var(--ac)}
+table.tt td.t.mk{background:var(--ac);color:#fff}
+table.tt td.bl{background:#fff;min-width:54px}
+.box{border:1px solid var(--line);border-left:4px solid var(--ac);margin:7px 0;background:#fff}
+.box .bt{font-size:12px;font-weight:800;padding:3px 10px 0;color:var(--ac)}
+.box .bb{padding:1px 10px 6px}
+.box.def{background:var(--tint)}
+.box.prop{border-left-color:var(--ink)} .box.prop .bt{color:var(--ink)}
+.box.warn{border-left-color:var(--warn);background:var(--warnt)} .box.warn .bt{color:var(--warn)}
+.box.tip{border-left-color:var(--tip);background:var(--tipt)} .box.tip .bt{color:var(--tip)}
+.box.q{border-left-color:var(--ink);background:var(--soft)} .box.q .bt{color:var(--sub)}
+.ex{border:1px solid var(--ac);margin:6px 0}
+.exh{background:var(--ac);color:#fff;padding:3px 10px;font-weight:800;font-size:12.6px}
+.exq{padding:6px 10px;border-bottom:1px dashed var(--line);font-weight:600}
+.sol{padding:5px 10px 7px}
+.sol .sl{display:inline-block;font-size:11px;font-weight:800;color:var(--ac);border:1px solid var(--ac);border-radius:2px;padding:0 5px;margin-right:6px;line-height:17px}
+.pr{display:flex;gap:9px;margin:7px 0;padding-bottom:5px;border-bottom:1px dotted var(--line)}
+.pn{flex:none;min-width:26px;height:22px;padding:0 6px;border-radius:3px;background:var(--ink);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.pt{flex:1}
+.ans{border-bottom:1px solid #b9c3d3;margin-top:4px;position:relative}
+.ans.sp1{height:26px}.ans.sp2{height:56px}.ans.sp3{height:96px}.ans.sp4{height:140px}
+.lnlab{position:absolute;left:0;top:2px;font-size:11px;color:var(--pale);font-weight:700}
+.code{border:1px solid var(--line);margin:6px 0}
+.cht{font-size:12px;font-weight:800;padding:3px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.code .cols{display:grid;grid-template-columns:1fr 1fr}
+.code .cols>div+div{border-left:1px solid var(--line)}
+.code .cols.stack{grid-template-columns:1fr}.code .cols.stack>div+div{border-left:0;border-top:1px solid var(--line)}
+.cl{display:block;font-size:10.5px;font-weight:800;color:var(--ac);padding:3px 9px 0}
+pre{font-family:'D2Coding','Consolas','DejaVu Sans Mono','Noto Sans CJK KR',monospace;font-size:11.2px;line-height:1.45;padding:2px 9px 7px;white-space:pre-wrap;word-break:break-all}
+.out{border-top:1px solid var(--line);background:#fbfcfe}
+.out pre{columns:2;column-gap:20px}
+.out pre.wide{columns:1}
+.opener{display:flex;gap:18px;align-items:flex-end;padding:8px 0 12px;border-bottom:3px solid var(--ink);margin-bottom:10px}
+.onum{font-size:88px;line-height:.82;font-weight:900;color:var(--ac);letter-spacing:-4px;font-variant-numeric:tabular-nums}
+.oarea{font-size:12px;color:var(--sub);font-weight:700}
+.opener h1{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2}
+.goal{font-size:13.6px;margin-top:4px}
+.omet{font-size:11.5px;color:var(--sub);margin-top:2px}
+.flow{background:var(--soft);padding:8px 12px 9px;margin-bottom:12px}
+.flow .ft{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:2px}
+.flow ol{margin:0 0 0 20px;columns:2;column-gap:22px;font-size:12.4px}
+.flow li b{margin-right:6px}
+.tools{margin-top:5px;font-size:12px}
+.tools .tl{color:var(--sub);font-weight:700;margin-right:6px}
+.tool{display:inline-block;border:1px solid var(--ac);color:var(--ac);border-radius:10px;padding:0 8px;margin-right:5px;font-weight:700;font-size:11.5px}
+.o{color:#2451b8;font-weight:900}.x{color:#a3324f;font-weight:700}
+table.grid{width:auto}table.grid th,table.grid td{text-align:center;min-width:58px;padding:3px 10px}
+.kn{font-weight:800;padding:0 3px;border-radius:2px}.kn.k{color:#2451b8;background:#edf2fc}.kn.n{color:#a3324f;background:#fbeef2}
+table.wt{width:auto;font-size:11.8px}table.wt th,table.wt td{text-align:center;padding:2px 9px}
+table.wt.blank td{height:24px;min-width:64px}
+table.bits{width:auto;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace;margin:6px 0}
+table.bits caption{caption-side:top;text-align:left;font-family:'Noto Sans CJK KR',sans-serif;font-size:12px;font-weight:700;color:var(--sub);padding-bottom:2px}
+table.bits th{font-size:10px;color:var(--pale);background:#fff;text-align:center;padding:1px 6px;font-weight:600}
+table.bits td{text-align:center;padding:2px 8px;min-width:26px}
+table.bits td.lab{font-family:'Noto Sans CJK KR',sans-serif;font-weight:700;text-align:left;background:var(--soft);min-width:70px}
+table.bits td.one{color:var(--ac);font-weight:800;background:var(--tint)}
+table.bits td.zero{color:#9aa4b5}
+table.bits td.dec{font-weight:700;min-width:44px}
+table.bits tr.res td{border-top:2px solid var(--ink)}
+table.bits tr.res td.one{background:var(--ac);color:#fff}
+table.hexref{font-size:11px}table.hexref th,table.hexref td{text-align:center;padding:2px 3px;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace}
+.bitrow{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:flex-start}
+.bitrow table{margin:4px 0}
+table.dg td:first-child{background:var(--soft)}
+table.sieve{width:auto;margin:6px 0}
+table.sieve td{width:36px;height:24px;text-align:center;vertical-align:middle;padding:0;font-size:12px;font-variant-numeric:tabular-nums}
+table.sieve td.sp{background:var(--ac);color:#fff;font-weight:800}
+table.sieve td.sc{color:#8d99ad}
+table.sieve td.s1{color:#c3cad6}
+table.sieve td.f2{background:#f3f5f9}table.sieve td.f3{background:#fcf1e6}table.sieve td.f5{background:#f2edfc}table.sieve td.f7{background:#fcecf0}
+.legend{font-size:11.5px;color:var(--sub)}.legend i{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin:0 3px 0 10px;border:1px solid var(--line)}
+table.lat{width:auto;font-variant-numeric:tabular-nums}
+table.lat td{text-align:center;min-width:40px;height:28px;padding:0;font-weight:700}
+table.lat td.z{color:#c3cad6;font-weight:400}
+table.lat td.bk{background:#3a4352;color:#fff}
+table.lat td.hl{background:var(--ac);color:#fff}
+table.lat td.ax{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;min-width:22px}
+table.pas{width:auto;font-variant-numeric:tabular-nums;border-collapse:separate;border-spacing:2px}
+table.pas td{border:1px solid var(--line);text-align:center;min-width:34px;padding:2px 4px;font-weight:700}
+table.pas td.e{border:0;background:#fff;min-width:17px;padding:0}
+table.pas td.m1{background:var(--tint);color:var(--ac)}
+table.pas td.m2{background:var(--ac);color:#fff}
+table.pas td.lab{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;text-align:right;padding-right:4px}
+.capt{font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 1px}
+table.lat td.hl{background:var(--ac);color:#fff}
+h2.ah{font-size:16px;font-weight:800;border-bottom:2px solid var(--ac);color:var(--ac);padding-bottom:3px;margin:2px 0 6px}
+table.at td:first-child{white-space:nowrap;font-weight:700;text-align:center}
+table.at td:nth-child(2){font-weight:700;color:var(--ac)}
+table.at{font-size:12px}
+.asol{border:1px solid var(--line);padding:6px 10px;margin:6px 0}
+.cover{height:100%;display:flex;flex-direction:column}
+.cv-top{border-top:8px solid var(--ac);padding-top:14px}
+.cv-series{font-size:13px;color:var(--sub);font-weight:700}
+.cv-title{font-size:40px;font-weight:900;letter-spacing:-1.5px;line-height:1.2;margin-top:6px}
+.cv-sub{font-size:17px;color:var(--sub);font-weight:600;margin-top:4px}
+.toc{margin-top:22px;border-top:2px solid var(--ink)}
+.toc .row{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.toc .n{font-size:34px;font-weight:900;color:var(--ac);width:62px;line-height:1;font-variant-numeric:tabular-nums}
+.toc .t{font-size:17px;font-weight:800}
+.toc .g{font-size:12.2px;color:var(--sub)}
+.toc .pg{margin-left:auto;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.use{margin-top:16px}
+.cv-foot{margin-top:auto;display:flex;align-items:flex-end;border-top:1px solid var(--line);padding-top:8px;font-size:12px;color:var(--sub)}
+.cv-foot b{color:var(--ink);font-size:14px}
+@page{size:A4;margin:0}
+@media print{body{background:#fff;padding:0}.bar{display:none}.page{margin:0;box-shadow:none;break-after:page}.page:last-child{break-after:auto}}
+@media screen and (max-width:820px){
+  body{padding:56px 0 0}
+  .page{width:auto;height:auto;overflow:visible;padding:40px 14px 44px;margin:0 0 10px}
+  .rh,.foot{left:14px;right:14px}
+  .code .cols{grid-template-columns:1fr}.code .cols>div+div{border-left:0;border-top:1px solid var(--line)}
+  table{display:block;overflow-x:auto}.out pre,.flow ol{columns:1}
+  svg{max-width:100%;height:auto}
+  .onum{font-size:60px}.opener h1{font-size:24px}.bar .hint{display:none}
+}
+
+.q{border:1px solid var(--line);margin:0 0 10px;break-inside:avoid}
+.qh{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.qn{min-width:28px;height:24px;border-radius:3px;background:var(--ink);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.qk{font-size:12px;font-weight:700;color:var(--sub)}
+.qd{font-size:11.5px;font-weight:800;border-radius:9px;padding:0 8px;border:1px solid}
+.d-기본{color:#0e7a6f;border-color:#0e7a6f}.d-발전{color:#2451b8;border-color:#2451b8}.d-도전{color:#a3324f;border-color:#a3324f;background:#fbeef2}
+.qs{margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.qb{padding:7px 12px 4px;font-size:13.6px;line-height:1.8}
+.opts{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:4px}
+.opts.col{flex-direction:column;gap:0}
+table.mini{width:auto;margin:5px 0;font-size:12.4px}table.mini th,table.mini td{text-align:center;padding:2px 10px}
+.work{margin:0 12px;border:1px dashed #c9d2df;border-radius:3px;background:repeating-linear-gradient(#fff 0 25px,#eef1f6 25px 26px)}
+.work.w1{height:66px}.work.w2{height:104px}.work.w3{height:170px}.work.w4{height:270px}
+.aline{display:flex;justify-content:flex-end;padding:6px 12px 8px}
+.aline span{display:inline-block;width:52%;border-bottom:1.5px solid var(--ink);font-size:12px;font-weight:800;color:var(--sub);padding-left:2px}
+.band{display:flex;align-items:baseline;gap:10px;border-bottom:3px solid var(--ac);padding:2px 0 4px;margin:0 0 9px}
+.band .bn{font-size:22px;font-weight:900;color:var(--ac)}
+.band b{font-size:17px;font-weight:900}
+.band .br{margin-left:auto;font-size:12px;color:var(--sub);font-weight:700}
+.exam{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;border-top:8px solid var(--ac);padding-top:12px;margin-bottom:12px}
+.exam .t1{font-size:13px;color:var(--sub);font-weight:700}
+.exam .t2{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2;margin-top:4px}
+.exam .t3{font-size:15px;color:var(--sub);font-weight:600}
+.namebox{border:1.5px solid var(--ink);display:grid;grid-template-columns:auto 1fr;font-size:13px}
+.namebox div{padding:6px 10px;border-bottom:1px solid var(--line)}
+.namebox div:nth-child(odd){background:var(--soft);font-weight:700;border-right:1px solid var(--line)}
+.rules{font-size:12.4px;margin-bottom:10px}
+.a{border:1px solid var(--line);margin:0 0 9px;break-inside:avoid}
+.ahd{display:flex;align-items:center;gap:10px;padding:4px 10px;border-bottom:1px solid var(--line);background:var(--tint)}
+.an{min-width:28px;height:24px;border-radius:3px;background:var(--ac);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aa{font-weight:800;color:var(--ac);font-size:13.6px}
+.ab{padding:6px 12px 8px;font-size:12.8px;line-height:1.75}
+.trap{margin-top:5px;padding:3px 9px;border-left:3px solid var(--warn);background:var(--warnt);font-size:12.2px}
+.trap b{color:var(--warn);margin-right:4px}
+.rub{margin-top:5px;padding:3px 9px;border-left:3px solid var(--tip);background:var(--tipt);font-size:12.2px}
+.rub b{color:var(--tip);margin-right:4px}
+table.key{font-size:12.4px}table.key td,table.key th{text-align:center;vertical-align:middle}
+table.key td.n{font-weight:900;background:var(--soft);width:38px}
+table.key td.v{font-weight:700;color:var(--ac)}
+.part{font-size:11px;font-weight:800;color:#fff;background:var(--ink);padding:1px 7px;border-radius:2px;margin-right:6px}
+.part.ans{background:var(--ac)}
+@media print{body.only-q .pg-a{display:none}body.only-a .pg-q{display:none}}
+</style></head><body>
+<div class="bar"><b>주제 09~12 확인 평가 20문항</b><span class="hint">A4 · 여백 없음 · 배경 그래픽 켜기</span>
+<span style="margin-left:auto;display:flex;gap:6px"><button type="button" data-mode="only-q">문제지 인쇄</button><button type="button" data-mode="only-a">정답과 해설 인쇄</button><button type="button" data-mode="">전체 인쇄</button></span></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="exam"><div><div class="t1">중등 정보올림피아드 대비 이산수학 · 1단계 기본</div>
+<div class="t2">경우의 수와 확률 확인 평가</div><div class="t3">주제 09~12 · 20문항 · 100점 · 60분</div></div>
+<div class="namebox"><div>이름</div><div></div><div>반</div><div></div><div>날짜</div><div></div><div>점수</div><div style="text-align:right;font-weight:800">/ 100</div></div></div>
+<div class="rules"><table class=""><tr><th style="width:12%">구분</th><th style="width:32%">문항</th><th style="width:10%">배점</th><th>안내</th></tr><tr><td>기본</td><td>각 주제 1~3번째 (12문항)</td><td>4점</td><td>정답만 채점</td></tr><tr><td>발전</td><td>각 주제 4번째 (4문항)</td><td>6점</td><td>과정의 핵심이 맞으면 부분 점수</td></tr><tr><td>도전</td><td>각 주제 5번째 (4문항)</td><td>7점</td><td>풀이 과정과 이유를 채점 기준에 따라 부분 점수</td></tr></table>
+<p class="small">계산기는 쓰지 않습니다. 풀이 공간에 경우를 나눈 기준, 표, 수형도를 남기세요. 지우지 않은 풀이도 채점에 반영합니다.</p></div><div class="band"><span class="bn">주제 09</span><b>합의 법칙과 곱의 법칙</b><span class="br">1~5번</span></div><div class="q"><div class="qh"><span class="qn">1</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">서로 다른 주사위 두 개를 던질 때 두 눈의 합이 7 또는 11인 경우의 수를 구하시오.</div><div class="work w1" style="height:159px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">2</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">1부터 200까지의 자연수 중 3의 배수 또는 5의 배수는 몇 개인가?</div><div class="work w2" style="height:197px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 1 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">3</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">0, 1, 2, 3, 4에서 서로 다른 숫자를 골라 만든 <b>네 자리 수</b>는 몇 개인가?</div><div class="work w2" style="height:105px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">4</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">세 가지 색으로 네 칸을 칠한다. 이웃한 칸은 서로 다른 색이어야 한다.<br>(1) 네 칸이 <b>한 줄로</b> 늘어서 있을 때 칠하는 방법은 몇 가지인가?<br>(2) 네 칸이 <b>원형으로</b> 놓여 있을 때(1번과 4번도 이웃) 칠하는 방법은 몇 가지인가?</div><div class="work w3" style="height:171px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">5</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">1부터 1000까지의 자연수 중에서 숫자 <b>1이 적어도 한 번</b> 나오는 수는 몇 개인가? 여사건을 이용해 구하고, 왜 그렇게 세는 것이 더 쉬운지 함께 설명하시오.</div><div class="work w4" style="height:271px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 2 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 10</span><b>순열</b><span class="br">6~10번</span></div><div class="q"><div class="qh"><span class="qn">6</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">PROGRAM의 일곱 글자를 한 줄로 배열하는 방법은 몇 가지인가?</div><div class="work w1" style="height:74px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">7</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">7명 중 3명을 뽑아 회장, 부회장, 총무를 정하는 방법은 몇 가지인가?</div><div class="work w1" style="height:74px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">8</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">7명이 원탁에 둘러앉는 방법은 몇 가지인가?</div><div class="work w1" style="height:74px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">9</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">남학생 4명과 여학생 3명이 한 줄로 선다.<br>(1) 여학생 3명이 <b>모두 이웃</b>하는 방법은 몇 가지인가?<br>(2) 여학생끼리 <b>어느 두 명도 이웃하지 않는</b> 방법은 몇 가지인가?</div><div class="work w3" style="height:178px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 3 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">10</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">A, B, C, D, E를 한 줄로 배열한 것을 사전순으로 늘어놓는다.<br>(1) 70번째 배열을 구하시오.<br>(2) DBACE는 몇 번째 배열인가?<br>두 문제 모두 자리별로 몇 개씩 묶이는지 밝혀 과정을 쓰시오.</div><div class="work w4" style="height:750px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 4 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 11</span><b>조합과 파스칼 삼각형</b><span class="br">11~15번</span></div><div class="q"><div class="qh"><span class="qn">11</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">12C3과 12C10의 값을 각각 구하시오. (12C10은 대칭성을 이용하시오.)</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">12</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">정십이각형의 대각선은 모두 몇 개인가?</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">13</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">남학생 6명, 여학생 5명 중 4명을 뽑을 때 여학생이 <b>적어도 1명</b> 포함되는 경우의 수를 구하시오.</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 5 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">14</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">(1) 8명을 4명씩 두 조로 나누는 방법은 몇 가지인가? (조에 이름은 없다.)<br>(2) 9명을 3명씩 세 조로 나누는 방법은 몇 가지인가? (조에 이름은 없다.)<br>왜 나누어 주어야 하는지도 함께 쓰시오.</div><div class="work w3" style="height:258px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">15</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">파스칼 삼각형의 셋째 열에 나오는 수 1, 3, 6, 10, 15, 21, 28, 36을 모두 더하면 120이 된다. 곧<br><b>2C2 + 3C2 + 4C2 + … + 9C2 = 10C3</b><br>이 성립한다. 이 식이 왜 성립하는지 설명하시오. (힌트: 10명 중 3명을 뽑을 때, <b>뽑힌 번호 중 가장 큰 번호</b>가 무엇인지로 경우를 나누어 보시오.)</div><div class="work w4" style="height:358px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 6 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 12</span><b>격자 최단경로</b><span class="br">16~20번</span></div><div class="q"><div class="qh"><span class="qn">16</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">가로 6칸, 세로 3칸 격자의 왼쪽 아래에서 오른쪽 위로 가는 최단경로는 몇 가지인가?</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">17</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">가로 5칸, 세로 5칸 격자에서 점 (2, 3)을 <b>반드시 지나는</b> 최단경로는 몇 가지인가?</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">18</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">RRRUUU를 한 줄로 배열하는 방법의 수를 구하고, 그것이 어떤 격자의 최단경로 수와 같은지 쓰시오.</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 7 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 09~12 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">19</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">가로 4칸, 세로 4칸 격자에서 점 (1, 1)과 점 (3, 3)을 <b>모두 지나지 않는</b> 최단경로는 몇 가지인가? 덧셈 표를 그려서 구하시오.</div><div class="work w4" style="height:332px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">20</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">계단 12칸을 오른다. 한 번에 1칸, 2칸, 3칸 중 하나만큼 오를 수 있다.<br>(1) 오르는 방법은 몇 가지인가?<br>(2) 이 문제를 푸는 방법이 격자 최단경로 표의 “왼쪽 + 아래” 규칙과 어떻게 닮았는지 설명하시오.</div><div class="work w4" style="height:332px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 8 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="band"><span class="bn">정답</span><b>빠른 정답표</b><span class="br">기본 4점 · 발전 6점 · 도전 7점</span></div><table class="key"><tr><th colspan="2">주제 09 (1~5번)</th><th colspan="2">주제 10 (6~10번)</th><th colspan="2">주제 11 (11~15번)</th><th colspan="2">주제 12 (16~20번)</th></tr><tr><td class="n">1</td><td class="v">8가지</td><td class="n">6</td><td class="v">2520가지</td><td class="n">11</td><td class="v">220, 66</td><td class="n">16</td><td class="v">84가지</td></tr><tr><td class="n">2</td><td class="v">93개</td><td class="n">7</td><td class="v">210가지</td><td class="n">12</td><td class="v">54개</td><td class="n">17</td><td class="v">100가지</td></tr><tr><td class="n">3</td><td class="v">96개</td><td class="n">8</td><td class="v">720가지</td><td class="n">13</td><td class="v">315가지</td><td class="n">18</td><td class="v">20가지, 가로 3칸·세로 3칸</td></tr><tr><td class="n">4</td><td class="v">(1) 24가지 (2) 18가지</td><td class="n">9</td><td class="v">(1) 720가지 (2) 1440가지</td><td class="n">14</td><td class="v">(1) 35가지 (2) 280가지</td><td class="n">19</td><td class="v">14가지</td></tr><tr><td class="n">5</td><td class="v">272개</td><td class="n">10</td><td class="v">(1) CEBDA (2) 79번째</td><td class="n">15</td><td class="v">설명</td><td class="n">20</td><td class="v">(1) 927가지</td></tr></table>
+<p class="small">부분 점수는 각 해설의 채점 기준을 따릅니다. 모든 정답은 Python 전수 조사로 확인했습니다.</p></div><div class="blk"><div class="band"><span class="bn">주제 09</span><b>합의 법칙과 곱의 법칙</b><span class="br">1~5번</span></div><div class="a"><div class="ahd"><span class="an">1</span><span class="aa">정답 8가지</span></div><div class="ab">합이 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1)의 6가지. 합이 11: (5,6), (6,5)의 2가지. 두 경우는 동시에 일어날 수 없으므로 6 + 2 = 8가지.<div class="trap"><b>자주 하는 오답</b> 주사위가 서로 다르므로 (1,6)과 (6,1)은 다른 경우다. 이를 같은 것으로 보아 4가지로 세는 경우가 많다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">2</span><span class="aa">정답 93개</span></div><div class="ab">3의 배수 200 ÷ 3 = 66개, 5의 배수 200 ÷ 5 = 40개, 둘 다인 15의 배수 200 ÷ 15 = 13개. 66 + 40 − 13 = 93개.<div class="trap"><b>자주 하는 오답</b> 겹치는 15의 배수를 빼지 않아 106개로 답하는 경우. 두 조건이 <b>겹치면</b> 합의 법칙을 그대로 쓸 수 없다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">3</span><span class="aa">정답 96개</span></div><div class="ab">천의 자리에는 0이 올 수 없다.<table class="mini"><tr><th>자리</th><th>천</th><th>백</th><th>십</th><th>일</th></tr><tr><td>선택지</td><td>0을 뺀 4가지</td><td>남은 4가지</td><td>남은 3가지</td><td>남은 2가지</td></tr></table>4 × 4 × 3 × 2 = 96개. 백의 자리에 0을 쓸 수 있으므로 다시 4가지가 되는 점에 주의한다.<div class="trap"><b>자주 하는 오답</b> 천의 자리를 4가지로 잡은 뒤 백의 자리를 3가지로 세어 72개로 답하는 경우.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 1 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">4</span><span class="aa">정답 (1) 24가지　(2) 18가지</span></div><div class="ab">(1) 맨 왼쪽 칸은 3가지, 그다음부터는 바로 왼쪽과 달라야 하므로 각각 2가지. 3 × 2 × 2 × 2 = <b>24가지</b>.<br>(2) 원형에서는 1번과 4번도 달라야 한다. <b>1번과 3번이 같은 색인지</b>로 나눈다.<table class="mini"><tr><th>경우</th><th>1번</th><th>3번</th><th>2번</th><th>4번</th><th>가짓수</th></tr><tr><td>1번과 3번이 같은 색</td><td>3가지</td><td>1번과 같음</td><td>1번과 달라야 함 → 2가지</td><td>1번과 달라야 함 → 2가지</td><td>3 × 2 × 2 = 12</td></tr><tr><td>1번과 3번이 다른 색</td><td>3가지</td><td>2가지</td><td>둘 다와 달라야 함 → 1가지</td><td>둘 다와 달라야 함 → 1가지</td><td>3 × 2 × 1 × 1 = 6</td></tr></table>두 경우는 겹치지 않으므로 12 + 6 = <b>18가지</b>.<div class="trap"><b>자주 하는 오답</b> (2)를 3 × 2 × 2 × 2에서 “4번이 1번과 같은 경우”만 빼려다 틀리는 경우. 4번은 3번과도 달라야 해서 단순히 빼면 맞지 않는다. 1번과 3번의 관계로 <b>경우를 나누는 것</b>이 정석이다.</div><div class="rub"><b>채점 기준</b> (1) 3점. (2) 경우를 나눈 기준 2점, 두 경우의 계산과 합 1점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">5</span><span class="aa">정답 272개</span></div><div class="ab"><b>여사건으로 세기</b> “1이 적어도 한 번 나온다”의 반대는 “<b>1이 한 번도 나오지 않는다</b>”이다.<br>1부터 1000까지의 수를 000부터 999까지의 세 자리 문자열로 보고(앞에 0을 채움) 마지막에 1000을 따로 생각한다. 각 자리에 1을 뺀 0, 2, 3, 4, 5, 6, 7, 8, 9의 9가지를 쓸 수 있으므로 9 × 9 × 9 = 729가지이고, 여기에는 000(= 0)이 들어 있으므로 1~999 중 1이 없는 수는 728개다. 1000에는 1이 있으므로 1이 없는 수는 모두 <b>728개</b>.<br>따라서 1이 적어도 한 번 나오는 수는 1000 − 728 = <b>272개</b>이다.<br><b>왜 여사건이 쉬운가</b> 직접 세면 “1이 한 번”, “두 번”, “세 번” 나오는 경우로 나누고 자리까지 따져야 해서 계산이 길고 겹침을 살피기 어렵다. 반면 “1이 하나도 없다”는 <b>모든 자리가 똑같은 조건</b>을 만족하면 되므로 곱의 법칙 한 번으로 끝난다.<div class="trap"><b>자주 하는 오답</b> 1~999를 세 자리로 보지 않고 한 자리, 두 자리, 세 자리로 나누어 세다가 빠뜨리는 경우. 앞에 0을 채워 <b>모두 세 자리로 맞추면</b> 한 번에 계산된다. 또 1000을 빠뜨리거나, 000을 빼지 않아 729개로 답하는 경우.</div><div class="rub"><b>채점 기준</b> 여사건으로 바꾼 것 2점, 각 자리 9가지로 곱한 계산 2점, 000과 1000 처리 1점, 여사건이 쉬운 이유 2점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 10</span><b>순열</b><span class="br">6~10번</span></div><div class="a"><div class="ahd"><span class="an">6</span><span class="aa">정답 2520가지</span></div><div class="ab">P, R, O, G, R, A, M에서 R이 2개, 나머지는 1개씩이다. 7! ÷ 2! = 5040 ÷ 2 = 2520.<div class="trap"><b>자주 하는 오답</b> 같은 글자 R이 두 개인 것을 놓쳐 5040으로 답하는 경우. 글자를 하나씩 세어 보는 습관을 들인다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">7</span><span class="aa">정답 210가지</span></div><div class="ab">자리가 구별되므로 순열이다. 7P3 = 7 × 6 × 5 = 210.<div class="trap"><b>자주 하는 오답</b> 조합으로 보아 7C3 = 35로 답하는 경우. 회장·부회장·총무는 <b>서로 다른 자리</b>이므로 순서가 있다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 2 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">8</span><span class="aa">정답 720가지</span></div><div class="ab">원순열이므로 (7 − 1)! = 6! = 720. 회전해서 겹치는 7가지를 같은 배치로 보므로 7! ÷ 7 = 6!이다.<div class="trap"><b>자주 하는 오답</b> 7! = 5040으로 답하는 경우.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">9</span><span class="aa">정답 (1) 720가지　(2) 1440가지</span></div><div class="ab">(1) 여학생 3명을 한 덩어리로 묶으면 덩어리 1개와 남학생 4명, 모두 5개를 배열하므로 5! = 120가지. 덩어리 안에서 여학생의 순서가 3! = 6가지이므로 120 × 6 = <b>720가지</b>.<br>(2) 남학생 4명을 먼저 배열하면 4! = 24가지이고, 다음처럼 빈자리가 5개 생긴다.<div class="capt" style="font-family:monospace;font-size:14px">_ 남 _ 남 _ 남 _ 남 _ &nbsp;&nbsp;← 빈자리 5개</div>이 중 서로 다른 3곳에 여학생을 순서 있게 넣으면 5 × 4 × 3 = 60가지. 24 × 60 = <b>1440가지</b>.<div class="trap"><b>자주 하는 오답</b> (2)를 전체 7! = 5040에서 (1)의 720을 빼 4320으로 답하는 경우. (1)의 반대는 “셋 다 이웃하지는 않음”이지 “어느 둘도 이웃하지 않음”이 아니다. 두 명만 이웃하는 경우가 남아 있으므로 <b>사이에 넣기</b>로 직접 세야 한다.</div><div class="rub"><b>채점 기준</b> (1) 묶고 안에서 배열 3점. (2) 사이에 넣기로 세면 3점(빈자리가 5개임을 밝혀야 함).</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">10</span><span class="aa">정답 (1) CEBDA　(2) 79번째</span></div><div class="ab">전체는 5! = 120가지다. 첫 자리가 정해지면 나머지 4자리는 4! = 24가지씩이므로 24개씩 묶인다.<table class="mini"><tr><th>첫 자리</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr><tr><td>순서</td><td>1~24</td><td>25~48</td><td>49~72</td><td>73~96</td><td>97~120</td></tr></table><b>(1)</b> 70은 49~72에 들어가므로 첫 자리는 <b>C</b>이고, 그 안에서 70 − 48 = 22번째다. 남은 A, B, D, E에 대해 둘째 자리마다 3! = 6개씩이므로 1~6은 A, 7~12는 B, 13~18은 D, 19~24는 E. 22번째이므로 둘째 자리는 <b>E</b>이고 그 안에서 22 − 18 = 4번째. 남은 A, B, D에 대해 셋째 자리마다 2! = 2개씩이므로 1~2는 A, 3~4는 B. 4번째이므로 셋째 자리는 <b>B</b>이고 그 안에서 2번째. 남은 A, D의 배열은 AD, DA이므로 2번째는 DA. 따라서 <b>CEBDA</b>.<br><b>(2)</b> 거꾸로 센다. 첫 자리 D 앞에는 A, B, C로 시작하는 3 × 24 = 72개가 있다. 둘째 자리 B 앞에는(남은 A, B, C, E 중 B보다 작은 A) 1 × 6 = 6개. 셋째 자리 A 앞에는(남은 A, C, E 중 A보다 작은 것 없음) 0개. 넷째 자리 C 앞에는(남은 C, E 중 C보다 작은 것 없음) 0개. 72 + 6 + 0 + 0 = 78개가 앞에 있으므로 DBACE는 <b>79번째</b>이다.<div class="trap"><b>자주 하는 오답</b> (2)에서 “앞에 있는 개수”와 “몇 번째”를 헷갈려 78번째로 답하는 경우. 앞에 78개가 있으면 자기 자신은 79번째다. 또 이미 쓴 글자를 빼지 않고 세는 경우.</div><div class="rub"><b>채점 기준</b> (1) 자리마다 묶음 크기(24, 6, 2)를 밝히고 차례로 좁힘 4점. (2) 앞선 개수를 자리별로 더하고 1을 더함 3점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 11</span><b>조합과 파스칼 삼각형</b><span class="br">11~15번</span></div><div class="a"><div class="ahd"><span class="an">11</span><span class="aa">정답 220, 66</span></div><div class="ab">12C3 = (12 × 11 × 10) ÷ (3 × 2 × 1) = 1320 ÷ 6 = 220.<br>12C10 = 12C2 = (12 × 11) ÷ 2 = 66. 10개를 고르는 것은 <b>남길 2개를 고르는 것</b>과 같다.<div class="trap"><b>자주 하는 오답</b> 12C10을 12P10처럼 길게 계산하다 실수하는 경우. nCr = nC(n − r)를 쓰면 계산이 짧아진다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 3 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">12</span><span class="aa">정답 54개</span></div><div class="ab">두 꼭짓점을 잇는 선분은 12C2 = (12 × 11) ÷ 2 = 66개이고, 그중 12개는 변이다. 66 − 12 = 54개.<div class="trap"><b>자주 하는 오답</b> 변을 빼지 않아 66개로 답하는 경우.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">13</span><span class="aa">정답 315가지</span></div><div class="ab">전체 11명 중 4명: 11C4 = (11 × 10 × 9 × 8) ÷ 24 = 330. 여학생이 한 명도 없는 경우(남 6명 중 4명): 6C4 = 6C2 = 15. 330 − 15 = <b>315</b>.<div class="trap"><b>자주 하는 오답</b> 여학생 수 1, 2, 3, 4명으로 나누어 더하다 계산 실수하는 경우. 검산: 5 × 20 + 10 × 20 + 10 × 6 + 5 × 1 = 100 + 200 + 60 + 5 = 315로 같다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">14</span><span class="aa">정답 (1) 35가지　(2) 280가지</span></div><div class="ab">(1) 차례로 고르면 8C4 × 4C4 = 70 × 1 = 70가지인데, 두 조에 이름이 없으므로 <b>두 조의 순서를 바꾼 2! = 2가지</b>가 같은 나눔이다. 70 ÷ 2 = <b>35가지</b>.<br>(2) 9C3 × 6C3 × 3C3 = 84 × 20 × 1 = 1680이고, 세 조의 순서 3! = 6으로 나누어 1680 ÷ 6 = <b>280가지</b>.<br><b>나누는 이유</b> 조를 차례로 고르는 계산은 “첫 번째 조, 두 번째 조, …”처럼 조에 순서를 붙여 센 것이다. 실제로는 조에 이름이 없으므로 같은 나눔을 조의 순서를 바꾼 횟수만큼 <b>여러 번 세었다</b>. 조의 크기가 모두 같을 때만 이렇게 나눈다. 크기가 다르면 조가 크기로 구별되므로 나누지 않는다.<div class="trap"><b>자주 하는 오답</b> (1)을 70가지, (2)를 1680가지로 답하는 경우. “조에 이름이 없다”가 나오면 같은 크기의 조 개수의 계승으로 나눈다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 2점, 나누는 이유를 “같은 나눔을 여러 번 세었다”로 설명 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 4 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">15</span><span class="aa">정답 설명</span></div><div class="ab">1번부터 10번까지 번호가 붙은 10명 중 3명을 뽑는 방법의 수는 10C3이다. 이것을 <b>뽑힌 세 명 중 가장 큰 번호가 몇 번인지</b>로 나누어 센다.<table class="mini"><tr><th>가장 큰 번호</th><th>남은 2명을 고르는 범위</th><th>가짓수</th></tr><tr><td>3번</td><td>1~2번에서 2명</td><td>2C2 = 1</td></tr><tr><td>4번</td><td>1~3번에서 2명</td><td>3C2 = 3</td></tr><tr><td>5번</td><td>1~4번에서 2명</td><td>4C2 = 6</td></tr><tr><td>…</td><td>…</td><td>…</td></tr><tr><td>10번</td><td>1~9번에서 2명</td><td>9C2 = 36</td></tr></table><b>겹치지 않는 이유</b> 뽑은 세 명의 모임 하나를 보면 그중 가장 큰 번호는 하나로 정해지므로, 어떤 모임도 두 무리에 동시에 들어가지 않는다.<br><b>빠짐이 없는 이유</b> 세 명을 뽑으면 가장 큰 번호는 반드시 3번 이상 10번 이하이므로, 모든 모임이 어느 한 무리에 들어간다.<br>따라서 합의 법칙에 의해 10C3 = 2C2 + 3C2 + … + 9C2이고, 값을 계산하면 1 + 3 + 6 + 10 + 15 + 21 + 28 + 36 = 120 = 10C3이다.<br><b>다른 설명 (파스칼 점화식)</b> 10C3 = 9C2 + 9C3, 9C3 = 8C2 + 8C3, …을 계속 펼치면 마지막에 3C3 = 2C2 = 1이 되어 같은 식이 나온다.<div class="trap"><b>자주 하는 오답</b> 1 + 3 + 6 + … + 36 = 120을 직접 더해 보이고 끝내는 경우. 계산이 맞는 것과 <b>왜 그런지</b>는 다르다. 경우를 나누는 기준을 밝혀야 한다.</div><div class="rub"><b>채점 기준</b> 가장 큰 번호로 경우를 나눈 아이디어 3점, 각 경우의 가짓수를 kC2로 바르게 쓴 것 2점, 겹치지 않음과 빠짐없음 2점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 12</span><b>격자 최단경로</b><span class="br">16~20번</span></div><div class="a"><div class="ahd"><span class="an">16</span><span class="aa">정답 84가지</span></div><div class="ab">오른쪽 6번, 위쪽 3번을 늘어놓으므로 9C3 = (9 × 8 × 7) ÷ 6 = 84. 9C6으로 계산해도 같다.<div class="trap"><b>자주 하는 오답</b> 6C3이나 9C4처럼 숫자를 잘못 넣는 경우. 전체 이동 횟수는 6 + 3 = 9번이다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">17</span><span class="aa">정답 100가지</span></div><div class="ab">(0,0) → (2,3): 가로 2칸, 세로 3칸이므로 5C2 = 10가지. (2,3) → (5,5): 가로 3칸, 세로 2칸이므로 5C2 = 10가지. 앞 구간과 뒤 구간을 따로 고를 수 있으므로 곱의 법칙으로 10 × 10 = <b>100가지</b>.<div class="trap"><b>자주 하는 오답</b> 두 구간의 경로 수를 더해 20으로 답하는 경우. “반드시 지난다”는 두 구간을 <b>이어 붙이는</b> 것이므로 곱한다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">18</span><span class="aa">정답 20가지, 가로 3칸·세로 3칸 격자</span></div><div class="ab">6자리 중 R이 들어갈 3자리를 고르면 되므로 6C3 = 20가지. 같은 것이 있는 순열로 보면 6! ÷ (3! × 3!) = 20으로 같다. R 3번, U 3번은 오른쪽으로 3칸, 위쪽으로 3칸 가는 것이므로 <b>가로 3칸·세로 3칸 격자</b>의 최단경로 수와 같다.<div class="trap"><b>자주 하는 오답</b> 격자 크기를 “가로 4칸·세로 4칸”처럼 교차점 수로 답하는 경우. R의 개수가 <b>칸 수</b>다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 5 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 09~12 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">19</span><span class="aa">정답 14가지</span></div><div class="ab">(1, 1)과 (3, 3)에 0을 적고 나머지는 왼쪽 + 아래로 채운다.<table class="lat"><tr><td class="ax">4</td><td class="">1</td><td class="">3</td><td class="">7</td><td class="">7</td><td class="">14</td></tr><tr><td class="ax">3</td><td class="">1</td><td class="">2</td><td class="">4</td><td class="bk">×</td><td class="">7</td></tr><tr><td class="ax">2</td><td class="">1</td><td class="">1</td><td class="">2</td><td class="">4</td><td class="">7</td></tr><tr><td class="ax">1</td><td class="">1</td><td class="bk">×</td><td class="">1</td><td class="">2</td><td class="">3</td></tr><tr><td class="ax">0</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td></tr><tr><td class="ax"></td><td class="ax">0</td><td class="ax">1</td><td class="ax">2</td><td class="ax">3</td><td class="ax">4</td></tr></table>도착점의 값은 <b>14가지</b>이다.<br><b>참고</b> 전체는 8C4 = 70가지다. 조합으로 풀려면 (1,1)을 지나는 경우, (3,3)을 지나는 경우, 두 점을 모두 지나는 경우를 따로 세어 세 가지를 따로 세어 겹침을 조정해야 하므로 번거롭다. 막힌 곳이 둘 이상이면 <b>표가 확실하다</b>.<div class="trap"><b>자주 하는 오답</b> 막힌 칸에 0을 적은 뒤 그 위나 오른쪽 칸을 다시 계산하지 않는 경우. 0을 적은 뒤에도 나머지 칸은 규칙대로 계속 더해야 한다. 또 가로 4칸·세로 4칸을 5 × 5 점이 아니라 4 × 4 점으로 그리는 경우.</div><div class="rub"><b>채점 기준</b> 표를 바르게 그림 2점, 막힌 두 칸을 0으로 둠 2점, 나머지 칸을 규칙대로 채워 정답 2점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">20</span><span class="aa">정답 (1) 927가지</span></div><div class="ab">(1) n칸을 오르는 방법의 수를 aₙ이라 하자. <b>마지막에 몇 칸을 올랐는지</b>로 나누면 1칸, 2칸, 3칸의 세 경우이고, 이 셋은 겹치지 않고 빠짐도 없다. 따라서 aₙ = aₙ₋₁ + aₙ₋₂ + aₙ₋₃이다. a₁ = 1, a₂ = 2, a₃ = 4에서 시작해 차례로 구한다.<table class="mini"><tr><th>n</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr><tr><td>aₙ</td><td>1</td><td>2</td><td>4</td><td>7</td><td>13</td><td>24</td><td>44</td><td>81</td><td>149</td><td>274</td><td>504</td><td><b>927</b></td></tr></table><b>(2)</b> 격자 표에서 점 P까지의 경로 수를 구할 때, P에 도착하기 <b>바로 직전</b>에 어디에 있었는지로 경우를 나누었다. 직전 위치는 왼쪽 점이나 아래 점뿐이고 두 경우가 겹치지 않으므로 두 값을 더했다.<br>계단도 똑같다. 12칸에 도착하기 <b>바로 직전</b>에 서 있던 칸은 11칸, 10칸, 9칸 중 하나뿐이고 서로 겹치지 않으므로 세 값을 더한다. 두 문제 모두 <b>“직전 위치로 경우를 나누고, 이미 구해 둔 답을 더한다”</b>는 같은 구조이며, 격자는 직전 위치가 2곳, 계단은 3곳이라는 점만 다르다. 앞의 답을 저장해 두고 쓰는 이 방법이 2단계에서 배울 DP다.<div class="trap"><b>자주 하는 오답</b> (1)에서 a₃을 3으로 잡는 경우. 3칸은 1+1+1, 1+2, 2+1, 3의 <b>4가지</b>다. 또 a₀ = 1로 두고 시작해도 되지만 그 뜻(아무것도 하지 않는 한 가지)을 밝혀야 한다.</div><div class="rub"><b>채점 기준</b> (1) 점화식을 세운 것 2점, 표를 끝까지 채워 927 2점. (2) 직전 위치로 경우를 나눈다는 공통점 2점, 겹치지 않음을 언급 1점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 6 / 6</span></div></div>
+<script>
+document.querySelectorAll('.bar button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.body.classList.remove('only-q','only-a');
+    if(b.dataset.mode) document.body.classList.add(b.dataset.mode);
+    window.print();
+  });
+});
+window.addEventListener('afterprint',function(){document.body.classList.remove('only-q','only-a');});
+</script></body></html>
