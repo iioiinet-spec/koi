@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이산수학 1단계 기본 주제 17~20 확인 평가 20문항</title><style>
+:root{--ink:#172033;--sub:#52607a;--pale:#8d99ad;--line:#d3dae6;--soft:#f3f5f9;--desk:#e3e7ee;
+  --ac:#b02a5b;--tint:#fcecf2;--warn:#a33a1f;--warnt:#fdefe9;--tip:#1d5fa8;--tipt:#eaf1fa}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:var(--desk);color:var(--ink);font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR','Malgun Gothic',sans-serif;
+  font-size:13.2px;line-height:1.72;padding:62px 12px 24px;word-break:keep-all}
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;background:var(--ink);color:#e6ebf3;display:flex;align-items:center;gap:14px;padding:9px 18px;font-size:13px}
+.bar button{margin-left:auto;background:#fff;color:var(--ink);border:0;border-radius:4px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.bar button:focus-visible{outline:3px solid #8fb3ff;outline-offset:2px}
+.bar .hint{font-size:12px;color:#a9b5c7}
+.page{width:210mm;height:297mm;margin:0 auto 14px;background:#fff;position:relative;padding:17mm 15mm 16mm;overflow:hidden;box-shadow:0 1px 3px rgba(23,32,51,.2)}
+.rh{position:absolute;top:7mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale);border-bottom:1px solid var(--line);padding-bottom:3px}
+.rh b{color:var(--ac);font-weight:700;margin-right:6px}
+.rh .r{margin-left:auto}
+.foot{position:absolute;bottom:6mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale)}
+.foot .r{margin-left:auto;font-variant-numeric:tabular-nums}
+.blk{margin-bottom:10px}
+h2.sec{font-size:16.5px;font-weight:800;margin:2px 0 8px;display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+h2.sec .mk{color:var(--ac);font-size:18px}
+h2.sec .sub{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--sub)}
+h3{font-size:14.2px;font-weight:800;margin:10px 0 5px;color:var(--ink)}
+h3::before{content:'';display:inline-block;width:7px;height:7px;background:var(--ac);margin-right:7px;vertical-align:2px}
+p{margin:4px 0}
+p.small{font-size:12px;color:var(--sub)}
+ul{margin:4px 0 4px 20px}
+li{margin:1px 0}
+code{font-family:'D2Coding','Consolas','DejaVu Sans Mono',monospace;font-size:12px;background:var(--soft);padding:0 3px;border-radius:2px}
+.mx{font-family:'Cambria Math','DejaVu Sans','Noto Sans CJK KR',sans-serif;white-space:nowrap}
+table{border-collapse:collapse;margin:6px 0;font-size:12.4px;line-height:1.55;width:100%}
+th,td{border:1px solid var(--line);padding:4px 7px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:700}
+table.tt{width:auto;margin:6px 0;font-family:'DejaVu Sans','Noto Sans CJK KR',sans-serif}
+table.tt th,table.tt td{text-align:center;padding:2px 12px;min-width:34px;vertical-align:middle}
+table.tt th.v{background:#e6ebf3}
+table.tt th.mk{background:var(--ac);color:#fff}
+table.tt td.t{color:var(--ac);font-weight:700;background:var(--tint)}
+table.tt td.f{color:#9aa4b5}
+table.tt td.mk{border-left:2px solid var(--ac);border-right:2px solid var(--ac)}
+table.tt td.t.mk{background:var(--ac);color:#fff}
+table.tt td.bl{background:#fff;min-width:54px}
+.box{border:1px solid var(--line);border-left:4px solid var(--ac);margin:7px 0;background:#fff}
+.box .bt{font-size:12px;font-weight:800;padding:3px 10px 0;color:var(--ac)}
+.box .bb{padding:1px 10px 6px}
+.box.def{background:var(--tint)}
+.box.prop{border-left-color:var(--ink)} .box.prop .bt{color:var(--ink)}
+.box.warn{border-left-color:var(--warn);background:var(--warnt)} .box.warn .bt{color:var(--warn)}
+.box.tip{border-left-color:var(--tip);background:var(--tipt)} .box.tip .bt{color:var(--tip)}
+.box.q{border-left-color:var(--ink);background:var(--soft)} .box.q .bt{color:var(--sub)}
+.ex{border:1px solid var(--ac);margin:6px 0}
+.exh{background:var(--ac);color:#fff;padding:3px 10px;font-weight:800;font-size:12.6px}
+.exq{padding:6px 10px;border-bottom:1px dashed var(--line);font-weight:600}
+.sol{padding:5px 10px 7px}
+.sol .sl{display:inline-block;font-size:11px;font-weight:800;color:var(--ac);border:1px solid var(--ac);border-radius:2px;padding:0 5px;margin-right:6px;line-height:17px}
+.pr{display:flex;gap:9px;margin:7px 0;padding-bottom:5px;border-bottom:1px dotted var(--line)}
+.pn{flex:none;min-width:26px;height:22px;padding:0 6px;border-radius:3px;background:var(--ink);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.pt{flex:1}
+.ans{border-bottom:1px solid #b9c3d3;margin-top:4px;position:relative}
+.ans.sp1{height:26px}.ans.sp2{height:56px}.ans.sp3{height:96px}.ans.sp4{height:140px}
+.lnlab{position:absolute;left:0;top:2px;font-size:11px;color:var(--pale);font-weight:700}
+.code{border:1px solid var(--line);margin:6px 0}
+.cht{font-size:12px;font-weight:800;padding:3px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.code .cols{display:grid;grid-template-columns:1fr 1fr}
+.code .cols>div+div{border-left:1px solid var(--line)}
+.code .cols.stack{grid-template-columns:1fr}.code .cols.stack>div+div{border-left:0;border-top:1px solid var(--line)}
+.cl{display:block;font-size:10.5px;font-weight:800;color:var(--ac);padding:3px 9px 0}
+pre{font-family:'D2Coding','Consolas','DejaVu Sans Mono','Noto Sans CJK KR',monospace;font-size:11.2px;line-height:1.45;padding:2px 9px 7px;white-space:pre-wrap;word-break:break-all}
+.out{border-top:1px solid var(--line);background:#fbfcfe}
+.out pre{columns:2;column-gap:20px}
+.out pre.wide{columns:1}
+.opener{display:flex;gap:18px;align-items:flex-end;padding:8px 0 12px;border-bottom:3px solid var(--ink);margin-bottom:10px}
+.onum{font-size:88px;line-height:.82;font-weight:900;color:var(--ac);letter-spacing:-4px;font-variant-numeric:tabular-nums}
+.oarea{font-size:12px;color:var(--sub);font-weight:700}
+.opener h1{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2}
+.goal{font-size:13.6px;margin-top:4px}
+.omet{font-size:11.5px;color:var(--sub);margin-top:2px}
+.flow{background:var(--soft);padding:8px 12px 9px;margin-bottom:12px}
+.flow .ft{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:2px}
+.flow ol{margin:0 0 0 20px;columns:2;column-gap:22px;font-size:12.4px}
+.flow li b{margin-right:6px}
+.tools{margin-top:5px;font-size:12px}
+.tools .tl{color:var(--sub);font-weight:700;margin-right:6px}
+.tool{display:inline-block;border:1px solid var(--ac);color:var(--ac);border-radius:10px;padding:0 8px;margin-right:5px;font-weight:700;font-size:11.5px}
+.o{color:#2451b8;font-weight:900}.x{color:#a3324f;font-weight:700}
+table.grid{width:auto}table.grid th,table.grid td{text-align:center;min-width:58px;padding:3px 10px}
+.kn{font-weight:800;padding:0 3px;border-radius:2px}.kn.k{color:#2451b8;background:#edf2fc}.kn.n{color:#a3324f;background:#fbeef2}
+table.wt{width:auto;font-size:11.8px}table.wt th,table.wt td{text-align:center;padding:2px 9px}
+table.wt.blank td{height:24px;min-width:64px}
+table.bits{width:auto;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace;margin:6px 0}
+table.bits caption{caption-side:top;text-align:left;font-family:'Noto Sans CJK KR',sans-serif;font-size:12px;font-weight:700;color:var(--sub);padding-bottom:2px}
+table.bits th{font-size:10px;color:var(--pale);background:#fff;text-align:center;padding:1px 6px;font-weight:600}
+table.bits td{text-align:center;padding:2px 8px;min-width:26px}
+table.bits td.lab{font-family:'Noto Sans CJK KR',sans-serif;font-weight:700;text-align:left;background:var(--soft);min-width:70px}
+table.bits td.one{color:var(--ac);font-weight:800;background:var(--tint)}
+table.bits td.zero{color:#9aa4b5}
+table.bits td.dec{font-weight:700;min-width:44px}
+table.bits tr.res td{border-top:2px solid var(--ink)}
+table.bits tr.res td.one{background:var(--ac);color:#fff}
+table.hexref{font-size:11px}table.hexref th,table.hexref td{text-align:center;padding:2px 3px;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace}
+.bitrow{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:flex-start}
+.bitrow table{margin:4px 0}
+table.dg td:first-child{background:var(--soft)}
+table.sieve{width:auto;margin:6px 0}
+table.sieve td{width:36px;height:24px;text-align:center;vertical-align:middle;padding:0;font-size:12px;font-variant-numeric:tabular-nums}
+table.sieve td.sp{background:var(--ac);color:#fff;font-weight:800}
+table.sieve td.sc{color:#8d99ad}
+table.sieve td.s1{color:#c3cad6}
+table.sieve td.f2{background:#f3f5f9}table.sieve td.f3{background:#fcf1e6}table.sieve td.f5{background:#f2edfc}table.sieve td.f7{background:#fcecf0}
+.legend{font-size:11.5px;color:var(--sub)}.legend i{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin:0 3px 0 10px;border:1px solid var(--line)}
+table.lat{width:auto;font-variant-numeric:tabular-nums}
+table.lat td{text-align:center;min-width:40px;height:28px;padding:0;font-weight:700}
+table.lat td.z{color:#c3cad6;font-weight:400}
+table.lat td.bk{background:#3a4352;color:#fff}
+table.lat td.hl{background:var(--ac);color:#fff}
+table.lat td.ax{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;min-width:22px}
+table.pas{width:auto;font-variant-numeric:tabular-nums;border-collapse:separate;border-spacing:2px}
+table.pas td{border:1px solid var(--line);text-align:center;min-width:34px;padding:2px 4px;font-weight:700}
+table.pas td.e{border:0;background:#fff;min-width:17px;padding:0}
+table.pas td.m1{background:var(--tint);color:var(--ac)}
+table.pas td.m2{background:var(--ac);color:#fff}
+table.pas td.lab{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;text-align:right;padding-right:4px}
+.capt{font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 1px}
+table.lat td.hl{background:var(--ac);color:#fff}
+table.seq{width:auto;font-variant-numeric:tabular-nums}
+table.seq th,table.seq td{text-align:center;padding:3px 10px;min-width:40px}
+table.seq td.lab,table.seq th.lab{text-align:left;background:var(--soft);font-weight:700;min-width:78px}
+table.seq td.d{color:var(--ac);font-weight:700;background:var(--tint)}
+table.seq td.hl{background:var(--ac);color:#fff;font-weight:800}
+.diffrow{font-family:'DejaVu Sans Mono',monospace;font-size:12.5px;letter-spacing:.5px}
+.sg{font-family:'DejaVu Sans','Noto Sans CJK KR',sans-serif;font-size:15px;font-weight:700;line-height:1}
+table.adj{width:auto;font-variant-numeric:tabular-nums;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace}
+table.adj th,table.adj td{text-align:center;padding:2px 9px;min-width:26px}
+table.adj th{background:var(--soft);font-weight:700}
+table.adj td.one{background:var(--tint);color:var(--ac);font-weight:800}
+table.adj td.zero{color:#b8c0cc}
+table.adj td.dg{background:var(--ac);color:#fff;font-weight:800}
+.gfig{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-start}
+.gcap{font-size:12px;font-weight:700;color:var(--sub);margin:3px 0 1px}
+h2.ah{font-size:16px;font-weight:800;border-bottom:2px solid var(--ac);color:var(--ac);padding-bottom:3px;margin:2px 0 6px}
+table.at td:first-child{white-space:nowrap;font-weight:700;text-align:center}
+table.at td:nth-child(2){font-weight:700;color:var(--ac)}
+table.at{font-size:12px}
+.asol{border:1px solid var(--line);padding:6px 10px;margin:6px 0}
+.cover{height:100%;display:flex;flex-direction:column}
+.cv-top{border-top:8px solid var(--ac);padding-top:14px}
+.cv-series{font-size:13px;color:var(--sub);font-weight:700}
+.cv-title{font-size:40px;font-weight:900;letter-spacing:-1.5px;line-height:1.2;margin-top:6px}
+.cv-sub{font-size:17px;color:var(--sub);font-weight:600;margin-top:4px}
+.toc{margin-top:22px;border-top:2px solid var(--ink)}
+.toc .row{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.toc .n{font-size:34px;font-weight:900;color:var(--ac);width:62px;line-height:1;font-variant-numeric:tabular-nums}
+.toc .t{font-size:17px;font-weight:800}
+.toc .g{font-size:12.2px;color:var(--sub)}
+.toc .pg{margin-left:auto;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.use{margin-top:16px}
+.cv-foot{margin-top:auto;display:flex;align-items:flex-end;border-top:1px solid var(--line);padding-top:8px;font-size:12px;color:var(--sub)}
+.cv-foot b{color:var(--ink);font-size:14px}
+@page{size:A4;margin:0}
+@media print{body{background:#fff;padding:0}.bar{display:none}.page{margin:0;box-shadow:none;break-after:page}.page:last-child{break-after:auto}}
+@media screen and (max-width:820px){
+  body{padding:56px 0 0}
+  .page{width:auto;height:auto;overflow:visible;padding:40px 14px 44px;margin:0 0 10px}
+  .rh,.foot{left:14px;right:14px}
+  .code .cols{grid-template-columns:1fr}.code .cols>div+div{border-left:0;border-top:1px solid var(--line)}
+  table{display:block;overflow-x:auto}.out pre,.flow ol{columns:1}
+  svg{max-width:100%;height:auto}
+  .onum{font-size:60px}.opener h1{font-size:24px}.bar .hint{display:none}
+}
+
+.q{border:1px solid var(--line);margin:0 0 10px;break-inside:avoid}
+.qh{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.qn{min-width:28px;height:24px;border-radius:3px;background:var(--ink);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.qk{font-size:12px;font-weight:700;color:var(--sub)}
+.qd{font-size:11.5px;font-weight:800;border-radius:9px;padding:0 8px;border:1px solid}
+.d-기본{color:#0e7a6f;border-color:#0e7a6f}.d-발전{color:#2451b8;border-color:#2451b8}.d-도전{color:#a3324f;border-color:#a3324f;background:#fbeef2}
+.qs{margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.qb{padding:7px 12px 4px;font-size:13.6px;line-height:1.8}
+.opts{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:4px}
+.opts.col{flex-direction:column;gap:0}
+table.mini{width:auto;margin:5px 0;font-size:12.4px}table.mini th,table.mini td{text-align:center;padding:2px 10px}
+.work{margin:0 12px;border:1px dashed #c9d2df;border-radius:3px;background:repeating-linear-gradient(#fff 0 25px,#eef1f6 25px 26px)}
+.work.w1{height:66px}.work.w2{height:104px}.work.w3{height:170px}.work.w4{height:270px}
+.aline{display:flex;justify-content:flex-end;padding:6px 12px 8px}
+.aline span{display:inline-block;width:52%;border-bottom:1.5px solid var(--ink);font-size:12px;font-weight:800;color:var(--sub);padding-left:2px}
+.band{display:flex;align-items:baseline;gap:10px;border-bottom:3px solid var(--ac);padding:2px 0 4px;margin:0 0 9px}
+.band .bn{font-size:22px;font-weight:900;color:var(--ac)}
+.band b{font-size:17px;font-weight:900}
+.band .br{margin-left:auto;font-size:12px;color:var(--sub);font-weight:700}
+.exam{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;border-top:8px solid var(--ac);padding-top:12px;margin-bottom:12px}
+.exam .t1{font-size:13px;color:var(--sub);font-weight:700}
+.exam .t2{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2;margin-top:4px}
+.exam .t3{font-size:15px;color:var(--sub);font-weight:600}
+.namebox{border:1.5px solid var(--ink);display:grid;grid-template-columns:auto 1fr;font-size:13px}
+.namebox div{padding:6px 10px;border-bottom:1px solid var(--line)}
+.namebox div:nth-child(odd){background:var(--soft);font-weight:700;border-right:1px solid var(--line)}
+.rules{font-size:12.4px;margin-bottom:10px}
+.a{border:1px solid var(--line);margin:0 0 9px;break-inside:avoid}
+.ahd{display:flex;align-items:center;gap:10px;padding:4px 10px;border-bottom:1px solid var(--line);background:var(--tint)}
+.an{min-width:28px;height:24px;border-radius:3px;background:var(--ac);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aa{font-weight:800;color:var(--ac);font-size:13.6px}
+.ab{padding:6px 12px 8px;font-size:12.8px;line-height:1.75}
+.trap{margin-top:5px;padding:3px 9px;border-left:3px solid var(--warn);background:var(--warnt);font-size:12.2px}
+.trap b{color:var(--warn);margin-right:4px}
+.rub{margin-top:5px;padding:3px 9px;border-left:3px solid var(--tip);background:var(--tipt);font-size:12.2px}
+.rub b{color:var(--tip);margin-right:4px}
+table.key{font-size:12.4px}table.key td,table.key th{text-align:center;vertical-align:middle}
+table.key td.n{font-weight:900;background:var(--soft);width:38px}
+table.key td.v{font-weight:700;color:var(--ac)}
+.part{font-size:11px;font-weight:800;color:#fff;background:var(--ink);padding:1px 7px;border-radius:2px;margin-right:6px}
+.part.ans{background:var(--ac)}
+@media print{body.only-q .pg-a{display:none}body.only-a .pg-q{display:none}}
+</style></head><body>
+<div class="bar"><b>주제 17~20 확인 평가 20문항</b><span class="hint">A4 · 여백 없음 · 배경 그래픽 켜기</span>
+<span style="margin-left:auto;display:flex;gap:6px"><button type="button" data-mode="only-q">문제지 인쇄</button><button type="button" data-mode="only-a">정답과 해설 인쇄</button><button type="button" data-mode="">전체 인쇄</button></span></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="exam"><div><div class="t1">중등 정보올림피아드 대비 이산수학 · 1단계 기본</div>
+<div class="t2">그래프와 트리 확인 평가</div><div class="t3">주제 17~20 · 20문항 · 100점 · 60분</div></div>
+<div class="namebox"><div>이름</div><div></div><div>반</div><div></div><div>날짜</div><div></div><div>점수</div><div style="text-align:right;font-weight:800">/ 100</div></div></div>
+<div class="rules"><table class=""><tr><th style="width:12%">구분</th><th style="width:32%">문항</th><th style="width:10%">배점</th><th>안내</th></tr><tr><td>기본</td><td>각 주제 1~3번째 (12문항)</td><td>4점</td><td>정답만 채점</td></tr><tr><td>발전</td><td>각 주제 4번째 (4문항)</td><td>6점</td><td>과정의 핵심이 맞으면 부분 점수</td></tr><tr><td>도전</td><td>각 주제 5번째 (4문항)</td><td>7점</td><td>풀이 과정과 이유를 채점 기준에 따라 부분 점수</td></tr></table>
+<p class="small">계산기는 쓰지 않습니다. 풀이 공간에 차수 표, 그래프 그림, 복원 과정을 남기세요. 지우지 않은 풀이도 채점에 반영합니다.</p></div><div class="band"><span class="bn">주제 17</span><b>그래프의 기본</b><span class="br">1~5번</span></div><div class="q"><div class="qh"><span class="qn">1</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">간선이 18개인 그래프에서 모든 정점의 차수의 합을 구하시오.</div><div class="work w1" style="height:159px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">2</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">어떤 그래프의 차수가 2, 3, 3, 4, 4, 4일 때 간선은 몇 개인가?</div><div class="work w2" style="height:197px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 1 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">3</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">정점 8개가 서로 모두 이어진 완전그래프의 간선 수와 각 정점의 차수를 구하시오.</div><div class="work w2" style="height:105px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">4</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">(1) 정점이 9개이고 모든 정점의 차수가 5인 그래프가 존재하는지 판정하고 이유를 쓰시오.<br>(2) 정점이 9개이고 모든 정점의 차수가 4인 그래프는 존재할 수 있는가? 간선 수도 구하시오.</div><div class="work w3" style="height:171px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">5</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">어느 모임에서 사람마다 <b>똑같은 수</b>의 사람과 악수를 했다.<br>(1) 12명이 있고 악수가 모두 30번 일어났다면 한 사람은 몇 명과 악수했는가?<br>(2) n명이 각자 정확히 3명과 악수했다면 n은 어떤 수여야 하는가? 이유를 쓰시오.</div><div class="work w4" style="height:271px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 2 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 18</span><b>한붓그리기 (오일러 경로)</b><span class="br">6~10번</span></div><div class="q"><div class="qh"><span class="qn">6</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">어떤 연결 그래프의 차수가 2, 2, 2, 4, 4일 때 한붓그리기가 가능한지 판정하고, 가능하다면 출발점의 조건을 쓰시오.</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">7</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">정점 7개가 서로 모두 이어진 완전그래프는 한붓그리기가 가능한가? 이유를 쓰시오.</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">8</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">차수가 1, 1, 2, 2, 3, 3인 연결 그래프의 최소 획 수를 구하시오.</div><div class="work w2" style="height:189px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 3 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">9</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">점 3 × 4개로 된 <b>2 × 3 격자</b>(선분 17개)에 대하여<br>(1) 각 점의 차수를 위치별로 구하시오.<br>(2) 홀수 차수 정점은 몇 개인가?<br>(3) 최소 몇 획이 필요한가?</div><div class="work w3" style="height:245px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">10</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">아래 그래프에서 각 정점의 차수를 구하고, 한붓그리기가 가능한지 판정하시오. 가능하다면 출발점과 도착점을 밝히고 실제 경로를 하나 쓰시오.<br><div class="gfig"><div><svg viewBox="0 0 290 150" width="290" height="150" role="img" aria-label="그래프" style="display:block"><style>.ge{stroke:#8d99ad;stroke-width:1.6}.gn{fill:#fff;stroke:#b02a5b;stroke-width:1.8}.gt{font-size:12px;font-weight:700;fill:#172033;text-anchor:middle;dominant-baseline:central}.gd{font-size:10.5px;fill:#b02a5b;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:3;stroke-linejoin:round}</style><line class="ge" x1="40" y1="26" x2="140" y2="26"/><line class="ge" x1="40" y1="26" x2="90" y2="110"/><line class="ge" x1="140" y1="26" x2="90" y2="110"/><line class="ge" x1="140" y1="26" x2="190" y2="110"/><line class="ge" x1="240" y1="26" x2="190" y2="110"/><line class="ge" x1="90" y1="110" x2="190" y2="110"/><circle class="gn" cx="40" cy="26" r="13"/><text class="gt" x="40" y="26">A</text><circle class="gn" cx="140" cy="26" r="13"/><text class="gt" x="140" y="26">B</text><circle class="gn" cx="240" cy="26" r="13"/><text class="gt" x="240" y="26">C</text><circle class="gn" cx="90" cy="110" r="13"/><text class="gt" x="90" y="110">D</text><circle class="gn" cx="190" cy="110" r="13"/><text class="gt" x="190" y="110">E</text></svg></div></div></div><div class="work w3" style="height:245px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 4 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 19</span><b>트리의 성질</b><span class="br">11~15번</span></div><div class="q"><div class="qh"><span class="qn">11</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">정점이 25개인 트리의 간선 수와 모든 정점의 차수의 합을 구하시오.</div><div class="work w2" style="height:167px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">12</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">차수가 5인 정점이 4개이고 나머지가 모두 리프인 트리에서 리프는 몇 개인가?</div><div class="work w3" style="height:233px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">13</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">정점이 10개, 간선이 10개인 연결 그래프는 트리인가? 이유를 쓰시오.</div><div class="work w2" style="height:167px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 5 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">14</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">아래 트리에서 A가 루트이다.<br><div class="gfig"><div><svg viewBox="0 0 290 160" width="290" height="160" role="img" aria-label="트리 그림" style="display:block"><style>.te{stroke:#8d99ad;stroke-width:1.6}.tn{fill:#fff;stroke:#b02a5b;stroke-width:1.8}.th{fill:#b02a5b;stroke:#b02a5b}.tt{font-size:12px;font-weight:700;fill:#172033;text-anchor:middle;dominant-baseline:central}.thx{font-size:12px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:central}</style><line class="te" x1="140" y1="22" x2="70" y2="76"/><line class="te" x1="140" y1="22" x2="210" y2="76"/><line class="te" x1="70" y1="76" x2="30" y2="130"/><line class="te" x1="70" y1="76" x2="110" y2="130"/><line class="te" x1="210" y1="76" x2="175" y2="130"/><line class="te" x1="210" y1="76" x2="245" y2="130"/><circle class="th" cx="140" cy="22" r="12"/><text class="thx" x="140" y="22">A</text><circle class="tn" cx="70" cy="76" r="12"/><text class="tt" x="70" y="76">B</text><circle class="tn" cx="210" cy="76" r="12"/><text class="tt" x="210" y="76">C</text><circle class="tn" cx="30" cy="130" r="12"/><text class="tt" x="30" y="130">D</text><circle class="tn" cx="110" cy="130" r="12"/><text class="tt" x="110" y="130">E</text><circle class="tn" cx="175" cy="130" r="12"/><text class="tt" x="175" y="130">F</text><circle class="tn" cx="245" cy="130" r="12"/><text class="tt" x="245" y="130">G</text></svg></div></div>(1) 트리의 높이와 리프를 모두 쓰시오.<br>(2) D와 G 사이의 거리를 구하시오.<br>(3) C의 서브트리에 속한 정점을 모두 쓰시오.</div><div class="work w3" style="height:170px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">15</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">어떤 트리에 차수가 3인 정점이 6개, 차수가 2인 정점이 5개 있고 나머지는 모두 리프이다.<br>(1) 리프의 개수를 구하시오.<br>(2) 정점과 간선의 개수를 구하시오.<br>(3) 차수가 2인 정점의 개수를 5에서 100으로 바꾸면 리프의 개수는 어떻게 되는가? 이유를 쓰시오.</div><div class="work w4" style="height:270px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 6 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 20</span><b>이진 트리와 순회</b><span class="br">16~20번</span></div><div class="q"><div class="qh"><span class="qn">16</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">높이가 6인 포화 이진 트리의 정점 수와 리프 수를 구하시오.</div><div class="work w2" style="height:133px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">17</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">배열로 저장한 이진 트리에서 13번 정점의 부모와 두 자식의 번호를 구하시오.</div><div class="work w2" style="height:133px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">18</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">전위 순회가 ABDEHCFG, 중위 순회가 DBHEAFCG인 이진 트리의 후위 순회 결과를 구하시오.</div><div class="work w4" style="height:299px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 7 / 8</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 17~20 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">19</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">어떤 이진 트리의 <b>후위</b> 순회가 DEBFGCA, <b>중위</b> 순회가 DBEAFCG이다.<br>(1) 루트를 어떻게 알 수 있는지 쓰시오.<br>(2) 트리를 복원해 전위 순회 결과를 구하시오.</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">20</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">배열로 저장한 이진 트리에서 두 정점의 번호가 10과 27이다.<br>(1) 두 정점의 깊이를 각각 구하시오.<br>(2) 번호를 2로 나누어 가며 공통 조상을 찾는 과정을 쓰시오.<br>(3) 두 정점 사이의 거리를 구하고, 실제 경로가 지나는 번호를 모두 쓰시오.</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 8 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="band"><span class="bn">정답</span><b>빠른 정답표</b><span class="br">기본 4점 · 발전 6점 · 도전 7점</span></div><table class="key"><tr><th colspan="2">주제 17 (1~5번)</th><th colspan="2">주제 18 (6~10번)</th><th colspan="2">주제 19 (11~15번)</th><th colspan="2">주제 20 (16~20번)</th></tr><tr><td class="n">1</td><td class="v">36</td><td class="n">6</td><td class="v">가능 (회로), 아무 점</td><td class="n">11</td><td class="v">간선 24개, 차수합 48</td><td class="n">16</td><td class="v">정점 127개, 리프 64개</td></tr><tr><td class="n">2</td><td class="v">10개</td><td class="n">7</td><td class="v">가능</td><td class="n">12</td><td class="v">14개</td><td class="n">17</td><td class="v">부모 6, 자식 26과 27</td></tr><tr><td class="n">3</td><td class="v">간선 28개, 차수 7</td><td class="n">8</td><td class="v">2획</td><td class="n">13</td><td class="v">트리가 아니다</td><td class="n">18</td><td class="v">DHEBFGCA</td></tr><tr><td class="n">4</td><td class="v">(1) 존재하지 않음 (2) 존재, 간선 18개</td><td class="n">9</td><td class="v">(2) 6개 (3) 3획</td><td class="n">14</td><td class="v">(1) 높이 2 (2) 4</td><td class="n">19</td><td class="v">(2) ABDECFG</td></tr><tr><td class="n">5</td><td class="v">(1) 5명 (2) 짝수</td><td class="n">10</td><td class="v">A → B, 경로 예시</td><td class="n">15</td><td class="v">(1) 8개 (3) 그대로 8개</td><td class="n">20</td><td class="v">(3) 7</td></tr></table>
+<p class="small">부분 점수는 각 해설의 채점 기준을 따릅니다. 모든 정답은 Python 전수 조사로 확인했습니다.</p></div><div class="blk"><div class="band"><span class="bn">주제 17</span><b>그래프의 기본</b><span class="br">1~5번</span></div><div class="a"><div class="ahd"><span class="an">1</span><span class="aa">정답 36</span></div><div class="ab">악수 정리에 따라 차수의 합 = 2 × 간선 수 = 2 × 18 = 36</div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">2</span><span class="aa">정답 10개</span></div><div class="ab">차수의 합이 2 + 3 + 3 + 4 + 4 + 4 = 20이므로 간선은 20 ÷ 2 = 10개.<div class="trap"><b>자주 하는 오답</b> 차수를 그대로 간선 수로 답하는 경우. 간선 하나가 양 끝에서 <b>두 번</b> 세어지므로 2로 나눈다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">3</span><span class="aa">정답 간선 28개, 차수 7</span></div><div class="ab">한 정점은 자기 자신을 뺀 7개와 이어지므로 차수는 7이다. 차수의 합 8 × 7 = 56이고 간선은 그 절반인 28개.<div class="trap"><b>자주 하는 오답</b> 차수를 8로 답하는 경우. 자기 자신과는 잇지 않는다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">4</span><span class="aa">정답 (1) 존재하지 않는다　(2) 존재한다, 간선 18개</span></div><div class="ab">(1) 차수의 합이 9 × 5 = <b>45</b>로 홀수다. 차수의 합은 반드시 간선 수의 2배, 곧 짝수여야 하므로 존재할 수 없다. (차수가 홀수인 정점이 9개로 홀수 개라고 설명해도 된다.)<br>(2) 차수의 합이 9 × 4 = 36으로 짝수이므로 간선은 18개다. 실제로 9개의 정점을 원형으로 놓고 각자 양옆 두 명과 그 다음 두 명까지 이으면 모든 차수가 4가 된다.<div class="trap"><b>자주 하는 오답</b> (1)에서 “그려 보니 안 된다”로 끝내는 경우. <b>차수의 합이 홀수</b>라는 한 줄이 증명이다.</div><div class="rub"><b>채점 기준</b> (1) 차수의 합 계산과 홀수 판정 3점, (2) 존재 판정과 간선 수 3점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 1 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">5</span><span class="aa">정답 (1) 5명　(2) 짝수</span></div><div class="ab">(1) 악수 한 번이 간선 하나이므로 간선이 30개, 차수의 합은 60이다. 12명이 똑같은 수 k명과 악수했다면 12k = 60이므로 <b>k = 5</b>.<br>(2) 각자 3명과 악수했다면 차수의 합은 3n이고, 이것이 간선 수의 2배이므로 <b>3n이 짝수</b>여야 한다. 3은 홀수이므로 n이 짝수여야 한다.<br>다른 설명: 모든 사람의 차수가 3(홀수)이므로 홀수 차수인 사람이 n명이다. 홀수 차수 정점은 항상 짝수 개이므로 n은 짝수다.<br><b>확인</b> n = 4이면 간선 6개(완전그래프 K₄)로 가능하고, n = 5이면 차수의 합 15가 홀수라 불가능하다.<div class="trap"><b>자주 하는 오답</b> (2)에서 “3의 배수”라고 답하는 경우. 조건은 차수의 합 3n이 <b>짝수</b>라는 것이지 3의 배수가 아니다.</div><div class="rub"><b>채점 기준</b> (1) 차수의 합을 거쳐 계산 3점, (2) 3n이 짝수여야 함을 밝힘 2점, n이 짝수라는 결론 2점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 18</span><b>한붓그리기 (오일러 경로)</b><span class="br">6~10번</span></div><div class="a"><div class="ahd"><span class="an">6</span><span class="aa">정답 가능, 아무 점에서나 출발</span></div><div class="ab">모든 차수가 짝수이므로 오일러 <b>회로</b>가 있다. 어느 점에서 출발해도 되고 반드시 출발점으로 돌아온다. (간선은 차수의 합 14 ÷ 2 = 7개)<div class="trap"><b>자주 하는 오답</b> 차수가 큰 정점에서 출발해야 한다고 답하는 경우. 모든 차수가 짝수이면 출발점은 자유다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">7</span><span class="aa">정답 가능 (오일러 회로)</span></div><div class="ab">K₇에서 각 정점의 차수는 6으로 모두 <b>짝수</b>다. 홀수 차수 정점이 0개이므로 1획으로 그릴 수 있고 출발점으로 돌아온다. (간선은 21개)<div class="trap"><b>자주 하는 오답</b> 간선이 21개로 홀수라서 안 된다고 답하는 경우. 판정은 <b>차수의 홀짝</b>으로 한다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">8</span><span class="aa">정답 2획</span></div><div class="ab">홀수 차수 정점은 1, 1, 3, 3의 <b>4개</b>이므로 4 ÷ 2 = 2획.<div class="trap"><b>자주 하는 오답</b> 홀수 차수 정점이 2개 이하이면 1획이라는 것만 기억하고 4개에서 헤매는 경우. 최소 획 수는 (홀수 정점 수) ÷ 2다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 2 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">9</span><span class="aa">정답 (1) 모서리 2, 변 위 3, 안쪽 4　(2) 6개　(3) 3획</span></div><div class="ab">(1) 2 × 3 격자는 점이 3 × 4 = 12개다.<table class="mini"><tr><th>위치</th><th>개수</th><th>차수</th></tr><tr><td>네 모서리</td><td>4개</td><td>2</td></tr><tr><td>변 위(모서리 제외)</td><td>가로 변에 1개씩 2개 + 세로 변에 2개씩 4개 = 6개</td><td>3</td></tr><tr><td>안쪽</td><td>2개</td><td>4</td></tr></table><b>검산</b> 차수의 합 = 2×4 + 3×6 + 4×2 = 8 + 18 + 8 = 34 = 2 × 17로 간선 17개와 맞는다.<br>(2) 홀수 차수 정점은 변 위의 <b>6개</b>다.<br>(3) 6 ÷ 2 = <b>3획</b>.<div class="trap"><b>자주 하는 오답</b> 격자의 점 개수를 3 × 3 = 9개로 세는 경우. 2 × 3 격자에는 점이 (2+1) × (3+1) = 12개 있다.</div><div class="rub"><b>채점 기준</b> (1) 위치별 차수와 개수 3점, (2) 2점, (3) 1점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">10</span><span class="aa">정답 A에서 출발해 B에서 끝남 (또는 반대)</span></div><div class="ab">차수를 센다.<table class="mini"><tr><th>정점</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr><tr><td>차수</td><td>2</td><td>3</td><td>1</td><td>3</td><td>3</td></tr></table><b>검산</b> 차수의 합 2 + 3 + 1 + 3 + 3 = 12 = 2 × 6으로 간선 6개와 맞는다.<br>홀수 차수 정점은 B, C, D, E의 <b>4개</b>이므로 한붓그리기는 <b>불가능</b>하고 최소 <b>2획</b>이 필요하다.<br>예를 들어 ① C → E → B → A → D → E, ② B → D 의 두 획으로 모든 간선을 그릴 수 있다. (첫 획은 C에서 출발해 E에서 끝나고, 둘째 획은 B에서 출발해 D에서 끝난다. 홀수 정점 4개가 두 쌍으로 나뉘어 각 획의 양 끝이 된다.)<div class="trap"><b>자주 하는 오답</b> 차수를 세지 않고 그려 보다가 “되는 것 같다”고 답하는 경우. 반드시 차수를 먼저 센다. 또 그림에서 C의 간선이 하나뿐임을 놓치는 경우.</div><div class="rub"><b>채점 기준</b> 차수를 모두 바르게 셈 3점, 홀수 정점 4개를 세고 불가능 판정 2점, 최소 2획과 실제 두 획의 경로 2점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 19</span><b>트리의 성질</b><span class="br">11~15번</span></div><div class="a"><div class="ahd"><span class="an">11</span><span class="aa">정답 간선 24개, 차수의 합 48</span></div><div class="ab">정점 n개인 트리의 간선은 n − 1 = 24개다. 차수의 합은 2 × 24 = 48.</div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 3 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">12</span><span class="aa">정답 14개</span></div><div class="ab">리프 수를 L이라 하면 정점은 4 + L개, 간선은 4 + L − 1 = 3 + L개다.<table class="mini"><tr><th>세는 방법</th><th>식</th></tr><tr><td>차수를 직접 더한다</td><td>5 × 4 + 1 × L = 20 + L</td></tr><tr><td>악수 정리</td><td>2(3 + L) = 6 + 2L</td></tr></table>20 + L = 6 + 2L이므로 <b>L = 14</b>. 정점은 18개, 간선은 17개다. 검산: 차수의 합 20 + 14 = 34 = 2 × 17<div class="trap"><b>자주 하는 오답</b> 간선 수를 정점 수와 같게 두거나, 리프의 차수를 0으로 세는 경우. 리프의 차수는 <b>1</b>이다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">13</span><span class="aa">정답 트리가 아니다</span></div><div class="ab">정점 10개인 트리의 간선은 9개여야 한다. 간선이 하나 더 있으므로 어딘가에 사이클이 있다. (연결되어 있으면서 간선이 n − 1개보다 많으면 반드시 사이클이 생긴다.)<div class="trap"><b>자주 하는 오답</b> “연결되어 있으니 트리”라고 답하는 경우. 트리는 연결 + 사이클 없음, 두 조건을 모두 만족해야 한다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">14</span><span class="aa">정답 (1) 높이 2, 리프 D, E, F, G　(2) 4　(3) C, F, G</span></div><div class="ab">(1) 가장 깊은 정점 D, E, F, G의 깊이가 2이므로 높이는 <b>2</b>이고 자식이 없는 이 넷이 리프다.<br>(2) 유일한 경로는 D → B → A → C → G로 간선 4개다. 깊이로 계산하면 2 + 2 − 2 × 0 = <b>4</b>(공통 조상이 루트 A).<br>(3) C와 그 아래 전부이므로 <b>C, F, G</b>.<div class="trap"><b>자주 하는 오답</b> (2)에서 공통 조상을 B나 C로 잡는 경우. D와 G를 모두 조상으로 갖는 가장 가까운 정점은 루트 A다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 2점, (3) 2점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">15</span><span class="aa">정답 (1) 8개　(2) 정점 19개, 간선 18개　(3) 그대로 8개</span></div><div class="ab">리프 수를 L, 정점 수를 n이라 하자.<table class="mini"><tr><th>세는 방법</th><th>식</th></tr><tr><td>정점 수</td><td>n = 6 + 5 + L = 11 + L</td></tr><tr><td>차수를 직접 더한다</td><td>3 × 6 + 2 × 5 + 1 × L = 28 + L</td></tr><tr><td>악수 정리</td><td>2(n − 1) = 2(10 + L) = 20 + 2L</td></tr></table>(1) 28 + L = 20 + 2L이므로 <b>L = 8</b>.<br>(2) 정점은 11 + 8 = <b>19개</b>, 간선은 <b>18개</b>. 검산: 차수의 합 28 + 8 = 36 = 2 × 18<br>(3) 차수 2인 정점의 개수를 a라 두고 같은 계산을 하면 18 + 2a + L = 2(6 + a + L − 1) = 10 + 2a + 2L이 되어 <b>L = 8</b>로 a가 사라진다. 곧 a를 100으로 바꾸어도 리프는 여전히 <b>8개</b>다.<br><b>이유</b> 차수가 2인 정점은 길 한가운데에 점을 하나 더 찍은 것과 같아서 <b>가지가 갈라지지 않는다</b>. 리프의 수는 가지가 몇 번 갈라지는지, 곧 차수가 3 이상인 정점에만 달려 있다.<div class="trap"><b>자주 하는 오답</b> (3)에서 정점이 늘었으니 리프도 는다고 답하는 경우. 식에서 a가 사라지는 것을 직접 확인해야 한다.</div><div class="rub"><b>채점 기준</b> (1) 두 가지 세기로 식을 세움 2점, 정답 1점. (2) 2점. (3) a가 소거됨을 보이거나 “갈라지지 않는다”로 설명 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 4 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="band"><span class="bn">주제 20</span><b>이진 트리와 순회</b><span class="br">16~20번</span></div><div class="a"><div class="ahd"><span class="an">16</span><span class="aa">정답 정점 127개, 리프 64개</span></div><div class="ab">깊이 0부터 6까지 각 층에 1, 2, 4, …, 64개가 있으므로 정점은 2⁷ − 1 = <b>127개</b>, 리프는 가장 깊은 층의 2⁶ = <b>64개</b>.<div class="trap"><b>자주 하는 오답</b> 2⁶ − 1 = 63으로 답하는 경우. 높이 h인 포화 이진 트리의 정점은 2^(h+1) − 1개다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">17</span><span class="aa">정답 부모 6, 왼쪽 자식 26, 오른쪽 자식 27</span></div><div class="ab">부모는 13 ÷ 2의 몫인 <b>6</b>, 왼쪽 자식은 2 × 13 = <b>26</b>, 오른쪽 자식은 <b>27</b>.<div class="trap"><b>자주 하는 오답</b> 부모를 6.5나 7로 답하는 경우. <b>몫</b>을 쓴다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">18</span><span class="aa">정답 DHEBFGCA</span></div><div class="ab">전위의 첫 글자 A가 루트다. 중위 DBHEAFCG에서 A의 왼쪽은 DBHE(4개), 오른쪽은 FCG(3개)다.<table class="mini"><tr><th></th><th>왼쪽 서브트리</th><th>루트</th><th>오른쪽 서브트리</th></tr><tr><td>중위</td><td>D B H E</td><td><b>A</b></td><td>F C G</td></tr><tr><td>전위</td><td>B D E H</td><td><b>A</b></td><td>C F G</td></tr></table>왼쪽(전위 BDEH, 중위 DBHE): 루트 B, 중위에서 B의 왼쪽은 D, 오른쪽은 HE. 다시 (전위 EH, 중위 HE)이므로 루트 E에 왼쪽 자식 H.<br>오른쪽(전위 CFG, 중위 FCG): 루트 C, 왼쪽 자식 F, 오른쪽 자식 G.<br>후위(왼 → 오 → 루트)로 읽으면 D, H, E, B / F, G, C / A → <b>DHEBFGCA</b><div class="trap"><b>자주 하는 오답</b> 중위에서 루트의 왼쪽 글자 수와 전위에서 끊는 글자 수를 맞추지 않는 경우. 왼쪽이 4글자면 전위에서도 루트 다음 <b>4글자</b>가 왼쪽이다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">19</span><span class="aa">정답 (1) 후위의 마지막 글자　(2) ABDECFG</span></div><div class="ab">(1) 후위 순회는 “왼쪽 → 오른쪽 → 루트” 순서이므로 <b>마지막 글자가 루트</b>다. 여기서는 <b>A</b>.<br>(2) 중위 DBEAFCG에서 A의 왼쪽은 DBE(3개), 오른쪽은 FCG(3개)다. 후위 DEBFGCA에서도 앞 3글자 DEB가 왼쪽, 다음 3글자 FGC가 오른쪽이다.<table class="mini"><tr><th></th><th>왼쪽 서브트리</th><th>오른쪽 서브트리</th><th>루트</th></tr><tr><td>중위</td><td>D B E</td><td>F C G</td><td><b>A</b> (가운데)</td></tr><tr><td>후위</td><td>D E B</td><td>F G C</td><td><b>A</b> (맨 뒤)</td></tr></table>왼쪽(후위 DEB, 중위 DBE): 루트 B, 왼쪽 자식 D, 오른쪽 자식 E.<br>오른쪽(후위 FGC, 중위 FCG): 루트 C, 왼쪽 자식 F, 오른쪽 자식 G.<br>전위(루트 → 왼 → 오)로 읽으면 A, B, D, E, C, F, G → <b>ABDECFG</b><div class="trap"><b>자주 하는 오답</b> 후위에서도 루트를 맨 앞에서 찾는 경우. 후위는 루트가 <b>맨 뒤</b>에 온다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 좌우로 나눈 표 2점, 복원과 전위 결과 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 5 / 6</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 17~20 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">20</span><span class="aa">정답 (1) 3, 4　(2) 공통 조상 1번　(3) 거리 7</span></div><div class="ab">(1) 깊이 d의 번호는 2ᵈ부터 2ᵈ⁺¹ − 1까지다. 8 ≤ 10 &lt; 16이므로 10은 <b>깊이 3</b>, 16 ≤ 27 &lt; 32이므로 27은 <b>깊이 4</b>.<br>(2) 더 깊은 쪽을 먼저 올려 깊이를 맞춘 뒤 함께 올린다.<table class="mini"><tr><th>단계</th><th>10의 조상</th><th>27의 조상</th><th>깊이</th></tr><tr><td>시작</td><td>10</td><td>27</td><td>3, 4</td></tr><tr><td>27을 한 번 올림</td><td>10</td><td>13</td><td>3, 3</td></tr><tr><td>함께 올림</td><td>5</td><td>6</td><td>2, 2</td></tr><tr><td>함께 올림</td><td>2</td><td>3</td><td>1, 1</td></tr><tr><td>함께 올림</td><td><b>1</b></td><td><b>1</b></td><td>0, 0</td></tr></table>처음 같아지는 번호는 <b>1번(루트)</b>이고 깊이는 0이다.<br>(3) 거리 = 3 + 4 − 2 × 0 = <b>7</b>. 경로는 10 → 5 → 2 → 1 → 3 → 6 → 13 → 27로 정점 8개, 간선 7개다.<div class="trap"><b>자주 하는 오답</b> (2)에서 깊이를 맞추지 않고 두 번호를 동시에 나누는 경우. 깊이가 다르면 먼저 <b>깊은 쪽만</b> 올려 맞춘다. 또 (3)에서 정점 수 8을 거리로 답하는 경우. 거리는 <b>간선 수</b>다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 깊이를 맞춘 뒤 함께 올리는 과정 3점, (3) 거리와 경로 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 6 / 6</span></div></div>
+<script>
+document.querySelectorAll('.bar button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.body.classList.remove('only-q','only-a');
+    if(b.dataset.mode) document.body.classList.add(b.dataset.mode);
+    window.print();
+  });
+});
+window.addEventListener('afterprint',function(){document.body.classList.remove('only-q','only-a');});
+</script></body></html>
