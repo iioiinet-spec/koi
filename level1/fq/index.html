@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이산수학 1단계 기본 주제 21~24 확인 평가 20문항</title><style>
+:root{--ink:#172033;--sub:#52607a;--pale:#8d99ad;--line:#d3dae6;--soft:#f3f5f9;--desk:#e3e7ee;
+  --ac:#2f6f4e;--tint:#e9f4ee;--warn:#a3324f;--warnt:#fbeef2;--tip:#8a5a12;--tipt:#fcf3e4}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:var(--desk);color:var(--ink);font-family:'Pretendard','Noto Sans KR','Noto Sans CJK KR','Malgun Gothic',sans-serif;
+  font-size:13.2px;line-height:1.72;padding:62px 12px 24px;word-break:keep-all}
+.bar{position:fixed;top:0;left:0;right:0;z-index:10;background:var(--ink);color:#e6ebf3;display:flex;align-items:center;gap:14px;padding:9px 18px;font-size:13px}
+.bar button{margin-left:auto;background:#fff;color:var(--ink);border:0;border-radius:4px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.bar button:focus-visible{outline:3px solid #8fb3ff;outline-offset:2px}
+.bar .hint{font-size:12px;color:#a9b5c7}
+.page{width:210mm;height:297mm;margin:0 auto 14px;background:#fff;position:relative;padding:17mm 15mm 16mm;overflow:hidden;box-shadow:0 1px 3px rgba(23,32,51,.2)}
+.rh{position:absolute;top:7mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale);border-bottom:1px solid var(--line);padding-bottom:3px}
+.rh b{color:var(--ac);font-weight:700;margin-right:6px}
+.rh .r{margin-left:auto}
+.foot{position:absolute;bottom:6mm;left:15mm;right:15mm;display:flex;font-size:10.5px;color:var(--pale)}
+.foot .r{margin-left:auto;font-variant-numeric:tabular-nums}
+.blk{margin-bottom:10px}
+h2.sec{font-size:16.5px;font-weight:800;margin:2px 0 8px;display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+h2.sec .mk{color:var(--ac);font-size:18px}
+h2.sec .sub{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--sub)}
+h3{font-size:14.2px;font-weight:800;margin:10px 0 5px;color:var(--ink)}
+h3::before{content:'';display:inline-block;width:7px;height:7px;background:var(--ac);margin-right:7px;vertical-align:2px}
+p{margin:4px 0}
+p.small{font-size:12px;color:var(--sub)}
+ul{margin:4px 0 4px 20px}
+li{margin:1px 0}
+code{font-family:'D2Coding','Consolas','DejaVu Sans Mono',monospace;font-size:12px;background:var(--soft);padding:0 3px;border-radius:2px}
+.mx{font-family:'Cambria Math','DejaVu Sans','Noto Sans CJK KR',sans-serif;white-space:nowrap}
+table{border-collapse:collapse;margin:6px 0;font-size:12.4px;line-height:1.55;width:100%}
+th,td{border:1px solid var(--line);padding:4px 7px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:700}
+table.tt{width:auto;margin:6px 0;font-family:'DejaVu Sans','Noto Sans CJK KR',sans-serif}
+table.tt th,table.tt td{text-align:center;padding:2px 12px;min-width:34px;vertical-align:middle}
+table.tt th.v{background:#e6ebf3}
+table.tt th.mk{background:var(--ac);color:#fff}
+table.tt td.t{color:var(--ac);font-weight:700;background:var(--tint)}
+table.tt td.f{color:#9aa4b5}
+table.tt td.mk{border-left:2px solid var(--ac);border-right:2px solid var(--ac)}
+table.tt td.t.mk{background:var(--ac);color:#fff}
+table.tt td.bl{background:#fff;min-width:54px}
+.box{border:1px solid var(--line);border-left:4px solid var(--ac);margin:7px 0;background:#fff}
+.box .bt{font-size:12px;font-weight:800;padding:3px 10px 0;color:var(--ac)}
+.box .bb{padding:1px 10px 6px}
+.box.def{background:var(--tint)}
+.box.prop{border-left-color:var(--ink)} .box.prop .bt{color:var(--ink)}
+.box.warn{border-left-color:var(--warn);background:var(--warnt)} .box.warn .bt{color:var(--warn)}
+.box.tip{border-left-color:var(--tip);background:var(--tipt)} .box.tip .bt{color:var(--tip)}
+.box.q{border-left-color:var(--ink);background:var(--soft)} .box.q .bt{color:var(--sub)}
+.ex{border:1px solid var(--ac);margin:6px 0}
+.exh{background:var(--ac);color:#fff;padding:3px 10px;font-weight:800;font-size:12.6px}
+.exq{padding:6px 10px;border-bottom:1px dashed var(--line);font-weight:600}
+.sol{padding:5px 10px 7px}
+.sol .sl{display:inline-block;font-size:11px;font-weight:800;color:var(--ac);border:1px solid var(--ac);border-radius:2px;padding:0 5px;margin-right:6px;line-height:17px}
+.pr{display:flex;gap:9px;margin:7px 0;padding-bottom:5px;border-bottom:1px dotted var(--line)}
+.pn{flex:none;min-width:26px;height:22px;padding:0 6px;border-radius:3px;background:var(--ink);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.pt{flex:1}
+.ans{border-bottom:1px solid #b9c3d3;margin-top:4px;position:relative}
+.ans.sp1{height:26px}.ans.sp2{height:56px}.ans.sp3{height:96px}.ans.sp4{height:140px}
+.lnlab{position:absolute;left:0;top:2px;font-size:11px;color:var(--pale);font-weight:700}
+.code{border:1px solid var(--line);margin:6px 0}
+.cht{font-size:12px;font-weight:800;padding:3px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.code .cols{display:grid;grid-template-columns:1fr 1fr}
+.code .cols>div+div{border-left:1px solid var(--line)}
+.code .cols.stack{grid-template-columns:1fr}.code .cols.stack>div+div{border-left:0;border-top:1px solid var(--line)}
+.cl{display:block;font-size:10.5px;font-weight:800;color:var(--ac);padding:3px 9px 0}
+pre{font-family:'D2Coding','Consolas','DejaVu Sans Mono','Noto Sans CJK KR',monospace;font-size:11.2px;line-height:1.45;padding:2px 9px 7px;white-space:pre-wrap;word-break:break-all}
+.out{border-top:1px solid var(--line);background:#fbfcfe}
+.out pre{columns:2;column-gap:20px}
+.out pre.wide{columns:1}
+.opener{display:flex;gap:18px;align-items:flex-end;padding:8px 0 12px;border-bottom:3px solid var(--ink);margin-bottom:10px}
+.onum{font-size:88px;line-height:.82;font-weight:900;color:var(--ac);letter-spacing:-4px;font-variant-numeric:tabular-nums}
+.oarea{font-size:12px;color:var(--sub);font-weight:700}
+.opener h1{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2}
+.goal{font-size:13.6px;margin-top:4px}
+.omet{font-size:11.5px;color:var(--sub);margin-top:2px}
+.flow{background:var(--soft);padding:8px 12px 9px;margin-bottom:12px}
+.flow .ft{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:2px}
+.flow ol{margin:0 0 0 20px;columns:2;column-gap:22px;font-size:12.4px}
+.flow li b{margin-right:6px}
+.tools{margin-top:5px;font-size:12px}
+.tools .tl{color:var(--sub);font-weight:700;margin-right:6px}
+.tool{display:inline-block;border:1px solid var(--ac);color:var(--ac);border-radius:10px;padding:0 8px;margin-right:5px;font-weight:700;font-size:11.5px}
+.o{color:#2451b8;font-weight:900}.x{color:#a3324f;font-weight:700}
+table.grid{width:auto}table.grid th,table.grid td{text-align:center;min-width:58px;padding:3px 10px}
+.kn{font-weight:800;padding:0 3px;border-radius:2px}.kn.k{color:#2451b8;background:#edf2fc}.kn.n{color:#a3324f;background:#fbeef2}
+table.wt{width:auto;font-size:11.8px}table.wt th,table.wt td{text-align:center;padding:2px 9px}
+table.wt.blank td{height:24px;min-width:64px}
+table.bits{width:auto;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace;margin:6px 0}
+table.bits caption{caption-side:top;text-align:left;font-family:'Noto Sans CJK KR',sans-serif;font-size:12px;font-weight:700;color:var(--sub);padding-bottom:2px}
+table.bits th{font-size:10px;color:var(--pale);background:#fff;text-align:center;padding:1px 6px;font-weight:600}
+table.bits td{text-align:center;padding:2px 8px;min-width:26px}
+table.bits td.lab{font-family:'Noto Sans CJK KR',sans-serif;font-weight:700;text-align:left;background:var(--soft);min-width:70px}
+table.bits td.one{color:var(--ac);font-weight:800;background:var(--tint)}
+table.bits td.zero{color:#9aa4b5}
+table.bits td.dec{font-weight:700;min-width:44px}
+table.bits tr.res td{border-top:2px solid var(--ink)}
+table.bits tr.res td.one{background:var(--ac);color:#fff}
+table.hexref{font-size:11px}table.hexref th,table.hexref td{text-align:center;padding:2px 3px;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace}
+.bitrow{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:flex-start}
+.bitrow table{margin:4px 0}
+table.dg td:first-child{background:var(--soft)}
+table.sieve{width:auto;margin:6px 0}
+table.sieve td{width:36px;height:24px;text-align:center;vertical-align:middle;padding:0;font-size:12px;font-variant-numeric:tabular-nums}
+table.sieve td.sp{background:var(--ac);color:#fff;font-weight:800}
+table.sieve td.sc{color:#8d99ad}
+table.sieve td.s1{color:#c3cad6}
+table.sieve td.f2{background:#f3f5f9}table.sieve td.f3{background:#fcf1e6}table.sieve td.f5{background:#f2edfc}table.sieve td.f7{background:#fcecf0}
+.legend{font-size:11.5px;color:var(--sub)}.legend i{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin:0 3px 0 10px;border:1px solid var(--line)}
+table.lat{width:auto;font-variant-numeric:tabular-nums}
+table.lat td{text-align:center;min-width:40px;height:28px;padding:0;font-weight:700}
+table.lat td.z{color:#c3cad6;font-weight:400}
+table.lat td.bk{background:#3a4352;color:#fff}
+table.lat td.hl{background:var(--ac);color:#fff}
+table.lat td.ax{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;min-width:22px}
+table.pas{width:auto;font-variant-numeric:tabular-nums;border-collapse:separate;border-spacing:2px}
+table.pas td{border:1px solid var(--line);text-align:center;min-width:34px;padding:2px 4px;font-weight:700}
+table.pas td.e{border:0;background:#fff;min-width:17px;padding:0}
+table.pas td.m1{background:var(--tint);color:var(--ac)}
+table.pas td.m2{background:var(--ac);color:#fff}
+table.pas td.lab{border:0;background:#fff;color:var(--pale);font-size:10.5px;font-weight:600;text-align:right;padding-right:4px}
+.capt{font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 1px}
+table.lat td.hl{background:var(--ac);color:#fff}
+table.seq{width:auto;font-variant-numeric:tabular-nums}
+table.seq th,table.seq td{text-align:center;padding:3px 10px;min-width:40px}
+table.seq td.lab,table.seq th.lab{text-align:left;background:var(--soft);font-weight:700;min-width:78px}
+table.seq td.d{color:var(--ac);font-weight:700;background:var(--tint)}
+table.seq td.hl{background:var(--ac);color:#fff;font-weight:800}
+.diffrow{font-family:'DejaVu Sans Mono',monospace;font-size:12.5px;letter-spacing:.5px}
+.sg{font-family:'DejaVu Sans','Noto Sans CJK KR',sans-serif;font-size:15px;font-weight:700;line-height:1}
+table.adj{width:auto;font-variant-numeric:tabular-nums;font-family:'DejaVu Sans Mono','Noto Sans CJK KR',monospace}
+table.adj th,table.adj td{text-align:center;padding:2px 9px;min-width:26px}
+table.adj th{background:var(--soft);font-weight:700}
+table.adj td.one{background:var(--tint);color:var(--ac);font-weight:800}
+table.adj td.zero{color:#b8c0cc}
+table.adj td.dg{background:var(--ac);color:#fff;font-weight:800}
+.gfig{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:flex-start}
+.gcap{font-size:12px;font-weight:700;color:var(--sub);margin:3px 0 1px}
+table.tr th,table.tr td{text-align:center;padding:2px 9px;font-variant-numeric:tabular-nums}
+table.tr td.k{background:var(--soft);font-weight:700;text-align:left}
+table.tr td.hl{background:var(--ac);color:#fff;font-weight:800}
+table.tr td.sw{background:var(--tint);color:var(--ac);font-weight:800}
+.stk{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:5px 0}
+.stk .col{text-align:center;font-size:11px;color:var(--sub)}
+.stk .bx{display:flex;flex-direction:column-reverse;border:1.5px solid var(--ink);border-top:0;min-width:34px;min-height:22px}
+.stk .bx span{border-top:1px solid var(--line);font-size:12px;font-weight:700;padding:1px 0;background:var(--tint);color:var(--ac)}
+.qd2{display:flex;gap:0;border:1.5px solid var(--ink);min-height:24px;min-width:40px}
+.qd2 span{border-right:1px solid var(--line);padding:2px 8px;font-size:12px;font-weight:700;background:var(--tint);color:var(--ac)}
+h2.ah{font-size:16px;font-weight:800;border-bottom:2px solid var(--ac);color:var(--ac);padding-bottom:3px;margin:2px 0 6px}
+table.at td:first-child{white-space:nowrap;font-weight:700;text-align:center}
+table.at td:nth-child(2){font-weight:700;color:var(--ac)}
+table.at{font-size:12px}
+.asol{border:1px solid var(--line);padding:6px 10px;margin:6px 0}
+.cover{height:100%;display:flex;flex-direction:column}
+.cv-top{border-top:8px solid var(--ac);padding-top:14px}
+.cv-series{font-size:13px;color:var(--sub);font-weight:700}
+.cv-title{font-size:40px;font-weight:900;letter-spacing:-1.5px;line-height:1.2;margin-top:6px}
+.cv-sub{font-size:17px;color:var(--sub);font-weight:600;margin-top:4px}
+.toc{margin-top:22px;border-top:2px solid var(--ink)}
+.toc .row{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.toc .n{font-size:34px;font-weight:900;color:var(--ac);width:62px;line-height:1;font-variant-numeric:tabular-nums}
+.toc .t{font-size:17px;font-weight:800}
+.toc .g{font-size:12.2px;color:var(--sub)}
+.toc .pg{margin-left:auto;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.use{margin-top:16px}
+.cv-foot{margin-top:auto;display:flex;align-items:flex-end;border-top:1px solid var(--line);padding-top:8px;font-size:12px;color:var(--sub)}
+.cv-foot b{color:var(--ink);font-size:14px}
+@page{size:A4;margin:0}
+@media print{body{background:#fff;padding:0}.bar{display:none}.page{margin:0;box-shadow:none;break-after:page}.page:last-child{break-after:auto}}
+@media screen and (max-width:820px){
+  body{padding:56px 0 0}
+  .page{width:auto;height:auto;overflow:visible;padding:40px 14px 44px;margin:0 0 10px}
+  .rh,.foot{left:14px;right:14px}
+  .code .cols{grid-template-columns:1fr}.code .cols>div+div{border-left:0;border-top:1px solid var(--line)}
+  table{display:block;overflow-x:auto}.out pre,.flow ol{columns:1}
+  svg{max-width:100%;height:auto}
+  .onum{font-size:60px}.opener h1{font-size:24px}.bar .hint{display:none}
+}
+
+.q{border:1px solid var(--line);margin:0 0 10px;break-inside:avoid}
+.qh{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.qn{min-width:28px;height:24px;border-radius:3px;background:var(--ink);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.qk{font-size:12px;font-weight:700;color:var(--sub)}
+.qd{font-size:11.5px;font-weight:800;border-radius:9px;padding:0 8px;border:1px solid}
+.d-기본{color:#0e7a6f;border-color:#0e7a6f}.d-발전{color:#2451b8;border-color:#2451b8}.d-도전{color:#a3324f;border-color:#a3324f;background:#fbeef2}
+.qs{margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.qb{padding:7px 12px 4px;font-size:13.6px;line-height:1.8}
+.opts{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:4px}
+.opts.col{flex-direction:column;gap:0}
+table.mini{width:auto;margin:5px 0;font-size:12.4px}table.mini th,table.mini td{text-align:center;padding:2px 10px}
+.work{margin:0 12px;border:1px dashed #c9d2df;border-radius:3px;background:repeating-linear-gradient(#fff 0 25px,#eef1f6 25px 26px)}
+.work.w1{height:66px}.work.w2{height:104px}.work.w3{height:170px}.work.w4{height:270px}
+.aline{display:flex;justify-content:flex-end;padding:6px 12px 8px}
+.aline span{display:inline-block;width:52%;border-bottom:1.5px solid var(--ink);font-size:12px;font-weight:800;color:var(--sub);padding-left:2px}
+.band{display:flex;align-items:baseline;gap:10px;border-bottom:3px solid var(--ac);padding:2px 0 4px;margin:0 0 9px}
+.band .bn{font-size:22px;font-weight:900;color:var(--ac)}
+.band b{font-size:17px;font-weight:900}
+.band .br{margin-left:auto;font-size:12px;color:var(--sub);font-weight:700}
+.exam{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;border-top:8px solid var(--ac);padding-top:12px;margin-bottom:12px}
+.exam .t1{font-size:13px;color:var(--sub);font-weight:700}
+.exam .t2{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.2;margin-top:4px}
+.exam .t3{font-size:15px;color:var(--sub);font-weight:600}
+.namebox{border:1.5px solid var(--ink);display:grid;grid-template-columns:auto 1fr;font-size:13px}
+.namebox div{padding:6px 10px;border-bottom:1px solid var(--line)}
+.namebox div:nth-child(odd){background:var(--soft);font-weight:700;border-right:1px solid var(--line)}
+.rules{font-size:12.4px;margin-bottom:10px}
+.a{border:1px solid var(--line);margin:0 0 9px;break-inside:avoid}
+.ahd{display:flex;align-items:center;gap:10px;padding:4px 10px;border-bottom:1px solid var(--line);background:var(--tint)}
+.an{min-width:28px;height:24px;border-radius:3px;background:var(--ac);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.aa{font-weight:800;color:var(--ac);font-size:13.6px}
+.ab{padding:6px 12px 8px;font-size:12.8px;line-height:1.75}
+.trap{margin-top:5px;padding:3px 9px;border-left:3px solid var(--warn);background:var(--warnt);font-size:12.2px}
+.trap b{color:var(--warn);margin-right:4px}
+.rub{margin-top:5px;padding:3px 9px;border-left:3px solid var(--tip);background:var(--tipt);font-size:12.2px}
+.rub b{color:var(--tip);margin-right:4px}
+table.key{font-size:12.4px}table.key td,table.key th{text-align:center;vertical-align:middle}
+table.key td.n{font-weight:900;background:var(--soft);width:38px}
+table.key td.v{font-weight:700;color:var(--ac)}
+.part{font-size:11px;font-weight:800;color:#fff;background:var(--ink);padding:1px 7px;border-radius:2px;margin-right:6px}
+.part.ans{background:var(--ac)}
+@media print{body.only-q .pg-a{display:none}body.only-a .pg-q{display:none}}
+</style></head><body>
+<div class="bar"><b>주제 21~24 확인 평가 20문항</b><span class="hint">A4 · 여백 없음 · 배경 그래픽 켜기</span>
+<span style="margin-left:auto;display:flex;gap:6px"><button type="button" data-mode="only-q">문제지 인쇄</button><button type="button" data-mode="only-a">정답과 해설 인쇄</button><button type="button" data-mode="">전체 인쇄</button></span></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="exam"><div><div class="t1">중등 정보올림피아드 대비 이산수학 · 1단계 기본</div>
+<div class="t2">알고리즘 전략 확인 평가</div><div class="t3">주제 21~24 · 20문항 · 100점 · 60분</div></div>
+<div class="namebox"><div>이름</div><div></div><div>반</div><div></div><div>날짜</div><div></div><div>점수</div><div style="text-align:right;font-weight:800">/ 100</div></div></div>
+<div class="rules"><table class=""><tr><th style="width:12%">구분</th><th style="width:32%">문항</th><th style="width:10%">배점</th><th>안내</th></tr><tr><td>기본</td><td>각 주제 1~3번째 (12문항)</td><td>4점</td><td>정답만 채점</td></tr><tr><td>발전</td><td>각 주제 4번째 (4문항)</td><td>6점</td><td>과정의 핵심이 맞으면 부분 점수</td></tr><tr><td>도전</td><td>각 주제 5번째 (4문항)</td><td>7점</td><td>풀이 과정과 이유를 채점 기준에 따라 부분 점수</td></tr></table>
+<p class="small">계산기는 쓰지 않습니다. 풀이 공간에 추적표, 스택 그림, 경우를 나눈 기준을 남기세요. 지우지 않은 풀이도 채점에 반영합니다.</p></div><div class="band"><span class="bn">주제 21</span><b>알고리즘과 실행 추적</b><span class="br">1~5번</span></div><div class="q"><div class="qh"><span class="qn">1</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">우박수 규칙(짝수면 2로 나누고, 홀수면 3배 하고 1을 더한다)으로 <b>13</b>에서 시작하면 1이 될 때까지 몇 번의 연산이 필요한가? 추적표를 만들어 구하시오.</div><div class="work w3" style="height:217px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">2</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb"><code>for i in range(5, 40)</code>은 몇 번 반복하는가?</div><div class="work w1" style="height:113px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 1 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">3</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">다음에서 <code>cnt</code>는 몇 번 늘어나는가?<br><code>cnt = 0</code><br><code>for i in range(1, 9):</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;for j in range(1, i+1):</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cnt += 1</code></div><div class="work w2" style="height:222px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">4</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">다음 절차를 a = 1071, b = 462로 추적표를 만들어 따라가시오.<br><code>while b != 0: a, b = b, a % b</code><br><code>print(a)</code><br>(1) 추적표를 완성하고 출력을 구하시오.<br>(2) 반복은 몇 번 돌았는가?<br>(3) 이 절차가 구하는 것은 무엇인가?</div><div class="work w3" style="height:288px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 2 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">5</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">우박수 규칙으로 <b>9</b>에서 시작한다.<br>(1) 1이 될 때까지 몇 번의 연산이 필요한가? 추적표로 구하시오.<br>(2) 도중에 7이 나타난다. 7에서 1까지가 16번임을 알고 있다면 (1)의 답을 어떻게 빠르게 구할 수 있는지 설명하시오.<br>(3) 어떤 수 n의 횟수를 알 때 2n의 횟수는 얼마인가? 이유를 쓰시오.</div><div class="work w4" style="height:750px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 3 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 22</span><b>완전 탐색의 사고</b><span class="br">6~10번</span></div><div class="q"><div class="qh"><span class="qn">6</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">1~9에서 서로 다른 세 수를 골라 합이 <b>18</b>이 되게 하는 방법은 몇 가지인가? (순서 무시)</div><div class="work w3" style="height:237px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">7</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">세 자리 자연수 중에서 앞뒤로 읽어도 같은 수(팰린드롬)는 몇 개인가?</div><div class="work w2" style="height:171px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">8</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb"><code>for a in range(1,7): for b in range(a+1,7): for c in range(b+1,7):</code> 안쪽 몸통은 몇 번 실행되는가?</div><div class="work w1" style="height:133px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 4 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">9</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">네 자리 자연수 중에서 각 자리 숫자의 합이 <b>8</b>인 것은 몇 개인가? 천의 자리를 기준으로 경우를 나누어 구하고, 후보 공간의 크기도 함께 쓰시오.</div><div class="work w4" style="height:320px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">10</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">세 변의 길이가 모두 <b>25 이하</b>의 자연수이고 a &lt; b &lt; c인 직각삼각형을 모두 찾으려고 한다.<br>(1) 후보 공간의 크기를 구하시오.<br>(2) 조건을 만족하는 (a, b, c)를 모두 구하시오.<br>(3) a &lt; b &lt; c 조건을 빼고 세 수를 각각 1~25에서 자유롭게 고른다면 후보가 몇 배로 늘어나는지 쓰시오.</div><div class="work w4" style="height:320px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 5 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 23</span><b>정렬의 원리</b><span class="br">11~15번</span></div><div class="q"><div class="qh"><span class="qn">11</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">[3, 5, 1, 4, 2]의 역순쌍을 모두 세고, 버블 정렬의 교환 횟수를 구하시오.</div><div class="work w3" style="height:233px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">12</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">[2, 1, 4, 3]을 버블 정렬할 때 비교 횟수와 교환 횟수를 각각 구하시오.</div><div class="work w2" style="height:167px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">13</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">원소가 6개인 배열에서 역순쌍은 최대 몇 개인가? 그때의 배열을 하나 쓰시오.</div><div class="work w2" style="height:167px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 6 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">14</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">[3, 5, 1, 4, 2]에 대하여<br>(1) 버블 정렬의 각 바퀴가 끝난 뒤의 배열을 모두 쓰시오.<br>(2) <b>선택 정렬</b>로 정렬할 때 교환은 몇 번인가? 각 단계의 배열도 쓰시오.<br>(3) 두 정렬의 교환 횟수가 다른 까닭을 쓰시오.</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">15</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">1, 2, 3, 4를 한 줄로 늘어놓는 24가지 배열에 대하여<br>(1) 역순쌍이 0개, 1개, 2개, 3개, 4개, 5개, 6개인 배열의 수를 각각 구해 표로 정리하시오.<br>(2) 표가 좌우 대칭임을 확인하고, 그 까닭을 설명하시오. (힌트: 배열을 <b>뒤집으면</b> 역순쌍이 어떻게 되는가?)</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 7 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="band"><span class="bn">주제 24</span><b>스택과 큐</b><span class="br">16~20번</span></div><div class="q"><div class="qh"><span class="qn">16</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">스택에 1, 2, 3, 4, 5를 차례로 넣되 3을 넣은 직후에 두 번 pop하고, 나머지를 모두 넣은 뒤 끝까지 pop했다. 꺼낸 순서를 쓰시오.</div><div class="work w2" style="height:150px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">17</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">다음 중 올바른 괄호를 모두 고르시오.<br>① <code>(()(()))</code>　② <code>(())(()</code>　③ <code>()(())()</code>　④ <code>((())</code>　⑤ <code>(()())</code></div><div class="work w2" style="height:150px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">18</span><span class="qk">단답형</span><span class="qd d-기본">기본</span><span class="qs">4점</span></div><div class="qb">1, 2, 3, 4, 5를 차례로 스택에 넣으며 꺼낼 때 출력 순서 <b>2, 5, 3, 4, 1</b>이 가능한지 판정하고 이유를 쓰시오.</div><div class="work w3" style="height:216px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 8 / 9</span></div></div>
+<div class="page pg-q"><div class="rh"><span><span class="part">문제지</span>주제 21~24 확인 평가</span><span class="r">세영코딩연구소 이산수학 1단계 기본</span></div><div class="blk"><div class="q"><div class="qh"><span class="qn">19</span><span class="qk">단답·서술</span><span class="qd d-발전">발전</span><span class="qs">6점</span></div><div class="qb">1, 2, 3, 4, 5, 6, 7이 든 큐에서 “맨 앞의 하나를 꺼내 버리고, 그다음 하나를 꺼내 맨 뒤로 보낸다”를 반복한다.<br>(1) 각 단계의 큐 상태를 모두 쓰시오.<br>(2) 마지막에 남는 수는 무엇인가?</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="blk"><div class="q"><div class="qh"><span class="qn">20</span><span class="qk">서술형</span><span class="qd d-도전">도전</span><span class="qs">7점</span></div><div class="qb">1, 2, 3, 4, 5를 차례로 스택에 넣으며 꺼낸다고 하자.<br>(1) 출력 순서 <b>4, 3, 5, 2, 1</b>이 가능한지 판정하고 가능하다면 push와 pop의 순서를 쓰시오.<br>(2) 출력 순서 <b>5, 1, 2, 3, 4</b>가 불가능한 이유를 설명하시오.<br>(3) 가능한 출력 순서는 모두 몇 가지인가?</div><div class="work w4" style="height:308px"></div><div class="aline"><span>답</span></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">문제지 9 / 9</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="band"><span class="bn">정답</span><b>빠른 정답표</b><span class="br">기본 4점 · 발전 6점 · 도전 7점</span></div><table class="key"><tr><th colspan="2">주제 21 (1~5번)</th><th colspan="2">주제 22 (6~10번)</th><th colspan="2">주제 23 (11~15번)</th><th colspan="2">주제 24 (16~20번)</th></tr><tr><td class="n">1</td><td class="v">9번</td><td class="n">6</td><td class="v">7가지</td><td class="n">11</td><td class="v">6개, 6번</td><td class="n">16</td><td class="v">3, 2, 5, 4, 1</td></tr><tr><td class="n">2</td><td class="v">35번</td><td class="n">7</td><td class="v">90개</td><td class="n">12</td><td class="v">비교 6번, 교환 2번</td><td class="n">17</td><td class="v">①, ③, ⑤</td></tr><tr><td class="n">3</td><td class="v">36번</td><td class="n">8</td><td class="v">20번</td><td class="n">13</td><td class="v">15개</td><td class="n">18</td><td class="v">불가능</td></tr><tr><td class="n">4</td><td class="v">(1) 21 (2) 3번 (3) 최대공약수</td><td class="n">9</td><td class="v">120개</td><td class="n">14</td><td class="v">(2) 2번</td><td class="n">19</td><td class="v">(2) 6</td></tr><tr><td class="n">5</td><td class="v">(1) 19번 (3) n의 횟수 + 1</td><td class="n">10</td><td class="v">(2) 8개</td><td class="n">15</td><td class="v">1,3,5,6,5,3,1</td><td class="n">20</td><td class="v">(3) 42가지</td></tr></table>
+<p class="small">부분 점수는 각 해설의 채점 기준을 따릅니다. 모든 정답은 Python 전수 조사로 확인했습니다.</p></div><div class="blk"><div class="band"><span class="bn">주제 21</span><b>알고리즘과 실행 추적</b><span class="br">1~5번</span></div><div class="a"><div class="ahd"><span class="an">1</span><span class="aa">정답 9번</span></div><div class="ab">추적표의 한 행이 연산 한 번이다.<table class="tr"><tr><th>c</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr><tr><td class="k">n</td><td class="">13</td><td class="">40</td><td class="">20</td><td class="">10</td><td class="">5</td><td class="">16</td><td class="">8</td><td class="">4</td><td class="">2</td><td class="hl">1</td></tr><tr><td class="k">판단</td><td class="">홀</td><td class="">짝</td><td class="">짝</td><td class="">짝</td><td class="">홀</td><td class="">짝</td><td class="">짝</td><td class="">짝</td><td class="">짝</td><td class="">끝</td></tr></table>n = 1이 되는 순간 c = <b>9</b>이다.<div class="trap"><b>자주 하는 오답</b> 적힌 수의 개수 10을 답하는 경우. 연산 횟수는 <b>화살표의 개수</b>이므로 첫 행(c = 0)은 세지 않는다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">2</span><span class="aa">정답 35번</span></div><div class="ab">40 − 5 = 35. 5부터 39까지이며 40은 포함되지 않는다.<div class="trap"><b>자주 하는 오답</b> 40 − 5 + 1 = 36으로 답하는 경우. <code>range(a, b)</code>에 b는 들어가지 않는다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">3</span><span class="aa">정답 36번</span></div><div class="ab">바깥 i를 고정하면 안쪽은 i번 돈다.<table class="tr"><tr><th>i</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>합</th></tr><tr><td class="k">안쪽 횟수</td><td class="">1</td><td class="">2</td><td class="">3</td><td class="">4</td><td class="">5</td><td class="">6</td><td class="">7</td><td class="">8</td><td class="hl"><b>36</b></td></tr></table>1 + 2 + … + 8 = 8 × 9 ÷ 2 = <b>36번</b>이다.<div class="trap"><b>자주 하는 오답</b> 안쪽을 <code>range(1, 9)</code>로 잘못 읽어 8 × 8 = 64로 답하는 경우. 안쪽 범위에 <b>바깥 변수 i</b>가 들어 있는지 확인한다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 1 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">4</span><span class="aa">정답 (1) 21　(2) 3번　(3) 두 수의 최대공약수</span></div><div class="ab">(1) 한 번 돌 때마다 a에는 b가, b에는 a를 b로 나눈 나머지가 들어간다.<table class="tr"><tr><th>단계</th><th>0</th><th>1</th><th>2</th><th>3</th></tr><tr><td class="k">a</td><td class="">1071</td><td class="">462</td><td class="">147</td><td class="hl">21</td></tr><tr><td class="k">b</td><td class="">462</td><td class="">147</td><td class="">21</td><td class="">0</td></tr></table>b = 0이 된 순간의 a인 <b>21</b>이 출력된다.<br>(2) 표에서 값이 바뀐 횟수를 세면 <b>3번</b>이다.<br>(3) gcd(1071, 462) = 21이므로 이 절차는 <b>최대공약수</b>를 구한다(유클리드 호제법). 1071 = 3 × 7 × 51 = 3 × 357, 462 = 2 × 3 × 7 × 11이고 공통 부분이 3 × 7 = 21이다.<div class="trap"><b>자주 하는 오답</b> 나머지를 구할 때 1071 % 462 = 147을 147이 아닌 다른 값으로 잘못 계산하는 경우. 1071 = 462 × 2 + 147이다.</div><div class="rub"><b>채점 기준</b> (1) 추적표와 출력 3점, (2) 1점, (3) 2점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">5</span><span class="aa">정답 (1) 19번　(3) n의 횟수 + 1</span></div><div class="ab">(1) 추적표를 만든다.<table class="tr"><tr><th>c</th><th>0</th><th>1</th><th>2</th><th>3</th></tr><tr><td class="k">n</td><td class="">9</td><td class="">28</td><td class="">14</td><td class="">7</td></tr><tr><td class="k">판단</td><td class="">홀</td><td class="">짝</td><td class="">짝</td><td class="">—</td></tr></table>c = 3에서 <b>7</b>이 나타난다. 이후 7 → 22 → 11 → … → 1은 이론서에서 구한 대로 16번이므로 3 + 16 = <b>19번</b>이다.<br>(2) 우박수 규칙은 <b>현재 수만 보고</b> 다음 수를 정한다. 어떤 경로로 7에 도착했는지는 그 뒤의 과정에 아무 영향을 주지 않는다. 따라서 “9에서 7까지 가는 횟수”와 “7에서 1까지 가는 횟수”를 <b>따로 구해 더하면</b> 된다. 9에서 7까지는 3번이므로 3 + 16 = 19번이다.<br>(3) <b>n의 횟수 + 1</b>이다. 2n은 짝수이므로 첫 연산에서 반드시 2로 나뉘어 n이 되고, 그 뒤는 n에서 시작하는 것과 똑같기 때문이다. 예: 5는 5번, 10은 6번, 20은 7번이다.<div class="trap"><b>자주 하는 오답</b> (2)에서 “그냥 이어 붙이면 된다”고만 쓰는 경우. <b>다음 수가 현재 수만으로 정해진다</b>는 점을 밝혀야 한다.</div><div class="rub"><b>채점 기준</b> (1) 추적표로 7까지 3번을 보이고 19 결론 3점. (2) 현재 수만으로 다음이 정해짐을 설명 2점. (3) 2n → n을 밝히고 +1 결론 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 2 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="band"><span class="bn">주제 22</span><b>완전 탐색의 사고</b><span class="br">6~10번</span></div><div class="a"><div class="ahd"><span class="an">6</span><span class="aa">정답 7가지</span></div><div class="ab">가장 작은 수 a를 기준으로 나눈다. a가 정해지면 b + c = 18 − a이고 a &lt; b &lt; c ≤ 9여야 한다.<table class=""><tr><th style="width:10%">a</th><th style="width:12%">b + c</th><th>가능한 (b, c)</th><th style="width:10%">개수</th></tr><tr><td>1</td><td>17</td><td>(8, 9)</td><td>1</td></tr><tr><td>2</td><td>16</td><td>(7, 9)</td><td>1</td></tr><tr><td>3</td><td>15</td><td>(6, 9), (7, 8)</td><td>2</td></tr><tr><td>4</td><td>14</td><td>(5, 9), (6, 8)</td><td>2</td></tr><tr><td>5</td><td>13</td><td>(6, 7)</td><td>1</td></tr><tr><td>6 이상</td><td>12 이하</td><td>b, c가 6보다 커야 하므로 b + c ≥ 15 → 없음</td><td>0</td></tr></table>1 + 1 + 2 + 2 + 1 = <b>7가지</b>다. 목록은 (1,8,9) (2,7,9) (3,6,9) (3,7,8) (4,5,9) (4,6,8) (5,6,7).<br><b>참고</b> 각 수를 10 − x로 바꾸면 합 18인 조합이 합 12인 조합과 하나씩 짝지어진다. 합 12인 경우도 7가지다.<div class="trap"><b>자주 하는 오답</b> a = 1, 2인 경우를 “합이 너무 커서 없다”고 넘기는 경우. b + c의 최댓값은 8 + 9 = 17이므로 a = 1까지 가능하다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">7</span><span class="aa">정답 90개</span></div><div class="ab">세 자리 팰린드롬은 <b>aba</b> 꼴이다. a는 1~9의 9가지(0이 될 수 없음), b는 0~9의 10가지이므로 9 × 10 = <b>90개</b>.<div class="trap"><b>자주 하는 오답</b> a와 b가 달라야 한다고 생각해 81개로 답하는 경우. 111, 222처럼 같아도 된다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">8</span><span class="aa">정답 20번</span></div><div class="ab">1~6에서 서로 다른 세 수를 고르는 방법의 수와 같으므로 6C3 = 20.<div class="trap"><b>자주 하는 오답</b> 6 × 6 × 6 = 216으로 답하는 경우. 범위가 <code>a+1</code>, <code>b+1</code>부터 시작해 a &lt; b &lt; c가 강제된다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 3 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">9</span><span class="aa">정답 120개, 후보 공간 9000개</span></div><div class="ab"><b>후보 공간</b> 1000부터 9999까지 <b>9000개</b>다.<br><b>경우 나누기</b> 천의 자리를 a(1~8, a = 9면 나머지 합이 −1), 나머지 세 자리의 합을 8 − a라 하자. 세 자리 숫자(각 0~9)의 합이 k인 경우의 수는 k ≤ 9일 때 <b>(k+1)(k+2) ÷ 2</b>가지다.<table class="mini"><tr><th>a</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr><tr><td>나머지 합 k</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr><tr><td>경우의 수</td><td>36</td><td>28</td><td>21</td><td>15</td><td>10</td><td>6</td><td>3</td><td>1</td></tr></table>36 + 28 + 21 + 15 + 10 + 6 + 3 + 1 = <b>120개</b>이다.<br><b>다른 방법</b> 천의 자리를 a − 1 = a′(0 이상)로 바꾸면 a′ + b + c + d = 7이 되고, 음이 아닌 네 수의 합이 7인 경우는 10C3 = 120가지다(중복조합, 주제 35).<div class="trap"><b>자주 하는 오답</b> 천의 자리에 0을 허용해 165개로 답하는 경우. 네 자리 수이므로 천의 자리는 1 이상이다.</div><div class="rub"><b>채점 기준</b> 후보 공간 1점, 경우를 나눈 표 3점, 정답 2점.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">10</span><span class="aa">정답 (1) 2300개　(2) 8개　(3) 6배</span></div><div class="ab">(1) 1 ≤ a &lt; b &lt; c ≤ 25인 (a, b, c)의 개수는 25C3 = (25 × 24 × 23) ÷ 6 = <b>2300개</b>다.<br>(2) a² + b² = c²을 검사하면<table class="mini"><tr><th>(a, b, c)</th><th>(3,4,5)</th><th>(5,12,13)</th><th>(6,8,10)</th><th>(7,24,25)</th><th>(8,15,17)</th><th>(9,12,15)</th><th>(12,16,20)</th><th>(15,20,25)</th></tr><tr><td>확인</td><td>9+16=25</td><td>25+144=169</td><td>36+64=100</td><td>49+576=625</td><td>64+225=289</td><td>81+144=225</td><td>144+256=400</td><td>225+400=625</td></tr></table>모두 <b>8개</b>다. (3,4,5)의 배수 4개, (5,12,13)의 배수 2개, (7,24,25), (8,15,17)이 보인다.<br>(3) 세 수를 각각 자유롭게 고르면 25³ = 15625가지다. 15625 ÷ 2300 ≈ 6.8이지만, 정확히는 <b>세 수가 서로 다를 때 순서만 바뀐 3! = 6가지</b>가 모두 따로 세어지므로 약 <b>6배</b>로 늘어난다. (같은 수가 섞인 경우 때문에 정확히 6배는 아니다.)<div class="trap"><b>자주 하는 오답</b> (2)에서 (6,8,10), (9,12,15), (12,16,20), (15,20,25)처럼 <b>배수 꼴</b>을 빠뜨리는 경우. 기본 꼴만 찾으면 4개밖에 나오지 않는다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 8개를 모두 찾으면 4점(하나 빠질 때마다 1점 감점), (3) 1점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 23</span><b>정렬의 원리</b><span class="br">11~15번</span></div><div class="a"><div class="ahd"><span class="an">11</span><span class="aa">정답 역순쌍 6개, 교환 6번</span></div><div class="ab">각 수보다 뒤에 있으면서 더 작은 수를 센다.<table class="tr"><tr><th>앞의 수</th><th>3</th><th>5</th><th>1</th><th>4</th><th>2</th><th>합</th></tr><tr><td class="k">뒤쪽의 더 작은 수</td><td class="">1, 2</td><td class="">1, 4, 2</td><td class="">없음</td><td class="">2</td><td class="">없음</td><td class=""></td></tr><tr><td class="k">개수</td><td class="">2</td><td class="">3</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="hl"><b>6</b></td></tr></table>인접 교환 한 번이 역순쌍을 정확히 1 줄이므로 버블 정렬의 교환 횟수도 <b>6번</b>이다.<div class="trap"><b>자주 하는 오답</b> 앞쪽에 있는 더 큰 수를 세어 중복하는 경우. 각 쌍은 <b>한 번만</b> 세어야 한다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 4 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">12</span><span class="aa">정답 비교 6번, 교환 2번</span></div><div class="ab">비교는 3 + 2 + 1 = 6번이다. 역순쌍은 (2,1)과 (4,3)의 2개이므로 교환은 <b>2번</b>이다.<div class="trap"><b>자주 하는 오답</b> 비교와 교환을 같은 것으로 보는 경우. 비교는 항상 하고, 교환은 순서가 뒤바뀐 경우에만 한다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">13</span><span class="aa">정답 15개, 예: [6, 5, 4, 3, 2, 1]</span></div><div class="ab">모든 쌍이 역순쌍일 때가 최대이므로 6C2 = (6 × 5) ÷ 2 = <b>15개</b>이고, 그때 배열은 큰 수부터 늘어선 모양이다.</div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">14</span><span class="aa">정답 (1) 표 참고　(2) 2번　(3) 설명 참고</span></div><div class="ab">(1) 버블 정렬의 바퀴별 결과:<table class="tr"><tr><th>바퀴</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td class="k">배열</td><td class="">3 1 4 2 5</td><td class="">1 3 2 4 5</td><td class="">1 2 3 4 5</td><td class="">1 2 3 4 5</td></tr></table>(2) 선택 정렬은 남은 부분의 최솟값을 앞자리와 바꾼다.<table class="tr"><tr><th>단계</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td class="k">배열</td><td class="">1 5 3 4 2</td><td class="">1 2 3 4 5</td><td class="">1 2 3 4 5</td><td class="">1 2 3 4 5</td></tr><tr><td class="k">교환</td><td class="">○</td><td class="">○</td><td class="">×</td><td class="">×</td></tr></table>교환은 <b>2번</b>이다(1↔3, 2↔5).<br>(3) 버블 정렬은 <b>이웃한 두 수만</b> 바꾸므로 한 번의 교환이 역순쌍을 정확히 1 줄인다. 그래서 교환 횟수가 역순쌍의 개수(6번)와 같다.<br>선택 정렬은 <b>멀리 떨어진 두 수</b>를 한 번에 바꾸므로 한 번의 교환이 역순쌍을 여러 개 줄일 수 있다. 그래서 교환이 훨씬 적다(2번).<div class="trap"><b>자주 하는 오답</b> (2)에서 교환이 일어나지 않은 단계도 교환으로 세는 경우. 이미 제자리에 있으면 바꾸지 않는다.</div><div class="rub"><b>채점 기준</b> (1) 2점, (2) 배열과 횟수 2점, (3) 인접 교환과 원거리 교환의 차이를 설명 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 5 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">15</span><span class="aa">정답 1, 3, 5, 6, 5, 3, 1</span></div><div class="ab">(1) 24가지 배열의 역순쌍 개수를 세면 다음과 같다.<table class="tr"><tr><th>역순쌍 개수</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>합</th></tr><tr><td class="k">배열의 수</td><td class="">1</td><td class="">3</td><td class="">5</td><td class="">6</td><td class="">5</td><td class="">3</td><td class="">1</td><td class="hl"><b>24</b></td></tr></table>예를 들어 0개는 1234 하나, 6개는 4321 하나다.<br>(2) 표는 <b>1, 3, 5, 6, 5, 3, 1</b>로 좌우 대칭이다.<br><b>까닭</b> 어떤 배열을 <b>좌우로 뒤집으면</b>(맨 앞과 맨 뒤를 바꾸는 식으로 순서를 거꾸로 하면), 원래 역순쌍이었던 쌍은 역순쌍이 아니게 되고 아니었던 쌍은 역순쌍이 된다. 두 자리의 앞뒤 관계가 모두 뒤바뀌기 때문이다.<br>전체 쌍의 수는 4C2 = 6개이므로, 원래 역순쌍이 k개였다면 뒤집은 배열의 역순쌍은 <b>6 − k개</b>가 된다. 뒤집기는 배열 하나를 배열 하나에 <b>하나씩 짝지어</b> 주고 두 번 뒤집으면 제자리로 돌아오므로, 역순쌍이 k개인 배열과 6 − k개인 배열의 <b>개수가 같다</b>. 그래서 표가 좌우 대칭이다.<div class="trap"><b>자주 하는 오답</b> (1)에서 24가지를 모두 세지 않고 몇 개만 보고 답하는 경우. 역순쌍이 3개인 배열이 6개로 가장 많다.</div><div class="rub"><b>채점 기준</b> (1) 표를 바르게 채움 3점(한 칸 틀릴 때마다 1점 감점), (2) 뒤집으면 k ↔ 6 − k가 됨을 설명 3점, 하나씩 짝지어짐을 언급 1점.</div></div></div></div><div class="blk"><div class="band"><span class="bn">주제 24</span><b>스택과 큐</b><span class="br">16~20번</span></div><div class="a"><div class="ahd"><span class="an">16</span><span class="aa">정답 3, 2, 5, 4, 1</span></div><div class="ab">스택의 상태를 추적한다.<div class="stk"><div class="col"><div class="bx"><span>1</span><span>2</span><span>3</span></div>push 1,2,3</div><div class="col"><div class="bx"><span>1</span><span>2</span></div>pop → 3</div><div class="col"><div class="bx"><span>1</span></div>pop → 2</div><div class="col"><div class="bx"><span>1</span><span>4</span><span>5</span></div>push 4,5</div><div class="col"><div class="bx"><span>1</span><span>4</span></div>pop → 5</div><div class="col"><div class="bx"><span>1</span></div>pop → 4</div><div class="col"><div class="bx"></div>pop → 1</div></div>꺼낸 순서는 <b>3, 2, 5, 4, 1</b>이다.<div class="trap"><b>자주 하는 오답</b> 맨 아래의 1을 먼저 꺼내는 것으로 보는 경우. 스택은 <b>맨 위</b>에서만 꺼낸다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">17</span><span class="aa">정답 ①, ③, ⑤</span></div><div class="ab">여는 괄호를 +1, 닫는 괄호를 −1로 두고 도중에 음수가 되지 않으며 마지막이 0인지 본다.<table class="mini"><tr><th></th><th>①</th><th>②</th><th>③</th><th>④</th><th>⑤</th></tr><tr><td>개수 차의 변화</td><td>1 2 1 2 3 2 1 0</td><td>1 2 1 0 1 2 1</td><td>1 0 1 2 1 0 1 0</td><td>1 2 3 2 1</td><td>1 2 1 2 1 0</td></tr><tr><td>판정</td><td>올바름</td><td>끝에 1 남음</td><td>올바름</td><td>끝에 1 남음</td><td>올바름</td></tr></table><div class="trap"><b>자주 하는 오답</b> 괄호의 개수만 세는 경우. ④는 여는 괄호 3개, 닫는 괄호 2개로 개수부터 다르지만, 개수가 같아도 <code>())(</code>처럼 도중에 음수가 되면 잘못된 괄호다.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 6 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">18</span><span class="aa">정답 불가능</span></div><div class="ab">판정 방법을 따라간다. 2를 꺼내려면 1, 2를 push한 뒤 pop하므로 스택에 <b>1</b>이 남는다. 다음 5를 꺼내려면 3, 4, 5를 push해야 하고, 5를 pop하면 스택은 아래부터 <b>1, 3, 4</b>가 된다.<div class="stk"><div class="col"><div class="bx"><span>1</span></div>2를 꺼낸 뒤</div><div class="col"><div class="bx"><span>1</span><span>3</span><span>4</span><span>5</span></div>3,4,5 push</div><div class="col"><div class="bx"><span>1</span><span>3</span><span>4</span></div>pop → 5</div></div>이제 필요한 수는 3인데 맨 위는 4이고, 더 넣을 수도 없다. 따라서 <b>불가능</b>하다.<br><b>간단히</b> 출력에 <b>5, 3, 4</b>가 c … a … b (3 &lt; 4 &lt; 5) 꼴로 들어 있으므로 불가능하다.<div class="trap"><b>자주 하는 오답</b> 앞의 두 수만 보고 “가능할 것 같다”고 답하는 경우. 반드시 끝까지 추적하거나 c…a…b 꼴을 찾는다.</div></div></div></div><div class="blk"><div class="a"><div class="ahd"><span class="an">19</span><span class="aa">정답 (1) 표 참고　(2) 6</span></div><div class="ab">(1) 한 단계마다 앞의 하나를 버리고 그다음 하나를 맨 뒤로 보낸다.<table class="tr"><tr><th>단계</th><th>큐 (앞 → 뒤)</th><th>버린 수</th></tr><tr><td class="k">시작</td><td class="">1 2 3 4 5 6 7</td><td class="">—</td></tr><tr><td class="k">1</td><td class="">3 4 5 6 7 2</td><td class="">1</td></tr><tr><td class="k">2</td><td class="">5 6 7 2 4</td><td class="">3</td></tr><tr><td class="k">3</td><td class="">7 2 4 6</td><td class="">5</td></tr><tr><td class="k">4</td><td class="">4 6 2</td><td class="">7</td></tr><tr><td class="k">5</td><td class="">2 6</td><td class="">4</td></tr><tr><td class="k">6</td><td class="">6</td><td class="">2</td></tr></table>(2) 마지막에 남는 수는 <b>6</b>이다.<div class="trap"><b>자주 하는 오답</b> 버리기와 뒤로 보내기의 순서를 바꾸는 경우. <b>버린 다음</b> 그 뒤의 수를 옮긴다.</div><div class="rub"><b>채점 기준</b> (1) 단계별 상태를 모두 바르게 씀 4점(한 줄 틀릴 때마다 1점 감점), (2) 2점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 7 / 8</span></div></div>
+<div class="page pg-a"><div class="rh"><span><span class="part ans">정답과 해설</span>주제 21~24 확인 평가</span><span class="r">교사용</span></div><div class="blk"><div class="a"><div class="ahd"><span class="an">20</span><span class="aa">정답 (1) 가능　(2) 설명 참고　(3) 42가지</span></div><div class="ab">(1) <b>가능</b>하다. push1 push2 push3 push4 pop(4) pop(3) push5 pop(5) pop(2) pop(1)<div class="stk"><div class="col"><div class="bx"><span>1</span><span>2</span><span>3</span><span>4</span></div>1~4 push</div><div class="col"><div class="bx"><span>1</span><span>2</span><span>3</span></div>pop → 4</div><div class="col"><div class="bx"><span>1</span><span>2</span></div>pop → 3</div><div class="col"><div class="bx"><span>1</span><span>2</span><span>5</span></div>push 5</div><div class="col"><div class="bx"><span>1</span><span>2</span></div>pop → 5</div><div class="col"><div class="bx"><span>1</span></div>pop → 2</div></div>(2) 5가 가장 먼저 나오려면 1, 2, 3, 4, 5를 모두 push한 뒤 pop해야 한다. 그때 스택에는 아래부터 <b>1, 2, 3, 4</b>가 남아 있고 더 넣을 수도 없다. 스택은 맨 위에서만 꺼내므로 다음에 나올 수 있는 것은 <b>4</b>뿐인데 1이 필요하다. 따라서 불가능하다. (c … a … b 꼴로 보면 5, 1, 2에서 5 &gt; 2 &gt; 1이다.)<br>(3) n = 5의 카탈란 수인 <b>42가지</b>다. 1, 2, 5, 14, 42로 이어진다.<div class="trap"><b>자주 하는 오답</b> (2)에서 “해 보니 안 된다”로 끝내는 경우. 5를 꺼낸 순간 스택의 <b>상태가 하나로 정해진다</b>는 점을 밝혀야 한다.</div><div class="rub"><b>채점 기준</b> (1) 판정과 push/pop 순서 3점, (2) 5를 꺼낸 뒤 상태를 밝히고 4만 나올 수 있음을 설명 3점, (3) 1점.</div></div></div></div><div class="foot"><span>세영코딩연구소 / Ph.D KIM</span><span class="r">정답과 해설 8 / 8</span></div></div>
+<script>
+document.querySelectorAll('.bar button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.body.classList.remove('only-q','only-a');
+    if(b.dataset.mode) document.body.classList.add(b.dataset.mode);
+    window.print();
+  });
+});
+window.addEventListener('afterprint',function(){document.body.classList.remove('only-q','only-a');});
+</script></body></html>
