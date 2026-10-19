@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정보올림피아드 트리 시각화 실습실 | 세영코딩연구소</title>
+<style>
+:root{--ink:#15233b;--muted:#53647d;--navy:#112341;--blue:#235aca;--sky:#edf4ff;--line:#dce5ef;--paper:#fff;--bg:#f5f8fc;--teal:#087b81;--red:#b93947;--shadow:0 10px 30px rgba(25,48,77,.07)}
+*{box-sizing:border-box}html,body{margin:0}body{font-family: "Pretendard","Noto Sans KR","Malgun Gothic",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.52}button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #76b7fd;outline-offset:2px}button:disabled{cursor:not-allowed;opacity:.43}.shell{max-width:1590px;margin:0 auto;padding:23px 26px 60px}.hero{background:linear-gradient(114deg,#112341,#1d3769);border-radius:19px;padding:26px 30px;color:white;display:flex;align-items:center;justify-content:space-between;gap:24px;box-shadow:var(--shadow)}.brand{font-size:12px;letter-spacing:.13em;font-weight:800;color:#9bd6ff}.hero h1{font-size:clamp(23px,2.4vw,34px);line-height:1.25;margin:8px 0}.hero p{color:#d9e6f8;margin:0}.hero-art{min-width:118px}.hero-art svg{width:128px;height:97px}.tagline{font-size:12px;font-weight:800;border:1px solid #8aa7cc;border-radius:24px;padding:6px 10px;color:#deedff;display:inline-block;margin-bottom:4px}.layout{display:grid;grid-template-columns:minmax(310px,420px) minmax(0,1fr);gap:20px;align-items:start;margin-top:20px}.panel{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}.pad{padding:19px}.panel-title{display:flex;align-items:center;gap:9px;margin:0 0 15px;font-size:19px;font-weight:850}.stepnum{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:9px;background:#dceafe;color:#2454a2;font-size:14px}.label{font-size:14px;font-weight:800;color:#32435a;display:block;margin:14px 0 7px}.hint{font-size:13px;color:var(--muted);line-height:1.6;margin:6px 0 10px}.subhint{font-size:13px;color:#365074;background:#eff5ff;border-left:3px solid #6195e7;padding:9px 11px;border-radius:5px;margin:10px 0}select,input[type=text],textarea{width:100%;border:1px solid #c7d3e1;border-radius:9px;padding:10px 11px;color:#142441;background:#fff}select{font-weight:700}.mono{font-family:Consolas,'D2Coding','Courier New',monospace;font-size:15px;line-height:1.66;tab-size:4}textarea{resize:vertical;min-height:240px}#expected{min-height:81px}.inline{display:flex;gap:9px;align-items:center}.grow{flex:1;min-width:0}.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:1px solid #c6d5e7;background:white;color:#204068;padding:10px 12px;border-radius:9px;font-weight:800;transition:background .15s}.btn:hover:not(:disabled){background:#eaf2fc}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:#164bb0}.btn.soft{background:#eaf3ff;border-color:#cadef6}.btn.accent{background:#087b81;border-color:#087b81;color:#fff}.btn.small{padding:7px 9px;font-size:13px}.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.full{width:100%}.checkline{display:flex;gap:8px;align-items:center;color:#3b516c;font-size:13px;margin:10px 0}.checkline input{width:16px;height:16px}.error{padding:10px 12px;background:#fff0f0;border:1px solid #ebadad;border-radius:9px;color:#9d2635;font-size:14px;font-weight:750;display:none;white-space:pre-wrap;margin-top:10px}.error.show{display:block}.workspace{display:flex;flex-direction:column;gap:17px}.canvas-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.canvas-head h2{margin:0;font-size:20px}.muted{color:var(--muted)}.mini{font-size:13px}.status{font-weight:850;color:#0b766c;border-radius:40px;background:#e7f7f2;padding:6px 10px;font-size:13px}.svg-box{height:545px;min-height:320px;border:1px solid #dce5ef;border-radius:12px;background-color:#fff;background-image:radial-gradient(#e6edf6 1px,transparent 1px);background-size:22px 22px;overflow:hidden;position:relative;touch-action:none}#treeSvg{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none}#treeSvg.dragging{cursor:grabbing}.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#6b7e97;pointer-events:none;padding:20px;font-size:17px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.toolbar .spacer{flex:1}.toolbar label{font-size:13px;font-weight:800;color:#4a5b72}.toolbar input[type=range]{width:120px;accent-color:var(--blue)}.stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:15px}.stat{background:#f2f6fc;border:1px solid #e1e9f4;border-radius:10px;padding:10px 10px}.stat-name{display:block;font-size:12px;color:#5e6e86;font-weight:800}.stat-value{display:block;margin-top:2px;font-size:20px;font-weight:850;color:#172e52;overflow-wrap:anywhere}.split{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}.info-card{padding:16px 18px}.info-card h3{font-size:17px;margin:0 0 13px}.rows{display:grid;gap:9px}.value-row{display:grid;grid-template-columns:108px minmax(0,1fr);align-items:start;gap:9px;border-bottom:1px solid #edf0f5;padding:7px 0}.value-row:last-child{border-bottom:0}.value-row b{font-size:14px}.value-row span{color:#284364;word-break:break-word;overflow-wrap:anywhere;font-size:14px}.code-result{color:#173665;background:#f2f6fc;border-radius:8px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;font-family:Consolas,'D2Coding',monospace;font-size:13px;line-height:1.5}.traversal-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.sequence-card{border:1px solid #dce7f5;background:#f9fbff;border-radius:10px;padding:11px}.sequence-card h4{font-size:14px;color:#395474;margin:0 0 8px}.sequence-card code{display:block;overflow-wrap:anywhere;word-break:break-word;font-size:15px;font-weight:800;color:#19335a}.play-panel{border-top:1px solid #e1e8f2;margin-top:14px;padding-top:14px}.playline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.playline select{max-width:210px;flex:1;min-width:136px}.sliderlabel{font-size:13px;font-weight:800;color:#46607f}.speed{accent-color:var(--blue);width:95px}.progress{height:8px;overflow:hidden;border-radius:9px;background:#e5edf6;margin:14px 0 8px}.progress>div{width:0;height:100%;background:linear-gradient(90deg,#23848c,#2865da);transition:width .15s}.print-only{display:none}.print-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.print-grid pre{white-space:pre-wrap;font-family:Consolas,monospace;font-size:12px}.footnote{background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px 19px;font-size:14px;color:#4e6078;line-height:1.7}.footnote strong{color:#233b5e}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#455a76;font-weight:700}.dot{width:12px;height:12px;border-radius:100%;display:inline-block;vertical-align:middle;margin-right:4px;background:#eff6ff;border:2px solid #2a61ba}.dot.root{background:#0d7c80;border-color:#0d7c80}.dot.done{background:#c4e5fc;border-color:#2a61ba}.dot.current{background:#ffcb75;border-color:#e58926}.dot.selected{background:white;border-color:#d23b65}.svg-node circle{transition:fill .16s,stroke .16s,stroke-width .16s}.svg-node{cursor:pointer}.svg-node:hover circle{filter:drop-shadow(0 2px 4px #7b9fbb)}.svg-node:focus{outline:none}.svg-node:focus-visible circle{stroke:#d12f6b;stroke-width:5}.svg-node text{pointer-events:none;font-family:Consolas,'Malgun Gothic',monospace;font-weight:850;font-size:17px;dominant-baseline:central;text-anchor:middle;fill:#183658}.svg-node.current circle{fill:#ffcf76;stroke:#ca6b0d;stroke-width:4}.svg-node.selected circle{stroke:#c82d66;stroke-width:5}.svg-node.done circle{fill:#cce9ff;stroke:#3267b6}.svg-node.root:not(.done):not(.current) circle{fill:#0b737b;stroke:#0b737b}.svg-node.root:not(.done):not(.current) text{fill:#fff}.svg-node.done.root text{fill:#183658}.svg-edge{fill:none;stroke:#9bb0ca;stroke-width:2.5;stroke-linecap:round}.svg-edge.path{stroke:#db8e2d;stroke-width:4}.svg-caption{font-size:11px;fill:#55718e;font-weight:700;pointer-events:none}.section-cap{font-size:12px;color:#516683;font-weight:800;letter-spacing:.06em;margin:2px 0 8px}.utility{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.text-button{border:none;background:none;color:#2a5bc1;text-decoration:underline;cursor:pointer;font-weight:750;font-size:13px;padding:0}.kbd{border:1px solid #ccd8e6;background:#f7f9fc;padding:1px 5px;border-radius:4px;font-size:12px}@media(max-width:1120px){.layout{grid-template-columns:360px minmax(0,1fr)}.split{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(5,1fr)}.svg-box{height:450px}}@media(max-width:830px){.shell{padding:12px 10px 45px}.layout{display:block}.workspace{margin-top:14px}.hero{padding:20px}.hero-art{display:none}.stat-grid{grid-template-columns:repeat(3,1fr)}.svg-box{height:390px}.pad{padding:15px}.toolbar input[type=range]{width:88px}}@media(max-width:450px){.traversal-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.toolbar .spacer{display:none}.preset-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:22px}.playline select{max-width:none}}@media print{@page{size:A4 landscape;margin:10mm}html,body{background:white!important;color:black}.shell{max-width:none;padding:0}.hero{background:white!important;color:black;border:1px solid #aaa;box-shadow:none;padding:10px 15px}.hero p,.hero .brand{color:#333}.hero-art,.tagline,.input-controls,.toolbar,.play-panel,.footnote,.legend,.no-print,.preset-grid,#errorBox{display:none!important}.layout{display:block;margin-top:10px}.panel{box-shadow:none;border:1px solid #bbb;border-radius:3px;margin:10px 0;break-inside:avoid}.input-panel{display:none}.pad{padding:10px}.svg-box{height:143mm;border:none;background:white!important}.split{grid-template-columns:1fr 1fr}.status{border:1px solid #aaa;background:white;color:black}.stat-grid{margin-top:8px}.stat{padding:5px}.stat-value{font-size:15px}.canvas-head{margin-bottom:4px}.panel-title{font-size:15px}.info-card{padding:10px}.footerprint{display:block!important;font-size:11px;color:#444}.print-only{display:block!important}.print-grid{grid-template-columns:1fr 1fr}.print-only h3{margin:0 0 7px;font-size:14px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="hero">
+    <div><div class="brand">SEYOUNG CODING LAB · Ph.D KIM</div><h1>정보올림피아드 트리 시각화 실습실</h1><p>문제의 예제 입력 → 실제 트리 그림 → 순회 순서 → 단계별 탐색까지 한 화면에서 확인합니다.</p></div>
+    <div class="hero-art" aria-hidden="true"><svg viewBox="0 0 130 99"><g stroke="#83baff" stroke-width="4" stroke-linecap="round" fill="none"><path d="M65 14 L31 44 M65 14 L99 44 M31 44 L14 79 M31 44 L48 79 M99 44 L82 79 M99 44 L116 79"/></g><g fill="#b6e5fc" stroke="#fff" stroke-width="2"><circle cx="65" cy="14" r="9"/><circle cx="31" cy="44" r="9"/><circle cx="99" cy="44" r="9"/><circle cx="14" cy="79" r="9"/><circle cx="48" cy="79" r="9"/><circle cx="82" cy="79" r="9"/><circle cx="116" cy="79" r="9"/></g></svg></div>
+  </header>
+  <div class="layout">
+    <section class="panel input-panel"><div class="pad">
+      <h2 class="panel-title"><span class="stepnum">1</span> 예제 입력</h2>
+      <label class="label" for="format">문제에 맞는 트리 입력 형식</label>
+      <select id="format">
+        <option value="edges">간선 목록 (N, 간선 N-1개)</option>
+        <option value="parents">부모 배열 (각 노드의 부모 번호)</option>
+        <option value="binary">이진트리 (노드 왼쪽 오른쪽)</option>
+        <option value="level">레벨 순서 입력 (null 포함)</option>
+        <option value="bst">이진 탐색 트리 (삽입 순서)</option>
+      </select>
+      <p class="subhint" id="formatHelp"></p>
+      <div class="input-grid input-controls">
+        <div><label class="label" for="rootId">루트 노드</label><input type="text" id="rootId" value="1" placeholder="예: 1"></div>
+        <div><label class="label" for="sortMode">자식 노드의 좌우 순서</label><select id="sortMode"><option value="input">입력에 나온 순서</option><option value="asc">노드 번호 오름차순</option></select></div>
+      </div>
+      <label class="label" for="sampleInput">예제 입력 붙여넣기</label>
+      <textarea id="sampleInput" class="mono" spellcheck="false" aria-label="트리 문제의 예제 입력"></textarea>
+      <div class="section-cap">형식별 예제 바로 불러오기</div>
+      <div class="preset-grid">
+        <button class="btn small" type="button" data-demo="edges">1. 간선 예제</button>
+        <button class="btn small" type="button" data-demo="parents">2. 부모 배열</button>
+        <button class="btn small" type="button" data-demo="binary">3. 이진트리</button>
+        <button class="btn small" type="button" data-demo="level">4. 레벨 순서</button>
+        <button class="btn small" type="button" data-demo="bst">5. BST 삽입</button>
+        <button class="btn small" type="button" id="clearButton">입력 지우기</button>
+      </div>
+      <button class="btn primary full" id="drawButton" style="margin-top:14px;padding:13px;font-size:17px" type="button">입력값으로 트리 그리기 →</button>
+      <div id="errorBox" class="error" role="alert" aria-live="polite"></div>
+      <label class="label" for="expected">문제의 예제 출력 (선택 입력)</label>
+      <textarea id="expected" class="mono" placeholder="정보올림피아드 문제에 나온 '예제 출력'을 여기에 붙여넣을 수 있습니다.\n(문제별 정답 계산은 별도 알고리즘이 필요합니다.)"></textarea>
+      <p class="hint">이 칸은 문제에서 제시한 출력을 기록하는 용도입니다. 아래의 순회 결과는 트리 구조를 기반으로 자동 계산합니다.</p>
+    </div></section>
+    <div class="workspace">
+      <section class="panel"><div class="pad">
+        <div class="canvas-head"><h2 class="panel-title" style="margin:0"><span class="stepnum">2</span> 트리 구조 시각화</h2><span class="status" id="treeStatus">예제 불러옴</span></div>
+        <p class="hint">노드를 클릭하면 부모·깊이·자식·서브트리 정보를 표시합니다. 빈 공간을 드래그하면 이동하고, 휠로 확대할 수 있습니다.</p>
+        <div class="svg-box" id="svgBox"><svg id="treeSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="입력값으로 구성한 트리 그래프"></svg><div class="empty" id="emptyPrompt">트리를 그리려면 왼쪽에서 입력을 확인하고 '트리 그리기'를 누르세요.</div></div>
+        <div class="toolbar no-print"><button class="btn small" id="zoomOut" type="button" aria-label="축소">− 축소</button><label for="zoom">배율</label><input id="zoom" type="range" min="0.55" max="3.5" step="0.05" value="1"><span id="zoomText" class="mini" style="min-width:45px">100%</span><button class="btn small" id="zoomIn" type="button" aria-label="확대">+ 확대</button><button class="btn small soft" id="fit" type="button">화면 맞춤</button><div class="spacer"></div><button class="btn small" id="saveSvg" type="button">SVG 저장</button><button class="btn small" id="print" type="button">인쇄 / PDF</button></div>
+        <div class="stat-grid" id="stats" aria-live="polite">
+          <div class="stat"><span class="stat-name">노드 수</span><span class="stat-value" id="statNodes">—</span></div>
+          <div class="stat"><span class="stat-name">간선 수</span><span class="stat-value" id="statEdges">—</span></div>
+          <div class="stat"><span class="stat-name">루트</span><span class="stat-value" id="statRoot">—</span></div>
+          <div class="stat"><span class="stat-name">최대 깊이</span><span class="stat-value" id="statDepth">—</span></div>
+          <div class="stat"><span class="stat-name">리프(잎) 수</span><span class="stat-value" id="statLeaves">—</span></div>
+        </div>
+      </div></section>
+      <div class="split">
+        <section class="panel info-card"><h3><span class="stepnum">3</span> 방문 순서 시각화</h3>
+          <div class="traversal-grid">
+            <div class="sequence-card"><h4>전위 순회 · DFS (루트 → 자식)</h4><code id="preorder">—</code></div>
+            <div class="sequence-card"><h4>중위 순회 · 이진트리 전용</h4><code id="inorder">—</code></div>
+            <div class="sequence-card"><h4>후위 순회 (자식 → 루트)</h4><code id="postorder">—</code></div>
+            <div class="sequence-card"><h4>레벨 순회 · BFS</h4><code id="bfsorder">—</code></div>
+          </div>
+          <div class="play-panel no-print">
+            <div class="label" style="margin-top:0">단계별 애니메이션</div>
+            <div class="playline"><select id="algorithm" aria-label="방문 순서 선택"><option value="bfs">BFS · 너비 우선</option><option value="pre">DFS · 전위</option><option value="in">중위 · 이진트리</option><option value="post">후위</option></select><button class="btn small" id="prev" type="button">◀ 이전</button><button class="btn small accent" id="play" type="button">▶ 재생</button><button class="btn small" id="next" type="button">다음 ▶</button><button class="btn small" id="reset" type="button">초기화</button></div>
+            <div class="progress"><div id="progressFill"></div></div>
+            <div id="stepText" class="mini muted" aria-live="polite">순회를 선택하고 재생하거나 '다음'을 눌러보세요.</div>
+            <div class="playline" style="margin-top:9px"><label class="sliderlabel" for="speed">재생 속도</label><input id="speed" class="speed" type="range" min="200" max="1600" step="100" value="850"><span id="speedText" class="mini">0.85초/노드</span></div>
+          </div>
+        </section>
+        <section class="panel info-card"><h3><span class="stepnum">4</span> 선택한 노드 상세</h3>
+          <div class="rows">
+            <div class="value-row"><b>선택 노드</b><span id="nodeName">노드를 클릭하세요.</span></div>
+            <div class="value-row"><b>부모 노드</b><span id="nodeParent">—</span></div>
+            <div class="value-row"><b>깊이</b><span id="nodeDepth">—</span></div>
+            <div class="value-row"><b>자식 노드</b><span id="nodeChildren">—</span></div>
+            <div class="value-row"><b>서브트리 크기</b><span id="nodeSubtree">—</span></div>
+            <div class="value-row"><b>루트 → 노드 경로</b><span id="nodePath">—</span></div>
+          </div>
+          <div style="margin-top:15px" class="legend"><span><i class="dot root"></i> 루트</span><span><i class="dot done"></i> 방문함</span><span><i class="dot current"></i> 현재 방문</span><span><i class="dot selected"></i> 클릭 선택</span></div>
+        </section>
+      </div>
+      <section class="panel print-only" style="padding:10px 14px;break-inside:avoid"><h3>문제의 예제 입력과 예제 출력</h3><div class="print-grid"><div><strong>예제 입력</strong><pre id="printInput"></pre></div><div><strong>예제 출력 (문제에서 직접 입력)</strong><pre id="printOutput"></pre></div></div></section>
+      <section class="footnote"><strong>문제 풀이 시 꼭 확인하세요.</strong> 간선 목록은 보통 <strong>방향이 없는 트리</strong>이므로 지정한 루트를 기준으로 부모·자식 관계를 정합니다. 간선 입력의 자식 좌우 순서는 문제에 따로 정해져 있지 않으면 임의적이며, 여기서는 입력 순서(또는 오름차순)를 사용합니다. <strong>중위 순회</strong>는 왼쪽·오른쪽이 구분된 이진트리 형식에서만 계산합니다. 가중치, 여러 테스트케이스, 특수한 부가 입력은 문제별 전처리가 필요할 수 있습니다. 화면의 방문 순서는 구조를 살펴보기 위한 계산값이지, 모든 정보올림피아드 문제의 정답을 대신하지는 않습니다.</section>
+      <div class="footerprint" style="display:none">세영코딩연구소 · Ph.D KIM — 정보올림피아드 트리 시각화 학습자료</div>
+    </div>
+  </div>
+</main>
+<script>
+'use strict';
+(()=>{
+  const $=id=>document.getElementById(id);
+  const svgNS='http://www.w3.org/2000/svg';
+  const presets={
+    edges:{text:'9\n1 2\n1 3\n2 4\n2 5\n3 6\n3 7\n7 8\n7 9',root:'1'},
+    parents:{text:'9\n0 1 1 2 2 3 3 7 7',root:'1'},
+    binary:{text:'7\n1 2 3\n2 4 5\n3 6 7\n4 0 0\n5 0 0\n6 0 0\n7 0 0',root:'1'},
+    level:{text:'A B C D E null F null null G',root:'A'},
+    bst:{text:'9\n8 3 10 1 6 14 4 7 13',root:'8'}
+  };
+  const help={
+    edges:'첫 줄에 N, 다음 줄부터 「정점1 정점2」를 N-1개 입력합니다. 예: 1 3. 첫 줄 N N-1도 지원합니다.',
+    parents:'첫 줄에 N, 이후 부모 번호를 나열합니다. N개 입력 시 1번~N번의 부모(루트는 0 또는 -1), N-1개면 2번~N번의 부모이며 루트는 1입니다.',
+    binary:'첫 줄에 N, 다음 N줄은 「노드 왼쪽자식 오른쪽자식」으로 입력합니다. 자식이 없으면 0, -1, null을 씁니다. 왼쪽/오른쪽만 N줄 써도 됩니다.',
+    level:'레벨 순서대로 공백으로 구분해 입력합니다. 없는 자식은 null, N, 0, -1 등으로 표시합니다. 맨 앞에 N은 붙이지 않습니다.',
+    bst:'첫 토큰은 입력 개수 N, 다음 N개 수는 BST에 삽입할 키입니다. 예: 7 다음 8 3 10 1 6 14 4. 중복 키는 허용하지 않습니다.'
+  };
+  let tree=null, selected=null, timeline=[], step=0, timer=null, points=new Map(), scene={w:800,h:540,cx:400,cy:270}, viewport={x:0,y:0,zoom:1}, pointer=null;
+  function err(msg){throw new Error(msg)}
+  function linesOf(s){return s.replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(x=>x && !x.startsWith('//') && !x.startsWith('```'))}
+  function tokens(s){return s.trim().split(/\s+/).filter(Boolean)}
+  function validN(s){if(!/^\d+$/.test(s))err('노드 개수 N은 양의 정수여야 합니다.');let n=Number(s);if(n<1||n>500)err('지원 노드 개수: 1~500개 (예제 시각화 권장).');return n}
+  function newTree(binary){return {nodes:new Map(),root:null,binary}}
+  function addNode(t,id){id=String(id);if(!t.nodes.has(id))t.nodes.set(id,{id,children:[],left:null,right:null,parent:null,depth:0,subtree:1});return t.nodes.get(id)}
+  function compareIDs(a,b){const an=Number(a),bn=Number(b);if(a!==''&&b!==''&&Number.isFinite(an)&&Number.isFinite(bn)&&an!==bn)return an-bn;return a.localeCompare(b,'ko',{numeric:true})}
+  function sorted(s){return $('sortMode').value==='asc'?Array.from(s).sort(compareIDs):Array.from(s)}
+  function attach(t,p,c,side){const parent=addNode(t,p),child=addNode(t,c);if(parent.id===child.id)err('노드 '+p+'가 자기 자신을 자식으로 가질 수 없습니다.');if(child.parent!==null)err('노드 '+c+'에 부모가 두 개 이상 있습니다. 간선/배열을 확인하세요.');if(parent.children.includes(child.id))err('중복된 간선이 있습니다: '+p+' → '+c);parent.children.push(child.id);child.parent=parent.id;if(side==='left'||side==='right')parent[side]=child.id}
+  function parseEdges(s){const lines=linesOf(s);if(!lines.length)err('예제 입력이 비었습니다.');const first=tokens(lines.shift());if(first.length>2)err('간선 목록의 첫 줄은 N 또는 N M 형식이어야 합니다.');const n=validN(first[0]);if(first.length===2 && (!/^\d+$/.test(first[1])||Number(first[1])!==n-1))err('트리는 간선 수가 N-1개여야 합니다.');let edges=[];
+    for(const l of lines){let a=tokens(l);if(a.length===2||a.length===3){edges.push(a.slice(0,2));}
+      else if(a.length>3&&a.length%2===0){for(let i=0;i<a.length;i+=2)edges.push(a.slice(i,i+2));}
+      else err('각 간선은 「정점1 정점2」로 입력하세요: '+l);
+    }
+    if(edges.length!==n-1)err('간선 개수 오류: N='+n+'일 때 '+(n-1)+'개 필요하지만 '+edges.length+'개를 읽었습니다.');
+    const adj=new Map();function link(a,b){if(!adj.has(a))adj.set(a,[]);adj.get(a).push(b)}
+    for(const [a,b] of edges){if(a===b)err('자기 자신을 연결한 간선이 있습니다: '+a);link(a,b);link(b,a)}
+    let root=$('rootId').value.trim()||'1';if(!adj.has(root)&&n!==1)err('루트 '+root+'은(는) 간선에 나오지 않습니다. 루트를 확인하세요.');if(n===1)root= root||'1';
+    const t=newTree(false);for(const id of adj.keys())addNode(t,id);addNode(t,root);if(t.nodes.size!==n)err('N='+n+'이지만 실제 정점은 '+t.nodes.size+'개입니다. 연결된 정점 번호를 확인하세요.');
+    t.root=root;const q=[root],vis=new Set([root]);for(let i=0;i<q.length;i++){let cur=q[i];for(const v of sorted(adj.get(cur)||[])){if(v===t.nodes.get(cur).parent)continue;if(vis.has(v))err('사이클이 발견되었습니다. 트리 간선인지 확인하세요.');vis.add(v);attach(t,cur,v);q.push(v)}}
+    if(vis.size!==n)err('그래프가 연결되어 있지 않습니다. 한 개의 트리인지 확인하세요.');return t
+  }
+  function parseParents(s){let arr=tokens(s);if(!arr.length)err('부모 배열이 비었습니다.');let n=validN(arr.shift());if(arr.length!==n && arr.length!==n-1)err('부모 번호는 N개 또는 N-1개여야 합니다. (N='+n+', 읽은 개수='+arr.length+')');let t=newTree(false);for(let i=1;i<=n;i++)addNode(t,String(i));let root;
+    if(arr.length===n){let roots=[];arr.forEach((p,i)=>{const c=String(i+1);if(['0','-1','null','N'].includes(p))roots.push(c);else {if(!t.nodes.has(p))err('노드 '+c+'의 부모 '+p+'가 범위 1~N 밖입니다.');attach(t,p,c)}});if(roots.length!==1)err('부모가 0 또는 -1인 루트가 정확히 한 개 있어야 합니다. 현재: '+roots.length+'개');root=roots[0]}
+    else{root='1';arr.forEach((p,i)=>{const c=String(i+2);if(!t.nodes.has(p))err('노드 '+c+'의 부모 '+p+'가 범위 밖입니다.');attach(t,p,c)})}
+    if($('sortMode').value==='asc')for(const node of t.nodes.values())node.children.sort(compareIDs);t.root=root;return t
+  }
+  const isNull=v=>v==null||['0','-1','null','n','none','#','-'].includes(String(v).toLowerCase());
+  function parseBinary(s){const lines=linesOf(s);if(!lines.length)err('입력 내용이 없습니다.');let head=tokens(lines.shift()), n=validN(head[0]);if(head.length!==1)err('이진트리 첫 줄에는 노드 개수 N만 쓰세요.');if(lines.length!==n)err('노드 정보는 N줄 필요합니다. (N='+n+', 현재 '+lines.length+'줄)');
+    let rows=lines.map((l,i)=>{let tok=tokens(l);if(tok.length===2)return [String(i+1),...tok];if(tok.length===3)return tok;err((i+2)+'번째 줄: 「노드 왼쪽 오른쪽」 또는 「왼쪽 오른쪽」 형식이어야 합니다.')});
+    const t=newTree(true);for(const [id] of rows){if(t.nodes.has(id))err('노드 번호가 중복되었습니다: '+id);addNode(t,id)}
+    for(const [id,l,r] of rows){if(!isNull(l)){if(!t.nodes.has(l))err(id+'의 왼쪽 자식 '+l+'에 대한 노드 정보가 없습니다.');attach(t,id,l,'left')}if(!isNull(r)){if(!t.nodes.has(r))err(id+'의 오른쪽 자식 '+r+'에 대한 노드 정보가 없습니다.');attach(t,id,r,'right')}}
+    let roots=Array.from(t.nodes.values()).filter(n=>n.parent===null);if(roots.length!==1)err('루트 후보가 '+roots.length+'개입니다. 순환이나 누락을 확인하세요.');t.root=roots[0].id;return t
+  }
+  function parseLevel(s){let arr=tokens(s);if(!arr.length)err('레벨 순서 입력이 비어 있습니다.');if(isNull(arr[0]))err('루트는 null일 수 없습니다.');const t=newTree(true),root=arr.shift();t.root=root;addNode(t,root);const q=[root];let at=0;
+    while(at<q.length&&arr.length){let id=q[at++];for(const side of ['left','right']){if(!arr.length)break;let v=arr.shift();if(!isNull(v)){if(t.nodes.has(v))err('노드 번호가 중복되었습니다: '+v+' (레벨 순서 노드 이름은 서로 달라야 합니다.)');attach(t,id,v,side);q.push(v)}}}
+    if(arr.some(x=>!isNull(x)))err('부모가 없는 추가 노드 값이 있습니다. 레벨 순서를 확인하세요.');if(t.nodes.size>500)err('노드는 500개까지 표시합니다.');return t
+  }
+  function parseBST(s){let arr=tokens(s);if(!arr.length)err('BST 입력이 비었습니다.');let n=validN(arr.shift());if(arr.length!==n)err('BST에 삽입할 값 '+n+'개가 필요합니다. 현재: '+arr.length+'개');if(arr.some(a=>!Number.isFinite(Number(a))))err('BST 키는 숫자만 사용할 수 있습니다.');const t=newTree(true);let seen=new Set();for(const raw of arr){const val=Number(raw);if(seen.has(val))err('BST 예제에서는 중복 키를 지원하지 않습니다: '+raw);seen.add(val);if(!t.root){t.root=raw;addNode(t,raw);continue}let here=t.root;while(true){const node=t.nodes.get(here),side=val<Number(here)?'left':'right';if(!node[side]){attach(t,here,raw,side);break}here=node[side]}}return t}
+  function verify(t){if(t.nodes.size>500)err('노드는 500개까지만 시각화합니다.');if(!t.nodes.has(t.root))err('루트 노드를 찾을 수 없습니다.');const visit=new Set(),stack=[[t.root,0]];let visited=0;while(stack.length){const [id,d]=stack.pop();if(visit.has(id))err('순환이 발견되었습니다. 트리가 아닙니다.');visit.add(id);const node=t.nodes.get(id);node.depth=d;visited++;if(d>500)err('깊이가 너무 큽니다.');for(let i=node.children.length-1;i>=0;i--)stack.push([node.children[i],d+1])}if(visited!==t.nodes.size)err('루트에서 도달하지 못하는 노드가 있습니다. 하나의 연결된 트리가 아닙니다.');const post=[];let st=[[t.root,false]];while(st.length){const [id,back]=st.pop();if(back){let nd=t.nodes.get(id);nd.subtree=1+nd.children.reduce((a,c)=>a+t.nodes.get(c).subtree,0);post.push(id)}else{st.push([id,true]);for(let i=t.nodes.get(id).children.length-1;i>=0;i--)st.push([t.nodes.get(id).children[i],false])}}t.post=post;return t}
+  function traversals(t){let pre=[],post=[],bfs=[],ino=[];
+    function dfs(id){const a=t.nodes.get(id);pre.push(id);for(const c of a.children)dfs(c);post.push(id)}
+    function inorder(id){if(!id)return;const a=t.nodes.get(id);inorder(a.left);ino.push(id);inorder(a.right)}
+    dfs(t.root);if(t.binary)inorder(t.root);const q=[t.root];for(let i=0;i<q.length;i++){let id=q[i];bfs.push(id);q.push(...t.nodes.get(id).children)}return {pre,post,bfs,in:ino}
+  }
+  function measureLayout(t){const widths=new Map(),coords=new Map();const base=91,gap=36,phantom=45,dy=110;
+    function measure(id){const nd=t.nodes.get(id);let w=base;if(t.binary){const l=nd.left?measure(nd.left):phantom,r=nd.right?measure(nd.right):phantom;if(nd.left||nd.right)w=Math.max(base,l+r+gap)}else if(nd.children.length){const ww=nd.children.map(measure);w=Math.max(base,ww.reduce((a,b)=>a+b,0)+gap*(ww.length-1))}widths.set(id,w);return w}
+    const W=measure(t.root);function place(id,left,depth){let nd=t.nodes.get(id),w=widths.get(id),x=left+w/2;coords.set(id,{x,y:70+depth*dy});if(t.binary){const l=nd.left?widths.get(nd.left):phantom,r=nd.right?widths.get(nd.right):phantom;if(nd.left||nd.right){let sum=l+r+gap, pos=left+(w-sum)/2;if(nd.left)place(nd.left,pos,depth+1);if(nd.right)place(nd.right,pos+l+gap,depth+1)}}else if(nd.children.length){let widthsSum=nd.children.reduce((a,c)=>a+widths.get(c),0)+gap*(nd.children.length-1),pos=left+(w-widthsSum)/2;for(const c of nd.children){place(c,pos,depth+1);pos+=widths.get(c)+gap}}}
+    place(t.root,70,0);const maxDepth=Math.max(...Array.from(t.nodes.values(),x=>x.depth));return {coords,width:W+140,height:140+maxDepth*dy,maxDepth}
+  }
+  function makeSvg(tag,attrs){const el=document.createElementNS(svgNS,tag);for(const [k,v] of Object.entries(attrs||{}))el.setAttribute(k,v);return el}
+  function renderGraph(){const svg=$('treeSvg');svg.replaceChildren();points.clear();if(!tree){$('emptyPrompt').style.display='flex';return}$('emptyPrompt').style.display='none';const {coords,width,height,maxDepth}=measureLayout(tree);points=coords;const bg=makeSvg('rect',{x:0,y:0,width:Math.max(width,1),height:Math.max(height,1),fill:'transparent'});svg.append(bg);
+    for(const nd of tree.nodes.values()){for(const child of nd.children){const a=coords.get(nd.id),b=coords.get(child);const path=makeSvg('path',{class:'svg-edge',id:'edge-'+encodeURIComponent(nd.id)+'-'+encodeURIComponent(child),d:`M${a.x} ${a.y+24} C${a.x} ${a.y+65}, ${b.x} ${b.y-65}, ${b.x} ${b.y-24}`});path.dataset.child=child;svg.append(path)}}
+    const doneSet=new Set(timeline.slice(0,Math.max(step-1,0))),current=timeline[step-1];
+    for(const [id,xy] of coords){const g=makeSvg('g',{class:'svg-node'+(id===tree.root?' root':'')+(doneSet.has(id)?' done':'')+(id===current?' current':'')+(id===selected?' selected':''),'data-id':id,role:'button',tabindex:0,'aria-label':'노드 '+id});let c=makeSvg('circle',{cx:xy.x,cy:xy.y,r:26,fill:'#eef5ff',stroke:'#366bb5','stroke-width':2.5}),lab=makeSvg('text',{x:xy.x,y:xy.y});lab.textContent=id.length>7?id.slice(0,6)+'…':id;if(id.length>3)lab.setAttribute('font-size','13');g.append(c,lab);let title=makeSvg('title');title.textContent='노드 '+id;g.append(title);g.addEventListener('click',()=>selectNode(id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectNode(id)}});svg.append(g)}
+    applyNodeStates();updateBaseView(width,height,maxDepth)
+  }
+  function updateBaseView(w,h){let svg=$('treeSvg'),rect=svg.getBoundingClientRect(),aspect=rect.width/Math.max(1,rect.height);let baseW=Math.max(w,h*aspect),baseH=Math.max(h,w/aspect);scene={w:baseW,h:baseH,cx:w/2,cy:h/2};viewport={x:scene.cx,y:scene.cy,zoom:1};$('zoom').value='1';setView()}
+  function setView(){let zoom=viewport.zoom,w=scene.w/zoom,h=scene.h/zoom;$('treeSvg').setAttribute('viewBox',`${viewport.x-w/2} ${viewport.y-h/2} ${w} ${h}`);$('zoomText').textContent=Math.round(zoom*100)+'%';$('zoom').value=String(zoom)}
+  function changeZoom(v){viewport.zoom=Math.max(.55,Math.min(3.5,Number(v)));setView()}
+  function applyNodeStates(){if(!tree)return;let visited=new Set(timeline.slice(0,Math.max(0,step-1))),active=step>0?timeline[step-1]:null;const pathIDs=new Set();if(selected){let cur=selected;while(cur!=null){pathIDs.add(cur);cur=tree.nodes.get(cur).parent}}for(const g of $('treeSvg').querySelectorAll('.svg-node')){let id=g.dataset.id;g.classList.toggle('root',id===tree.root);g.classList.toggle('done',visited.has(id));g.classList.toggle('current',id===active);g.classList.toggle('selected',id===selected)}for(const e of $('treeSvg').querySelectorAll('.svg-edge'))e.classList.toggle('path',pathIDs.has(e.dataset.child))}
+  function selectNode(id){if(!tree||!tree.nodes.has(id))return;selected=id;const nd=tree.nodes.get(id);$('nodeName').textContent=id+(id===tree.root?' (루트)':'');$('nodeParent').textContent=nd.parent===null?'없음 (루트)':nd.parent;$('nodeDepth').textContent=String(nd.depth)+' (루트의 깊이 = 0)';$('nodeChildren').textContent=nd.children.length?nd.children.join(', '):'없음 (리프 노드)';$('nodeSubtree').textContent=String(nd.subtree)+'개 (자기 자신 포함)';const path=[];let cur=id;while(cur!==null){path.push(cur);cur=tree.nodes.get(cur).parent}$('nodePath').textContent=path.reverse().join(' → ');applyNodeStates()}
+  function updateResults(){let ts=traversals(tree);$('preorder').textContent=ts.pre.join(' → ');$('inorder').textContent=tree.binary?ts.in.join(' → '):'해당 없음';$('postorder').textContent=ts.post.join(' → ');$('bfsorder').textContent=ts.bfs.join(' → ');$('algorithm').querySelector('[value="in"]').disabled=!tree.binary;if(!tree.binary&&$('algorithm').value==='in')$('algorithm').value='bfs';$('statNodes').textContent=tree.nodes.size;$('statEdges').textContent=tree.nodes.size-1;$('statRoot').textContent=tree.root;$('statDepth').textContent=String(Math.max(...Array.from(tree.nodes.values(),nd=>nd.depth)));$('statLeaves').textContent=String(Array.from(tree.nodes.values()).filter(nd=>!nd.children.length).length);$('treeStatus').textContent='트리 생성 완료 · '+tree.nodes.size+'개 노드';return ts}
+  function stop(){if(timer!==null){clearInterval(timer);timer=null}$('play').textContent='▶ 재생'}
+  function setupTimeline(){stop();if(!tree){timeline=[];step=0;return}const ts=traversals(tree);timeline=ts[$('algorithm').value].slice();step=0;refreshStep()}
+  function refreshStep(){let total=timeline.length;$('progressFill').style.width=(total?step/total*100:0)+'%';if(!step){$('stepText').textContent=total?`총 ${total}개 노드. 시작 버튼 또는 다음 버튼을 누르세요.`:'트리를 먼저 그려주세요.'}else{$('stepText').textContent=`${step} / ${total}단계 · 현재 방문: ${timeline[step-1]} · 방문한 노드: ${timeline.slice(0,step).join(' → ')}`}if(tree)applyNodeStates();$('prev').disabled=step===0;$('next').disabled=step>=total;$('play').disabled=!total}
+  function nextStep(){if(step<timeline.length){step++;refreshStep()}if(step>=timeline.length)stop()}
+  function draw(){stop();$('printInput').textContent=$('sampleInput').value;$('printOutput').textContent=$('expected').value||'(입력 없음)';try{let s=$('sampleInput').value,fmt=$('format').value;let t=fmt==='edges'?parseEdges(s):fmt==='parents'?parseParents(s):fmt==='binary'?parseBinary(s):fmt==='level'?parseLevel(s):parseBST(s);tree=verify(t);selected=null;$('errorBox').classList.remove('show');$('errorBox').textContent='';$('nodeName').textContent='노드를 클릭하세요.';for(const id of ['nodeParent','nodeDepth','nodeChildren','nodeSubtree','nodePath'])$(id).textContent='—';updateResults();setupTimeline();renderGraph();selectNode(tree.root)}catch(e){tree=null;selected=null;timeline=[];step=0;$('treeSvg').replaceChildren();$('emptyPrompt').style.display='flex';$('emptyPrompt').textContent='입력을 확인하고 다시 그려주세요.';$('errorBox').classList.add('show');$('errorBox').textContent='입력 형식 오류: '+e.message;$('treeStatus').textContent='입력 오류';$('nodeName').textContent='노드를 클릭하세요.';for(const id of ['nodeParent','nodeDepth','nodeChildren','nodeSubtree','nodePath'])$(id).textContent='—';for(const id of ['preorder','inorder','postorder','bfsorder','statNodes','statEdges','statRoot','statDepth','statLeaves'])$(id).textContent='—';refreshStep()}}
+  function setFormat(f){$('format').value=f;$('formatHelp').textContent=help[f];$('rootId').disabled=f!=='edges';$('sortMode').disabled=f!=='edges'&&f!=='parents'}
+  function preset(f){setFormat(f);$('sampleInput').value=presets[f].text;$('rootId').value=presets[f].root;$('sortMode').value='input';$('expected').value='';draw()}
+  function exportSVG(){if(!tree)return alert('먼저 트리를 그려주세요.');const clone=$('treeSvg').cloneNode(true);clone.querySelectorAll('.svg-node').forEach(node=>{const c=node.querySelector('circle'),txt=node.querySelector('text');if(node.classList.contains('current')){c.setAttribute('fill','#ffcf76');c.setAttribute('stroke','#ca6b0d')}else if(node.classList.contains('done')){c.setAttribute('fill','#cce9ff');c.setAttribute('stroke','#3267b6')}else if(node.classList.contains('root')){c.setAttribute('fill','#0b737b');c.setAttribute('stroke','#0b737b');txt.setAttribute('fill','#ffffff')}else {c.setAttribute('fill','#eef5ff');c.setAttribute('stroke','#366bb5')}if(node.classList.contains('selected')){c.setAttribute('stroke','#c82d66');c.setAttribute('stroke-width','5')}txt.setAttribute('fill',node.classList.contains('root')&&!node.classList.contains('done')&&!node.classList.contains('current')?'#ffffff':'#183658')});clone.querySelectorAll('.svg-edge').forEach(path=>{path.setAttribute('fill','none');path.setAttribute('stroke',path.classList.contains('path')?'#db8e2d':'#9bb0ca');path.setAttribute('stroke-width',path.classList.contains('path')?'4':'2.5')});let bounds=measureLayout(tree),w=bounds.width,h=bounds.height;clone.setAttribute('viewBox',`0 0 ${w} ${h}`);clone.setAttribute('width',w);clone.setAttribute('height',h);clone.setAttribute('xmlns',svgNS);clone.removeAttribute('style');const back=makeSvg('rect',{x:0,y:0,width:w,height:h,fill:'#fff'});clone.insertBefore(back,clone.firstChild);const xml='<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(clone),blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='KOI_tree_'+$('format').value+'.svg';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
+  $('expected').addEventListener('input',()=>{$('printOutput').textContent=$('expected').value||'(입력 없음)'});
+  $('format').addEventListener('change',e=>{setFormat(e.target.value);$('sampleInput').value=presets[e.target.value].text;$('rootId').value=presets[e.target.value].root});
+  document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.demo)));
+  $('clearButton').addEventListener('click',()=>{$('sampleInput').value='';$('expected').value='';$('sampleInput').focus()});$('drawButton').addEventListener('click',draw);$('rootId').addEventListener('keydown',e=>{if(e.key==='Enter')draw()});$('algorithm').addEventListener('change',setupTimeline);
+  $('prev').addEventListener('click',()=>{stop();step=Math.max(0,step-1);refreshStep()});$('next').addEventListener('click',()=>{stop();nextStep()});$('reset').addEventListener('click',()=>{stop();step=0;refreshStep()});$('play').addEventListener('click',()=>{if(timer!==null){stop();return}if(!timeline.length)return;if(step>=timeline.length)step=0;nextStep();if(step>=timeline.length)return;timer=setInterval(nextStep,Number($('speed').value));$('play').textContent='⏸ 일시정지'});
+  $('speed').addEventListener('input',()=>{$('speedText').textContent=(Number($('speed').value)/1000).toFixed(2)+'초/노드';if(timer!==null){stop();timer=setInterval(nextStep,Number($('speed').value));$('play').textContent='⏸ 일시정지'}});
+  $('zoom').addEventListener('input',e=>changeZoom(e.target.value));$('zoomIn').addEventListener('click',()=>changeZoom(viewport.zoom+.2));$('zoomOut').addEventListener('click',()=>changeZoom(viewport.zoom-.2));$('fit').addEventListener('click',()=>{viewport.x=scene.cx;viewport.y=scene.cy;changeZoom(1)});$('saveSvg').addEventListener('click',exportSVG);$('print').addEventListener('click',()=>window.print());
+  const svg=$('treeSvg');svg.addEventListener('pointerdown',e=>{if(!tree||e.target.closest('.svg-node'))return;pointer={x:e.clientX,y:e.clientY,cx:viewport.x,cy:viewport.y};svg.setPointerCapture(e.pointerId);svg.classList.add('dragging')});svg.addEventListener('pointermove',e=>{if(!pointer)return;const rect=svg.getBoundingClientRect();viewport.x=pointer.cx-(e.clientX-pointer.x)/rect.width*scene.w/viewport.zoom;viewport.y=pointer.cy-(e.clientY-pointer.y)/rect.height*scene.h/viewport.zoom;setView()});const endPointer=()=>{pointer=null;svg.classList.remove('dragging')};svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);svg.addEventListener('lostpointercapture',endPointer);svg.addEventListener('wheel',e=>{if(!tree)return;e.preventDefault();changeZoom(viewport.zoom*(e.deltaY<0?1.12:1/1.12))},{passive:false});
+  document.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tag))return;if(e.key==='ArrowRight'){e.preventDefault();stop();nextStep()}if(e.key==='ArrowLeft'){e.preventDefault();stop();step=Math.max(0,step-1);refreshStep()}});
+  let resizeWait=null;window.addEventListener('resize',()=>{clearTimeout(resizeWait);resizeWait=setTimeout(()=>{if(tree){let z=viewport.zoom;renderGraph();changeZoom(z)}},120)});
+  preset('edges');
+})();
+</script>
+</body>
+</html>
