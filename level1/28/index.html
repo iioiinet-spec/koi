@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>부울대수 논리식 간소화 | 10문제</title>
+<style>
+:root{--navy:#193a55;--accent:#226c9b;--text:#203242;--muted:#667787;--line:#dce5eb;--bg:#f6f9fb;--soft:#edf4f8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:'Malgun Gothic','NanumGothic','Noto Sans CJK KR',system-ui,sans-serif;font-size:16px;line-height:1.65}
+button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #f0af43;outline-offset:3px}
+.container{max-width:1010px;margin:auto;padding:27px 28px 75px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid #d9e5ee;padding-bottom:9px}.brand{font-size:13px;font-weight:800;letter-spacing:.09em;color:var(--accent)}.serial{font-size:13px;color:var(--muted)}
+.hero{padding:24px 0 16px}.eyebrow{font-size:14px;font-weight:700;color:var(--accent)}h1{font-size:34px;letter-spacing:-.055em;line-height:1.27;margin:5px 0}h2{font-size:23px;color:var(--navy);margin:30px 0 10px}h3{font-size:18px;margin:0;flex:1}.lead{font-size:17px;color:#536677;margin:10px 0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}.chip{border:1px solid #d5e4ee;border-radius:99px;background:white;padding:5px 11px;font-weight:700;font-size:13px;color:var(--accent)}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:19px 0 8px;padding:14px;background:#eaf2f8;border-radius:12px}.toolbar button,.check-btn{border:1px solid var(--accent);color:white;background:var(--accent);padding:9px 13px;border-radius:9px;font-weight:700}.toolbar .secondary{background:white;color:var(--accent)}.toolbar button:hover,.check-btn:hover{filter:brightness(.91)}.toolbar-note{font-size:13px;color:#55687b;margin:0 0 24px}
+.reference{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 25px}.note{background:#f4f9fc;padding:10px 14px;border-left:4px solid var(--accent);font-size:15px}.reference p{margin:8px 0}.law-table{width:100%;border-collapse:collapse;margin-top:15px;font-size:15px}.law-table td,.law-table th{border-bottom:1px solid var(--line);padding:10px 9px;text-align:left}.law-table th{width:29%;color:var(--navy)}.mono,.expression,.step-formula,input{font-family:Consolas,'NanumGothicCoding',monospace}.workflow{font-weight:700;color:#355d79}
+.section-heading{border-bottom:2px solid #dfebf2;padding-bottom:10px}.problem-list{display:grid;grid-template-columns:1fr;gap:16px}.problem-card{border:1px solid var(--line);border-radius:14px;background:white;padding:19px 23px;break-inside:avoid}.problem-head{display:flex;gap:12px;align-items:center}.problem-number{font-weight:900;font-size:20px;color:var(--accent)}.problem-tag{border-radius:4px;background:#eaf3f9;color:var(--accent);font-size:12px;font-weight:800;padding:2px 7px}.expression{font-size:clamp(19px,2.8vw,25px);font-weight:700;color:#172c40;letter-spacing:.01em;overflow-wrap:anywhere;margin:12px 0 15px;background:#f5f9fc;padding:13px;border-radius:8px}.practice-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.practice-row label{font-size:14px;font-weight:700;white-space:nowrap}.practice-row input{min-width:130px;flex:1;border:1px solid #b7cbd9;background:white;border-radius:8px;padding:9px 11px;font-size:17px}.check-btn{font-size:14px}.feedback{font-size:14px;min-height:12px;margin:6px 0}.feedback.ok{color:#156a4f}.feedback.no{color:#a44932}.action-row{display:flex;gap:9px;flex-wrap:wrap;margin:5px 0 9px}.ghost-btn{font-size:13px;border:1px solid #bacbd6;background:white;padding:6px 11px;border-radius:7px;color:#315a76}.hint{color:#805b18;background:#fff9e7;padding:10px 13px;border-radius:8px;font-size:14px}.solution{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.solution summary{cursor:pointer;font-weight:800;color:var(--accent)}.solution-body{padding:5px 4px 1px}.answer-final{background:#edf7f4;border-left:4px solid #39947b;padding:9px 13px;border-radius:5px;font-weight:700}.answer-final strong{font-family:Consolas,monospace;font-size:20px;margin-left:16px}.steps{padding-left:24px}.steps li{padding:6px 3px;border-bottom:1px dotted #e1e8ed}.step-formula{font-size:17px;font-weight:700;display:inline-block;min-width:33%}.step-law{font-size:14px;color:#5c6d7b}.explain{font-size:14px;color:#425768;line-height:1.72}.truth{padding:11px;border-radius:9px;border:1px solid #bfd3e1;background:#f8fbfd;margin:10px 0}.truth table{border-collapse:collapse;text-align:center;font:14px Consolas,monospace;width:100%}.truth th,.truth td{border:1px solid #d9e4eb;padding:5px}.truth th{background:#e6f0f7}.truth-caption{font-size:13px;font-weight:700;color:var(--accent);margin:0 0 6px}
+footer{margin-top:35px;border-top:1px solid #d4e1e9;padding:12px 0;font-size:14px;color:#67798a;text-align:center}.print-line{display:none}
+@media(max-width:650px){.container{padding:18px 14px 45px}h1{font-size:28px}.reference{padding:15px}.problem-card{padding:16px}.toolbar{padding:11px}.topbar{display:block}.step-formula{display:block}.step-law{display:block}.law-table{font-size:13px}}
+@page{size:A4;margin:14mm 15mm 15mm 15mm}
+@media print{body{background:white;color:black;font-family:'Malgun Gothic','NanumGothic','Noto Sans CJK KR',sans-serif;font-size:10.3pt}.container{max-width:none;margin:0;padding:0}.topbar{border-bottom:1px solid #999}.toolbar,.toolbar-note,.practice-row,.feedback,.action-row,.hint,.truth,.no-print{display:none!important}.hero{padding:8mm 0 4mm}h1{font-size:20pt}h2{font-size:15pt;margin:15px 0 7px}.lead{font-size:10pt}.chips{margin:9px 0}.chip{border:1px solid #999;padding:2px 7px;color:#333}.reference{border:0;padding:0}.note{border-left:2px solid #555;background:white}.law-table{font-size:9pt}.law-table td,.law-table th{padding:4px}.section-heading{break-after:avoid}.problem-list{gap:0}.problem-card{border:0;border-bottom:1px solid #b6b6b6;border-radius:0;padding:10px 0 12px;break-inside:avoid}.problem-head{gap:9px}.problem-head h3{font-size:11pt}.expression{font-size:13.5pt;background:white;padding:3px 0;margin:7px 0}.problem-number{font-size:12pt;color:black}.problem-tag{color:black;background:white;border:1px solid #999}.print-line{display:block;font-size:9.5pt;color:#444;line-height:1.9}.solution{margin-top:7px;border-top:0;padding-top:5px}.solution summary{display:none}.solution-body{padding:0}.answer-final{background:white;border-left:2px solid #777;font-size:10pt;padding:3px 10px}.answer-final strong{font-size:12pt}.steps{margin:4px 0 6px}.steps li{padding:2px}.step-formula{font-size:10pt;min-width:28%}.step-law{font-size:9pt;color:#333}.explain{font-size:9pt;line-height:1.5;margin:4px 0}.print-student .solution{display:none!important}.print-student .print-line{display:block}.print-teacher .print-line{display:none}.print-teacher .solution{display:block!important}.print-teacher .solution-body{display:block!important}.print-teacher .solution[open]>.solution-body{display:block}footer{font-size:9pt;color:#555}.problem-card:nth-child(5n){break-after:auto}}
+</style></head><body>
+<div class="container"><div class="topbar"><span class="brand">SEYEONG CODING LAB</span><span class="serial">세영코딩연구소 · Ph.D. KIM</span></div>
+<header class="hero"><div class="eyebrow">컴퓨터과학 · 디지털 논리 기초</div><h1>부울대수 논리식 간소화</h1><p class="lead">기초부터 심화까지 10문제 · 단계별 정답 해설 · 진리표 검산</p><div class="chips"><span class="chip">기초 4</span><span class="chip">응용 4</span><span class="chip">심화 2</span><span class="chip">오프라인 실행 가능</span><span class="chip">A4 인쇄 최적화</span></div></header>
+<nav class="toolbar no-print" aria-label="학습 및 인쇄 기능"><button type="button" onclick="printPage('student')">학생용 문제 인쇄</button><button type="button" onclick="printPage('teacher')">정답·해설 포함 인쇄</button><button class="secondary" onclick="setAllSolutions(true)">전체 해설 열기</button><button class="secondary" onclick="setAllSolutions(false)">전체 해설 닫기</button></nav>
+<p class="toolbar-note no-print">학생용 인쇄에서는 정답이 빠지고 풀이 공간이 나타납니다. 교사용 인쇄에는 10문제의 풀이와 해설이 모두 포함됩니다.</p>
+<section class="reference" id="intro"><h2>1. 핵심 개념과 법칙</h2><p><b>기호 안내</b> : <span class="mono">+</span> = OR(논리합), <span class="mono">AB</span> 또는 <span class="mono">A·B</span> = AND(논리곱), <span class="mono">A'</span> = NOT(부정)</p><p class="note">연산 우선순위: 괄호 → NOT → AND → OR. 부울값은 0(거짓) 또는 1(참)입니다.</p><table class="law-table"><tbody><tr><th>멱등법칙</th><td class="mono">X+X=X, XX=X</td></tr><tr><th>보수법칙</th><td class="mono">X+X&#x27;=1, XX&#x27;=0</td></tr><tr><th>항등·지배법칙</th><td class="mono">X+0=X, X·1=X, X+1=1, X·0=0</td></tr><tr><th>흡수법칙</th><td class="mono">X+XY=X, X(X+Y)=X</td></tr><tr><th>분배법칙</th><td class="mono">X(Y+Z)=XY+XZ, X+YZ=(X+Y)(X+Z)</td></tr><tr><th>드모르간 법칙</th><td class="mono">(X+Y)&#x27;=X&#x27;Y&#x27;, (XY)&#x27;=X&#x27;+Y&#x27;</td></tr><tr><th>합의정리</th><td class="mono">XY+X&#x27;Z+YZ=XY+X&#x27;Z</td></tr></tbody></table><p class="workflow">풀이 순서: 공통 부분 찾기 → 묶거나 전개하기 → 보수·흡수 적용 → 추가 축약 확인</p></section>
+<section id="practice"><h2 class="section-heading">2. 연습문제 10개</h2><div class="problem-list"><article class="problem-card" data-id="1" id="p1">
+       <div class="problem-head"><div class="problem-number">01</div><div class="problem-tag">기초</div><h3>흡수법칙</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = A + AB</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer1">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer1" placeholder="예: A+B 또는 AB" aria-label="1번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(1)">동치 확인</button></div>
+       <p class="feedback" id="feedback1" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(1)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(1)">진리표 검증</button></div>
+       <p class="hint" id="hint1" hidden>같은 변수 A를 가진 두 항의 관계를 살펴보세요.</p>
+       <div class="truth" id="truth1" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A</strong></div>
+         <ol class="steps"><li><span class="step-formula">A + AB</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">A(1+B)</span><span class="step-law">공통인수 A로 묶기</span></li><li><span class="step-formula">A·1</span><span class="step-law">지배법칙: 1+B=1</span></li><li><span class="step-formula">A</span><span class="step-law">항등법칙: A·1=A</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> AB가 1이면 A도 반드시 1입니다. 따라서 AB는 A에 이미 포함된 조건이므로 지워도 결과가 달라지지 않습니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="2" id="p2">
+       <div class="problem-head"><div class="problem-number">02</div><div class="problem-tag">기초</div><h3>흡수법칙의 곱 형태</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = A(A+B)</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer2">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer2" placeholder="예: A+B 또는 AB" aria-label="2번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(2)">동치 확인</button></div>
+       <p class="feedback" id="feedback2" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(2)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(2)">진리표 검증</button></div>
+       <p class="hint" id="hint2" hidden>괄호를 전개한 다음 같은 항을 정리해 보세요.</p>
+       <div class="truth" id="truth2" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A</strong></div>
+         <ol class="steps"><li><span class="step-formula">A(A+B)</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">AA+AB</span><span class="step-law">분배법칙</span></li><li><span class="step-formula">A+AB</span><span class="step-law">멱등법칙: AA=A</span></li><li><span class="step-formula">A</span><span class="step-law">흡수법칙: A+AB=A</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> A가 0이면 전체 곱이 0이고, A가 1이면 괄호 안도 1입니다. 따라서 B의 값과 상관없이 결과는 A입니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="3" id="p3">
+       <div class="problem-head"><div class="problem-number">03</div><div class="problem-tag">기초</div><h3>보수법칙</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = AB + AB&#x27;</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer3">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer3" placeholder="예: A+B 또는 AB" aria-label="3번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(3)">동치 확인</button></div>
+       <p class="feedback" id="feedback3" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(3)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(3)">진리표 검증</button></div>
+       <p class="hint" id="hint3" hidden>공통인수 A를 묶고 B와 B&#x27;의 관계를 이용하세요.</p>
+       <div class="truth" id="truth3" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A</strong></div>
+         <ol class="steps"><li><span class="step-formula">AB + AB&#x27;</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">A(B+B&#x27;)</span><span class="step-law">분배법칙의 역방향</span></li><li><span class="step-formula">A·1</span><span class="step-law">보수법칙: B+B&#x27;=1</span></li><li><span class="step-formula">A</span><span class="step-law">항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> B가 1인 경우와 0인 경우를 모두 포함하기 때문에 B 조건이 사라지고 A만 남습니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="4" id="p4">
+       <div class="problem-head"><div class="problem-number">04</div><div class="problem-tag">기초</div><h3>곱의 축약 공식</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = (A+B)(A+B&#x27;)</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer4">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer4" placeholder="예: A+B 또는 AB" aria-label="4번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(4)">동치 확인</button></div>
+       <p class="feedback" id="feedback4" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(4)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(4)">진리표 검증</button></div>
+       <p class="hint" id="hint4" hidden>(X+Y)(X+Z)=X+YZ 공식을 적용해 보세요.</p>
+       <div class="truth" id="truth4" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A</strong></div>
+         <ol class="steps"><li><span class="step-formula">(A+B)(A+B&#x27;)</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">A+BB&#x27;</span><span class="step-law">분배·흡수에 따른 축약 공식</span></li><li><span class="step-formula">A+0</span><span class="step-law">보수법칙: BB&#x27;=0</span></li><li><span class="step-formula">A</span><span class="step-law">항등법칙: A+0=A</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> 두 괄호를 모두 참으로 만들려면 A가 참이거나 B와 B&#x27;가 동시에 참이어야 합니다. 후자는 불가능하므로 A만 남습니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="5" id="p5">
+       <div class="problem-head"><div class="problem-number">05</div><div class="problem-tag">응용</div><h3>드모르간 + 인수분해</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = (A+B)&#x27; + A&#x27;B</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer5">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer5" placeholder="예: A+B 또는 AB" aria-label="5번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(5)">동치 확인</button></div>
+       <p class="feedback" id="feedback5" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(5)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(5)">진리표 검증</button></div>
+       <p class="hint" id="hint5" hidden>먼저 괄호 밖의 부정을 드모르간 법칙으로 처리하세요.</p>
+       <div class="truth" id="truth5" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A&#x27;</strong></div>
+         <ol class="steps"><li><span class="step-formula">(A+B)&#x27; + A&#x27;B</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">A&#x27;B&#x27; + A&#x27;B</span><span class="step-law">드모르간 법칙: (A+B)&#x27;=A&#x27;B&#x27;</span></li><li><span class="step-formula">A&#x27;(B&#x27;+B)</span><span class="step-law">공통인수 A&#x27;로 묶기</span></li><li><span class="step-formula">A&#x27;·1</span><span class="step-law">보수법칙: B&#x27;+B=1</span></li><li><span class="step-formula">A&#x27;</span><span class="step-law">항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> 드모르간 법칙을 먼저 적용하면 A&#x27;가 공통인수로 나타납니다. B의 양쪽 경우가 모두 포함되어 최종적으로 A&#x27;만 남습니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="6" id="p6">
+       <div class="problem-head"><div class="problem-number">06</div><div class="problem-tag">응용</div><h3>흡수 변형 공식</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = A + A&#x27;B</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer6">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer6" placeholder="예: A+B 또는 AB" aria-label="6번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(6)">동치 확인</button></div>
+       <p class="feedback" id="feedback6" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(6)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(6)">진리표 검증</button></div>
+       <p class="hint" id="hint6" hidden>X+YZ=(X+Y)(X+Z) 형태로 바꾸세요.</p>
+       <div class="truth" id="truth6" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A+B</strong></div>
+         <ol class="steps"><li><span class="step-formula">A + A&#x27;B</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">(A+A&#x27;)(A+B)</span><span class="step-law">분배법칙의 변형: X+YZ=(X+Y)(X+Z)</span></li><li><span class="step-formula">1·(A+B)</span><span class="step-law">보수법칙: A+A&#x27;=1</span></li><li><span class="step-formula">A+B</span><span class="step-law">항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> A=1이면 무조건 참입니다. A=0이면 두 번째 항 A&#x27;B가 B로 바뀌므로 A+B와 같은 결과를 냅니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="7" id="p7">
+       <div class="problem-head"><div class="problem-number">07</div><div class="problem-tag">응용</div><h3>합의정리(Consensus)</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = AB + A&#x27;C + BC</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer7">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer7" placeholder="예: A+B 또는 AB" aria-label="7번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(7)">동치 확인</button></div>
+       <p class="feedback" id="feedback7" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(7)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(7)">진리표 검증</button></div>
+       <p class="hint" id="hint7" hidden>BC에 1=A+A&#x27;를 곱하고 기존 두 항에 흡수시켜 보세요.</p>
+       <div class="truth" id="truth7" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>AB+A&#x27;C</strong></div>
+         <ol class="steps"><li><span class="step-formula">AB + A&#x27;C + BC</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">AB + A&#x27;C + BC(A+A&#x27;)</span><span class="step-law">항등·보수법칙: A+A&#x27;=1</span></li><li><span class="step-formula">AB + A&#x27;C + ABC + A&#x27;BC</span><span class="step-law">분배법칙</span></li><li><span class="step-formula">AB(1+C)+A&#x27;C(1+B)</span><span class="step-law">공통인수로 묶기</span></li><li><span class="step-formula">AB+A&#x27;C</span><span class="step-law">지배·항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> BC=1인 경우 A=1이면 AB가 1이고, A=0이면 A&#x27;C가 1입니다. 따라서 BC는 결과를 바꾸지 않는 중복항입니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="8" id="p8">
+       <div class="problem-head"><div class="problem-number">08</div><div class="problem-tag">응용</div><h3>공통 합항</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = (A+B)(A&#x27;+B)</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer8">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer8" placeholder="예: A+B 또는 AB" aria-label="8번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(8)">동치 확인</button></div>
+       <p class="feedback" id="feedback8" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(8)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(8)">진리표 검증</button></div>
+       <p class="hint" id="hint8" hidden>공통으로 들어 있는 B를 X처럼 생각하세요.</p>
+       <div class="truth" id="truth8" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>B</strong></div>
+         <ol class="steps"><li><span class="step-formula">(A+B)(A&#x27;+B)</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">B+AA&#x27;</span><span class="step-law">축약 공식: (X+Y)(X+Z)=X+YZ</span></li><li><span class="step-formula">B+0</span><span class="step-law">보수법칙: AA&#x27;=0</span></li><li><span class="step-formula">B</span><span class="step-law">항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> B=1일 때는 양쪽 괄호가 모두 참이고, B=0이면 A와 A&#x27;가 동시에 참이어야 하므로 불가능합니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="9" id="p9">
+       <div class="problem-head"><div class="problem-number">09</div><div class="problem-tag">심화</div><h3>복합항을 하나의 변수로 보기</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = (A+B+C)(A+B+C&#x27;)</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer9">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer9" placeholder="예: A+B 또는 AB" aria-label="9번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(9)">동치 확인</button></div>
+       <p class="feedback" id="feedback9" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(9)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(9)">진리표 검증</button></div>
+       <p class="hint" id="hint9" hidden>X=A+B로 치환하면 (X+C)(X+C&#x27;) 형태입니다.</p>
+       <div class="truth" id="truth9" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>A+B</strong></div>
+         <ol class="steps"><li><span class="step-formula">(A+B+C)(A+B+C&#x27;)</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">(A+B)+CC&#x27;</span><span class="step-law">X=A+B로 보고 (X+Y)(X+Z)=X+YZ 적용</span></li><li><span class="step-formula">(A+B)+0</span><span class="step-law">보수법칙: CC&#x27;=0</span></li><li><span class="step-formula">A+B</span><span class="step-law">항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> A+B라는 공통 부분이 양쪽 괄호에 그대로 들어 있습니다. C와 C&#x27;를 동시에 요구하는 나머지 부분은 항상 거짓이므로 사라집니다.</p></div>
+       </details>
+       </article>
+<article class="problem-card" data-id="10" id="p10">
+       <div class="problem-head"><div class="problem-number">10</div><div class="problem-tag">심화</div><h3>여러 최소항의 묶기</h3></div>
+       <div class="expression" aria-label="주어진 논리식">F = A&#x27;B&#x27;C + A&#x27;BC + AB&#x27;C + ABC + AB</div><div class="print-line">간소식: _________________________________________________<br>풀이: ___________________________________________________</div>
+       <div class="practice-row"><label for="answer10">나의 간소식</label><input autocomplete="off" spellcheck="false" id="answer10" placeholder="예: A+B 또는 AB" aria-label="10번 정답 입력"><button type="button" class="check-btn" onclick="checkAnswer(10)">동치 확인</button></div>
+       <p class="feedback" id="feedback10" aria-live="polite"></p>
+       <div class="action-row"><button type="button" class="ghost-btn hint-btn" onclick="toggleHint(10)">힌트 보기</button><button type="button" class="ghost-btn" onclick="showTruthTable(10)">진리표 검증</button></div>
+       <p class="hint" id="hint10" hidden>먼저 C가 붙은 네 항을 A와 B에 따라 묶으세요.</p>
+       <div class="truth" id="truth10" hidden></div>
+       <details class="solution"><summary>정답 및 단계별 해설 보기</summary>
+         <div class="solution-body"><div class="answer-final">최종 간소식 <strong>C+AB</strong></div>
+         <ol class="steps"><li><span class="step-formula">A&#x27;B&#x27;C + A&#x27;BC + AB&#x27;C + ABC + AB</span><span class="step-law">주어진 식</span></li><li><span class="step-formula">A&#x27;C(B&#x27;+B)+AC(B&#x27;+B)+AB</span><span class="step-law">공통인수 A&#x27;C, AC로 묶기</span></li><li><span class="step-formula">A&#x27;C+AC+AB</span><span class="step-law">보수법칙: B&#x27;+B=1</span></li><li><span class="step-formula">C(A&#x27;+A)+AB</span><span class="step-law">공통인수 C로 묶기</span></li><li><span class="step-formula">C+AB</span><span class="step-law">보수법칙: A&#x27;+A=1, 항등법칙</span></li></ol><p class="explain"><strong>왜 이렇게 줄어들까요?</strong> 처음 네 항은 A와 B의 네 가지 조합에서 모두 C=1을 요구하므로 전체적으로 C가 됩니다. 마지막 AB 항은 C와 무관하게 참이 될 수 있어 남습니다.</p></div>
+       </details>
+       </article></div></section>
+<footer>세영코딩연구소 | Ph.D. KIM &nbsp;&nbsp;·&nbsp;&nbsp; 부울대수 간소화 실습자료</footer></div>
+<script>
+'use strict';
+const QUESTIONS=[{"id": 1, "expr": "A + AB", "answer": "A", "vars": "AB"}, {"id": 2, "expr": "A(A+B)", "answer": "A", "vars": "AB"}, {"id": 3, "expr": "AB + AB'", "answer": "A", "vars": "AB"}, {"id": 4, "expr": "(A+B)(A+B')", "answer": "A", "vars": "AB"}, {"id": 5, "expr": "(A+B)' + A'B", "answer": "A'", "vars": "AB"}, {"id": 6, "expr": "A + A'B", "answer": "A+B", "vars": "AB"}, {"id": 7, "expr": "AB + A'C + BC", "answer": "AB+A'C", "vars": "ABC"}, {"id": 8, "expr": "(A+B)(A'+B)", "answer": "B", "vars": "AB"}, {"id": 9, "expr": "(A+B+C)(A+B+C')", "answer": "A+B", "vars": "ABC"}, {"id": 10, "expr": "A'B'C + A'BC + AB'C + ABC + AB", "answer": "C+AB", "vars": "ABC"}];
+const byId=Object.fromEntries(QUESTIONS.map(q=>[q.id,q]));
+function tokenize(expr){
+  const s=expr.replace(/\s+/g,'').replace(/[·×*∧]/g,'.').replace(/[∨]/g,'+').replace(/[’′]/g,"'").toUpperCase();
+  if(!s || s.length>150) throw new Error('수식은 1~150자로 입력하세요.');
+  const toks=[...s];
+  if(toks.some(t=>!/[A-D01+.'()]/.test(t))) throw new Error("A, B, C, 괄호, +, 곱셈, 부정(')만 사용하세요.");
+  return toks;
+}
+function compile(expr){
+  const tok=tokenize(expr); let i=0;
+  const peek=()=>tok[i];
+  const take=x=>{if(peek()===x){i++;return true}return false};
+  function atom(){
+    if(take('(')){const t=orExpr();if(!take(')'))throw new Error('닫는 괄호가 필요합니다.');return t}
+    const t=peek();
+    if(t==='0'||t==='1'){i++;return ()=>t==='1'}
+    if(t && /[A-D]/.test(t)){i++;return env=>Boolean(env[t])}
+    throw new Error('변수 또는 여는 괄호가 필요합니다.');
+  }
+  function notExpr(){let t=atom();while(take("'")){const x=t;t=env=>!x(env)}return t}
+  function startsAtom(t){return t==='('||t==='0'||t==='1'||(t && /[A-D]/.test(t))}
+  function andExpr(){let left=notExpr();while(true){if(take('.')){const right=notExpr(),x=left;left=env=>x(env)&&right(env)}else if(startsAtom(peek())){const right=notExpr(),x=left;left=env=>x(env)&&right(env)}else break}return left}
+  function orExpr(){let left=andExpr();while(take('+')){const right=andExpr(),x=left;left=env=>x(env)||right(env)}return left}
+  const fn=orExpr();if(i<tok.length)throw new Error('식의 끝에 해석할 수 없는 기호가 있습니다.');return fn;
+}
+function truthRows(vars){const names=[...vars];const rows=[];for(let k=0;k<(1<<names.length);k++){const env={};names.forEach((n,j)=>env[n]=!!(k&(1<<(names.length-j-1))));rows.push(env)}return rows}
+function checkAnswer(id){const q=byId[id],input=document.getElementById('answer'+id),p=document.getElementById('feedback'+id);const given=input.value.trim();p.className='feedback';if(!given){p.textContent='간소화한 식을 먼저 입력하세요.';return}try{const f=compile(given),orig=compile(q.expr);const eq=truthRows(q.vars).every(row=>f(row)===orig(row));if(eq){p.classList.add('ok');p.textContent='정답과 동치입니다! 모든 입력에서 원래 식과 출력이 같습니다.'}else{p.classList.add('no');p.textContent='아직 동치가 아닙니다. 입력 중 출력이 다른 경우가 있습니다. 다시 확인해 보세요.'}}catch(e){p.classList.add('no');p.textContent='수식 확인: '+e.message}}
+function toggleHint(id){const el=document.getElementById('hint'+id);el.hidden=!el.hidden}
+function showTruthTable(id){const q=byId[id],slot=document.getElementById('truth'+id);if(!slot.hidden){slot.hidden=true;return}const orig=compile(q.expr),simpl=compile(q.answer);const vars=[...q.vars];let html='<p class="truth-caption">원래 식과 최종 식의 진리표 비교</p><table><thead><tr>'+vars.map(v=>'<th>'+v+'</th>').join('')+'<th>원래 식</th><th>간소식</th></tr></thead><tbody>';for(const row of truthRows(q.vars)){html+='<tr>'+vars.map(v=>'<td>'+(+row[v])+'</td>').join('')+'<td>'+(+orig(row))+'</td><td>'+(+simpl(row))+'</td></tr>'}html+='</tbody></table>';slot.innerHTML=html;slot.hidden=false}
+function setAllSolutions(open){document.querySelectorAll('details.solution').forEach(d=>d.open=open)}
+let printing=false,previous=[];
+function printPage(type){if(printing)return;printing=true;previous=[...document.querySelectorAll('details.solution')].map(d=>d.open);document.querySelectorAll('details.solution').forEach(d=>d.open=type==='teacher');document.body.classList.toggle('print-teacher',type==='teacher');document.body.classList.toggle('print-student',type==='student');window.print();setTimeout(restorePrint,1500)}
+function restorePrint(){if(!printing)return;document.querySelectorAll('details.solution').forEach((d,i)=>d.open=previous[i]);document.body.classList.remove('print-teacher','print-student');printing=false}
+window.addEventListener('afterprint',restorePrint);
+// When invoked directly with Ctrl+P, print the full solutions if opened; otherwise practice view.
+</script></body></html>
